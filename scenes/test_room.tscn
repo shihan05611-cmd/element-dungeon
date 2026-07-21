@@ -1,0 +1,109 @@
+[gd_scene format=3 uid="uid://bmb26uxkb2anj"]
+
+[ext_resource type="Script" uid="uid://bsldscaidce86" path="res://scripts/test_room.gd" id="1_room"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="3_enemy"]
+[ext_resource type="Script" uid="uid://c1cmu0nydpvfh" path="res://scripts/combat_feedback.gd" id="4_feedback"]
+[ext_resource type="PackedScene" path="res://scenes/combat_hud.tscn" id="5_hud"]
+
+[sub_resource type="RectangleShape2D" id="GroundShape"]
+size = Vector2(1056, 84)
+
+[sub_resource type="RectangleShape2D" id="WallShape"]
+size = Vector2(40, 552)
+
+[sub_resource type="RectangleShape2D" id="LowPlatformShape"]
+size = Vector2(260, 24)
+
+[sub_resource type="RectangleShape2D" id="HighPlatformShape"]
+size = Vector2(230, 24)
+
+[node name="TestRoom" type="Node2D" unique_id=1583295720]
+script = ExtResource("1_room")
+
+[node name="RoomCollision" type="Node2D" parent="." unique_id=535788768]
+
+[node name="Ground" type="StaticBody2D" parent="RoomCollision" unique_id=2042161272]
+collision_layer = 4
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomCollision/Ground" unique_id=1067050567]
+position = Vector2(576, 558)
+shape = SubResource("GroundShape")
+
+[node name="Visual" type="Polygon2D" parent="RoomCollision/Ground" unique_id=960002243]
+color = Color(0.16, 0.18, 0.24, 1)
+polygon = PackedVector2Array(48, 516, 1104, 516, 1104, 600, 48, 600)
+
+[node name="FloorTrim" type="Polygon2D" parent="RoomCollision/Ground" unique_id=1461118040]
+color = Color(0.34, 0.38, 0.48, 1)
+polygon = PackedVector2Array(48, 516, 1104, 516, 1104, 530, 48, 530)
+
+[node name="LeftBoundary" type="StaticBody2D" parent="RoomCollision" unique_id=1096417229]
+collision_layer = 4
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomCollision/LeftBoundary" unique_id=1219881635]
+position = Vector2(68, 324)
+shape = SubResource("WallShape")
+
+[node name="RightBoundary" type="StaticBody2D" parent="RoomCollision" unique_id=1627094925]
+collision_layer = 4
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomCollision/RightBoundary" unique_id=1116328599]
+position = Vector2(1084, 324)
+shape = SubResource("WallShape")
+
+[node name="Platforms" type="Node2D" parent="." unique_id=505752711]
+
+[node name="LowPlatform" type="StaticBody2D" parent="Platforms" unique_id=1789258251]
+position = Vector2(370, 426)
+collision_layer = 4
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/LowPlatform" unique_id=2070105983]
+shape = SubResource("LowPlatformShape")
+one_way_collision = true
+one_way_collision_margin = 10.0
+
+[node name="Visual" type="Polygon2D" parent="Platforms/LowPlatform" unique_id=1466073372]
+color = Color(0.28, 0.32, 0.42, 1)
+polygon = PackedVector2Array(-130, -12, 130, -12, 122, 12, -122, 12)
+
+[node name="Trim" type="Polygon2D" parent="Platforms/LowPlatform" unique_id=1162157778]
+color = Color(0.48, 0.53, 0.65, 1)
+polygon = PackedVector2Array(-130, -12, 130, -12, 126, -4, -126, -4)
+
+[node name="HighPlatform" type="StaticBody2D" parent="Platforms" unique_id=497033109]
+position = Vector2(770, 340)
+collision_layer = 4
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/HighPlatform" unique_id=257012619]
+shape = SubResource("HighPlatformShape")
+one_way_collision = true
+one_way_collision_margin = 10.0
+
+[node name="Visual" type="Polygon2D" parent="Platforms/HighPlatform" unique_id=910527884]
+color = Color(0.28, 0.32, 0.42, 1)
+polygon = PackedVector2Array(-115, -12, 115, -12, 107, 12, -107, 12)
+
+[node name="Trim" type="Polygon2D" parent="Platforms/HighPlatform" unique_id=1560355751]
+color = Color(0.48, 0.53, 0.65, 1)
+polygon = PackedVector2Array(-115, -12, 115, -12, 111, -4, -111, -4)
+
+[node name="Player" parent="." unique_id=1279392486 instance=ExtResource("2_player")]
+position = Vector2(310, 470)
+
+[node name="Orc" parent="." unique_id=1690326613 instance=ExtResource("3_enemy")]
+position = Vector2(820, 470)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1137238899]
+position = Vector2(576, 324)
+
+[node name="WorldFeedbackLayer" type="Node2D" parent="." unique_id=548391723]
+z_index = 50
+script = ExtResource("4_feedback")
+
+[node name="CombatHUD" parent="." unique_id=1688477586 instance=ExtResource("5_hud")]

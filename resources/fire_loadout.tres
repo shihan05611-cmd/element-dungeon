@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SkillLoadout" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://combat/definitions/skill_loadout.gd" id="1_loadout"]
+[ext_resource type="Resource" path="res://resources/element_bolt.tres" id="2_bolt"]
+[ext_resource type="Resource" path="res://resources/element_slash.tres" id="3_slash"]
+
+[resource]
+script = ExtResource("1_loadout")
+form_element_id = &"fire"
+slots = {
+&"melee": ExtResource("3_slash"),
+&"primary": ExtResource("2_bolt")
+}

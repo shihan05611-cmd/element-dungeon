@@ -1,0 +1,75 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="1_enemy"]
+[ext_resource type="SpriteFrames" path="res://resources/animations/enemy_frames.tres" id="2_frames"]
+[ext_resource type="Script" path="res://combat/components/damage_receiver.gd" id="3_damage"]
+[ext_resource type="Script" path="res://combat/components/element_carrier.gd" id="4_carrier"]
+[ext_resource type="Script" path="res://combat/components/combat_receiver.gd" id="5_receiver"]
+[ext_resource type="Script" path="res://combat/delivery/combat_hurtbox.gd" id="6_hurtbox"]
+
+[sub_resource type="CapsuleShape2D" id="BodyShape"]
+radius = 16.0
+height = 36.0
+
+[sub_resource type="CapsuleShape2D" id="HurtShape"]
+radius = 18.0
+height = 46.0
+
+[node name="Enemy" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_enemy")
+
+[node name="BodyCollision" type="CollisionShape2D" parent="."]
+position = Vector2(0, 14)
+shape = SubResource("BodyShape")
+
+[node name="CombatHurtbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+monitorable = true
+script = ExtResource("6_hurtbox")
+receiver_path = NodePath("../CombatReceiver")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CombatHurtbox"]
+position = Vector2(0, 7)
+shape = SubResource("HurtShape")
+
+[node name="DamageReceiver" type="Node" parent="."]
+script = ExtResource("3_damage")
+configured_maximum_health = 240
+configured_starting_health = 240
+defense_flat = 0.0
+
+[node name="ElementCarrier" type="Node" parent="."]
+script = ExtResource("4_carrier")
+
+[node name="CombatReceiver" type="Node" parent="."]
+script = ExtResource("5_receiver")
+target_team_id = &"enemy"
+element_carrier_path = NodePath("../ElementCarrier")
+damage_receiver_path = NodePath("../DamageReceiver")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(0, 4)
+sprite_frames = ExtResource("2_frames")
+animation = &"idle"
+scale = Vector2(3, 3)
+z_index = 2
+
+[node name="Prompt" type="Label" parent="."]
+visible = false
+offset_left = -74.0
+offset_top = -72.0
+offset_right = 74.0
+offset_bottom = -45.0
+theme_override_colors/font_color = Color(1, 0.88, 0.55, 1)
+theme_override_colors/font_shadow_color = Color(0.05, 0.05, 0.08, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 14
+text = "战斗测试目标"
+horizontal_alignment = 1
+

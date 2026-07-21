@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ElementDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://combat/definitions/element_definition.gd" id="1_element"]
+
+[resource]
+script = ExtResource("1_element")
+id = &"fire"
+display_name = "火"
+presentation_color = Color(1, 0.36, 0.2, 1)
+presentation_tags = PackedStringArray("fire", "warm")

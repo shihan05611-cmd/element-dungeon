@@ -1,0 +1,87 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
+[ext_resource type="SpriteFrames" path="res://resources/animations/player_frames.tres" id="2_frames"]
+[ext_resource type="Script" path="res://combat/components/damage_receiver.gd" id="3_damage"]
+[ext_resource type="Script" path="res://combat/components/combat_receiver.gd" id="4_receiver"]
+[ext_resource type="Script" path="res://combat/components/energy_component.gd" id="5_energy"]
+[ext_resource type="Script" path="res://combat/components/element_form_controller.gd" id="6_form"]
+[ext_resource type="Script" path="res://combat/components/skill_executor.gd" id="7_executor"]
+[ext_resource type="Script" path="res://combat/components/skill_controller.gd" id="8_controller"]
+[ext_resource type="Script" path="res://combat/delivery/combat_hurtbox.gd" id="9_hurtbox"]
+[ext_resource type="Resource" path="res://resources/water_loadout.tres" id="10_water_loadout"]
+[ext_resource type="Resource" path="res://resources/fire_loadout.tres" id="11_fire_loadout"]
+[ext_resource type="Resource" path="res://resources/water_element.tres" id="12_water"]
+[ext_resource type="Resource" path="res://resources/fire_element.tres" id="13_fire"]
+
+[sub_resource type="CapsuleShape2D" id="BodyShape"]
+radius = 15.0
+height = 34.0
+
+[sub_resource type="CapsuleShape2D" id="HurtShape"]
+radius = 16.0
+height = 42.0
+
+[node name="Player" type="CharacterBody2D"]
+collision_layer = 1
+collision_mask = 6
+script = ExtResource("1_player")
+water_definition = ExtResource("12_water")
+fire_definition = ExtResource("13_fire")
+
+[node name="BodyCollision" type="CollisionShape2D" parent="."]
+position = Vector2(0, 14)
+shape = SubResource("BodyShape")
+
+[node name="CombatHurtbox" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+monitorable = true
+script = ExtResource("9_hurtbox")
+receiver_path = NodePath("../CombatReceiver")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CombatHurtbox"]
+position = Vector2(0, 8)
+shape = SubResource("HurtShape")
+
+[node name="DamageReceiver" type="Node" parent="."]
+script = ExtResource("3_damage")
+configured_maximum_health = 100
+configured_starting_health = 100
+
+[node name="CombatReceiver" type="Node" parent="."]
+script = ExtResource("4_receiver")
+target_team_id = &"player"
+element_carrier_path = NodePath("")
+damage_receiver_path = NodePath("../DamageReceiver")
+
+[node name="EnergyComponent" type="Node" parent="."]
+script = ExtResource("5_energy")
+maximum_energy = 100
+starting_energy = 100
+
+[node name="ElementFormController" type="Node" parent="."]
+script = ExtResource("6_form")
+initial_form_id = &"water"
+
+[node name="SkillExecutor" type="Node" parent="."]
+script = ExtResource("7_executor")
+energy_component_path = NodePath("../EnergyComponent")
+form_controller_path = NodePath("../ElementFormController")
+
+[node name="SkillController" type="Node" parent="."]
+script = ExtResource("8_controller")
+form_controller_path = NodePath("../ElementFormController")
+executor_path = NodePath("../SkillExecutor")
+water_loadout = ExtResource("10_water_loadout")
+fire_loadout = ExtResource("11_fire_loadout")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(0, 1)
+sprite_frames = ExtResource("2_frames")
+animation = &"idle"
+flip_h = true
+scale = Vector2(2, 2)
+z_index = 2

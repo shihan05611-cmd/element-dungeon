@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://b8iwusey30yd6"]
+
+[ext_resource type="Script" uid="uid://b2p5xuomj0hba" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" uid="uid://bngnpje0l1neb" path="res://combat/definitions/attack_payload_definition.gd" id="2_payload"]
+[ext_resource type="PackedScene" path="res://scenes/transient_melee_delivery.tscn" id="3_delivery"]
+
+[sub_resource type="Resource" id="SlashPayload"]
+script = ExtResource("2_payload")
+base_damage = 5.0
+element_mode = 0
+element_amount = 0
+presentation_tags = PackedStringArray("element_slash", "melee")
+
+[resource]
+script = ExtResource("1_skill")
+skill_id = &"element_slash"
+startup_time = 0.08
+active_time = 0.12
+recovery_time = 0.18
+delivery_scene = ExtResource("3_delivery")
+payload = SubResource("SlashPayload")

@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://prototype_skill/skill_caster.gd" id="1"]
+[ext_resource type="PackedScene" path="res://prototype_skill/element_bolt.tscn" id="2"]
+
+[node name="PrototypeSkillCaster" type="Node"]
+script = ExtResource("1")
+projectile_scene = ExtResource("2")
