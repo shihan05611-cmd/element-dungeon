@@ -1,0 +1,18 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/vfx/skill_vfx_coordinator.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/elemental_fury_presentation.tscn" id="2_fury"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/elemental_laser_presentation.tscn" id="3_laser"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/element_reclaim_presentation.tscn" id="4_reclaim"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/burning_presentation.tscn" id="5_burning"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/unending_presentation.tscn" id="6_unending"]
+
+[node name="SkillVfxCoordinator" type="Node2D"]
+z_index = 12
+script = ExtResource("1_script")
+fury_scene = ExtResource("2_fury")
+laser_scene = ExtResource("3_laser")
+reclaim_scene = ExtResource("4_reclaim")
+burning_scene = ExtResource("5_burning")
+unending_scene = ExtResource("6_unending")
+

@@ -41,7 +41,7 @@ func _run() -> void:
 	var energy := EnergyComponent.new()
 	energy.configure_runtime(100, 100)
 	host.add_child(energy)
-	var form := ElementFormController.new()
+	var form := CurrentElementController.new()
 	form.configure_runtime(ElementIds.WATER)
 	host.add_child(form)
 	var executor := SkillExecutor.new()
@@ -55,16 +55,18 @@ func _run() -> void:
 	root.add_child(host)
 
 	var payload_definition := AttackPayloadDefinition.new()
-	payload_definition.base_damage = 10.0
+	payload_definition.damage_multiplier = 1.0
 	payload_definition.element_mode = AttackPayloadDefinition.ElementMode.FOLLOW_CAST_FORM
 	payload_definition.element_amount = 1
+	var execution := InstantDeliveryExecution.new()
+	execution.active_time = 0.2
+	execution.delivery_scene = PROJECTILE_SCENE
+	execution.payload = payload_definition
 	var skill := SkillDefinition.new()
 	skill.skill_id = &"integration_projectile"
 	skill.startup_time = 0.01
-	skill.active_time = 0.2
 	skill.recovery_time = 0.1
-	skill.delivery_scene = PROJECTILE_SCENE
-	skill.payload = payload_definition
+	skill.execution_definition = execution
 
 	var spawn_observation := {"valid": false}
 	executor.delivery_spawned.connect(func(
@@ -83,7 +85,7 @@ func _run() -> void:
 	)
 
 	await physics_frame
-	var attempt := executor.try_cast(skill)
+	var attempt := executor._try_cast_configured(skill)
 	if not attempt.accepted:
 		_failures.append("SkillExecutor rejected valid production Delivery scene")
 	if not executor.advance(0.02):

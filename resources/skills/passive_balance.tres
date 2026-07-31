@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SkillDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://combat/passives/stat_modifier_passive_effect_definition.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="BalanceEffect"]
+script = ExtResource("2_effect")
+maximum_health_bonus = 10
+maximum_energy_bonus = 5
+attack_multiplier = 1.05
+
+[resource]
+script = ExtResource("1_skill")
+skill_id = &"passive_balance"
+activation_kind = 1
+element_policy = 2
+passive_effect_definition = SubResource("BalanceEffect")

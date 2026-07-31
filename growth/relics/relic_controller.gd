@@ -7,7 +7,6 @@ extends RefCounted
 var _effect_port: GrowthEffectPort
 var _owned_definitions: Dictionary = {}
 var _runtime_states: Dictionary = {}
-var _processed_event_keys: Dictionary = {}
 
 
 func _init(effect_port: GrowthEffectPort = null) -> void:
@@ -27,9 +26,7 @@ func register_owned_relic(definition: RelicDefinition) -> RunCommandResult:
 func handle_event(event: RunEvent) -> RelicDispatchResult:
 	if event == null or not event.is_valid():
 		return RelicDispatchResult.rejected(&"invalid_run_event")
-	var identity := event.identity_key()
-	if _processed_event_keys.has(identity):
-		return RelicDispatchResult.repeated()
+
 	var triggered: Array[StringName] = []
 	var relic_ids: Array[StringName] = []
 	for relic_id_variant in _owned_definitions.keys():
@@ -45,7 +42,6 @@ func handle_event(event: RunEvent) -> RelicDispatchResult:
 		if effect != null and effect.try_apply(definition, event, _effect_port):
 			runtime.record_trigger(definition)
 			triggered.append(relic_id)
-	_processed_event_keys[identity] = true
 	return RelicDispatchResult.success(triggered)
 
 

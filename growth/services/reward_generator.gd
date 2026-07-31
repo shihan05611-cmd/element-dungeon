@@ -13,19 +13,16 @@ static func generate(
 ) -> RewardOffer:
 	if run_snapshot == null or context == null or not context.is_valid():
 		return RewardOffer.configuration_failure(&"", -1, seed, &"invalid_reward_generation_input")
-	if context.first_combat_room and context.reward_type != RewardType.SKILL:
-		return RewardOffer.configuration_failure(
-			context.room_id,
-			context.reward_type,
-			seed,
-			&"first_room_requires_skill_reward"
-		)
+	var authority_error := _route_authority_error(run_snapshot.route, context)
+	if not authority_error.is_empty():
+		return RewardOffer.configuration_failure(context.room_id, context.reward_type, seed, authority_error)
+	var first_combat_room := _is_first_combat_reward(run_snapshot.route)
 	var catalog_error := _validate_catalogs(skill_catalog, relic_catalog)
 	if not catalog_error.is_empty():
 		return RewardOffer.configuration_failure(context.room_id, context.reward_type, seed, catalog_error)
 	match context.reward_type:
 		RewardType.SKILL:
-			return _generate_skill_offer(run_snapshot, context, seed, skill_catalog)
+			return _generate_skill_offer(run_snapshot, context, seed, skill_catalog, first_combat_room)
 		RewardType.RELIC:
 			return _generate_relic_offer(run_snapshot, context, seed, relic_catalog)
 		_:
@@ -67,18 +64,19 @@ static func _generate_skill_offer(
 		run_snapshot: RunSnapshot,
 		context: RoomRewardContext,
 		seed: int,
-		skill_catalog: Array[SkillRewardDefinition]
+		skill_catalog: Array[SkillRewardDefinition],
+		first_combat_room: bool
 ) -> RewardOffer:
 	var candidates: Array[SkillRewardDefinition] = []
 	for definition in skill_catalog:
-		if context.first_combat_room and not definition.initial_pool:
+		if first_combat_room and not definition.initial_pool:
 			continue
 		if run_snapshot.skills.owns(definition.skill_id):
 			continue
 		if not definition.is_available_for(run_snapshot.unlocked_form_ids):
 			continue
 		candidates.append(definition)
-	if context.first_combat_room and candidates.size() < MAX_OPTIONS:
+	if first_combat_room and candidates.size() < MAX_OPTIONS:
 		return RewardOffer.configuration_failure(
 			context.room_id,
 			RewardType.SKILL,
@@ -138,6 +136,35 @@ static func _generate_relic_offer(
 			definition.description
 		))
 	return _valid_offer(context, seed, options)
+
+
+static func _route_authority_error(route: RouteSnapshot, context: RoomRewardContext) -> StringName:
+	if route == null:
+		return &"missing_route_snapshot"
+	# Detached snapshots are supported for pure candidate tests. Every real
+	# RunSession request reaches the generator in REWARD and is checked below.
+	if route.phase != RunPhase.REWARD:
+		return &""
+	if route.completed_combat_rooms <= 0:
+		return &"invalid_reward_progress"
+	if route.current_room_id != context.room_id:
+		return &"reward_room_mismatch"
+	var expected_type := RewardType.SKILL if route.completed_combat_rooms == 1 else route.selected_reward_type
+	if not RewardType.is_valid(expected_type):
+		return &"missing_route_reward_type"
+	if context.reward_type != expected_type:
+		return &"reward_type_route_mismatch"
+	return &""
+
+
+static func _is_first_combat_reward(route: RouteSnapshot) -> bool:
+	if route == null:
+		return false
+	if route.phase == RunPhase.REWARD:
+		return route.completed_combat_rooms == 1
+	# Compatibility for detached pure-service tests only. No caller-provided
+	# boolean is consulted.
+	return route.completed_combat_rooms <= 1
 
 
 static func _valid_offer(context: RoomRewardContext, seed: int, options: Array[RewardOption]) -> RewardOffer:

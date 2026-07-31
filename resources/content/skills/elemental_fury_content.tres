@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillContentDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="1_content"]
+[ext_resource type="Resource" path="res://resources/skills/elemental_fury.tres" id="2_gameplay"]
+[ext_resource type="PackedScene" path="res://combat/delivery/element_rage_delivery.tscn" id="3_delivery"]
+[ext_resource type="Texture2D" path="res://assets/generated/vfx/elemental_fury/icon.png" id="4_icon"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/elemental_fury_presentation.tscn" id="5_presentation"]
+
+[resource]
+script = ExtResource("1_content")
+skill_id = &"elemental_fury"
+display_name = "元素之怒"
+description = "至少需要20点能量；释放时消耗全部当前能量，按消耗量提高伤害、附着与爆发半径。"
+icon = ExtResource("4_icon")
+presentation_scene = ExtResource("5_presentation")
+gameplay_definition = ExtResource("2_gameplay")
+runtime_delivery_scene = ExtResource("3_delivery")
+reward_pool = true
+initial_reward_pool = true
+allowed_form_ids = Array[StringName]([&"water", &"fire"])
+

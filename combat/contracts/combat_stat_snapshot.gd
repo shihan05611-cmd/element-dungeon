@@ -5,6 +5,8 @@ extends RefCounted
 ## `from_dictionary` exists for integration code but rejects every unknown key
 ## and copies only validated scalar values.
 
+const BASE_ATTACK: float = 10.0
+
 const ATTACK_MULTIPLIER: StringName = &"attack_multiplier"
 const FLAT_DAMAGE_BONUS: StringName = &"flat_damage_bonus"
 const ALLOWED_FIELDS: Array[StringName] = [ATTACK_MULTIPLIER, FLAT_DAMAGE_BONUS]
@@ -16,6 +18,10 @@ var attack_multiplier: float:
 var flat_damage_bonus: float:
 	get:
 		return _flat_damage_bonus
+
+var effective_attack: float:
+	get:
+		return BASE_ATTACK * _attack_multiplier
 
 var validation_error: StringName:
 	get:
@@ -55,10 +61,10 @@ func is_valid() -> bool:
 	return _validation_error.is_empty()
 
 
-func calculate_offensive_damage(base_damage: float) -> float:
-	if not is_valid() or not is_finite(base_damage):
+func calculate_offensive_damage(damage_multiplier: float) -> float:
+	if not is_valid() or not is_finite(damage_multiplier) or damage_multiplier < 0.0:
 		return NAN
-	return maxf(0.0, base_damage * _attack_multiplier + _flat_damage_bonus)
+	return maxf(0.0, effective_attack * damage_multiplier + _flat_damage_bonus)
 
 
 func to_dictionary() -> Dictionary:

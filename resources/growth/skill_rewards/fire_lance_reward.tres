@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SkillRewardDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://growth/definitions/skill_reward_definition.gd" id="1_reward"]
+
+[resource]
+script = ExtResource("1_reward")
+skill_id = &"fire_lance"
+display_name = "火枪术"
+description = "火元素专属投射技能；释放被接受时自动切换并锁定火元素。"
+initial_pool = true
+allowed_form_ids = Array[StringName]([&"water", &"fire"])

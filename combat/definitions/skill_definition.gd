@@ -1,76 +1,136 @@
 class_name SkillDefinition
 extends Resource
 
-## Static skill configuration. Runtime energy, cooldowns, cast state and hit
-## history deliberately live in per-actor components instead of this Resource.
+## Immutable skill identity and common cast policy. Strategy-specific energy,
+## payload, delivery, channel, and functional rules live in the polymorphic
+## execution definition. Passive rules live in a typed passive definition.
 
-enum FormPolicy {
-	ANY_FORM,
-	REQUIRED_FORM,
+enum ActivationKind {
+	ACTIVE,
+	PASSIVE,
+}
+
+enum ElementPolicy {
+	EXCLUSIVE_ELEMENT,
+	CURRENT_ELEMENT,
+	NEUTRAL,
+}
+
+enum EnergyRefundPolicy {
+	NEVER,
+	BEFORE_DELIVERY,
 }
 
 @export var skill_id: StringName = &""
-@export var form_policy: FormPolicy = FormPolicy.ANY_FORM
-@export var required_form_id: StringName = ElementIds.NONE
+@export var activation_kind: ActivationKind = ActivationKind.ACTIVE
+@export var element_policy: ElementPolicy = ElementPolicy.CURRENT_ELEMENT
+@export var required_element_id: StringName = ElementIds.NONE
+@export var energy_refund_policy: EnergyRefundPolicy = EnergyRefundPolicy.NEVER
 @export_range(0.0, 60.0, 0.001, "or_greater") var startup_time: float = 0.0
-@export_range(0.0, 60.0, 0.001, "or_greater") var active_time: float = 0.0
 @export_range(0.0, 60.0, 0.001, "or_greater") var recovery_time: float = 0.0
-@export_range(0, 1000000, 1, "or_greater") var energy_cost: int = 0
 @export_range(0.0, 3600.0, 0.001, "or_greater") var cooldown: float = 0.0
-@export var delivery_scene: PackedScene
-@export var payload: AttackPayloadDefinition
+@export var execution_definition: SkillExecutionDefinition
+@export var passive_effect_definition: PassiveEffectDefinition
+
+## Read-only availability preview for existing HUD integration. Resource and
+## Executor authority belongs to execution_definition, not this facade.
+var energy_cost: int:
+	get:
+		return execution_definition.minimum_energy_required() if execution_definition != null else 0
 
 
 func validation_error() -> StringName:
 	if skill_id.is_empty():
 		return &"missing_skill_id"
-	if not _is_valid_duration(startup_time):
-		return &"invalid_startup_time"
-	if not _is_valid_duration(active_time):
-		return &"invalid_active_time"
-	if not _is_valid_duration(recovery_time):
-		return &"invalid_recovery_time"
-	if energy_cost < 0:
-		return &"invalid_energy_cost"
-	if not _is_valid_duration(cooldown):
-		return &"invalid_cooldown"
-	if delivery_scene == null:
-		return &"missing_delivery_scene"
-	if payload == null or not payload.is_valid():
-		return &"invalid_payload_definition"
-
-	match form_policy:
-		FormPolicy.ANY_FORM:
-			if required_form_id != ElementIds.NONE:
-				return &"universal_skill_has_required_form"
-			if (
-				payload.element_mode != AttackPayloadDefinition.ElementMode.FOLLOW_CAST_FORM
-				and payload.element_mode != AttackPayloadDefinition.ElementMode.NONE
-			):
-				return &"universal_skill_must_follow_cast_form_or_be_neutral"
-		FormPolicy.REQUIRED_FORM:
-			if not ElementIds.is_combat_element(required_form_id):
-				return &"invalid_required_form"
-			if payload.element_mode == AttackPayloadDefinition.ElementMode.NONE:
-				return &"exclusive_skill_missing_element"
-			if (
-				payload.element_mode == AttackPayloadDefinition.ElementMode.FIXED_ELEMENT
-				and payload.fixed_element_id != required_form_id
-			):
-				return &"exclusive_skill_element_mismatch"
+	var policy_error := _element_policy_error()
+	if not policy_error.is_empty():
+		return policy_error
+	match activation_kind:
+		ActivationKind.ACTIVE:
+			return _active_validation_error()
+		ActivationKind.PASSIVE:
+			return _passive_validation_error()
 		_:
-			return &"unknown_form_policy"
-	return &""
+			return &"unknown_activation_kind"
 
 
 func is_valid() -> bool:
 	return validation_error().is_empty()
 
 
-func is_form_allowed(form_id: StringName) -> bool:
-	if not ElementIds.is_combat_element(form_id):
-		return false
-	return form_policy == FormPolicy.ANY_FORM or required_form_id == form_id
+func is_active_skill() -> bool:
+	return activation_kind == ActivationKind.ACTIVE
+
+
+func is_passive_skill() -> bool:
+	return activation_kind == ActivationKind.PASSIVE
+
+
+func is_element_available(available_element_ids: Array[StringName]) -> bool:
+	if element_policy != ElementPolicy.EXCLUSIVE_ELEMENT:
+		return true
+	return available_element_ids.has(required_element_id)
+
+
+func resolve_cast_element(current_element_id: StringName) -> StringName:
+	match element_policy:
+		ElementPolicy.EXCLUSIVE_ELEMENT:
+			return required_element_id
+		ElementPolicy.CURRENT_ELEMENT:
+			return current_element_id
+		ElementPolicy.NEUTRAL:
+			return ElementIds.NONE
+		_:
+			return &""
+
+
+func _active_validation_error() -> StringName:
+	if passive_effect_definition != null:
+		return &"active_skill_has_passive_effect"
+	if not _is_valid_duration(startup_time):
+		return &"invalid_startup_time"
+	if not _is_valid_duration(recovery_time):
+		return &"invalid_recovery_time"
+	if not _is_valid_duration(cooldown):
+		return &"invalid_cooldown"
+	if execution_definition == null:
+		return &"missing_execution_definition"
+	var execution_error := execution_definition.validation_error()
+	if not execution_error.is_empty():
+		return execution_error
+	return execution_definition.element_policy_validation_error(
+		element_policy,
+		required_element_id
+	)
+
+
+func _passive_validation_error() -> StringName:
+	if passive_effect_definition == null:
+		return &"passive_skill_missing_effect_definition"
+	if not passive_effect_definition.validation_error().is_empty():
+		return passive_effect_definition.validation_error()
+	if execution_definition != null:
+		return &"passive_skill_has_execution_definition"
+	if not is_zero_approx(startup_time) or not is_zero_approx(recovery_time):
+		return &"passive_skill_has_cast_timing"
+	if not is_zero_approx(cooldown):
+		return &"passive_skill_has_cooldown"
+	if energy_refund_policy != EnergyRefundPolicy.NEVER:
+		return &"passive_skill_has_refund_policy"
+	return &""
+
+
+func _element_policy_error() -> StringName:
+	match element_policy:
+		ElementPolicy.EXCLUSIVE_ELEMENT:
+			if required_element_id.is_empty() or required_element_id == ElementIds.NONE:
+				return &"exclusive_skill_missing_element"
+		ElementPolicy.CURRENT_ELEMENT, ElementPolicy.NEUTRAL:
+			if required_element_id != ElementIds.NONE:
+				return &"nonexclusive_skill_has_required_element"
+		_:
+			return &"unknown_element_policy"
+	return &""
 
 
 static func _is_valid_duration(value: float) -> bool:

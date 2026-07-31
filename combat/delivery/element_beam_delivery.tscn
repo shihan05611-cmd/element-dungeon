@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://combat/delivery/element_beam_delivery.gd" id="1_script"]
+
+[node name="ElementBeamDelivery" type="Node2D"]
+script = ExtResource("1_script")
+beam_length = 320.0
+beam_width = 24.0
+hurtbox_collision_mask = 8
+max_query_results = 256
+active_on_ready = true

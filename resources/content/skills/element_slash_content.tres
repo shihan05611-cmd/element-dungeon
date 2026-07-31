@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SkillContentDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="1_content"]
+[ext_resource type="Resource" path="res://resources/element_slash.tres" id="2_gameplay"]
+
+[resource]
+script = ExtResource("1_content")
+skill_id = &"element_slash"
+display_name = "元素斩"
+description = "固定普通攻击，造成50%攻击力的中性近战伤害。"
+gameplay_definition = ExtResource("2_gameplay")
+fixed_basic_attack = true
+equippable = false
+allowed_form_ids = Array[StringName]([&"water", &"fire"])

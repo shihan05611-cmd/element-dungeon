@@ -1,0 +1,73 @@
+[gd_resource type="SpriteFrames" load_steps=11 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png" id="1_water"]
+[ext_resource type="Texture2D" path="res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png" id="2_fire"]
+
+[sub_resource type="AtlasTexture" id="water_0"]
+atlas = ExtResource("1_water")
+region = Rect2(0, 0, 384, 160)
+
+[sub_resource type="AtlasTexture" id="water_1"]
+atlas = ExtResource("1_water")
+region = Rect2(384, 0, 384, 160)
+
+[sub_resource type="AtlasTexture" id="water_2"]
+atlas = ExtResource("1_water")
+region = Rect2(768, 0, 384, 160)
+
+[sub_resource type="AtlasTexture" id="water_3"]
+atlas = ExtResource("1_water")
+region = Rect2(1152, 0, 384, 160)
+
+[sub_resource type="AtlasTexture" id="fire_0"]
+atlas = ExtResource("2_fire")
+region = Rect2(0, 0, 384, 160)
+
+[sub_resource type="AtlasTexture" id="fire_1"]
+atlas = ExtResource("2_fire")
+region = Rect2(384, 0, 384, 160)
+
+[sub_resource type="AtlasTexture" id="fire_2"]
+atlas = ExtResource("2_fire")
+region = Rect2(768, 0, 384, 160)
+
+[sub_resource type="AtlasTexture" id="fire_3"]
+atlas = ExtResource("2_fire")
+region = Rect2(1152, 0, 384, 160)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("fire_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("fire_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("fire_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("fire_3")
+}],
+"loop": true,
+"name": &"fire",
+"speed": 12.5
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("water_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("water_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("water_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("water_3")
+}],
+"loop": true,
+"name": &"water",
+"speed": 12.5
+}]

@@ -41,6 +41,8 @@ func _run() -> void:
 	await _test_enemy_delivery_hits_player()
 	await _test_layout_and_reduced_motion()
 
+	for tween: Tween in get_processed_tweens():
+		tween.kill()
 	if is_instance_valid(_room):
 		_room.queue_free()
 	await process_frame
@@ -71,10 +73,12 @@ func _test_scene_contracts() -> void:
 	_expect(_target.combat_receiver.get_element_carrier() == _target.element_carrier, "enemy carrier wired")
 	_expect(_player.get_node("CombatHurtbox").collision_layer == 16, "player hurtbox uses formal layer")
 	_expect(_target.get_node("CombatHurtbox").collision_layer == 8, "enemy hurtbox uses formal layer")
-	_expect(_player.skill_controller.water_loadout.is_valid(), "water loadout valid")
-	_expect(_player.skill_controller.fire_loadout.is_valid(), "fire loadout valid")
+	var run_host := _room.get_node("RunSessionHost") as RunSessionHost
+	_expect(run_host != null and run_host.run_session != null, "room-owned run session host configured")
+	_expect(_player.skill_controller.shared_loadout.is_shared(), "formal player stores only the shared loadout template")
+	_expect(_player.skill_controller.runtime_loadout == run_host.runtime_loadout and run_host.runtime_loadout.snapshot().get_skill_id(SkillSlotIds.ACTIVE_1) == &"element_bolt", "player consumes host shared runtime loadout")
 	_expect(_player.water_definition.is_valid() and _player.fire_definition.is_valid(), "element definitions valid")
-	_expect(InputMap.has_action(&"cast_primary") and InputMap.has_action(&"switch_element"), "combat input actions registered")
+	_expect(InputMap.has_action(&"cast_active_1") and InputMap.has_action(&"cast_active_2") and InputMap.has_action(&"cast_active_3") and InputMap.has_action(&"switch_element"), "shared active input actions registered")
 	_expect(ProjectSettings.get_setting("layer_names/2d_physics/layer_4") == "EnemyHurtbox", "collision layer names registered")
 	var player_source := FileAccess.get_file_as_string("res://scripts/player.gd")
 	var enemy_source := FileAccess.get_file_as_string("res://scripts/enemy.gd")
@@ -88,7 +92,7 @@ func _test_neutral_melee() -> void:
 	_player.global_position = Vector2(310.0, 470.0)
 	_target.global_position = Vector2(370.0, 470.0)
 	_player.facing = 1.0
-	_player.request_form(ElementIds.WATER)
+	_player.request_element(ElementIds.WATER)
 	_player.energy_component.set_current(100)
 	_player.skill_executor.advance(2.0)
 	_target.element_carrier.set_amounts_silent(0, 2)
@@ -97,7 +101,7 @@ func _test_neutral_melee() -> void:
 	var capture: Callable = func(result: CombatResult) -> void:
 		committed.append(result)
 	_target.combat_receiver.hit_resolved.connect(capture)
-	var attempt: CastAttemptResult = _player.try_cast_slot(&"melee")
+	var attempt: CastAttemptResult = _player.try_basic_attack()
 	_expect(attempt.accepted, "neutral melee cast accepted")
 	_player.skill_executor.advance(0.09)
 	await _wait_physics(3)
@@ -118,7 +122,7 @@ func _test_water_hit_and_hud() -> void:
 	_reset_target_state()
 	_player.global_position = Vector2(310.0, 470.0)
 	_target.global_position = Vector2(430.0, 470.0)
-	_player.request_form(ElementIds.WATER)
+	_player.request_element(ElementIds.WATER)
 	_player.energy_component.set_current(100)
 	_player.skill_executor.advance(2.0)
 	var feedback_count_before := _feedback.get_child_count()
@@ -127,14 +131,14 @@ func _test_water_hit_and_hud() -> void:
 	var capture: Callable = func(result: CombatResult) -> void:
 		committed.append(result)
 	_target.combat_receiver.hit_resolved.connect(capture)
-	var attempt: CastAttemptResult = _player.try_cast_slot(&"primary")
+	var attempt: CastAttemptResult = _player.try_cast_slot(SkillSlotIds.ACTIVE_1)
 	_expect(attempt.accepted, "water projectile cast accepted")
-	_expect(_player.energy_component.current_energy == 80, "energy committed on cast acceptance")
-	_expect(int(_hud.energy_bar.value) == 80, "HUD energy reads component value")
+	_expect(_player.energy_component.current_energy == 90, "energy committed on cast acceptance")
+	_expect(int(_hud.energy_bar.value) == 90, "HUD energy reads component value")
 	_player.skill_executor.advance(0.13)
 	await _wait_physics(10)
 
-	_expect(_target.element_carrier.get_amount(ElementIds.WATER) == 3, "water projectile attaches three layers")
+	_expect(_target.element_carrier.get_amount(ElementIds.WATER) == 1, "water projectile attaches one layer")
 	_expect(_target.damage_receiver.current_health == 230, "projectile damage uses defense pipeline")
 	_expect(committed.size() == 1 and committed[0].final_damage == 10, "one committed result with final damage")
 	_expect(_feedback.get_child_count() == feedback_count_before + 1, "one damage number spawned from committed result")
@@ -146,25 +150,25 @@ func _test_water_hit_and_hud() -> void:
 func _test_reaction_and_remaining_element() -> void:
 	_reset_target_state()
 	_target.element_carrier.set_amounts_silent(0, 2)
-	_player.request_form(ElementIds.WATER)
+	_player.request_element(ElementIds.WATER)
 	_player.energy_component.set_current(100)
 	_player.skill_executor.advance(1.0)
 	var committed: Array[CombatResult] = []
 	var capture: Callable = func(result: CombatResult) -> void:
 		committed.append(result)
 	_target.combat_receiver.hit_resolved.connect(capture)
-	var attempt: CastAttemptResult = _player.try_cast_slot(&"primary")
+	var attempt: CastAttemptResult = _player.try_cast_slot(SkillSlotIds.ACTIVE_1)
 	_expect(attempt.accepted, "reaction cast accepted")
 	_player.skill_executor.advance(0.13)
 	await _wait_physics(10)
 
-	_expect(_target.element_carrier.get_amount(ElementIds.FIRE) == 0, "opposite fire consumed")
-	_expect(_target.element_carrier.get_amount(ElementIds.WATER) == 1, "unconsumed incoming water remains")
+	_expect(_target.element_carrier.get_amount(ElementIds.FIRE) == 1, "one opposite fire layer is consumed")
+	_expect(_target.element_carrier.get_amount(ElementIds.WATER) == 0, "incoming water is fully consumed by reaction")
 	_expect(committed.size() == 1 and committed[0].reaction_triggered, "reaction reported once")
 	if not committed.is_empty():
-		_expect(committed[0].reaction_consumed == 2, "reaction consumes one to one")
-		_expect(is_equal_approx(committed[0].reaction_multiplier, 1.6), "reaction multiplier is 1.6")
-		_expect(committed[0].final_damage == 16, "reaction final damage rounds once after defense")
+		_expect(committed[0].reaction_consumed == 1, "reaction consumes one to one")
+		_expect(is_equal_approx(committed[0].reaction_multiplier, 1.3), "reaction multiplier is 1.3")
+		_expect(committed[0].final_damage == 13, "reaction final damage rounds once after defense")
 	_target.combat_receiver.hit_resolved.disconnect(capture)
 	_player.skill_executor.advance(1.0)
 	print("PASS agent_d_reaction_and_remaining")
@@ -174,24 +178,24 @@ func _test_form_snapshot_locking() -> void:
 	_reset_target_state()
 	_target.global_position = Vector2(1000.0, 470.0)
 	_player.energy_component.set_current(100)
-	_player.request_form(ElementIds.WATER)
+	_player.request_element(ElementIds.WATER)
 	_player.skill_executor.advance(1.0)
 	var spawned: Array[Node] = []
 	var capture: Callable = func(delivery: Node) -> void:
 		spawned.append(delivery)
 	_player.delivery_created.connect(capture)
 
-	var water_attempt: CastAttemptResult = _player.try_cast_slot(&"primary")
+	var water_attempt: CastAttemptResult = _player.try_cast_slot(SkillSlotIds.ACTIVE_1)
 	_expect(water_attempt.accepted, "water snapshot cast accepted")
 	_player.skill_executor.advance(0.13)
 	_expect(spawned.size() == 1, "water delivery spawned exactly once")
-	_player.toggle_form()
+	_player.cycle_next()
 	if not spawned.is_empty():
 		var water_delivery: ElementProjectile = spawned[0] as ElementProjectile
 		_expect(water_delivery != null and water_delivery.payload.element_id == ElementIds.WATER, "flight payload remains water after switch")
 	_player.skill_executor.advance(1.0)
 
-	var fire_attempt: CastAttemptResult = _player.try_cast_slot(&"primary")
+	var fire_attempt: CastAttemptResult = _player.try_cast_slot(SkillSlotIds.ACTIVE_1)
 	_expect(fire_attempt.accepted, "next fire snapshot cast accepted")
 	_player.skill_executor.advance(0.13)
 	_expect(spawned.size() == 2, "fire delivery spawned exactly once")
@@ -207,20 +211,20 @@ func _test_form_snapshot_locking() -> void:
 
 
 func _test_startup_cancel_no_refund() -> void:
-	_player.request_form(ElementIds.WATER)
+	_player.request_element(ElementIds.WATER)
 	_player.energy_component.set_current(100)
 	_player.skill_executor.advance(1.0)
 	var spawn_count: Array[int] = [0]
 	var capture: Callable = func(_delivery: Node) -> void:
 		spawn_count[0] += 1
 	_player.delivery_created.connect(capture)
-	var attempt: CastAttemptResult = _player.try_cast_slot(&"primary")
+	var attempt: CastAttemptResult = _player.try_cast_slot(SkillSlotIds.ACTIVE_1)
 	_expect(attempt.accepted, "startup cast accepted before cancel")
 	var cast_id := _player.skill_executor.current_cast_id
 	_expect(_player.skill_controller.cancel_current_cast(&"integration_hit", cast_id), "startup cancel accepted")
 	_player.skill_executor.advance(1.0)
 	await _wait_physics(2)
-	_expect(_player.energy_component.current_energy == 80, "startup cancel does not refund energy")
+	_expect(_player.energy_component.current_energy == 90, "startup cancel does not refund energy")
 	_expect(spawn_count[0] == 0, "cancelled startup creates no late delivery")
 	_expect(_player.skill_executor.current_phase == SkillExecutor.Phase.IDLE, "cancel returns executor to idle")
 	_player.delivery_created.disconnect(capture)
@@ -232,10 +236,10 @@ func _test_energy_recovery_pause_mapping() -> void:
 	_player.hurt_time = 0.0
 	_player.global_position = Vector2(310.0, 470.0)
 	_target.global_position = Vector2(1000.0, 470.0)
-	_player.request_form(ElementIds.WATER)
+	_player.request_element(ElementIds.WATER)
 	_player.skill_executor.advance(1.0)
 	_player.energy_component.set_current(100)
-	var attempt: CastAttemptResult = _player.try_cast_slot(&"primary")
+	var attempt: CastAttemptResult = _player.try_cast_slot(SkillSlotIds.ACTIVE_1)
 	_expect(attempt.accepted, "recovery mapping cast accepted")
 	_expect(_player.energy_component.regeneration_paused, "startup pauses energy recovery")
 	_expect(_player.energy_component.advance_regeneration(10.0) == 0, "startup pause freezes recovery delay")
@@ -247,7 +251,7 @@ func _test_energy_recovery_pause_mapping() -> void:
 	_expect(not _player.energy_component.regeneration_paused, "recovery resumes energy clock")
 	_expect(_player.energy_component.advance_regeneration(1.0) == 0, "one-second post-spend delay is preserved")
 	_expect(_player.energy_component.advance_regeneration(1.0) == 5, "recovery grants default five energy per second")
-	_expect(_player.energy_component.current_energy == 85, "recovered energy commits to component")
+	_expect(_player.energy_component.current_energy == 95, "recovered energy commits to component")
 	_player.hurt_time = PlayerCharacter.HURT_DURATION
 	_player.call(&"_update_energy_regeneration_pause")
 	_expect(_player.energy_component.regeneration_paused, "hurt state pauses energy recovery")
@@ -322,4 +326,3 @@ func _expect(condition: bool, description: String) -> void:
 	_assertions += 1
 	if not condition:
 		_failures.append(description)
-

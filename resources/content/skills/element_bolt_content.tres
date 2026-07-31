@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SkillContentDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="1_content"]
+[ext_resource type="Resource" path="res://resources/element_bolt.tres" id="2_gameplay"]
+[ext_resource type="Texture2D" path="res://assets/generated/vfx/element_bolt/icon.png" id="3_icon"]
+
+[resource]
+script = ExtResource("1_content")
+skill_id = &"element_bolt"
+display_name = "元素弹"
+description = "消耗10点能量，发射造成100%攻击力伤害并附着1层当前元素的小型投射物。"
+icon = ExtResource("3_icon")
+gameplay_definition = ExtResource("2_gameplay")
+initially_owned = true
+default_slot_id = &"active_1"
+allowed_form_ids = Array[StringName]([&"water", &"fire"])
+

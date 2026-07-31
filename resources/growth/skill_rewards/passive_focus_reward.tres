@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SkillRewardDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://growth/definitions/skill_reward_definition.gd" id="1_reward"]
+
+[resource]
+script = ExtResource("1_reward")
+skill_id = &"passive_focus"
+display_name = "专注"
+description = "装备时攻击倍率提高 10%。"
+allowed_form_ids = Array[StringName]([&"water", &"fire"])

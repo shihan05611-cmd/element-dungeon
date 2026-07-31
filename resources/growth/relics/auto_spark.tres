@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FormChangeRelicDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://growth/relics/form_change_relic_definition.gd" id="1_relic"]
+
+[resource]
+script = ExtResource("1_relic")
+relic_id = &"auto_spark"
+display_name = "自律火花"
+description = "仅专属技能自动切换元素时恢复 5 点能量。"
+amount = 5
+response_policy = 2

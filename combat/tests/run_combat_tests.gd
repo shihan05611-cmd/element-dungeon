@@ -192,11 +192,11 @@ func _test_zero_element_has_no_ghost_remainder() -> void:
 
 
 func _test_invalid_contracts_are_rejected() -> void:
-	_expect(not RuntimeAttackPayload.new(1.0, 1.0, ElementIds.WATER, -1).is_valid(), "negative amount invalid")
-	_expect(not RuntimeAttackPayload.new(1.0, 1.0, &"earth", 1).is_valid(), "unknown element invalid")
-	_expect(not RuntimeAttackPayload.new(1.0, INF, ElementIds.WATER, 1).is_valid(), "infinite damage invalid")
-	_expect(not RuntimeAttackPayload.new(NAN, 1.0, ElementIds.WATER, 1).is_valid(), "NaN damage invalid")
-	var bad_request := HitRequest.new(_cast(), RuntimeAttackPayload.new(1.0, 1.0, ElementIds.WATER, -1), 1, 0, Vector2.ZERO, Vector2.RIGHT)
+	_expect(not RuntimeAttackPayload.from_locked_inputs(10.0, 1.0, 0.0, 10.0, ElementIds.WATER, -1).is_valid(), "negative amount invalid")
+	_expect(not RuntimeAttackPayload.from_locked_inputs(10.0, 1.0, 0.0, 10.0, &"earth", 1).is_valid(), "unknown element invalid")
+	_expect(not RuntimeAttackPayload.from_locked_inputs(10.0, 1.0, 0.0, INF, ElementIds.WATER, 1).is_valid(), "infinite damage invalid")
+	_expect(not RuntimeAttackPayload.from_locked_inputs(NAN, 1.0, 0.0, 1.0, ElementIds.WATER, 1).is_valid(), "NaN attack invalid")
+	var bad_request := HitRequest.new(_cast(), RuntimeAttackPayload.from_locked_inputs(10.0, 1.0, 0.0, 10.0, ElementIds.WATER, -1), 1, 0, Vector2.ZERO, Vector2.RIGHT)
 	_expect(not bad_request.is_valid(), "request rejects invalid payload")
 	var target := _make_target()
 	var result: CombatResult = target.receiver.receive_hit(bad_request)
@@ -212,7 +212,7 @@ func _test_neutral_cast_snapshot_is_valid() -> void:
 	_expect(neutral_cast.is_valid(), "neutral cast snapshot is a valid attack source")
 	_expect_eq(neutral_cast.cast_element_id, ElementIds.NONE, "neutral cast preserves none element")
 	var definition := AttackPayloadDefinition.new()
-	definition.base_damage = 5.0
+	definition.damage_multiplier = 0.5
 	definition.element_mode = AttackPayloadDefinition.ElementMode.NONE
 	definition.element_amount = 0
 	var runtime := definition.build_runtime(neutral_cast)
@@ -225,14 +225,15 @@ func _test_stat_dictionary_is_whitelisted_and_copied() -> void:
 	source[CombatStatSnapshot.ATTACK_MULTIPLIER] = 99.0
 	_expect(snapshot.is_valid(), "allowed scalar stats are valid")
 	_expect_float(snapshot.attack_multiplier, 2.0, "snapshot is isolated from source mutation")
-	_expect_float(snapshot.calculate_offensive_damage(3.0), 7.0, "offensive formula is explicit")
+	_expect_float(snapshot.effective_attack, 20.0, "effective attack locks base attack times modifiers")
+	_expect_float(snapshot.calculate_offensive_damage(0.3), 7.0, "offensive formula is explicit")
 	_expect(not CombatStatSnapshot.from_dictionary({&"critical_chance": 1.0}).is_valid(), "unknown stat is rejected")
 	_expect(not CombatStatSnapshot.from_dictionary({CombatStatSnapshot.ATTACK_MULTIPLIER: {"nested": 2}}).is_valid(), "nested arbitrary data is rejected")
 
 
 func _test_payload_definition_resolves_cast_form() -> void:
 	var definition := AttackPayloadDefinition.new()
-	definition.base_damage = 5.5
+	definition.damage_multiplier = 0.55
 	definition.element_mode = AttackPayloadDefinition.ElementMode.FOLLOW_CAST_FORM
 	definition.element_amount = 4
 	var stats := CombatStatSnapshot.new(1.25, 0.25)
@@ -436,7 +437,7 @@ func _test_queued_target_is_rejected() -> void:
 
 func _test_shared_resources_do_not_share_runtime_state() -> void:
 	var shared_definition := AttackPayloadDefinition.new()
-	shared_definition.base_damage = 10.0
+	shared_definition.damage_multiplier = 1.0
 	shared_definition.element_mode = AttackPayloadDefinition.ElementMode.FIXED_ELEMENT
 	shared_definition.fixed_element_id = ElementIds.WATER
 	shared_definition.element_amount = 3

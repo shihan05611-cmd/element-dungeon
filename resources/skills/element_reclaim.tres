@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SkillDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://combat/execution/element_reclaim_execution.gd" id="2_execution"]
+
+[sub_resource type="Resource" id="ReclaimExecution"]
+script = ExtResource("2_execution")
+
+[resource]
+script = ExtResource("1_skill")
+skill_id = &"element_reclaim"
+cooldown = 5.0
+execution_definition = SubResource("ReclaimExecution")

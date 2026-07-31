@@ -10,7 +10,7 @@ enum ElementMode {
 	FIXED_ELEMENT,
 }
 
-@export_range(0.0, 1000000.0, 0.01, "or_greater") var base_damage: float = 0.0
+@export_range(0.0, 100000.0, 0.01, "or_greater") var damage_multiplier: float = 0.0
 @export var element_mode: ElementMode = ElementMode.NONE
 @export var fixed_element_id: StringName = ElementIds.NONE
 @export_range(0, 10, 1) var element_amount: int = 0
@@ -18,8 +18,8 @@ enum ElementMode {
 
 
 func validation_error() -> StringName:
-	if not is_finite(base_damage) or base_damage < 0.0:
-		return &"invalid_base_damage"
+	if not is_finite(damage_multiplier) or damage_multiplier < 0.0:
+		return &"invalid_damage_multiplier"
 	if element_amount < 0 or element_amount > 10:
 		return &"invalid_element_amount"
 	match element_mode:
@@ -61,9 +61,12 @@ func build_runtime(cast_snapshot: CastSnapshot) -> RuntimeAttackPayload:
 	if element_mode != ElementMode.NONE and not ElementIds.is_combat_element(resolved_element):
 		return RuntimeAttackPayload.invalid(&"invalid_resolved_element")
 
-	var offensive_damage := cast_snapshot.stat_snapshot.calculate_offensive_damage(base_damage)
-	return RuntimeAttackPayload.new(
-		base_damage,
+	var stats := cast_snapshot.stat_snapshot
+	var offensive_damage := stats.calculate_offensive_damage(damage_multiplier)
+	return RuntimeAttackPayload.from_locked_inputs(
+		stats.effective_attack,
+		damage_multiplier,
+		stats.flat_damage_bonus,
 		offensive_damage,
 		resolved_element,
 		element_amount,

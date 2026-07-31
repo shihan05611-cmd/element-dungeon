@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/vfx/enemy_passive_vfx_presentation.gd" id="1_script"]
+[ext_resource type="SpriteFrames" path="res://resources/vfx/unending_loop_frames.tres" id="2_loop"]
+[ext_resource type="SpriteFrames" path="res://resources/vfx/unending_trigger_frames.tres" id="3_trigger"]
+
+[node name="UnendingPresentation" type="Node2D"]
+z_index = 4
+script = ExtResource("1_script")
+
+[node name="Loop" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(0, -21.76)
+sprite_frames = ExtResource("2_loop")
+animation = &"loop"
+
+[node name="Trigger" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(0, -21.76)
+sprite_frames = ExtResource("3_trigger")
+animation = &"trigger"
+

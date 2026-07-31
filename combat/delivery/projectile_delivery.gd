@@ -93,6 +93,13 @@ func advance(delta: float) -> void:
 		finish(FINISH_MAX_DISTANCE)
 
 
+func _on_delivery_cleanup() -> void:
+	_distance_travelled = 0.0
+	hit_index = 0
+	_disconnect_owned_signal(&"blocker_contact")
+	super()
+
+
 func _move_fraction(motion: Vector2, fraction: float) -> void:
 	var safe_fraction := clampf(fraction, 0.0, 1.0)
 	global_position += motion * safe_fraction
@@ -200,5 +207,7 @@ func _contact_from_result(raw_hit: Dictionary, require_hurtbox: bool) -> Diction
 	if rid.is_valid():
 		return {"rid": rid, "stable_id": rid.get_id()}
 	return {}
+
+
 
 

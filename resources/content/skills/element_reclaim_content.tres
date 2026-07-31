@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SkillContentDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="1_content"]
+[ext_resource type="Resource" path="res://resources/skills/element_reclaim.tres" id="2_gameplay"]
+[ext_resource type="Texture2D" path="res://assets/generated/vfx/element_reclaim/icon.png" id="3_icon"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/element_reclaim_presentation.tscn" id="4_presentation"]
+
+[resource]
+script = ExtResource("1_content")
+skill_id = &"element_reclaim"
+display_name = "回收"
+description = "吸收范围内全部当前元素附着，每层理论恢复5点能量；无可吸收层数或能量已满时失败。"
+icon = ExtResource("3_icon")
+presentation_scene = ExtResource("4_presentation")
+gameplay_definition = ExtResource("2_gameplay")
+reward_pool = true
+initial_reward_pool = true
+allowed_form_ids = Array[StringName]([&"water", &"fire"])
+

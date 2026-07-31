@@ -1,46 +1,30 @@
 class_name RecordingSkillDelivery
-extends Node2D
+extends DeliveryBase
 
-## Test double for Agent C's public pre-tree initialization protocol.
+## Typed test double for the DeliveryBase protocol used by SkillExecutor tests.
 
-var cast_snapshot: CastSnapshot
-var payload: RuntimeAttackPayload
-var delivery_id: int = 0
-var initial_transform: Transform2D = Transform2D.IDENTITY
-var direction: Vector2 = Vector2.ZERO
-var initialized: bool = false
-var initialized_inside_tree: bool = false
-var ready_after_initialize: bool = false
+@export var reject_initialization: bool = false
+
 var close_count: int = 0
+
+
+func close_hit_window() -> void:
+	close_count += 1
 
 
 func initialize_delivery(
 		p_cast_snapshot: CastSnapshot,
 		p_payload: RuntimeAttackPayload,
 		p_delivery_id: int,
-		p_initial_transform: Transform2D,
+		p_start_world_transform: Transform2D,
 		p_direction: Vector2
 ) -> bool:
-	initialized_inside_tree = is_inside_tree()
-	cast_snapshot = p_cast_snapshot
-	payload = p_payload
-	delivery_id = p_delivery_id
-	initial_transform = p_initial_transform
-	direction = p_direction
-	initialized = (
-		cast_snapshot != null
-		and cast_snapshot.is_valid()
-		and payload != null
-		and payload.is_valid()
-		and delivery_id > 0
+	if reject_initialization:
+		return false
+	return initialize(
+		p_cast_snapshot,
+		p_payload,
+		p_delivery_id,
+		p_start_world_transform,
+		p_direction
 	)
-	return initialized
-
-
-func _ready() -> void:
-	ready_after_initialize = initialized
-	global_transform = initial_transform
-
-
-func close_hit_window() -> void:
-	close_count += 1

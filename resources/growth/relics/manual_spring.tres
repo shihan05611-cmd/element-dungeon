@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FormChangeRelicDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://growth/relics/form_change_relic_definition.gd" id="1_relic"]
+
+[resource]
+script = ExtResource("1_relic")
+relic_id = &"manual_spring"
+display_name = "手动涌泉"
+description = "仅手动切换元素时恢复 5 点能量。"
+amount = 5
+response_policy = 1

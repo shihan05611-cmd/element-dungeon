@@ -49,6 +49,45 @@ func set_amounts_silent(water: int, fire: int) -> bool:
 	return replace_silent(ElementSnapshot.new(water, fire, per_element_capacity))
 
 
+func prepare_consume_all(element_id: StringName) -> ElementLayerConsumePlan:
+	if not ElementIds.is_combat_element(element_id):
+		return null
+	var before := snapshot()
+	if before.get_amount(element_id) <= 0:
+		return null
+	var after := ElementSnapshot.new(
+		0 if element_id == ElementIds.WATER else before.water_amount,
+		0 if element_id == ElementIds.FIRE else before.fire_amount,
+		per_element_capacity
+	)
+	var plan := ElementLayerConsumePlan.new(element_id, before, after)
+	return plan if plan.is_valid() else null
+
+
+func can_commit_element_consume(plan: ElementLayerConsumePlan) -> bool:
+	return (
+		plan != null
+		and plan.is_valid()
+		and plan.before.capacity == per_element_capacity
+		and snapshot().equals(plan.before)
+		and can_replace(plan.after)
+	)
+
+
+func commit_element_consume_silent(plan: ElementLayerConsumePlan) -> void:
+	assert(
+		can_commit_element_consume(plan),
+		"element consume plan must match the current complete snapshot"
+	)
+	var replaced := replace_silent(plan.after)
+	assert(replaced, "validated element consume replacement must commit")
+
+
+func publish_element_consume(plan: ElementLayerConsumePlan) -> void:
+	assert(plan != null and plan.is_valid())
+	notify_changed(plan.before)
+
+
 func notify_changed(previous: ElementSnapshot) -> void:
 	if previous == null or not previous.is_valid():
 		return

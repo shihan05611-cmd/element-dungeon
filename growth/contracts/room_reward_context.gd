@@ -1,8 +1,9 @@
 class_name RoomRewardContext
 extends RefCounted
 
-## Explicit reward-generation context; candidate catalogs are supplied
-## separately so this DTO remains room-focused.
+## Untrusted reward request data supplied by an integration layer. Whether this
+## is the first combat reward and which reward type is allowed are derived from
+## RunSnapshot.route, never from this DTO.
 
 var room_id: StringName:
 	get:
@@ -12,19 +13,17 @@ var reward_type: int:
 	get:
 		return _reward_type
 
-var first_combat_room: bool:
-	get:
-		return _first_combat_room
-
 var _room_id: StringName
 var _reward_type: int
-var _first_combat_room: bool
 
 
-func _init(p_room_id: StringName, p_reward_type: int, p_first_combat_room: bool = false) -> void:
+func _init(
+		p_room_id: StringName,
+		p_reward_type: int,
+		_ignored_legacy_first_room_hint: Variant = null
+) -> void:
 	_room_id = p_room_id
 	_reward_type = p_reward_type
-	_first_combat_room = p_first_combat_room
 
 
 func is_valid() -> bool:

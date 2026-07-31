@@ -1,17 +1,36 @@
 extends Node2D
 
+const RUN_CONTENT_CATALOG: RunContentCatalog = preload(
+	"res://resources/content/run_content_catalog.tres"
+)
+
+static var _persisted_shared_loadout: RuntimeLoadoutSnapshot
+
+
 @onready var player: PlayerCharacter = $Player
 @onready var target: CombatEnemy = $Orc
 @onready var feedback: CombatFeedback = $WorldFeedbackLayer
 @onready var hud: CombatHUD = $CombatHUD
+@onready var run_session_host: RunSessionHost = $RunSessionHost
+@onready var skill_vfx_coordinator: SkillVfxCoordinator = $SkillVfxCoordinator
 
 
 func _ready() -> void:
+	var enemies: Array[CombatEnemy] = [target]
+	if not run_session_host.configure(
+		player,
+		enemies,
+		RUN_CONTENT_CATALOG,
+		_persisted_shared_loadout
+	):
+		push_error("RunSessionHost configuration failed: %s" % String(run_session_host.last_error))
+	if not skill_vfx_coordinator.configure(player, run_session_host, enemies):
+		push_error("SkillVfxCoordinator configuration failed")
 	feedback.observe_receiver(player.combat_receiver)
 	feedback.observe_receiver(target.combat_receiver)
 	player.delivery_created.connect(_on_delivery_created)
 	target.delivery_created.connect(_on_delivery_created)
-	hud.configure(player, target, feedback)
+	hud.configure(player, target, feedback, run_session_host)
 	hud.reduced_motion_changed.connect(feedback.set_reduced_motion)
 	queue_redraw()
 
@@ -27,6 +46,8 @@ func _on_delivery_created(delivery: Node) -> void:
 
 
 func _reload_room() -> void:
+	_persisted_shared_loadout = run_session_host.saved_shared_loadout
+	run_session_host.on_run_reloaded()
 	get_tree().reload_current_scene()
 
 

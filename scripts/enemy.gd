@@ -13,6 +13,8 @@ const ATTACK_DISTANCE := 66.0
 const ATTACK_DURATION := 0.55
 
 @export var ai_enabled: bool = true
+@export var growth_enemy_id: StringName = &"orc_1"
+@export_range(0, 1000000, 1, "or_greater") var experience_reward: int = 50
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var prompt: Label = $Prompt

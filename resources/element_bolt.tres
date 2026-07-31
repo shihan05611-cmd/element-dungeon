@@ -1,23 +1,27 @@
-[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://dk8bsmn6u8c03"]
+[gd_resource type="Resource" script_class="SkillDefinition" load_steps=5 format=3 uid="uid://dk8bsmn6u8c03"]
 
 [ext_resource type="Script" uid="uid://b2p5xuomj0hba" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
 [ext_resource type="Script" uid="uid://bngnpje0l1neb" path="res://combat/definitions/attack_payload_definition.gd" id="2_payload"]
 [ext_resource type="PackedScene" path="res://scenes/element_projectile.tscn" id="3_delivery"]
+[ext_resource type="Script" path="res://combat/execution/instant_delivery_execution.gd" id="4_execution"]
 
 [sub_resource type="Resource" id="BoltPayload"]
 script = ExtResource("2_payload")
-base_damage = 10.0
+damage_multiplier = 1.0
 element_mode = 1
-element_amount = 3
+element_amount = 1
 presentation_tags = PackedStringArray("element_bolt", "projectile")
+
+[sub_resource type="Resource" id="BoltExecution"]
+script = ExtResource("4_execution")
+energy_cost = 10
+active_time = 0.08
+delivery_scene = ExtResource("3_delivery")
+payload = SubResource("BoltPayload")
 
 [resource]
 script = ExtResource("1_skill")
 skill_id = &"element_bolt"
 startup_time = 0.12
-active_time = 0.08
 recovery_time = 0.22
-energy_cost = 20
-delivery_scene = ExtResource("3_delivery")
-payload = SubResource("BoltPayload")
-
+execution_definition = SubResource("BoltExecution")

@@ -1,67 +1,794 @@
 extends SceneTree
 
-## Dependency-free Agent B test entry point:
-## Godot --headless --path <project> --script res://combat/tests/run_skill_tests.gd
+const RECORDING_DELIVERY: PackedScene = preload("res://combat/tests/recording_skill_delivery.tscn")
 
-const SLOT_PRIMARY: StringName = &"primary"
-const DELIVERY_SCENE: PackedScene = preload("res://combat/tests/recording_skill_delivery.tscn")
+
+class RecordingPassivePort:
+	extends PassiveEffectPort
+
+	var current: Array[PassiveEffectRuntime] = []
+	var commit_count: int = 0
+	var reject: bool = false
+
+	func validation_error(bindings: Array[PassiveEffectBinding]) -> StringName:
+		if reject:
+			return &"passive_port_rejected"
+		return super(bindings)
+
+	func commit_replace_effects(runtimes: Array[PassiveEffectRuntime]) -> void:
+		current = runtimes.duplicate()
+		commit_count += 1
+
+	func skill_ids() -> Array[StringName]:
+		var result: Array[StringName] = []
+		for runtime: PassiveEffectRuntime in current:
+			result.append(runtime.skill_id)
+		return result
+
+
+class Rig:
+	extends RefCounted
+
+	var host: Node2D
+	var delivery_parent: Node2D
+	var energy: EnergyComponent
+	var element: CurrentElementController
+	var executor: SkillExecutor
+	var controller: SkillController
+	var loadout: RuntimeSkillLoadout
+
+	func cleanup() -> void:
+		if is_instance_valid(host):
+			host.free()
+
 
 var _failures: Array[String] = []
 var _assertions: int = 0
 var _tests: int = 0
-var _next_identity: int = 1000
 
 
 func _initialize() -> void:
-	call_deferred(&"_run_all_tests")
+	call_deferred(&"_run_all")
 
 
-func _run_all_tests() -> void:
-	_run("static_configuration_validation", _test_static_configuration_validation)
-	_run("universal_skill_locks_water_form", _test_universal_skill_locks_water_form)
-	_run("universal_skill_locks_fire_form", _test_universal_skill_locks_fire_form)
-	_run("exclusive_skill_rejects_wrong_form_without_cost", _test_exclusive_skill_rejects_wrong_form_without_cost)
-	_run("accepted_transaction_is_complete_before_notifications", _test_accepted_transaction_is_complete_before_notifications)
-	_run("insufficient_energy_has_no_partial_state", _test_insufficient_energy_has_no_partial_state)
-	_run("cooldown_rejection_has_no_partial_state", _test_cooldown_rejection_has_no_partial_state)
-	_run("zero_cooldown_recasts_after_recovery", _test_zero_cooldown_recasts_after_recovery)
-	_run("startup_cancel_does_not_refund", _test_startup_cancel_does_not_refund)
-	_run("acceptance_callback_cancel_is_deferred", _test_acceptance_callback_cancel_is_deferred)
-	_run("active_delivery_survives_cancel_and_switch", _test_active_delivery_survives_cancel_and_switch)
-	_run("switch_during_cast_only_affects_next", _test_switch_during_cast_only_affects_next)
-	_run("large_delta_crosses_every_phase_once", _test_large_delta_crosses_every_phase_once)
-	_run("advance_reentry_is_rejected", _test_advance_reentry_is_rejected)
-	_run("recovery_cancel_does_not_reclose_window", _test_recovery_cancel_does_not_reclose_window)
-	_run("resource_mutation_cannot_change_cast", _test_resource_mutation_cannot_change_cast)
-	_run("late_token_cannot_affect_new_cast", _test_late_token_cannot_affect_new_cast)
-	_run("pause_and_exit_cancel_deterministically", _test_pause_and_exit_cancel_deterministically)
-	_run("external_gate_has_no_side_effects", _test_external_gate_has_no_side_effects)
-	_run("preflight_callback_reentry_is_rejected", _test_preflight_callback_reentry_is_rejected)
-	_run("invalid_configuration_has_no_side_effects", _test_invalid_configuration_has_no_side_effects)
-	_run("form_loadouts_are_independent", _test_form_loadouts_are_independent)
-	_run("component_notifications_are_post_commit", _test_component_notifications_are_post_commit)
-	_run("energy_regenerates_at_default_rate_and_pauses", _test_energy_regenerates_at_default_rate_and_pauses)
-	_run("shared_resources_keep_runtime_isolated", _test_shared_resources_keep_runtime_isolated)
+func _run_all() -> void:
+	_run("static_skill_dimensions", _test_static_skill_dimensions)
+	_run("runtime_four_slots_revision_and_stale", _test_runtime_four_slots_revision_and_stale)
+	_run("runtime_rejects_duplicate_and_active_in_passive_atomically", _test_runtime_rejects_duplicate_and_active_in_passive_atomically)
+	_run("four_passives_and_passive_button", _test_four_passives_and_passive_button)
+	_run("passive_lifecycle_has_no_leaks_or_duplicates", _test_passive_lifecycle_has_no_leaks_or_duplicates)
+	_run("legacy_migration_order_dedup_overflow_idempotent", _test_legacy_migration_order_dedup_overflow_idempotent)
+	_run("element_change_does_not_change_shared_mapping", _test_element_change_does_not_change_shared_mapping)
+	_run("element_event_same_and_duplicate_sequence", _test_element_event_same_and_duplicate_sequence)
+	_run("three_element_cycle_uses_configuration_order", _test_three_element_cycle_uses_configuration_order)
+	_run("exclusive_insufficient_energy_is_atomic", _test_exclusive_insufficient_energy_is_atomic)
+	_run("exclusive_unavailable_is_atomic", _test_exclusive_unavailable_is_atomic)
+	_run("exclusive_cooldown_rejection_preserves_element", _test_exclusive_cooldown_rejection_preserves_element)
+	_run("exclusive_success_switches_before_notifications", _test_exclusive_success_switches_before_notifications)
+	_run("exclusive_same_element_emits_no_change", _test_exclusive_same_element_emits_no_change)
+	_run("cancel_never_refunds_and_keeps_auto_element", _test_cancel_never_refunds_and_keeps_auto_element)
+	_run("before_delivery_cancel_refunds_but_keeps_cooldown", _test_before_delivery_cancel_refunds_but_keeps_cooldown)
+	_run("after_delivery_cancel_does_not_refund", _test_after_delivery_cancel_does_not_refund)
+	_run("current_element_snapshot_survives_buffered_switch", _test_current_element_snapshot_survives_buffered_switch)
+	_run("neutral_cast_locks_none", _test_neutral_cast_locks_none)
+	_run("idle_and_recovery_switch_immediately", _test_idle_and_recovery_switch_immediately)
+	_run("startup_active_keep_only_last_buffered_switch", _test_startup_active_keep_only_last_buffered_switch)
+	_run("busy_double_cycle_cancels_buffer", _test_busy_double_cycle_cancels_buffer)
+	_run("external_control_gate_buffers_and_flushes", _test_external_control_gate_buffers_and_flushes)
+	_run("lifecycle_clears_buffer", _test_lifecycle_clears_buffer)
+	_run("invalid_delivery_is_excluded_by_catalog", _test_invalid_delivery_is_excluded_by_catalog)
+	_run("delivery_initialization_failure_is_atomic", _test_delivery_initialization_failure_is_atomic)
+	_run("cast_started_reentry_is_busy", _test_cast_started_reentry_is_busy)
+	_run("large_delta_spawns_once_and_finishes", _test_large_delta_spawns_once_and_finishes)
 
 	if _failures.is_empty():
-		print("SKILL TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
+		print("AGENT B SKILL TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
 		quit(0)
 	else:
-		printerr("SKILL TESTS FAILED: %d/%d tests, %d assertions" % [_failures.size(), _tests, _assertions])
-		for failure in _failures:
+		printerr("AGENT B SKILL TESTS FAILED: %d/%d tests, %d assertions" % [
+			_failures.size(),
+			_tests,
+			_assertions,
+		])
+		for failure: String in _failures:
 			printerr("  - " + failure)
 		quit(1)
 
 
-func _run(test_name: String, test_callable: Callable) -> void:
+func _run(test_name: String, callable: Callable) -> void:
 	_tests += 1
-	var failure_count := _failures.size()
-	test_callable.call()
-	if _failures.size() == failure_count:
-		print("PASS " + test_name)
+	var before := _failures.size()
+	callable.call()
+	if _failures.size() == before:
+		print("PASS: " + test_name)
 	else:
-		for index in range(failure_count, _failures.size()):
+		for index in range(before, _failures.size()):
 			_failures[index] = test_name + ": " + _failures[index]
+
+
+func _test_static_skill_dimensions() -> void:
+	var current := _active(&"current", SkillDefinition.ElementPolicy.CURRENT_ELEMENT)
+	var neutral := _active(&"neutral", SkillDefinition.ElementPolicy.NEUTRAL)
+	var exclusive := _active(
+		&"exclusive",
+		SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT,
+		ElementIds.FIRE
+	)
+	var passive := _passive(&"passive", &"effect")
+	_expect(current.is_valid(), "current-element active is valid")
+	_expect(neutral.is_valid(), "neutral active is valid")
+	_expect(exclusive.is_valid(), "exclusive active is valid")
+	_expect(passive.is_valid(), "passive is valid")
+	var bad_passive := _passive(&"bad_passive", &"effect")
+	bad_passive.execution_definition = InstantDeliveryExecution.new()
+	_expect_eq(bad_passive.validation_error(), &"passive_skill_has_execution_definition", "passive cannot execute")
+	var bad_neutral := _active(&"bad_neutral", SkillDefinition.ElementPolicy.NEUTRAL)
+	_instant(bad_neutral).payload.element_mode = AttackPayloadDefinition.ElementMode.FOLLOW_CAST_FORM
+	_instant(bad_neutral).payload.element_amount = 1
+	_expect_eq(
+		bad_neutral.validation_error(),
+		&"neutral_skill_requires_neutral_payload",
+		"neutral must use none payload"
+	)
+	var bad_active := _active(&"bad_active")
+	_instant(bad_active).delivery_scene = null
+	_expect_eq(bad_active.validation_error(), &"missing_delivery_scene", "active requires delivery")
+
+
+func _test_runtime_four_slots_revision_and_stale() -> void:
+	var active := _active(&"active")
+	var passive := _passive(&"passive", &"effect")
+	var catalog: Array[SkillDefinition] = [active, passive]
+	var port := RecordingPassivePort.new()
+	var restored := _snapshot(&"active", &"", &"", &"passive", 7)
+	var runtime := RuntimeSkillLoadout.new(catalog, restored, port)
+	_expect_eq(runtime.snapshot().revision, 7, "persisted revision restored exactly")
+	_expect_eq(runtime.snapshot().get_skill_id(SkillSlotIds.ACTIVE_1), &"active", "mapping restored")
+	var next := _snapshot(&"", &"passive", &"", &"", runtime.snapshot().revision)
+	var result := runtime.try_replace_snapshot(next)
+	_expect(result.accepted, "valid replacement accepted")
+	_expect_eq(result.snapshot.revision, 8, "new replacement increments restored revision")
+	_expect_eq(runtime.get_skill_for_slot(SkillSlotIds.ACTIVE_2).skill_id, &"passive", "active slot accepts passive")
+	var stale := runtime.try_replace_snapshot(next)
+	_expect(not stale.accepted, "stale candidate rejected")
+	_expect_eq(stale.detail, &"stale_loadout_revision", "stale reason typed")
+	_expect_eq(runtime.snapshot().revision, 8, "stale failure preserves restored revision")
+
+
+func _test_runtime_rejects_duplicate_and_active_in_passive_atomically() -> void:
+	var active := _active(&"active")
+	var passive := _passive(&"passive", &"effect")
+	var catalog: Array[SkillDefinition] = [active, passive]
+	var port := RecordingPassivePort.new()
+	var runtime := RuntimeSkillLoadout.new(catalog, _snapshot(&"passive"), port)
+	var before := runtime.snapshot()
+	var commits := port.commit_count
+	var duplicate := _snapshot(&"passive", &"passive", &"", &"", before.revision)
+	var duplicate_result := runtime.try_replace_snapshot(duplicate)
+	_expect_eq(duplicate_result.detail, &"duplicate_equipped_skill", "duplicate rejected")
+	_expect(runtime.snapshot().same_mapping(before), "duplicate preserves mapping")
+	_expect_eq(port.commit_count, commits, "duplicate preserves passive registration")
+	var bad_slot := _snapshot(&"", &"", &"", &"active", before.revision)
+	var bad_result := runtime.try_replace_snapshot(bad_slot)
+	_expect_eq(bad_result.detail, &"active_skill_in_passive_slot", "active rejected in passive slot")
+	_expect(runtime.snapshot().same_mapping(before), "bad slot preserves mapping")
+	_expect_eq(port.commit_count, commits, "bad slot preserves passive registrations")
+
+
+func _test_four_passives_and_passive_button() -> void:
+	var passives: Array[SkillDefinition] = [
+		_passive(&"p1", &"e1"),
+		_passive(&"p2", &"e2"),
+		_passive(&"p3", &"e3"),
+		_passive(&"p4", &"e4"),
+	]
+	var port := RecordingPassivePort.new()
+	var rig := _make_rig(passives, _snapshot(&"p1", &"p2", &"p3", &"p4"), port)
+	_expect_eq(port.skill_ids().size(), 4, "all four passives registered")
+	_expect_eq(_unique_count(port.skill_ids()), 4, "passives registered once by skill id")
+	var before_energy := rig.energy.current_energy
+	var result := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	_expect(not result.accepted, "passive button rejected")
+	_expect_eq(result.reject_reason, CastAttemptResult.RejectReason.NOT_CASTABLE, "structured not-castable result")
+	_expect_eq(rig.energy.current_energy, before_energy, "passive button spends no energy")
+	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.IDLE, "passive button starts no cast")
+	rig.cleanup()
+
+
+func _test_passive_lifecycle_has_no_leaks_or_duplicates() -> void:
+	var p1 := _passive(&"p1", &"e1")
+	var p2 := _passive(&"p2", &"e2")
+	var p3 := _passive(&"p3", &"e3")
+	var catalog: Array[SkillDefinition] = [p1, p2, p3]
+	var port := RecordingPassivePort.new()
+	var runtime := RuntimeSkillLoadout.new(catalog, _snapshot(&"p1", &"p2", &"p3"), port)
+	_expect_eq(port.skill_ids().size(), 3, "three active-slot passives active")
+	runtime.on_owner_died()
+	_expect_eq(port.skill_ids().size(), 0, "death unregisters all")
+	var after_death := port.commit_count
+	runtime.on_owner_died()
+	_expect_eq(port.commit_count, after_death, "repeat death is idempotent")
+	runtime.on_owner_respawned()
+	_expect_eq(port.skill_ids().size(), 3, "respawn restores exact set")
+	var after_respawn := port.commit_count
+	runtime.on_owner_respawned()
+	_expect_eq(port.commit_count, after_respawn, "repeat respawn is idempotent")
+	runtime.on_floor_changed()
+	_expect_eq(_unique_count(port.skill_ids()), 3, "floor rebuild has no duplicates")
+	runtime.on_run_reloaded()
+	_expect_eq(_unique_count(port.skill_ids()), 3, "reload rebuild has no duplicates")
+	var replacement := _snapshot(&"", &"p2", &"", &"", runtime.snapshot().revision)
+	_expect(runtime.try_replace_snapshot(replacement).accepted, "passive replacement accepted")
+	_expect_eq(port.skill_ids(), [&"p2"], "unequipped passives removed atomically")
+
+
+func _test_legacy_migration_order_dedup_overflow_idempotent() -> void:
+	var legacy: Array[LegacyElementLoadoutSnapshot] = [
+		LegacyElementLoadoutSnapshot.new(ElementIds.WATER, [&"a", &"b", &"c"]),
+		LegacyElementLoadoutSnapshot.new(ElementIds.FIRE, [&"b", &"d"]),
+	]
+	var ordered: Array[StringName] = [ElementIds.WATER, ElementIds.FIRE]
+	var first := LegacyElementLoadoutMigrator.migrate(ElementIds.FIRE, ordered, legacy)
+	var second := LegacyElementLoadoutMigrator.migrate(ElementIds.FIRE, ordered, legacy)
+	_expect(first.accepted, "migration accepted")
+	_expect_eq(first.snapshot.get_skill_id(SkillSlotIds.ACTIVE_1), &"b", "current element first")
+	_expect_eq(first.snapshot.get_skill_id(SkillSlotIds.ACTIVE_2), &"d", "current remainder second")
+	_expect_eq(first.snapshot.get_skill_id(SkillSlotIds.ACTIVE_3), &"a", "ordered other element next")
+	_expect_eq(first.snapshot.get_skill_id(SkillSlotIds.PASSIVE_1), &"", "passive defaults empty")
+	_expect_eq(first.unequipped_skill_ids, [&"c"], "overflow remains unequipped")
+	_expect(first.snapshot.same_mapping(second.snapshot), "migration is idempotent")
+	_expect_eq(first.unequipped_skill_ids, second.unequipped_skill_ids, "overflow deterministic")
+	var resource_loadouts: Array[SkillLoadout] = [
+		load("res://resources/water_loadout.tres") as SkillLoadout,
+		load("res://resources/fire_loadout.tres") as SkillLoadout,
+	]
+	var resource_result := LegacyElementLoadoutMigrator.migrate_resources(
+		ElementIds.WATER,
+		ordered,
+		resource_loadouts
+	)
+	_expect_eq(
+		resource_result.snapshot.get_skill_id(SkillSlotIds.ACTIVE_1),
+		&"element_slash",
+		"legacy melee deterministically maps to active_1"
+	)
+	_expect_eq(
+		resource_result.snapshot.get_skill_id(SkillSlotIds.ACTIVE_2),
+		&"element_bolt",
+		"legacy primary deterministically maps to active_2"
+	)
+
+
+func _test_element_change_does_not_change_shared_mapping() -> void:
+	var skill := _active(&"skill")
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"skill"))
+	var before := rig.loadout.snapshot()
+	_expect(rig.controller.request_element(ElementIds.FIRE).changed, "idle switch committed")
+	_expect(rig.loadout.snapshot().same_mapping(before), "shared mapping unchanged")
+	_expect_eq(rig.controller.get_skill_for_slot(SkillSlotIds.ACTIVE_1).skill_id, &"skill", "same slot skill")
+	rig.cleanup()
+
+
+func _test_element_event_same_and_duplicate_sequence() -> void:
+	var controller := CurrentElementController.new()
+	var elements: Array[StringName] = [ElementIds.WATER, ElementIds.FIRE]
+	controller.configure_runtime(ElementIds.WATER, elements)
+	var observed := {"count": 0, "last": null}
+	controller.element_changed.connect(func(result: ElementChangeResult) -> void:
+		observed.count += 1
+		observed.last = result
+	)
+	var same := controller.request_element(ElementIds.WATER, FormChangedEvent.Source.MANUAL, 9)
+	_expect(same.accepted and not same.changed, "same element succeeds without change")
+	_expect_eq(observed.count, 0, "same element emits nothing")
+	var changed := controller.request_element(ElementIds.FIRE, FormChangedEvent.Source.MANUAL, 10)
+	_expect(changed.changed, "new element changes")
+	_expect_eq(changed.sequence, 1, "change sequence starts monotonic")
+	_expect(changed.timestamp_msec >= 0, "timestamp present")
+	_expect_eq(changed.source, FormChangedEvent.Source.MANUAL, "manual source present")
+	var duplicate := controller.request_element(ElementIds.WATER, FormChangedEvent.Source.MANUAL, 10)
+	_expect_eq(duplicate.detail, &"duplicate_request_sequence", "duplicate request rejected")
+	_expect_eq(observed.count, 1, "duplicate emits nothing")
+	_expect_eq(controller.current_element_id, ElementIds.FIRE, "duplicate preserves state")
+	controller.free()
+
+
+func _test_three_element_cycle_uses_configuration_order() -> void:
+	var controller := CurrentElementController.new()
+	var elements: Array[StringName] = [&"water", &"earth", &"air"]
+	_expect(controller.configure_runtime(&"water", elements), "three elements configured")
+	_expect_eq(controller.cycle_next().current_element_id, &"earth", "cycles to configured second")
+	_expect_eq(controller.cycle_next().current_element_id, &"air", "cycles to configured third")
+	_expect_eq(controller.cycle_next().current_element_id, &"water", "cycles back without switch branches")
+	controller.free()
+
+
+func _test_exclusive_insufficient_energy_is_atomic() -> void:
+	var skill := _active(
+		&"fire_skill",
+		SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT,
+		ElementIds.FIRE
+	)
+	_instant(skill).energy_cost = 10
+	skill.cooldown = 5.0
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"fire_skill"), null, [ElementIds.WATER, ElementIds.FIRE], 5)
+	var result := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	_expect_eq(result.reject_reason, CastAttemptResult.RejectReason.INSUFFICIENT_ENERGY, "energy rejection")
+	_expect_eq(rig.element.current_element_id, ElementIds.WATER, "failed cast does not auto-switch")
+	_expect_eq(rig.energy.current_energy, 5, "failed cast does not spend")
+	_expect(not rig.executor.is_skill_on_cooldown(skill.skill_id), "failed cast starts no cooldown")
+	_expect_eq(rig.delivery_parent.get_child_count(), 0, "failed cast spawns no delivery")
+	rig.cleanup()
+
+
+func _test_exclusive_unavailable_is_atomic() -> void:
+	var skill := _active(
+		&"fire_skill",
+		SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT,
+		ElementIds.FIRE
+	)
+	_instant(skill).energy_cost = 10
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"fire_skill"), null, [ElementIds.WATER], 100)
+	var result := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	_expect_eq(result.reject_reason, CastAttemptResult.RejectReason.ELEMENT_UNAVAILABLE, "unavailable typed")
+	_expect_eq(rig.element.current_element_id, ElementIds.WATER, "unavailable preserves element")
+	_expect_eq(rig.energy.current_energy, 100, "unavailable preserves energy")
+	_expect(not rig.executor.is_skill_on_cooldown(skill.skill_id), "unavailable starts no cooldown")
+	rig.cleanup()
+
+
+func _test_exclusive_cooldown_rejection_preserves_element() -> void:
+	var skill := _active(
+		&"fire_skill",
+		SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT,
+		ElementIds.FIRE
+	)
+	skill.cooldown = 5.0
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"fire_skill"))
+	_expect(rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1).accepted, "first cast accepted")
+	rig.executor.advance(1.0)
+	rig.element.request_element(ElementIds.WATER)
+	var remaining := rig.executor.get_cooldown_remaining(skill.skill_id)
+	var result := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	_expect_eq(result.reject_reason, CastAttemptResult.RejectReason.COOLDOWN_ACTIVE, "cooldown rejection")
+	_expect_eq(rig.element.current_element_id, ElementIds.WATER, "cooldown failure does not switch")
+	_expect_eq(rig.executor.get_cooldown_remaining(skill.skill_id), remaining, "cooldown unchanged by failure")
+	rig.cleanup()
+
+
+func _test_exclusive_success_switches_before_notifications() -> void:
+	var skill := _active(
+		&"fire_skill",
+		SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT,
+		ElementIds.FIRE
+	)
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"fire_skill"))
+	var observed := {"count": 0, "whole": false, "source": -1}
+	rig.element.element_changed.connect(func(change: ElementChangeResult) -> void:
+		observed.count += 1
+		observed.source = change.source
+		observed.whole = (
+			rig.element.current_element_id == ElementIds.FIRE
+			and rig.executor.current_phase == SkillExecutor.Phase.STARTUP
+			and rig.executor.current_cast_snapshot != null
+			and rig.executor.current_cast_snapshot.cast_element_id == ElementIds.FIRE
+		)
+	)
+	var result := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	_expect(result.accepted, "exclusive accepted")
+	_expect_eq(observed.count, 1, "one auto change event")
+	_expect(observed.whole, "element observer sees whole accepted transaction")
+	_expect_eq(observed.source, FormChangedEvent.Source.SKILL_AUTO, "auto source")
+	_expect_eq(result.cast_snapshot.cast_element_id, ElementIds.FIRE, "snapshot locks fire")
+	rig.cleanup()
+
+
+func _test_exclusive_same_element_emits_no_change() -> void:
+	var skill := _active(
+		&"fire_skill",
+		SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT,
+		ElementIds.FIRE
+	)
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"fire_skill"), null, [ElementIds.WATER, ElementIds.FIRE], 100, ElementIds.FIRE)
+	var observed := {"count": 0}
+	rig.element.element_changed.connect(func(_change: ElementChangeResult) -> void:
+		observed.count += 1
+	)
+	_expect(rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1).accepted, "same-element exclusive accepted")
+	_expect_eq(observed.count, 0, "same-element auto cast emits no element event")
+	rig.cleanup()
+
+
+func _test_cancel_never_refunds_and_keeps_auto_element() -> void:
+	var skill := _active(
+		&"fire_skill",
+		SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT,
+		ElementIds.FIRE
+	)
+	_instant(skill).energy_cost = 20
+	skill.cooldown = 5.0
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"fire_skill"))
+	var accepted := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	_expect(accepted.accepted, "cast accepted")
+	_expect(rig.executor.cancel_current_cast(&"test", accepted.cast_snapshot.cast_id), "startup cancelled")
+	_expect_eq(rig.element.current_element_id, ElementIds.FIRE, "auto switch never rolls back")
+	_expect_eq(rig.energy.current_energy, 80, "NEVER does not refund")
+	_expect(rig.executor.is_skill_on_cooldown(skill.skill_id), "cooldown remains")
+	rig.cleanup()
+
+
+func _test_before_delivery_cancel_refunds_but_keeps_cooldown() -> void:
+	var skill := _active(
+		&"fire_refund",
+		SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT,
+		ElementIds.FIRE,
+		SkillDefinition.EnergyRefundPolicy.BEFORE_DELIVERY
+	)
+	_instant(skill).energy_cost = 20
+	skill.cooldown = 5.0
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"fire_refund"))
+	var accepted := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	_expect_eq(rig.energy.current_energy, 80, "energy spent at accept")
+	rig.executor.cancel_current_cast(&"test", accepted.cast_snapshot.cast_id)
+	_expect_eq(rig.energy.current_energy, 100, "pre-delivery cancellation refunds")
+	_expect(rig.executor.is_skill_on_cooldown(skill.skill_id), "refund does not roll back cooldown")
+	_expect_eq(rig.element.current_element_id, ElementIds.FIRE, "refund does not roll back element")
+	rig.cleanup()
+
+
+func _test_after_delivery_cancel_does_not_refund() -> void:
+	var skill := _active(
+		&"delivered",
+		SkillDefinition.ElementPolicy.CURRENT_ELEMENT,
+		ElementIds.NONE,
+		SkillDefinition.EnergyRefundPolicy.BEFORE_DELIVERY
+	)
+	_instant(skill).energy_cost = 20
+	skill.startup_time = 0.1
+	_instant(skill).active_time = 1.0
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"delivered"))
+	var accepted := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	rig.executor.advance(0.1)
+	_expect_eq(rig.delivery_parent.get_child_count(), 1, "delivery generated")
+	rig.executor.cancel_current_cast(&"test", accepted.cast_snapshot.cast_id)
+	_expect_eq(rig.energy.current_energy, 80, "successful delivery prevents refund")
+	rig.cleanup()
+
+
+func _test_current_element_snapshot_survives_buffered_switch() -> void:
+	var skill := _active(&"current")
+	skill.startup_time = 0.1
+	_instant(skill).active_time = 0.1
+	skill.recovery_time = 0.5
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"current"))
+	var accepted := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	var queued := rig.controller.request_element(ElementIds.FIRE)
+	_expect(queued.buffered, "startup manual switch buffered")
+	_expect_eq(accepted.cast_snapshot.cast_element_id, ElementIds.WATER, "cast locks water")
+	_expect_eq(accepted.payload.element_id, ElementIds.WATER, "payload locks water")
+	rig.executor.advance(0.2)
+	_expect_eq(rig.element.current_element_id, ElementIds.FIRE, "buffer flushes entering recovery")
+	_expect_eq(accepted.cast_snapshot.cast_element_id, ElementIds.WATER, "snapshot remains water")
+	_expect_eq(accepted.payload.element_id, ElementIds.WATER, "payload remains water")
+	rig.cleanup()
+
+
+func _test_neutral_cast_locks_none() -> void:
+	var skill := _active(&"neutral", SkillDefinition.ElementPolicy.NEUTRAL)
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"neutral"))
+	var result := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	_expect(result.accepted, "neutral accepted")
+	_expect_eq(result.cast_snapshot.cast_element_id, ElementIds.NONE, "neutral snapshot locks NONE")
+	_expect_eq(result.payload.element_id, ElementIds.NONE, "neutral payload locks NONE")
+	_expect_eq(rig.element.current_element_id, ElementIds.WATER, "neutral does not switch")
+	rig.cleanup()
+
+
+func _test_idle_and_recovery_switch_immediately() -> void:
+	var skill := _active(&"current")
+	skill.startup_time = 0.1
+	_instant(skill).active_time = 0.1
+	skill.recovery_time = 1.0
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"current"))
+	_expect(rig.controller.request_element(ElementIds.FIRE).changed, "idle switch immediate")
+	rig.element.request_element(ElementIds.WATER)
+	rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	rig.executor.advance(0.2)
+	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.RECOVERY, "entered recovery")
+	var changed := rig.controller.request_element(ElementIds.FIRE)
+	_expect(changed.changed and not changed.buffered, "recovery switch immediate")
+	_expect_eq(rig.element.current_element_id, ElementIds.FIRE, "recovery state committed")
+	rig.cleanup()
+
+
+func _test_startup_active_keep_only_last_buffered_switch() -> void:
+	var skill := _active(&"current")
+	skill.startup_time = 0.2
+	_instant(skill).active_time = 0.2
+	skill.recovery_time = 1.0
+	var catalog: Array[SkillDefinition] = [skill]
+	var elements: Array[StringName] = [ElementIds.WATER, ElementIds.FIRE, &"earth"]
+	var rig := _make_rig(catalog, _snapshot(&"current"), null, elements)
+	var observed := {"count": 0}
+	rig.element.element_changed.connect(func(_change: ElementChangeResult) -> void:
+		observed.count += 1
+	)
+	rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	_expect(rig.controller.request_element(ElementIds.FIRE).buffered, "startup buffers")
+	_expect(rig.controller.request_element(&"earth").buffered, "startup replaces buffer")
+	rig.executor.advance(0.2)
+	_expect_eq(rig.element.current_element_id, ElementIds.WATER, "active still locked")
+	_expect(rig.controller.request_element(ElementIds.FIRE).buffered, "active keeps final request")
+	rig.executor.advance(0.2)
+	_expect_eq(rig.element.current_element_id, ElementIds.FIRE, "only final request flushes")
+	_expect_eq(observed.count, 1, "one buffered event published")
+	rig.cleanup()
+
+
+func _test_busy_double_cycle_cancels_buffer() -> void:
+	var skill := _active(&"current")
+	skill.startup_time = 0.2
+	_instant(skill).active_time = 0.2
+	skill.recovery_time = 1.0
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"current"))
+	var observed := {"count": 0}
+	rig.element.element_changed.connect(func(_change: ElementChangeResult) -> void:
+		observed.count += 1
+	)
+	rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	var first := rig.controller.cycle_next()
+	var second := rig.controller.cycle_next()
+	_expect(first.buffered, "first busy cycle buffers alternate element")
+	_expect(second.accepted and not second.buffered and not second.changed, "second busy cycle cancels buffer")
+	rig.executor.advance(0.4)
+	_expect_eq(rig.element.current_element_id, ElementIds.WATER, "cancelled buffer does not switch in recovery")
+	_expect_eq(observed.count, 0, "cancelled buffer publishes no change event")
+	rig.cleanup()
+
+
+func _test_external_control_gate_buffers_and_flushes() -> void:
+	var skill := _active(&"current")
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"current"))
+	var gate := {"allowed": false}
+	var callable := func() -> bool:
+		return gate.allowed
+	rig.controller.set_external_manual_element_gate(callable)
+	_expect(rig.controller.request_element(ElementIds.FIRE).buffered, "external lock buffers idle request")
+	_expect_eq(rig.element.current_element_id, ElementIds.WATER, "locked request not committed")
+	gate.allowed = true
+	rig.controller.set_external_manual_element_gate(callable)
+	_expect_eq(rig.element.current_element_id, ElementIds.FIRE, "unlock flushes once")
+	rig.element.request_element(ElementIds.WATER)
+	rig.controller.set_external_manual_element_gate(Callable())
+	gate.allowed = false
+	rig.executor.set_external_action_gate(func(_skill: SkillDefinition) -> bool:
+		return gate.allowed
+	)
+	_expect(rig.controller.request_element(ElementIds.FIRE).buffered, "executor control gate also buffers")
+	gate.allowed = true
+	rig.controller.call(&"_process", 0.0)
+	_expect_eq(rig.element.current_element_id, ElementIds.FIRE, "control recovery flushes buffered request")
+	rig.cleanup()
+
+
+func _test_lifecycle_clears_buffer() -> void:
+	var skill := _active(&"current")
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"current"))
+	var gate := {"allowed": false}
+	var callable := func() -> bool:
+		return gate.allowed
+	rig.controller.set_external_manual_element_gate(callable)
+	rig.controller.request_element(ElementIds.FIRE)
+	rig.controller.on_floor_changed()
+	gate.allowed = true
+	rig.controller.set_external_manual_element_gate(callable)
+	_expect_eq(rig.element.current_element_id, ElementIds.WATER, "floor clears buffered request")
+	gate.allowed = false
+	rig.controller.set_external_manual_element_gate(callable)
+	rig.controller.request_element(ElementIds.FIRE)
+	rig.controller.handle_pause_exit()
+	gate.allowed = true
+	rig.controller.set_external_manual_element_gate(callable)
+	_expect_eq(rig.element.current_element_id, ElementIds.WATER, "pause exit clears buffered request")
+	rig.cleanup()
+
+
+func _test_invalid_delivery_is_excluded_by_catalog() -> void:
+	var skill := _active(&"bad_delivery")
+	var invalid_scene := PackedScene.new()
+	var invalid_root := Node2D.new()
+	invalid_scene.pack(invalid_root)
+	invalid_root.free()
+	_instant(skill).delivery_scene = invalid_scene
+	var requested := _snapshot(skill.skill_id)
+	var catalog: Array[SkillDefinition] = [skill]
+	var rejected_catalog := RuntimeSkillLoadout.new(catalog, requested)
+	_expect_eq(
+		rejected_catalog.configuration_error,
+		&"delivery_scene_root_must_extend_delivery_base",
+		"runtime catalog rejects a delivery root outside DeliveryBase"
+	)
+	var validation := rejected_catalog.validate_snapshot(requested)
+	_expect(not validation.accepted, "invalid delivery cannot enter a runtime mapping")
+	_expect_eq(validation.detail, &"delivery_scene_root_must_extend_delivery_base", "catalog rejection remains structured")
+	_expect_eq(rejected_catalog.snapshot().get_skill_id(SkillSlotIds.ACTIVE_1), &"", "invalid mapping is not restored")
+	_expect(rejected_catalog.get_skill(skill.skill_id) == null, "invalid delivery is not exposed by the runtime catalog")
+
+func _test_delivery_initialization_failure_is_atomic() -> void:
+	var skill := _active(&"rejecting_delivery")
+	_instant(skill).energy_cost = 20
+	var rejecting_scene := PackedScene.new()
+	var rejecting_root := RecordingSkillDelivery.new()
+	rejecting_root.reject_initialization = true
+	rejecting_scene.pack(rejecting_root)
+	rejecting_root.free()
+	_instant(skill).delivery_scene = rejecting_scene
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(skill.skill_id))
+	_expect_eq(rig.loadout.configuration_error, &"", "typed delivery is accepted by catalog validation")
+	var result := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	_expect_eq(result.reject_reason, CastAttemptResult.RejectReason.DELIVERY_UNAVAILABLE, "initialization failure is structured")
+	_expect_eq(result.detail, &"delivery_initialization_rejected", "initialization failure detail preserved")
+	_expect_eq(rig.energy.current_energy, 100, "initialization failure spends no energy")
+	_expect_eq(rig.executor.get_cooldown_remaining(skill.skill_id), 0.0, "initialization failure starts no cooldown")
+	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.IDLE, "initialization failure starts no cast")
+	_expect_eq(rig.delivery_parent.get_child_count(), 0, "initialization failure adds no delivery")
+	rig.cleanup()
+
+func _test_cast_started_reentry_is_busy() -> void:
+	var skill := _active(&"reentry")
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"reentry"))
+	var observed := {"nested": null}
+	rig.executor.cast_started.connect(func(_snapshot_value: CastSnapshot, _payload: RuntimeAttackPayload) -> void:
+		observed.nested = rig.executor._try_cast_configured(skill, SkillSlotIds.ACTIVE_1)
+	)
+	var outer := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	_expect(outer.accepted, "outer accepted")
+	_expect(observed.nested != null, "nested attempted")
+	_expect_eq(observed.nested.reject_reason, CastAttemptResult.RejectReason.BUSY, "nested rejected busy")
+	_expect_eq(rig.energy.current_energy, 100, "zero-cost reentry cannot double spend")
+	rig.cleanup()
+
+
+func _test_large_delta_spawns_once_and_finishes() -> void:
+	var skill := _active(&"large_delta")
+	skill.startup_time = 0.1
+	_instant(skill).active_time = 0.1
+	skill.recovery_time = 0.1
+	var catalog: Array[SkillDefinition] = [skill]
+	var rig := _make_rig(catalog, _snapshot(&"large_delta"))
+	var observed := {"spawns": 0}
+	rig.executor.delivery_spawned.connect(func(_cast_id: int, _delivery_id: int, _delivery: Node) -> void:
+		observed.spawns += 1
+	)
+	_expect(rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1).accepted, "cast accepted")
+	_expect(rig.executor.advance(1.0), "large delta succeeds")
+	_expect_eq(observed.spawns, 1, "delivery spawned exactly once")
+	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.IDLE, "large delta finishes")
+	rig.cleanup()
+
+
+func _make_rig(
+	catalog: Array[SkillDefinition],
+	initial: RuntimeLoadoutSnapshot,
+	passive_port: PassiveEffectPort = null,
+	elements: Array[StringName] = [ElementIds.WATER, ElementIds.FIRE],
+	energy_current: int = 100,
+	current_element: StringName = ElementIds.WATER
+) -> Rig:
+	var rig := Rig.new()
+	rig.host = Node2D.new()
+	rig.delivery_parent = Node2D.new()
+	rig.host.add_child(rig.delivery_parent)
+	rig.energy = EnergyComponent.new()
+	rig.energy.configure_runtime(100, energy_current)
+	rig.host.add_child(rig.energy)
+	rig.element = CurrentElementController.new()
+	rig.element.configure_runtime(current_element, elements)
+	rig.host.add_child(rig.element)
+	rig.executor = SkillExecutor.new()
+	rig.executor.configure_dependencies(rig.energy, rig.element, rig.delivery_parent)
+	rig.executor.configure_cast_identity(1001, 1002, &"player")
+	rig.host.add_child(rig.executor)
+	rig.loadout = RuntimeSkillLoadout.new(catalog, initial, passive_port)
+	rig.controller = SkillController.new()
+	rig.controller.configure_runtime(rig.element, rig.executor, rig.loadout)
+	rig.host.add_child(rig.controller)
+	root.add_child(rig.host)
+	rig.executor.set_process(false)
+	rig.energy.set_process(false)
+	return rig
+
+
+func _active(
+	skill_id: StringName,
+	policy: SkillDefinition.ElementPolicy = SkillDefinition.ElementPolicy.CURRENT_ELEMENT,
+	required_element: StringName = ElementIds.NONE,
+	refund_policy: SkillDefinition.EnergyRefundPolicy = SkillDefinition.EnergyRefundPolicy.NEVER
+) -> SkillDefinition:
+	var payload := AttackPayloadDefinition.new()
+	payload.damage_multiplier = 1.0
+	match policy:
+		SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT:
+			payload.element_mode = AttackPayloadDefinition.ElementMode.FIXED_ELEMENT
+			payload.fixed_element_id = required_element
+			payload.element_amount = 1
+		SkillDefinition.ElementPolicy.CURRENT_ELEMENT:
+			payload.element_mode = AttackPayloadDefinition.ElementMode.FOLLOW_CAST_FORM
+			payload.element_amount = 1
+		SkillDefinition.ElementPolicy.NEUTRAL:
+			payload.element_mode = AttackPayloadDefinition.ElementMode.NONE
+			payload.element_amount = 0
+	var skill := SkillDefinition.new()
+	skill.skill_id = skill_id
+	skill.activation_kind = SkillDefinition.ActivationKind.ACTIVE
+	skill.element_policy = policy
+	skill.required_element_id = required_element
+	skill.energy_refund_policy = refund_policy
+	skill.startup_time = 0.1
+	skill.recovery_time = 0.1
+	var execution := InstantDeliveryExecution.new()
+	execution.active_time = 0.1
+	execution.delivery_scene = RECORDING_DELIVERY
+	execution.payload = payload
+	skill.execution_definition = execution
+	return skill
+
+
+func _passive(skill_id: StringName, effect_id: StringName) -> SkillDefinition:
+	var skill := SkillDefinition.new()
+	skill.skill_id = skill_id
+	skill.activation_kind = SkillDefinition.ActivationKind.PASSIVE
+	skill.element_policy = SkillDefinition.ElementPolicy.CURRENT_ELEMENT
+	var effect := StatModifierPassiveEffectDefinition.new()
+	if effect_id.is_empty():
+		effect.attack_multiplier = 1.0
+	skill.passive_effect_definition = effect
+	return skill
+
+
+func _instant(skill: SkillDefinition) -> InstantDeliveryExecution:
+	return skill.execution_definition as InstantDeliveryExecution
+
+
+func _snapshot(
+	active_1: StringName = &"",
+	active_2: StringName = &"",
+	active_3: StringName = &"",
+	passive_1: StringName = &"",
+	revision: int = 0
+) -> RuntimeLoadoutSnapshot:
+	var entries: Array[RuntimeLoadoutSlotSnapshot] = [
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_1, active_1),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_2, active_2),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_3, active_3),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_1, passive_1),
+	]
+	return RuntimeLoadoutSnapshot.new(entries, revision)
+
+
+func _unique_count(values: Array[StringName]) -> int:
+	var unique: Array[StringName] = []
+	for value: StringName in values:
+		if not unique.has(value):
+			unique.append(value)
+	return unique.size()
 
 
 func _expect(condition: bool, message: String) -> void:
@@ -71,571 +798,6 @@ func _expect(condition: bool, message: String) -> void:
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (expected %s, got %s)" % [message, str(expected), str(actual)])
-
-
-func _expect_float(actual: float, expected: float, message: String) -> void:
-	_expect(is_equal_approx(actual, expected), "%s (expected %s, got %s)" % [message, expected, actual])
-
-
-func _make_skill(
-		skill_id: StringName = &"element_bolt",
-		energy_cost: int = 10,
-		cooldown: float = 0.0,
-		startup: float = 0.1,
-		active: float = 0.2,
-		recovery: float = 0.3,
-		required_form: StringName = ElementIds.NONE
-) -> SkillDefinition:
-	var payload := AttackPayloadDefinition.new()
-	payload.base_damage = 10.0
-	payload.element_mode = AttackPayloadDefinition.ElementMode.FOLLOW_CAST_FORM
-	payload.element_amount = 3
-	var skill := SkillDefinition.new()
-	skill.skill_id = skill_id
-	skill.energy_cost = energy_cost
-	skill.cooldown = cooldown
-	skill.startup_time = startup
-	skill.active_time = active
-	skill.recovery_time = recovery
-	skill.delivery_scene = DELIVERY_SCENE
-	skill.payload = payload
-	if required_form != ElementIds.NONE:
-		skill.form_policy = SkillDefinition.FormPolicy.REQUIRED_FORM
-		skill.required_form_id = required_form
-	return skill
-
-
-func _make_loadout(form_id: StringName, skill: SkillDefinition) -> SkillLoadout:
-	var loadout := SkillLoadout.new()
-	loadout.form_element_id = form_id
-	loadout.slots[SLOT_PRIMARY] = skill
-	return loadout
-
-
-func _make_rig(
-		starting_energy: int = 100,
-		form_id: StringName = ElementIds.WATER,
-		shared_skill: SkillDefinition = null
-) -> Dictionary:
-	_next_identity += 10
-	var host := Node2D.new()
-	var delivery_parent := Node2D.new()
-	root.add_child(host)
-	root.add_child(delivery_parent)
-
-	var energy := EnergyComponent.new()
-	energy.configure_runtime(100, starting_energy)
-	host.add_child(energy)
-	var form := ElementFormController.new()
-	form.configure_runtime(form_id)
-	host.add_child(form)
-	var executor := SkillExecutor.new()
-	executor.configure_dependencies(energy, form, delivery_parent)
-	executor.configure_cast_identity(_next_identity, _next_identity + 1, &"player")
-	executor.set_stat_snapshot_provider(
-		func(_skill: SkillDefinition) -> CombatStatSnapshot:
-			return CombatStatSnapshot.new(1.5, 2.0)
-	)
-	executor.set_spawn_snapshot_provider(
-		func(_skill: SkillDefinition) -> DeliverySpawnSnapshot:
-			return DeliverySpawnSnapshot.new(
-				Transform2D(0.0, Vector2(12.0, 34.0)),
-				Vector2.LEFT
-			)
-	)
-	host.add_child(executor)
-	executor.set_process(false)
-
-	var skill := shared_skill if shared_skill != null else _make_skill()
-	var controller := SkillController.new()
-	controller.configure_runtime(
-		form,
-		executor,
-		_make_loadout(ElementIds.WATER, skill),
-		_make_loadout(ElementIds.FIRE, skill)
-	)
-	host.add_child(controller)
-	return {
-		"host": host,
-		"delivery_parent": delivery_parent,
-		"energy": energy,
-		"form": form,
-		"executor": executor,
-		"controller": controller,
-		"skill": skill,
-	}
-
-
-func _free_rig(rig: Dictionary) -> void:
-	var host: Node = rig.host
-	var delivery_parent: Node = rig.delivery_parent
-	if is_instance_valid(host):
-		host.free()
-	if is_instance_valid(delivery_parent):
-		delivery_parent.free()
-
-
-func _finish_cast(executor: SkillExecutor) -> void:
-	executor.advance(10.0)
-
-
-func _get_only_delivery(rig: Dictionary) -> RecordingSkillDelivery:
-	var delivery_parent: Node = rig.delivery_parent
-	if delivery_parent.get_child_count() != 1:
-		return null
-	return delivery_parent.get_child(0) as RecordingSkillDelivery
-
-
-func _test_static_configuration_validation() -> void:
-	var universal := _make_skill()
-	_expect(universal.is_valid(), "valid universal skill passes")
-	_expect(_make_loadout(ElementIds.WATER, universal).is_valid(), "water loadout accepts universal")
-	_expect(_make_loadout(ElementIds.FIRE, universal).is_valid(), "fire loadout accepts universal")
-	var neutral := _make_skill(&"neutral_slash")
-	neutral.payload.element_mode = AttackPayloadDefinition.ElementMode.NONE
-	neutral.payload.element_amount = 0
-	_expect(neutral.is_valid(), "neutral universal skill passes")
-	_expect(_make_loadout(ElementIds.WATER, neutral).is_valid(), "water loadout accepts neutral universal")
-	_expect(_make_loadout(ElementIds.FIRE, neutral).is_valid(), "fire loadout accepts neutral universal")
-	var exclusive := _make_skill(&"water_only", 10, 0.0, 0.1, 0.2, 0.3, ElementIds.WATER)
-	_expect(_make_loadout(ElementIds.WATER, exclusive).is_valid(), "water loadout accepts water skill")
-	_expect(not _make_loadout(ElementIds.FIRE, exclusive).is_valid(), "fire loadout rejects water skill")
-	var invalid := _make_skill()
-	invalid.payload.element_amount = -1
-	_expect(not invalid.is_valid(), "invalid payload invalidates skill")
-
-
-func _test_universal_skill_locks_water_form() -> void:
-	var rig := _make_rig(100, ElementIds.WATER)
-	var result: CastAttemptResult = rig.controller.try_cast_slot(SLOT_PRIMARY)
-	_expect(result.accepted, "water cast accepted")
-	_expect_eq(result.cast_snapshot.cast_element_id, ElementIds.WATER, "cast locks water")
-	_expect_eq(result.payload.element_id, ElementIds.WATER, "payload locks water")
-	_free_rig(rig)
-
-
-func _test_universal_skill_locks_fire_form() -> void:
-	var rig := _make_rig(100, ElementIds.FIRE)
-	var result: CastAttemptResult = rig.controller.try_cast_slot(SLOT_PRIMARY)
-	_expect(result.accepted, "fire cast accepted")
-	_expect_eq(result.cast_snapshot.cast_element_id, ElementIds.FIRE, "cast locks fire")
-	_expect_eq(result.payload.element_id, ElementIds.FIRE, "payload locks fire")
-	_free_rig(rig)
-
-
-func _test_exclusive_skill_rejects_wrong_form_without_cost() -> void:
-	var skill := _make_skill(&"water_only", 25, 3.0, 0.1, 0.2, 0.3, ElementIds.WATER)
-	var rig := _make_rig(100, ElementIds.FIRE, skill)
-	var result: CastAttemptResult = rig.executor.try_cast(skill)
-	_expect(not result.accepted, "wrong-form skill rejected")
-	_expect_eq(result.reject_reason, CastAttemptResult.RejectReason.FORM_MISMATCH, "structured form reason")
-	_expect_eq(rig.energy.current_energy, 100, "wrong form spends no energy")
-	_expect_float(rig.executor.get_cooldown_remaining(skill.skill_id), 0.0, "wrong form starts no cooldown")
-	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.IDLE, "wrong form creates no cast")
-	_free_rig(rig)
-
-
-func _test_accepted_transaction_is_complete_before_notifications() -> void:
-	var skill := _make_skill(&"special", 20, 5.0)
-	var rig := _make_rig(100, ElementIds.WATER, skill)
-	var observed := {"complete": false, "delta": 0}
-	rig.energy.energy_changed.connect(func(current: int, _maximum: int, delta: int) -> void:
-		observed.complete = (
-			current == 80
-			and rig.executor.current_phase == SkillExecutor.Phase.STARTUP
-			and is_equal_approx(rig.executor.get_cooldown_remaining(skill.skill_id), 5.0)
-			and rig.executor.current_cast_snapshot != null
-		)
-		observed.delta = delta
-	)
-	var result: CastAttemptResult = rig.executor.try_cast(skill)
-	_expect(result.accepted, "transaction accepted")
-	_expect(observed.complete, "observer sees complete accepted state")
-	_expect_eq(observed.delta, -20, "energy notification has actual delta")
-	_expect_eq(rig.energy.current_energy, 80, "energy spent exactly once")
-	_expect_float(rig.executor.get_cooldown_remaining(skill.skill_id), 5.0, "cooldown starts immediately")
-	_expect_float(result.payload.offensive_damage, 17.0, "attack stats lock at acceptance")
-	_free_rig(rig)
-
-
-func _test_insufficient_energy_has_no_partial_state() -> void:
-	var skill := _make_skill(&"expensive", 60, 4.0)
-	var rig := _make_rig(50, ElementIds.WATER, skill)
-	var result: CastAttemptResult = rig.executor.try_cast(skill)
-	_expect(not result.accepted, "insufficient cast rejected")
-	_expect_eq(result.reject_reason, CastAttemptResult.RejectReason.INSUFFICIENT_ENERGY, "structured energy reason")
-	_expect_eq(rig.energy.current_energy, 50, "rejection preserves energy")
-	_expect_float(rig.executor.get_cooldown_remaining(skill.skill_id), 0.0, "rejection starts no cooldown")
-	_expect(result.cast_snapshot == null and result.payload == null, "rejection returns no half cast")
-	_free_rig(rig)
-
-
-func _test_cooldown_rejection_has_no_partial_state() -> void:
-	var skill := _make_skill(&"special", 10, 3.0)
-	var rig := _make_rig(100, ElementIds.WATER, skill)
-	_expect(rig.executor.try_cast(skill).accepted, "first special cast accepted")
-	rig.executor.advance(0.6)
-	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.IDLE, "cast timing completed")
-	var energy_before: int = rig.energy.current_energy
-	var remaining_before: float = rig.executor.get_cooldown_remaining(skill.skill_id)
-	var rejected: CastAttemptResult = rig.executor.try_cast(skill)
-	_expect_eq(rejected.reject_reason, CastAttemptResult.RejectReason.COOLDOWN_ACTIVE, "structured cooldown reason")
-	_expect_eq(rig.energy.current_energy, energy_before, "cooldown rejection spends no energy")
-	_expect_float(rig.executor.get_cooldown_remaining(skill.skill_id), remaining_before, "timer is not restarted")
-	_free_rig(rig)
-
-
-func _test_zero_cooldown_recasts_after_recovery() -> void:
-	var skill := _make_skill(&"regular", 10, 0.0)
-	var rig := _make_rig(100, ElementIds.WATER, skill)
-	var first: CastAttemptResult = rig.executor.try_cast(skill)
-	_finish_cast(rig.executor)
-	var second: CastAttemptResult = rig.executor.try_cast(skill)
-	_expect(first.accepted and second.accepted, "regular skill recasts after timing")
-	_expect(first.cast_snapshot.cast_id != second.cast_snapshot.cast_id, "recast gets unique cast id")
-	_expect_eq(rig.energy.current_energy, 80, "each accepted cast spends once")
-	_free_rig(rig)
-
-
-func _test_startup_cancel_does_not_refund() -> void:
-	var skill := _make_skill(&"interruptible", 25, 5.0)
-	var rig := _make_rig(100, ElementIds.WATER, skill)
-	var reasons: Array[StringName] = []
-	rig.executor.cast_cancelled.connect(
-		func(_cast: CastSnapshot, reason: StringName) -> void:
-			reasons.append(reason)
-	)
-	var accepted: CastAttemptResult = rig.executor.try_cast(skill)
-	_expect(rig.executor.cancel_current_cast(&"hit", accepted.cast_snapshot.cast_id), "startup cancel accepted")
-	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.IDLE, "cancel returns idle")
-	_expect_eq(rig.energy.current_energy, 75, "cancel does not refund")
-	_expect_float(rig.executor.get_cooldown_remaining(skill.skill_id), 5.0, "cancel keeps cooldown")
-	_expect_eq(reasons, [&"hit"], "cancel event occurs exactly once")
-	_free_rig(rig)
-
-
-func _test_acceptance_callback_cancel_is_deferred() -> void:
-	var skill := _make_skill(&"callback_interrupt", 20, 5.0)
-	var rig := _make_rig(100, ElementIds.WATER, skill)
-	var cancelled := {"count": 0}
-	rig.executor.cast_started.connect(func(cast: CastSnapshot, _payload: RuntimeAttackPayload) -> void:
-		rig.executor.cancel_current_cast(&"hit", cast.cast_id)
-	)
-	rig.executor.cast_cancelled.connect(func(_cast: CastSnapshot, reason: StringName) -> void:
-		if reason == &"hit":
-			cancelled.count += 1
-	)
-	var result: CastAttemptResult = rig.executor.try_cast(skill)
-	_expect(result.accepted, "release transaction was accepted")
-	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.IDLE, "queued callback cancellation returns idle")
-	_expect_eq(cancelled.count, 1, "queued cancellation publishes exactly once")
-	_expect_eq(rig.energy.current_energy, 80, "queued cancellation does not refund")
-	_expect_float(rig.executor.get_cooldown_remaining(skill.skill_id), 5.0, "queued cancellation keeps cooldown")
-	_free_rig(rig)
-
-
-func _test_active_delivery_survives_cancel_and_switch() -> void:
-	var rig := _make_rig(100, ElementIds.WATER)
-	var accepted: CastAttemptResult = rig.executor.try_cast(rig.skill)
-	rig.executor.advance(0.1)
-	var delivery := _get_only_delivery(rig)
-	_expect(delivery != null, "delivery generated at ACTIVE entry")
-	_expect(delivery.initialized and not delivery.initialized_inside_tree, "delivery initialized before add_child")
-	_expect(delivery.ready_after_initialize, "ready observes initialized data")
-	_expect_eq(delivery.delivery_id, 1, "first delivery id is one")
-	_expect_eq(delivery.cast_snapshot.cast_id, accepted.cast_snapshot.cast_id, "delivery receives cast")
-	_expect_eq(delivery.payload.element_id, ElementIds.WATER, "delivery starts water")
-	_expect_eq(delivery.global_position, Vector2(12.0, 34.0), "delivery receives transform")
-	_expect_eq(delivery.direction, Vector2.LEFT, "delivery receives direction")
-	rig.form.request_form(ElementIds.FIRE)
-	_expect(rig.executor.cancel_current_cast(&"death", accepted.cast_snapshot.cast_id), "active cancel accepted")
-	_expect(is_instance_valid(delivery) and delivery.is_inside_tree(), "delivery survives cancellation")
-	_expect_eq(delivery.payload.element_id, ElementIds.WATER, "delivery is not recolored")
-	_expect_eq(delivery.close_count, 1, "active hit window closes once")
-	_free_rig(rig)
-
-
-func _test_switch_during_cast_only_affects_next() -> void:
-	var rig := _make_rig(100, ElementIds.WATER)
-	var first: CastAttemptResult = rig.executor.try_cast(rig.skill)
-	_expect(rig.form.request_form(ElementIds.FIRE), "form can switch during cast")
-	_expect_eq(first.cast_snapshot.cast_element_id, ElementIds.WATER, "current cast stays water")
-	_expect_eq(first.payload.element_id, ElementIds.WATER, "current payload stays water")
-	_finish_cast(rig.executor)
-	var second: CastAttemptResult = rig.executor.try_cast(rig.skill)
-	_expect(second.accepted, "next cast accepted")
-	_expect_eq(second.cast_snapshot.cast_element_id, ElementIds.FIRE, "next cast reads fire")
-	_expect_eq(second.payload.element_id, ElementIds.FIRE, "next payload reads fire")
-	_free_rig(rig)
-
-
-func _test_large_delta_crosses_every_phase_once() -> void:
-	var rig := _make_rig()
-	var phases: Array[int] = []
-	var deliveries: Array[int] = []
-	var finished_count := {"value": 0}
-	rig.executor.phase_changed.connect(
-		func(_cast_id: int, _previous: int, current: int) -> void:
-			phases.append(current)
-	)
-	rig.executor.delivery_spawned.connect(
-		func(_cast_id: int, delivery_id: int, _delivery: Node) -> void:
-			deliveries.append(delivery_id)
-	)
-	rig.executor.cast_finished.connect(
-		func(_cast: CastSnapshot) -> void:
-			finished_count.value += 1
-	)
-	_expect(rig.executor.try_cast(rig.skill).accepted, "cast accepted")
-	_expect(rig.executor.advance(10.0), "large delta accepted")
-	_expect_eq(
-		phases,
-		[
-			SkillExecutor.Phase.STARTUP,
-			SkillExecutor.Phase.ACTIVE,
-			SkillExecutor.Phase.RECOVERY,
-			SkillExecutor.Phase.IDLE,
-		],
-		"large delta preserves phase order"
-	)
-	_expect_eq(deliveries, [1], "large delta generates one delivery")
-	_expect_eq(finished_count.value, 1, "finish event occurs once")
-	var delivery := _get_only_delivery(rig)
-	_expect(delivery != null and delivery.close_count == 1, "ACTIVE exit closes once")
-	_free_rig(rig)
-
-
-func _test_advance_reentry_is_rejected() -> void:
-	var rig := _make_rig()
-	var nested_result := {"called": 0, "accepted": true}
-	rig.executor.phase_changed.connect(
-		func(_cast_id: int, _previous: int, current: int) -> void:
-			if current == SkillExecutor.Phase.ACTIVE:
-				nested_result.called += 1
-				nested_result.accepted = rig.executor.advance(10.0)
-	)
-	_expect(rig.executor.try_cast(rig.skill).accepted, "cast accepted")
-	_expect(rig.executor.advance(10.0), "outer advance succeeds")
-	_expect_eq(nested_result.called, 1, "ACTIVE entry occurs once")
-	_expect(not nested_result.accepted, "nested advance is rejected")
-	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.IDLE, "outer advance finishes cleanly")
-	_expect_eq(rig.delivery_parent.get_child_count(), 1, "reentry cannot duplicate delivery")
-	_free_rig(rig)
-
-
-func _test_recovery_cancel_does_not_reclose_window() -> void:
-	var rig := _make_rig()
-	var accepted: CastAttemptResult = rig.executor.try_cast(rig.skill)
-	rig.executor.advance(0.31)
-	var delivery := _get_only_delivery(rig)
-	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.RECOVERY, "cast reached recovery")
-	_expect(delivery != null and delivery.close_count == 1, "ACTIVE exit closed once")
-	_expect(rig.executor.cancel_current_cast(&"death", accepted.cast_snapshot.cast_id), "recovery cancel accepted")
-	_expect_eq(delivery.close_count, 1, "recovery cancel does not close a second time")
-	_free_rig(rig)
-
-
-func _test_resource_mutation_cannot_change_cast() -> void:
-	var rig := _make_rig(100, ElementIds.WATER)
-	var accepted: CastAttemptResult = rig.executor.try_cast(rig.skill)
-	rig.skill.startup_time = 99.0
-	rig.skill.active_time = 99.0
-	rig.skill.recovery_time = 99.0
-	rig.skill.payload.element_amount = 10
-	_expect(rig.executor.advance(0.6), "locked timings advance")
-	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.IDLE, "Resource edits do not extend cast")
-	var delivery := _get_only_delivery(rig)
-	_expect(delivery != null, "delivery still generated")
-	_expect_eq(delivery.payload.element_amount, 3, "delivery payload ignores Resource mutation")
-	_expect_eq(accepted.payload.element_amount, 3, "attempt payload remains immutable")
-	_free_rig(rig)
-
-
-func _test_late_token_cannot_affect_new_cast() -> void:
-	var rig := _make_rig()
-	var first: CastAttemptResult = rig.executor.try_cast(rig.skill)
-	rig.executor.cancel_current_cast(&"hit", first.cast_snapshot.cast_id)
-	var second: CastAttemptResult = rig.executor.try_cast(rig.skill)
-	_expect(second.accepted, "second cast accepted")
-	_expect(not rig.executor.cancel_current_cast(&"late_animation", first.cast_snapshot.cast_id), "old token cannot cancel")
-	_expect(not rig.executor.notify_presentation_marker(first.cast_snapshot.cast_id, &"active"), "old marker rejected")
-	_expect(rig.executor.notify_presentation_marker(second.cast_snapshot.cast_id, &"swing"), "current marker accepted")
-	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.STARTUP, "marker cannot advance gameplay")
-	_free_rig(rig)
-
-
-func _test_pause_and_exit_cancel_deterministically() -> void:
-	var paused_rig := _make_rig()
-	var pause_cancelled := {"value": false}
-	paused_rig.executor.cast_cancelled.connect(
-		func(_cast: CastSnapshot, reason: StringName) -> void:
-			pause_cancelled.value = reason == &"scene_tree_paused"
-	)
-	paused_rig.executor.try_cast(paused_rig.skill)
-	_expect(paused_rig.executor.handle_pause(), "pause cancellation accepted")
-	_expect(pause_cancelled.value and paused_rig.executor.current_phase == SkillExecutor.Phase.IDLE, "pause leaves no busy cast")
-	_free_rig(paused_rig)
-
-	var exit_rig := _make_rig()
-	var exit_cancelled := {"value": false}
-	exit_rig.executor.cast_cancelled.connect(
-		func(_cast: CastSnapshot, reason: StringName) -> void:
-			exit_cancelled.value = reason == &"caster_left_tree"
-	)
-	exit_rig.executor.try_cast(exit_rig.skill)
-	var host: Node = exit_rig.host
-	var executor: SkillExecutor = exit_rig.executor
-	host.remove_child(executor)
-	_expect(exit_cancelled.value, "leaving tree emits cancellation")
-	_expect_eq(executor.current_phase, SkillExecutor.Phase.IDLE, "removed executor is idle")
-	executor.free()
-	_free_rig(exit_rig)
-
-
-func _test_external_gate_has_no_side_effects() -> void:
-	var skill := _make_skill(&"gated", 15, 2.0)
-	var rig := _make_rig(100, ElementIds.WATER, skill)
-	rig.executor.set_external_action_gate(
-		func(_skill: SkillDefinition) -> bool:
-			return false
-	)
-	var result: CastAttemptResult = rig.executor.try_cast(skill)
-	_expect_eq(result.reject_reason, CastAttemptResult.RejectReason.EXTERNAL_GATE_REJECTED, "structured gate reason")
-	_expect_eq(rig.energy.current_energy, 100, "gate spends no energy")
-	_expect_float(rig.executor.get_cooldown_remaining(skill.skill_id), 0.0, "gate starts no cooldown")
-	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.IDLE, "gate creates no cast")
-	_free_rig(rig)
-
-
-func _test_preflight_callback_reentry_is_rejected() -> void:
-	var skill := _make_skill(&"reentry_guarded", 20, 2.0)
-	var rig := _make_rig(100, ElementIds.WATER, skill)
-	var nested_result := {"value": null}
-	var cast_starts := {"count": 0}
-	rig.executor.cast_started.connect(
-		func(_cast: CastSnapshot, _payload: RuntimeAttackPayload) -> void:
-			cast_starts.count += 1
-	)
-	rig.executor.set_external_action_gate(
-		func(_skill: SkillDefinition) -> bool:
-			nested_result.value = rig.executor.try_cast(skill)
-			return true
-	)
-	var outer_result: CastAttemptResult = rig.executor.try_cast(skill)
-	var nested: CastAttemptResult = nested_result.value
-	_expect(outer_result.accepted, "outer cast remains accepted")
-	_expect(nested != null and not nested.accepted, "nested cast is rejected")
-	_expect_eq(nested.reject_reason, CastAttemptResult.RejectReason.BUSY, "nested cast has structured busy reason")
-	_expect_eq(rig.energy.current_energy, 80, "reentry cannot double-spend energy")
-	_expect_float(rig.executor.get_cooldown_remaining(skill.skill_id), 2.0, "reentry cannot restart cooldown")
-	_expect_eq(cast_starts.count, 1, "reentry publishes one cast")
-	_free_rig(rig)
-
-
-func _test_invalid_configuration_has_no_side_effects() -> void:
-	var rig := _make_rig()
-	var invalid := _make_skill(&"invalid")
-	invalid.delivery_scene = null
-	var result: CastAttemptResult = rig.executor.try_cast(invalid)
-	_expect_eq(result.reject_reason, CastAttemptResult.RejectReason.INVALID_CONFIGURATION, "structured config reason")
-	_expect_eq(result.detail, &"missing_delivery_scene", "config detail preserved")
-	_expect_eq(rig.energy.current_energy, 100, "invalid config spends no energy")
-	_expect_eq(rig.executor.current_phase, SkillExecutor.Phase.IDLE, "invalid config creates no cast")
-	_free_rig(rig)
-
-
-func _test_form_loadouts_are_independent() -> void:
-	var rig := _make_rig()
-	var water_skill := _make_skill(&"water_slot")
-	var fire_skill := _make_skill(&"fire_slot")
-	rig.controller.water_loadout = _make_loadout(ElementIds.WATER, water_skill)
-	rig.controller.fire_loadout = _make_loadout(ElementIds.FIRE, fire_skill)
-	_expect_eq(rig.controller.get_skill_for_slot(SLOT_PRIMARY).skill_id, &"water_slot", "water selects water mapping")
-	rig.controller.request_form(ElementIds.FIRE)
-	_expect_eq(rig.controller.get_skill_for_slot(SLOT_PRIMARY).skill_id, &"fire_slot", "fire selects own mapping")
-	_expect(rig.controller.water_loadout.slots[SLOT_PRIMARY] != rig.controller.fire_loadout.slots[SLOT_PRIMARY], "slots are distinct")
-	_free_rig(rig)
-
-
-func _test_component_notifications_are_post_commit() -> void:
-	var energy := EnergyComponent.new()
-	var energy_observation := {"current": -1, "maximum": -1, "delta": 0}
-	energy.energy_changed.connect(func(current: int, maximum: int, delta: int) -> void:
-		energy_observation.current = current
-		energy_observation.maximum = maximum
-		energy_observation.delta = delta
-	)
-	energy.configure_runtime(50, 40)
-	_expect(energy.try_spend(15), "energy spend accepted")
-	_expect_eq(
-		[energy_observation.current, energy_observation.maximum, energy_observation.delta],
-		[25, 50, -15],
-		"energy signal reports committed state"
-	)
-	_expect_eq(energy.current_energy, 25, "energy getter matches signal")
-
-	var form := ElementFormController.new()
-	var form_observation: Array[StringName] = []
-	form.form_changed.connect(func(current: StringName, previous: StringName) -> void:
-		form_observation.append(previous)
-		form_observation.append(current)
-	)
-	_expect(form.request_form(ElementIds.FIRE), "valid form switch accepted")
-	_expect_eq(form_observation, [ElementIds.WATER, ElementIds.FIRE], "form signal reports committed transition")
-	_expect(not form.request_form(&"earth"), "unknown form rejected")
-	_expect_eq(form.current_form_id, ElementIds.FIRE, "rejected form preserves state")
-	energy.free()
-	form.free()
-
-
-func _test_energy_regenerates_at_default_rate_and_pauses() -> void:
-	var energy := EnergyComponent.new()
-	var observed_deltas: Array[int] = []
-	energy.energy_changed.connect(
-		func(_current: int, _maximum: int, delta: int) -> void:
-			observed_deltas.append(delta)
-	)
-	energy.configure_runtime(100, 100)
-	_expect_float(energy.regeneration_per_second, 5.0, "default recovery is five per second")
-	_expect_float(energy.regeneration_delay_after_spend, 1.0, "spend delay defaults to one second")
-	_expect(energy.try_spend(20), "energy spend starts recovery delay")
-	_expect_eq(energy.advance_regeneration(0.75), 0, "recovery does not start during spend delay")
-	energy.set_regeneration_paused(true)
-	_expect(energy.regeneration_paused, "recovery pause is observable")
-	_expect_eq(energy.advance_regeneration(10.0), 0, "paused recovery does not advance delay")
-	energy.set_regeneration_paused(false)
-	_expect_eq(energy.advance_regeneration(0.25), 0, "remaining delay resumes after pause")
-	_expect_eq(energy.advance_regeneration(0.4), 2, "recovery grants five energy per second")
-	_expect_eq(energy.advance_regeneration(0.1), 0, "fractional recovery is retained without early rounding")
-	_expect_eq(energy.advance_regeneration(0.1), 1, "fractional recovery commits at a whole point")
-	_expect_eq(energy.current_energy, 83, "recovery commits the expected total")
-	_expect_eq(observed_deltas, [-20, 2, 1], "recovery notifications report committed integer deltas")
-	energy.free()
-
-
-func _test_shared_resources_keep_runtime_isolated() -> void:
-	var shared_skill := _make_skill(&"shared_special", 20, 4.0)
-	var shared_water_loadout := _make_loadout(ElementIds.WATER, shared_skill)
-	var shared_fire_loadout := _make_loadout(ElementIds.FIRE, shared_skill)
-	var first := _make_rig(100, ElementIds.WATER, shared_skill)
-	var second := _make_rig(70, ElementIds.FIRE, shared_skill)
-	first.controller.water_loadout = shared_water_loadout
-	first.controller.fire_loadout = shared_fire_loadout
-	second.controller.water_loadout = shared_water_loadout
-	second.controller.fire_loadout = shared_fire_loadout
-	var first_result: CastAttemptResult = first.controller.try_cast_slot(SLOT_PRIMARY)
-	var second_result: CastAttemptResult = second.controller.try_cast_slot(SLOT_PRIMARY)
-	_expect(first_result.accepted and second_result.accepted, "both actors use shared skill")
-	_expect(first_result.cast_snapshot.cast_id != second_result.cast_snapshot.cast_id, "cast ids globally unique")
-	_expect_eq(first.energy.current_energy, 80, "first energy independent")
-	_expect_eq(second.energy.current_energy, 50, "second energy independent")
-	_expect_eq(first_result.payload.element_id, ElementIds.WATER, "first payload water")
-	_expect_eq(second_result.payload.element_id, ElementIds.FIRE, "second payload fire")
-	first.executor.advance(1.0)
-	_expect_float(first.executor.get_cooldown_remaining(shared_skill.skill_id), 3.0, "first cooldown advances")
-	_expect_float(second.executor.get_cooldown_remaining(shared_skill.skill_id), 4.0, "second cooldown untouched")
-	_expect_float(shared_skill.cooldown, 4.0, "Resource has no remaining cooldown")
-	_expect(first.controller.water_loadout == second.controller.water_loadout, "actors share the same loadout Resource")
-	_free_rig(first)
-	_free_rig(second)
+	_assertions += 1
+	if actual != expected:
+		_failures.append("%s (expected=%s, actual=%s)" % [message, str(expected), str(actual)])

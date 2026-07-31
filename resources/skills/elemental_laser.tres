@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SkillDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://combat/execution/channel_execution.gd" id="2_execution"]
+
+[sub_resource type="Resource" id="LaserExecution"]
+script = ExtResource("2_execution")
+movement_policy = 1
+tick_interval = 0.5
+energy_per_tick = 5
+damage_multiplier = 0.5
+element_amount = 1
+presentation_tags = PackedStringArray("elemental_laser", "beam")
+
+[resource]
+script = ExtResource("1_skill")
+skill_id = &"elemental_laser"
+execution_definition = SubResource("LaserExecution")

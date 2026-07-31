@@ -63,9 +63,17 @@ var hit_direction: Vector2:
 	get:
 		return _hit_direction
 
-var base_damage: float:
+var effective_attack: float:
 	get:
-		return _base_damage
+		return _effective_attack
+
+var damage_multiplier: float:
+	get:
+		return _damage_multiplier
+
+var fixed_damage_bonus: float:
+	get:
+		return _fixed_damage_bonus
 
 var offensive_damage: float:
 	get:
@@ -133,7 +141,9 @@ var _source_team_id: StringName = &""
 var _source_element_id: StringName = ElementIds.NONE
 var _hit_position: Vector2 = Vector2.ZERO
 var _hit_direction: Vector2 = Vector2.ZERO
-var _base_damage: float = 0.0
+var _effective_attack: float = 0.0
+var _damage_multiplier: float = 0.0
+var _fixed_damage_bonus: float = 0.0
 var _offensive_damage: float = 0.0
 var _reacted_damage: float = 0.0
 var _mitigated_damage: float = 0.0
@@ -169,7 +179,7 @@ static func from_plan(plan: CombatPlan) -> CombatResult:
 	result._copy_request_metadata(plan.request)
 
 	if plan.damage_resolution != null:
-		result._base_damage = plan.request.payload.base_damage
+		result._copy_locked_damage_input(plan.request.payload)
 		result._offensive_damage = plan.damage_resolution.offensive_damage
 		result._reacted_damage = plan.damage_resolution.reacted_damage
 		result._mitigated_damage = plan.damage_resolution.mitigated_damage
@@ -178,7 +188,7 @@ static func from_plan(plan: CombatPlan) -> CombatResult:
 		result._maximum_health = plan.maximum_health
 		result._health_delta = plan.health_delta()
 	else:
-		result._base_damage = plan.request.payload.base_damage
+		result._copy_locked_damage_input(plan.request.payload)
 		result._offensive_damage = plan.request.payload.offensive_damage
 
 	if plan.element_resolution != null:
@@ -213,6 +223,14 @@ func _copy_request_metadata(request: HitRequest) -> void:
 	_root_owner_id = request.cast_snapshot.root_owner_id
 	_skill_id = request.cast_snapshot.skill_id
 	_source_team_id = request.cast_snapshot.team_id
+
+
+func _copy_locked_damage_input(payload: RuntimeAttackPayload) -> void:
+	if payload == null:
+		return
+	_effective_attack = payload.effective_attack
+	_damage_multiplier = payload.damage_multiplier
+	_fixed_damage_bonus = payload.fixed_damage_bonus
 
 
 func _append_tag_once(tag: String) -> void:

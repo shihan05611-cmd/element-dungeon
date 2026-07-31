@@ -8,10 +8,10 @@
 | --- | --- |
 | `ElementIds` | 唯一元素目录：`NONE / WATER / FIRE`；业务脚本不得自由拼写元素 ID。 |
 | `ElementDefinition` | 静态元素显示定义；Resource 不保存运行时层数。 |
-| `AttackPayloadDefinition` | 静态伤害、`NONE / FOLLOW_CAST_FORM / FIXED_ELEMENT`、元素量和表现标签。 |
+| `AttackPayloadDefinition` | 静态技能伤害倍率、`NONE / FOLLOW_CAST_FORM / FIXED_ELEMENT`、元素量和表现标签。 |
 | `CombatStatSnapshot` | 只接受 `attack_multiplier`、`flat_damage_bonus` 两个标量字段；工厂深复制并拒绝未知字段。 |
 | `CastSnapshot` | `cast_id / skill_id / root_owner_id / caster_id / team_id / cast_element_id / stat_snapshot`；创建后不可写且没有 Delivery 字段。 |
-| `RuntimeAttackPayload` | 锁定的 `base_damage / offensive_damage / element_id / element_amount / presentation_tags`。 |
+| `RuntimeAttackPayload` | 锁定的 `effective_attack / damage_multiplier / fixed_damage_bonus / offensive_damage / element_id / element_amount / presentation_tags`。 |
 | `ElementSnapshot` | 不可变的水/火整数层和容量，始终满足每种元素 `0..capacity<=10`。 |
 | `HitRequest` | `CastSnapshot / RuntimeAttackPayload / delivery_id / hit_index / hit_position / hit_direction`；不包含目标引用。 |
 | `ElementResolution` | 纯规则输出：前后快照、delta、反应消耗、剩余来袭量和倍率。 |
@@ -25,13 +25,14 @@
 当前最小防御模型是目标命中时读取的非负 `defense_flat`：
 
 ```text
-offensive_damage = max(0, base_damage * attack_multiplier + flat_damage_bonus)
+effective_attack = 10 * attack_multiplier
+offensive_damage = max(0, effective_attack * damage_multiplier + flat_damage_bonus)
 reacted_damage = offensive_damage * reaction_multiplier
 mitigated_damage = max(0, reacted_damage - defense_flat)
 final_damage = roundi(mitigated_damage)
 ```
 
-中间值不取整。水火反应使用 `1.0 + 0.3 * consumed` 独立乘区。
+玩家基础攻击力固定为 10；成长、属性被动和临时攻击修正通过 `attack_multiplier` 合成，并在 Cast 接受时锁定。中间值不取整。水火反应使用 `1.0 + 0.3 * consumed` 独立乘区。
 
 ## receive_hit 精确顺序
 
@@ -108,7 +109,7 @@ receiver.configure_components(element_carrier, damage_receiver)
 Godot_v4.7.1-stable_win64.exe --headless --log-file .godot/combat-tests.log --path <project> --script res://combat/tests/run_combat_tests.gd
 ```
 
-测试覆盖纯规则矩阵、非法输入、无组件降级、最终零伤害、整体拒绝、一次取整、共享 Resource 隔离、有界去重、通知后状态、通知期重入、致命伤和待删除目标。
+测试覆盖纯规则矩阵、50%/100%/800% 倍率、非法输入、无组件降级、最终零伤害、整体拒绝、一次取整、共享 Resource 隔离、有界去重、通知后状态、通知期重入、致命伤和待删除目标。
 
 ## MVP 限制
 

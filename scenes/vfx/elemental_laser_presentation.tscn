@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/vfx/laser_vfx_presentation.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/generated/vfx/elemental_laser/beam_segment_water.png" id="2_water"]
+
+[node name="ElementalLaserPresentation" type="Node2D"]
+z_index = 18
+script = ExtResource("1_script")
+
+[node name="Segment0" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(32, 0)
+texture = ExtResource("2_water")
+
+[node name="Segment1" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(96, 0)
+texture = ExtResource("2_water")
+
+[node name="Segment2" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(160, 0)
+texture = ExtResource("2_water")
+
+[node name="Segment3" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(224, 0)
+texture = ExtResource("2_water")
+
+[node name="Segment4" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(288, 0)
+texture = ExtResource("2_water")
+

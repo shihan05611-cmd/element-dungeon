@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RunContentCatalog" load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://combat/content/run_content_catalog.gd" id="1_catalog"]
+[ext_resource type="Resource" path="res://resources/content/skills/element_slash_content.tres" id="2_slash"]
+[ext_resource type="Resource" path="res://resources/content/skills/element_bolt_content.tres" id="3_bolt"]
+[ext_resource type="Resource" path="res://resources/content/skills/elemental_fury_content.tres" id="4_fury"]
+[ext_resource type="Resource" path="res://resources/content/skills/elemental_laser_content.tres" id="5_laser"]
+[ext_resource type="Resource" path="res://resources/content/skills/element_reclaim_content.tres" id="6_reclaim"]
+[ext_resource type="Resource" path="res://resources/content/skills/burning_content.tres" id="7_burning"]
+[ext_resource type="Resource" path="res://resources/content/skills/unending_content.tres" id="8_unending"]
+[ext_resource type="Resource" path="res://resources/growth/relics/manual_spring.tres" id="9_manual"]
+[ext_resource type="Resource" path="res://resources/growth/relics/auto_spark.tres" id="10_auto"]
+[ext_resource type="Resource" path="res://resources/growth/relics/reaction_focus.tres" id="11_focus"]
+[ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="12_content_script"]
+[ext_resource type="Script" path="res://growth/definitions/relic_definition.gd" id="13_relic_script"]
+
+[resource]
+script = ExtResource("1_catalog")
+skill_contents = Array[ExtResource("12_content_script")]([ExtResource("2_slash"), ExtResource("3_bolt"), ExtResource("4_fury"), ExtResource("5_laser"), ExtResource("6_reclaim"), ExtResource("7_burning"), ExtResource("8_unending")])
+fixed_basic_attack_id = &"element_slash"
+relic_definitions = Array[ExtResource("13_relic_script")]([ExtResource("9_manual"), ExtResource("10_auto"), ExtResource("11_focus")])

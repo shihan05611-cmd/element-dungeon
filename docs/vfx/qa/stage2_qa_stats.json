@@ -1,0 +1,468 @@
+{
+  "final_png_count": 25,
+  "rows": [
+    {
+      "file": "element_bolt/icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "coverage": 0.404221,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "element_bolt/projectile_fire_no_jitter_spritesheet.png",
+      "size": [
+        1536,
+        160
+      ],
+      "mode": "RGBA",
+      "coverage": 0.312931,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "element_bolt/projectile_water_no_jitter_spritesheet.png",
+      "size": [
+        1536,
+        160
+      ],
+      "mode": "RGBA",
+      "coverage": 0.312931,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "elemental_fury/icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "coverage": 0.521774,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "elemental_fury/burst_core.png",
+      "size": [
+        512,
+        64
+      ],
+      "mode": "RGBA",
+      "coverage": 0.060272,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "elemental_laser/icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "coverage": 0.178055,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "elemental_laser/beam_segment_water.png",
+      "size": [
+        64,
+        24
+      ],
+      "mode": "RGBA",
+      "coverage": 0.375,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "elemental_laser/beam_segment_fire.png",
+      "size": [
+        64,
+        24
+      ],
+      "mode": "RGBA",
+      "coverage": 0.434245,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "elemental_laser/beam_tick_water.png",
+      "size": [
+        512,
+        64
+      ],
+      "mode": "RGBA",
+      "coverage": 0.059906,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "elemental_laser/beam_tick_fire.png",
+      "size": [
+        512,
+        64
+      ],
+      "mode": "RGBA",
+      "coverage": 0.046906,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "elemental_laser/beam_segment_water_mask.png",
+      "size": [
+        64,
+        24
+      ],
+      "mode": "L",
+      "coverage": 1.0,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "elemental_laser/beam_segment_fire_mask.png",
+      "size": [
+        64,
+        24
+      ],
+      "mode": "L",
+      "coverage": 1.0,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "elemental_laser/beam_tick_water_mask.png",
+      "size": [
+        512,
+        64
+      ],
+      "mode": "L",
+      "coverage": 1.0,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "elemental_laser/beam_tick_fire_mask.png",
+      "size": [
+        512,
+        64
+      ],
+      "mode": "L",
+      "coverage": 1.0,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "element_reclaim/icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "coverage": 0.304718,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "element_reclaim/reclaim_particle_water.png",
+      "size": [
+        256,
+        32
+      ],
+      "mode": "RGBA",
+      "coverage": 0.096802,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "element_reclaim/reclaim_particle_fire.png",
+      "size": [
+        256,
+        32
+      ],
+      "mode": "RGBA",
+      "coverage": 0.070801,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "element_reclaim/reclaim_extract_neutral.png",
+      "size": [
+        512,
+        64
+      ],
+      "mode": "RGBA",
+      "coverage": 0.099365,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "element_reclaim/reclaim_arrival_neutral.png",
+      "size": [
+        512,
+        64
+      ],
+      "mode": "RGBA",
+      "coverage": 0.084534,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "burning/icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "coverage": 0.267975,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "burning/burning_enemy_loop.png",
+      "size": [
+        768,
+        64
+      ],
+      "mode": "RGBA",
+      "coverage": 0.070435,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "burning/burning_tick.png",
+      "size": [
+        512,
+        64
+      ],
+      "mode": "RGBA",
+      "coverage": 0.042938,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "unending/icon.png",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "coverage": 0.387497,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "unending/unending_enemy_loop.png",
+      "size": [
+        768,
+        64
+      ],
+      "mode": "RGBA",
+      "coverage": 0.032145,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    },
+    {
+      "file": "unending/unending_trigger.png",
+      "size": [
+        512,
+        64
+      ],
+      "mode": "RGBA",
+      "coverage": 0.072815,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "key_pollution_pixels": 0,
+      "pass": true
+    }
+  ],
+  "mask_pairs": [
+    {
+      "base": "beam_segment_water",
+      "size": [
+        64,
+        24
+      ],
+      "aligned": true
+    },
+    {
+      "base": "beam_segment_fire",
+      "size": [
+        64,
+        24
+      ],
+      "aligned": true
+    },
+    {
+      "base": "beam_tick_water",
+      "size": [
+        512,
+        64
+      ],
+      "aligned": true
+    },
+    {
+      "base": "beam_tick_fire",
+      "size": [
+        512,
+        64
+      ],
+      "aligned": true
+    }
+  ],
+  "black_additive_assets": 0,
+  "black_additive_check": "N/A: final assets use RGBA alpha or color+mask; no black-background additive texture selected.",
+  "failures": [],
+  "pass": true
+}

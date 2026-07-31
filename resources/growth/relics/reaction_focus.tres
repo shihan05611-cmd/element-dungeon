@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RelicDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://growth/definitions/relic_definition.gd" id="1_relic"]
+
+[resource]
+script = ExtResource("1_relic")
+relic_id = &"reaction_focus"
+display_name = "反应聚焦"
+description = "元素反应实际消耗至少 1 层时，短暂提高攻击倍率。"
+effect_kind = 3
+reaction_threshold = 1
+attack_multiplier = 1.25
+duration_seconds = 3.0

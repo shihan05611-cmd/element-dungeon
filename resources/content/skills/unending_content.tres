@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SkillContentDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="1_content"]
+[ext_resource type="Resource" path="res://resources/skills/unending.tres" id="2_gameplay"]
+[ext_resource type="Texture2D" path="res://assets/generated/vfx/unending/icon.png" id="3_icon"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/unending_presentation.tscn" id="4_presentation"]
+
+[resource]
+script = ExtResource("1_content")
+skill_id = &"unending"
+display_name = "不息"
+description = "固定普通攻击成功命中时，按目标当前水元素层数恢复等量生命，不消耗水层。"
+icon = ExtResource("3_icon")
+presentation_scene = ExtResource("4_presentation")
+gameplay_definition = ExtResource("2_gameplay")
+reward_pool = true
+initial_reward_pool = true
+allowed_form_ids = Array[StringName]([&"water", &"fire"])
+

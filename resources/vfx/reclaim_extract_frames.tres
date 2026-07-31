@@ -1,0 +1,14 @@
+[gd_resource type="SpriteFrames" script_class="VfxSpriteSheetFrames" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/vfx/vfx_sprite_sheet_frames.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral.png" id="2_sheet"]
+
+[resource]
+script = ExtResource("1_script")
+animation_name = &"extract"
+frame_size = Vector2i(64, 64)
+frame_count = 8
+frames_per_second = 22.222222
+loops = false
+sheet = ExtResource("2_sheet")
+

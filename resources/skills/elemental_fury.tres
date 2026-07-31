@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SkillDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://combat/execution/all_energy_burst_execution.gd" id="2_execution"]
+
+[sub_resource type="Resource" id="FuryExecution"]
+script = ExtResource("2_execution")
+minimum_energy = 20
+damage_multiplier_per_energy = 0.08
+energy_per_element_amount = 20
+radius_step_count = 10
+radius_step_scale = 0.1
+presentation_tags = PackedStringArray("elemental_fury", "burst")
+
+[resource]
+script = ExtResource("1_skill")
+skill_id = &"elemental_fury"
+execution_definition = SubResource("FuryExecution")

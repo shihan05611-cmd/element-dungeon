@@ -42,6 +42,8 @@ func set_current_room(room_id: StringName) -> RunCommandResult:
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.INVALID_ARGUMENT, &"missing_room_id")
 	if _completed_room_ids.has(room_id):
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.DUPLICATE_ROOM, &"room_already_completed")
+	if not _current_room_id.is_empty() and _current_room_id != room_id:
+		return RunCommandResult.rejected(RunCommandResult.RejectReason.INVALID_STATE, &"combat_room_already_active")
 	_current_room_id = room_id
 	return RunCommandResult.success()
 

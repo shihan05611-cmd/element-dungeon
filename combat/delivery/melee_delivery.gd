@@ -107,9 +107,25 @@ func _physics_process(_delta: float) -> void:
 		)
 
 
+func _on_delivery_cleanup() -> void:
+	_active = false
+	_pending_open = false
+	_active_hit_index = -1
+	_pending_hit_index = -1
+	# initial_hit_index is mutable per-use configuration. Reset it so a pooled
+	# Melee/DelayedArea instance cannot inherit the previous generation's segment.
+	initial_hit_index = 0
+	_active_query_transform = Transform2D.IDENTITY
+	super()
+
+
 func _build_query_transform() -> Transform2D:
 	var facing_angle := direction.angle()
 	var query_origin := global_position + query_offset.rotated(facing_angle)
 	return Transform2D(facing_angle + query_rotation, query_origin)
+
+
+
+
 
 

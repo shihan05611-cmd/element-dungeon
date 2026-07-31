@@ -67,8 +67,9 @@ func can_spend(amount: int) -> bool:
 
 
 func try_spend(amount: int) -> bool:
-	if not _try_spend_silent(amount):
+	if not can_spend(amount):
 		return false
+	_spend_silent(amount)
 	_commit_spend_regeneration_delay(amount)
 	_emit_committed_delta(-amount)
 	return true
@@ -143,11 +144,9 @@ func advance_regeneration(delta: float) -> int:
 ## Internal transaction hook used by SkillExecutor so all accepted-cast state
 ## can be committed before observers are notified. Callers should use
 ## try_spend() unless coordinating the same synchronous transaction.
-func _try_spend_silent(amount: int) -> bool:
-	if not can_spend(amount):
-		return false
+func _spend_silent(amount: int) -> void:
+	assert(can_spend(amount), "energy spend must be validated before synchronous commit")
 	_current_energy -= amount
-	return true
 
 
 ## Completes the non-value side effect of a silent spend only after its caller
@@ -159,13 +158,18 @@ func _commit_spend_regeneration_delay(amount: int) -> void:
 	_regeneration_accumulator = 0.0
 
 
-func _restore_silent(amount: int) -> bool:
-	if amount < 0 or _current_energy + amount > _maximum_energy:
-		return false
-	_current_energy += amount
+
+
+## Transaction-only clamped restore. Returns the actual committed delta and
+## emits nothing so the surrounding cancellation can publish a whole state.
+func _restore_clamped_silent(amount: int) -> int:
+	if amount <= 0:
+		return 0
+	var previous := _current_energy
+	_current_energy = mini(_maximum_energy, _current_energy + amount)
 	if _current_energy >= _maximum_energy:
 		_reset_regeneration_clock()
-	return true
+	return _current_energy - previous
 
 
 func _emit_committed_delta(delta: int) -> void:
