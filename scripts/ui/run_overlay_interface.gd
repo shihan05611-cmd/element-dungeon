@@ -13,6 +13,7 @@ const SLOT_ORDER: Array[StringName] = [
 ]
 
 var colorblind_mode: bool = false
+var _current_element_id: StringName = ElementIds.WATER
 
 var _host: RunSessionHost
 var _catalog: RunContentCatalog
@@ -21,10 +22,17 @@ var _working_loadout: RuntimeLoadoutSnapshot
 var _shop_draft: ShopDraft
 var _selected_skill_id: StringName = &""
 var _reward_offer: RewardOffer
+var _reward_selected_index: int = -1
+var _reward_submitting: bool = false
+var _reward_submit_count: int = 0
+var _reward_cards: Array[Button] = []
 
 var _panel: PanelContainer
+var _outer_margin: MarginContainer
+var _panel_margin: MarginContainer
 var _title: Label
 var _subtitle: Label
+var _close: Button
 var _slot_row: HBoxContainer
 var _warning: Label
 var _inventory: GridContainer
@@ -33,12 +41,21 @@ var _relic_list: VBoxContainer
 var _status: Label
 var _confirm: Button
 var _reward_area: VBoxContainer
+var _reward_cards_stage: HBoxContainer
+var _reward_status: Label
+var _reward_confirm: Button
 var _loadout_area: VBoxContainer
 
 
 func _ready() -> void:
 	_build()
+	_apply_responsive_layout()
 	visible = false
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED and _outer_margin != null:
+		_apply_responsive_layout()
 
 
 func configure(host: RunSessionHost) -> void:
@@ -58,6 +75,10 @@ func configure(host: RunSessionHost) -> void:
 
 func toggle_loadout() -> void:
 	if visible:
+		if _reward_offer != null:
+			if _reward_status != null:
+				_reward_status.text = "奖励尚未确认 · 先选择候选，再使用独立确认按钮"
+			return
 		hide_overlay()
 	else:
 		show_loadout()
@@ -67,8 +88,12 @@ func show_loadout(snapshot_override: RuntimeLoadoutSnapshot = null) -> void:
 	if _host == null or _catalog == null:
 		return
 	_reward_offer = null
+	_reward_selected_index = -1
+	_reward_submitting = false
+	_reward_cards.clear()
 	_reward_area.visible = false
 	_loadout_area.visible = true
+	_close.visible = true
 	_snapshot = _host.run_session.snapshot()
 	_shop_draft = null
 	var route_phase := _snapshot.route.phase
@@ -99,34 +124,59 @@ func show_reward(offer: RewardOffer) -> void:
 	if offer == null or not offer.valid:
 		return
 	_reward_offer = offer
+	_reward_selected_index = -1
+	_reward_submitting = false
+	_reward_cards.clear()
 	_reward_area.visible = true
 	_loadout_area.visible = false
+	_close.visible = false
+	_snapshot = _host.run_session.snapshot() if _host != null and _host.run_session != null else _snapshot
 	_title.text = "房间奖励"
-	_subtitle.text = "选择一项已生成奖励；界面不重算候选或权重"
+	_subtitle.text = _reward_context_summary(offer)
 	_clear_children(_reward_area)
-	var prompt := _label("选择一项", 18, UI.TEXT)
-	_reward_area.add_child(prompt)
-	var cards := HBoxContainer.new()
-	cards.add_theme_constant_override(&"separation", 12)
-	_reward_area.add_child(cards)
-	for option: RewardOption in offer.options:
-		var button := Button.new()
-		button.custom_minimum_size = Vector2(236, 160)
-		button.text = "%s\n\n%s" % [option.display_name, option.description]
-		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		button.add_theme_font_size_override(&"font_size", 15)
-		button.add_theme_color_override(&"font_color", UI.TEXT)
-		button.add_theme_stylebox_override(
-			&"normal",
-			UI.button_style(UI.SURFACE_RAISED, UI.BORDER)
-		)
-		button.add_theme_stylebox_override(
-			&"hover",
-			UI.button_style(UI.SURFACE_SOFT, UI.BORDER_FOCUS)
-		)
-		button.pressed.connect(_claim_reward.bind(option.option_id))
-		cards.add_child(button)
+	var context := _label("比较 %d 项权威候选 · 移动焦点不会领取" % offer.options.size(), 14, UI.TEXT_MUTED)
+	context.name = "Context"
+	context.custom_minimum_size.y = 24
+	context.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_reward_area.add_child(context)
+	_reward_cards_stage = HBoxContainer.new()
+	_reward_cards_stage.name = "CardsStage"
+	_reward_cards_stage.alignment = BoxContainer.ALIGNMENT_CENTER
+	_reward_cards_stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_reward_cards_stage.add_theme_constant_override(&"separation", UI.GAP_MD)
+	_reward_area.add_child(_reward_cards_stage)
+	var options := offer.options
+	for index: int in options.size():
+		var button := _build_reward_card(options[index], index)
+		_reward_cards.append(button)
+		_reward_cards_stage.add_child(button)
+	var footer := HBoxContainer.new()
+	footer.name = "RewardFooter"
+	footer.custom_minimum_size.y = 52
+	footer.add_theme_constant_override(&"separation", UI.GAP_MD)
+	_reward_area.add_child(footer)
+	_reward_status = _label("请选择候选；领取只发生在显式确认后。", 13, UI.TEXT_MUTED)
+	_reward_status.name = "Status"
+	_reward_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_reward_status.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_reward_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	footer.add_child(_reward_status)
+	_reward_confirm = Button.new()
+	_reward_confirm.name = "ConfirmReward"
+	_reward_confirm.text = "确认领取"
+	_reward_confirm.custom_minimum_size = Vector2(176, 48)
+	_reward_confirm.focus_mode = Control.FOCUS_ALL
+	_reward_confirm.disabled = true
+	_reward_confirm.add_theme_font_size_override(&"font_size", 15)
+	_reward_confirm.add_theme_stylebox_override(&"normal", UI.button_style(UI.SURFACE_RAISED, UI.BORDER))
+	_reward_confirm.add_theme_stylebox_override(&"hover", UI.button_style(UI.SURFACE_SOFT, UI.BORDER_FOCUS))
+	_reward_confirm.add_theme_stylebox_override(&"focus", UI.focus_style())
+	_reward_confirm.pressed.connect(_confirm_reward_selection)
+	footer.add_child(_reward_confirm)
+	_wire_reward_focus()
+	_apply_responsive_layout()
 	_show_overlay()
+	call_deferred(&"_focus_initial_reward")
 
 
 func hide_overlay() -> void:
@@ -139,6 +189,42 @@ func set_colorblind_mode(enabled: bool) -> void:
 	colorblind_mode = enabled
 	if visible and _loadout_area.visible:
 		_refresh_loadout()
+	elif visible and _reward_area.visible:
+		_update_reward_card_styles()
+
+
+func set_current_element(element_id: StringName) -> void:
+	if element_id.is_empty():
+		return
+	_current_element_id = element_id
+
+
+func reward_selected_index() -> int:
+	return _reward_selected_index
+
+
+func reward_card_count() -> int:
+	return _reward_cards.size()
+
+
+func reward_card(index: int) -> Button:
+	return _reward_cards[index] if index >= 0 and index < _reward_cards.size() else null
+
+
+func reward_cards_container() -> HBoxContainer:
+	return _reward_cards_stage
+
+
+func reward_confirm_button() -> Button:
+	return _reward_confirm
+
+
+func reward_submission_active() -> bool:
+	return _reward_submitting
+
+
+func reward_submit_count() -> int:
+	return _reward_submit_count
 
 
 func set_preview_snapshot(snapshot: RuntimeLoadoutSnapshot) -> void:
@@ -192,13 +278,10 @@ func _build() -> void:
 	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(scrim)
 
-	var margin := MarginContainer.new()
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override(&"margin_left", 32)
-	margin.add_theme_constant_override(&"margin_top", 24)
-	margin.add_theme_constant_override(&"margin_right", 32)
-	margin.add_theme_constant_override(&"margin_bottom", 24)
-	add_child(margin)
+	_outer_margin = MarginContainer.new()
+	_outer_margin.name = "OuterMargin"
+	_outer_margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_outer_margin)
 
 	_panel = PanelContainer.new()
 	_panel.name = "Panel"
@@ -206,18 +289,15 @@ func _build() -> void:
 		&"panel",
 		UI.panel(UI.SURFACE, UI.BORDER_FOCUS, 10, 2)
 	)
-	margin.add_child(_panel)
+	_outer_margin.add_child(_panel)
 
-	var panel_margin := MarginContainer.new()
-	panel_margin.add_theme_constant_override(&"margin_left", 20)
-	panel_margin.add_theme_constant_override(&"margin_top", 16)
-	panel_margin.add_theme_constant_override(&"margin_right", 20)
-	panel_margin.add_theme_constant_override(&"margin_bottom", 16)
-	_panel.add_child(panel_margin)
+	_panel_margin = MarginContainer.new()
+	_panel_margin.name = "PanelMargin"
+	_panel.add_child(_panel_margin)
 
 	var root_box := VBoxContainer.new()
 	root_box.add_theme_constant_override(&"separation", 10)
-	panel_margin.add_child(root_box)
+	_panel_margin.add_child(root_box)
 
 	var header := HBoxContainer.new()
 	header.custom_minimum_size.y = 46
@@ -229,15 +309,17 @@ func _build() -> void:
 	heading.add_child(_title)
 	_subtitle = _label("", 13, UI.TEXT_MUTED)
 	heading.add_child(_subtitle)
-	var close := Button.new()
-	close.text = "关闭  L"
-	close.custom_minimum_size = Vector2(112, 44)
-	close.add_theme_stylebox_override(
+	_close = Button.new()
+	_close.name = "Close"
+	_close.text = "关闭  L"
+	_close.custom_minimum_size = Vector2(112, 44)
+	_close.add_theme_stylebox_override(
 		&"normal",
 		UI.button_style(UI.SURFACE_RAISED, UI.BORDER)
 	)
-	close.pressed.connect(hide_overlay)
-	header.add_child(close)
+	_close.add_theme_stylebox_override(&"focus", UI.focus_style())
+	_close.pressed.connect(hide_overlay)
+	header.add_child(_close)
 
 	_loadout_area = VBoxContainer.new()
 	_loadout_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -332,9 +414,258 @@ func _build() -> void:
 
 	_reward_area = VBoxContainer.new()
 	_reward_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_reward_area.alignment = BoxContainer.ALIGNMENT_CENTER
-	_reward_area.add_theme_constant_override(&"separation", 16)
+	_reward_area.alignment = BoxContainer.ALIGNMENT_BEGIN
+	_reward_area.add_theme_constant_override(&"separation", UI.GAP_SM)
 	root_box.add_child(_reward_area)
+
+
+func _build_reward_card(option: RewardOption, index: int) -> Button:
+	var card := Button.new()
+	card.name = "RewardOption%d" % index
+	card.text = ""
+	card.custom_minimum_size = _reward_card_size()
+	card.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	card.focus_mode = Control.FOCUS_ALL
+	card.clip_contents = true
+	card.add_theme_stylebox_override(&"normal", UI.button_style(UI.SURFACE_RAISED, UI.BORDER))
+	card.add_theme_stylebox_override(&"hover", UI.button_style(UI.SURFACE_SOFT, UI.BORDER_FOCUS))
+	card.add_theme_stylebox_override(&"pressed", UI.button_style(UI.SURFACE_SOFT, UI.BORDER_FOCUS))
+	card.add_theme_stylebox_override(&"focus", UI.focus_style())
+	var margin := MarginContainer.new()
+	margin.name = "Margin"
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override(&"margin_left", 10)
+	margin.add_theme_constant_override(&"margin_top", 10)
+	margin.add_theme_constant_override(&"margin_right", 10)
+	margin.add_theme_constant_override(&"margin_bottom", 10)
+	card.add_child(margin)
+	var box := VBoxContainer.new()
+	box.name = "Content"
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_theme_constant_override(&"separation", UI.GAP_XS)
+	margin.add_child(box)
+	var content := _catalog.content_for(option.content_id) if _catalog != null else null
+	var skill := content.gameplay_definition if content != null else null
+	var header := HBoxContainer.new()
+	header.name = "Header"
+	header.custom_minimum_size.y = 52
+	header.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	header.add_theme_constant_override(&"separation", UI.GAP_SM)
+	box.add_child(header)
+	if content != null and content.icon != null:
+		var icon := TextureRect.new()
+		icon.name = "Icon"
+		icon.custom_minimum_size = Vector2(48, 48)
+		icon.texture = content.icon
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		header.add_child(icon)
+	else:
+		header.add_child(_reward_type_glyph(option.reward_type))
+	var heading := VBoxContainer.new()
+	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	heading.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	header.add_child(heading)
+	var number := _label("%d · %s" % [index + 1, _reward_type_copy(option.reward_type)], 12, UI.TEXT_MUTED)
+	number.name = "Ordinal"
+	heading.add_child(number)
+	var title := _label(option.display_name, 18, UI.TEXT)
+	title.name = "Name"
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.max_lines_visible = 2
+	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	heading.add_child(title)
+	var policy_copy := _reward_policy_copy(skill, option.reward_type)
+	if not policy_copy.is_empty():
+		var policy := _label(policy_copy, 12, _policy_color(skill) if skill != null else UI.NEUTRAL)
+		policy.name = "Policy"
+		policy.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		policy.max_lines_visible = 2
+		box.add_child(policy)
+	var description := _label(option.description, 13, UI.TEXT)
+	description.name = "Description"
+	description.custom_minimum_size.y = 72
+	description.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description.max_lines_visible = 4
+	description.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	box.add_child(description)
+	var metric_copy := _reward_metric_copy(skill)
+	if not metric_copy.is_empty():
+		var metrics := _label(metric_copy, 12, UI.TEXT_MUTED)
+		metrics.name = "Metrics"
+		metrics.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		metrics.max_lines_visible = 2
+		box.add_child(metrics)
+	var build := _label(_reward_build_copy(option, skill), 12, UI.TEXT_MUTED)
+	build.name = "BuildState"
+	build.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	build.max_lines_visible = 2
+	box.add_child(build)
+	var selection := _label("○ 候选", 12, UI.TEXT_MUTED)
+	selection.name = "Selection"
+	selection.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	box.add_child(selection)
+	card.tooltip_text = "%s\n%s" % [option.display_name, option.description]
+	card.focus_entered.connect(_focus_reward_option.bind(index))
+	card.pressed.connect(_focus_reward_option.bind(index))
+	return card
+
+
+func _reward_type_glyph(reward_type: int) -> PanelContainer:
+	var panel := PanelContainer.new()
+	panel.name = "TypeGlyph"
+	panel.custom_minimum_size = Vector2(48, 48)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_theme_stylebox_override(&"panel", UI.flat_panel(UI.SURFACE_SOFT, UI.BORDER_FOCUS, 8, 2))
+	var glyph := _label("S" if reward_type == RewardType.SKILL else "R", 20, UI.BORDER_FOCUS)
+	glyph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	glyph.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	panel.add_child(glyph)
+	return panel
+
+
+func _focus_initial_reward() -> void:
+	if _reward_cards.is_empty() or not visible:
+		return
+	_focus_reward_option(0)
+	_reward_cards[0].grab_focus()
+
+
+func _focus_reward_option(index: int) -> void:
+	if _reward_submitting or index < 0 or index >= _reward_cards.size():
+		return
+	_reward_selected_index = index
+	if _reward_confirm != null:
+		_reward_confirm.disabled = false
+	if _reward_status != null and _reward_offer != null:
+		var option := _reward_offer.options[index]
+		_reward_status.text = "已聚焦 %d：%s · 尚未领取" % [index + 1, option.display_name]
+	_update_reward_card_styles()
+
+
+func _update_reward_card_styles() -> void:
+	for index: int in _reward_cards.size():
+		var card := _reward_cards[index]
+		var selected := index == _reward_selected_index
+		card.add_theme_stylebox_override(
+			&"normal",
+			UI.button_style(UI.SURFACE_SOFT if selected else UI.SURFACE_RAISED, UI.BORDER_FOCUS if selected else UI.BORDER)
+		)
+		var marker := card.get_node("Margin/Content/Selection") as Label
+		marker.text = "◆ 已聚焦" if selected else "○ 候选"
+		marker.add_theme_color_override(&"font_color", UI.BORDER_FOCUS if selected else UI.TEXT_MUTED)
+
+
+func _wire_reward_focus() -> void:
+	if _reward_confirm == null:
+		return
+	for index: int in _reward_cards.size():
+		var card := _reward_cards[index]
+		if index > 0:
+			card.focus_neighbor_left = card.get_path_to(_reward_cards[index - 1])
+		if index + 1 < _reward_cards.size():
+			card.focus_neighbor_right = card.get_path_to(_reward_cards[index + 1])
+		else:
+			card.focus_neighbor_right = card.get_path_to(_reward_confirm)
+		card.focus_neighbor_bottom = card.get_path_to(_reward_confirm)
+		card.focus_next = card.get_path_to(_reward_cards[index + 1] if index + 1 < _reward_cards.size() else _reward_confirm)
+	if not _reward_cards.is_empty():
+		_reward_confirm.focus_neighbor_top = _reward_confirm.get_path_to(_reward_cards[_reward_selected_index if _reward_selected_index >= 0 else 0])
+		_reward_confirm.focus_next = _reward_confirm.get_path_to(_reward_cards[0])
+
+
+func _confirm_reward_selection() -> void:
+	if _reward_selected_index < 0 or _reward_offer == null or _reward_submitting:
+		return
+	var options := _reward_offer.options
+	if _reward_selected_index >= options.size():
+		return
+	_claim_reward(options[_reward_selected_index].option_id)
+
+
+func _reward_context_summary(offer: RewardOffer) -> String:
+	var equipped := 0
+	if _snapshot != null and _snapshot.loadout != null:
+		for slot_id: StringName in SLOT_ORDER:
+			if not _snapshot.loadout.get_skill_id(slot_id).is_empty():
+				equipped += 1
+	return "%s · 当前元素 %s · 已装备 %d/4" % [
+		_reward_type_copy(offer.reward_type),
+		_element_text(_current_element_id),
+		equipped,
+	]
+
+
+func _reward_type_copy(reward_type: int) -> String:
+	return "技能奖励" if reward_type == RewardType.SKILL else "遗物奖励"
+
+
+func _reward_policy_copy(skill: SkillDefinition, reward_type: int) -> String:
+	if reward_type != RewardType.SKILL or skill == null:
+		return "RELIC 遗物" if reward_type == RewardType.RELIC else ""
+	return "%s · %s" % [_activation_text(skill), _policy_text(skill)]
+
+
+func _reward_metric_copy(skill: SkillDefinition) -> String:
+	if skill == null:
+		return ""
+	if skill.is_passive_skill():
+		return "无按键 · 无能耗 / 冷却"
+	var energy := "无能耗" if skill.energy_cost <= 0 else "能量 %d" % skill.energy_cost
+	var cooldown := "无冷却" if is_zero_approx(skill.cooldown) else "冷却 %.1fs" % skill.cooldown
+	return "%s · %s" % [energy, cooldown]
+
+
+func _reward_build_copy(option: RewardOption, skill: SkillDefinition) -> String:
+	var owned := false
+	var equipped_slot: StringName = &""
+	if _snapshot != null:
+		if option.reward_type == RewardType.SKILL:
+			owned = _snapshot.skills.owns(option.content_id)
+			for slot_id: StringName in SLOT_ORDER:
+				if _snapshot.loadout.get_skill_id(slot_id) == option.content_id:
+					equipped_slot = slot_id
+					break
+		else:
+			owned = _snapshot.relics.owns(option.content_id)
+	var state := "已拥有" if owned else "未拥有"
+	if not equipped_slot.is_empty():
+		state += " · 已装备 %s" % String(equipped_slot).to_upper()
+	elif option.reward_type == RewardType.SKILL:
+		state += " · 未装备"
+	if skill != null:
+		state += " · " + (
+			"槽位 ACTIVE 1–3 / PASSIVE 1"
+			if skill.is_passive_skill()
+			else "槽位 ACTIVE 1–3"
+		)
+	return state
+
+
+func _reward_card_size() -> Vector2:
+	var compact := size.x <= 960.0 or size.y <= 560.0
+	return Vector2(268, 300) if compact else Vector2(328, 320)
+
+
+func _apply_responsive_layout() -> void:
+	if _outer_margin == null or _panel_margin == null:
+		return
+	var compact := size.x <= 960.0 or size.y <= 560.0
+	var horizontal := 24 if compact else 56
+	var vertical := 32 if compact else 72
+	_outer_margin.add_theme_constant_override(&"margin_left", horizontal)
+	_outer_margin.add_theme_constant_override(&"margin_top", vertical)
+	_outer_margin.add_theme_constant_override(&"margin_right", horizontal)
+	_outer_margin.add_theme_constant_override(&"margin_bottom", vertical)
+	for side: StringName in [&"margin_left", &"margin_right"]:
+		_panel_margin.add_theme_constant_override(side, 12)
+	for side: StringName in [&"margin_top", &"margin_bottom"]:
+		_panel_margin.add_theme_constant_override(side, 8)
+	for card: Button in _reward_cards:
+		card.custom_minimum_size = _reward_card_size()
 
 
 func _refresh_loadout() -> void:
@@ -542,29 +873,69 @@ func _confirm_shop() -> void:
 
 
 func _claim_reward(option_id: StringName) -> void:
-	if _host == null or _reward_offer == null:
+	if _host == null or _reward_offer == null or _reward_submitting:
 		return
+	_reward_submitting = true
+	_reward_submit_count += 1
+	_set_reward_input_enabled(false)
+	if _reward_status != null:
+		_reward_status.text = "正在领取 · 请稍候"
 	var result := _host.run_session.claim_reward(_reward_offer.offer_id, option_id)
 	if not result.accepted:
-		_publish_detail(_detail_text(result.detail), &"error")
+		_reward_submitting = false
+		_set_reward_input_enabled(true)
+		var message := _detail_text(result.detail)
+		if _reward_status != null:
+			_reward_status.text = message
+			_reward_status.add_theme_color_override(&"font_color", UI.ERROR)
+		status_requested.emit(message, &"error")
+		_restore_reward_focus()
 		return
 	_snapshot = result.run_snapshot
+	_reward_submitting = false
+	_reward_offer = null
 	_show_route_options()
 
 
+func _set_reward_input_enabled(enabled: bool) -> void:
+	for card: Button in _reward_cards:
+		card.disabled = not enabled
+	if _reward_confirm != null:
+		_reward_confirm.disabled = not enabled or _reward_selected_index < 0
+
+
+func _restore_reward_focus() -> void:
+	if _reward_selected_index < 0 or _reward_selected_index >= _reward_cards.size():
+		return
+	_reward_cards[_reward_selected_index].call_deferred(&"grab_focus")
+
+
 func _show_route_options() -> void:
+	_reward_cards.clear()
+	_reward_cards_stage = null
+	_reward_confirm = null
+	_reward_status = null
+	_reward_selected_index = -1
+	_close.visible = false
 	_clear_children(_reward_area)
-	_reward_area.add_child(_label("奖励已领取 · 选择下一步", 19, UI.SUCCESS))
+	var heading := _label("奖励已领取 · 选择下一步", 19, UI.SUCCESS)
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_reward_area.add_child(heading)
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override(&"separation", 12)
 	_reward_area.add_child(row)
 	for option: RouteOption in _snapshot.route.next_options:
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(220, 72)
 		button.text = _route_option_text(option)
+		button.focus_mode = Control.FOCUS_ALL
+		button.add_theme_stylebox_override(&"focus", UI.focus_style())
 		button.pressed.connect(_choose_route.bind(option.option_id))
 		row.add_child(button)
+	if row.get_child_count() > 0:
+		(row.get_child(0) as Button).call_deferred(&"grab_focus")
 
 
 func _choose_route(option_id: StringName) -> void:
@@ -797,5 +1168,6 @@ func _clear_children(node: Node) -> void:
 
 
 func _show_overlay() -> void:
+	_apply_responsive_layout()
 	visible = true
 	move_to_front()
