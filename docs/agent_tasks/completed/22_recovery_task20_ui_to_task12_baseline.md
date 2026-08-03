@@ -1,8 +1,8 @@
 # 任务 22：将任务 20 UI 精确恢复到任务 12 已验收基线
 
-状态：BLOCKED
+状态：ACCEPTED
 负责人：UI Recovery Agent 1.0
-依赖：任务 21 已验收；任务 20 继续 BLOCKED；独立 Review 已失败，依赖任务 23 完成 Overlay 最终基线纠正恢复
+依赖：任务 21、23 已验收；任务 20 继续 BLOCKED
 
 ## 1. 任务目标
 
@@ -417,3 +417,14 @@
 - 执行侧未启动或连接Godot，未运行测试/scan/smoke/截图，未执行任何Git写操作、引用写入、gc/prune/maintenance，也未修改任务22原胶囊。
 
 完整交付见 `docs/agent_tasks/evidence/task23/overlay_final_recovery_delivery.md`。任务23现只到 `REVIEW`；任务22继续保持 `BLOCKED`，等待全新独立Review按正确冷启动顺序验收。Review通过前不得归档任务22/23或评估Git检查点。
+## 15. 中枢最终验收（2026-08-03）
+
+任务23已将 Overlay 从错误创建态 `2ca3…` 精确纠正到任务12最终对象 `b98a9c223f87caa983bb97d14639d73c62957337`。随后复用独立 Recovery Review 职责对话 `019fb7d5-cf0b-7871-a444-436115ba55a7`，在共享 Godot 完全退出后，以全新冷副本 `C:\tmp\element-dungeon-task23-revalidation-20260803-143309995\project` 完成稳定复验并得到 `REVIEW PASS`。
+
+- 三脚本精确为 CombatHUD `661d017c…`、Overlay `b98a9c22…`、Token `78751a2d…`。
+- editor scan、任务12 `13/110`、任务16 `11/209`、任务18 `9/124`、18/18 runners（224 tests / 1683 assertions）及180帧 smoke 全部通过，门禁日志错误/警告为0。
+- 任务20 runner 仅作非门禁诊断，结果仍为7 failures / 49 assertions，未混入任务12基线。
+- 新生成并人工查看12张非headless实际 Viewport 证据；正式四槽、900×540边界、可访问性、配装异常态、单一最终伤害及真实奖励→路线→ShopDraft链路全部通过。
+- 共享 `.godot` 672项、共享复制范围1122项、任务20 35项、任务21 17项、任务22/23文档证据、两个只读胶囊及三脚本在验收窗口内逐项零漂移。
+
+任务23纠正后，任务22“将任务20 UI恢复到任务12已验收基线”的整体目标已完整达成。中枢现将任务22标记为 `ACCEPTED` 并归档；任务20仍保持 `BLOCKED`。

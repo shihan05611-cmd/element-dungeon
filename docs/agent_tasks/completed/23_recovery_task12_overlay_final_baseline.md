@@ -1,6 +1,6 @@
 # 任务 23：任务 12 Overlay 最终基线纠正恢复
 
-状态：REVIEW
+状态：ACCEPTED
 负责人：Overlay Final Recovery Agent 1.0
 依赖：任务22独立Review失败 `019fb78e-0c54-7ca1-beba-044c32edd1ee`；任务22B只读取证 `019fb7a9-0e27-7ea2-ae3c-94d32c4468a0`
 
@@ -226,3 +226,14 @@
 - 执行侧未启动、连接或调用Godot；未运行测试、editor scan、smoke、截图、导入或保存；未执行任何Git写操作、引用写入、`hash-object -w`、gc/prune/maintenance。
 
 任务状态只更新到 `REVIEW`，此后冻结全部继续写入。必须由协调者创建全新独立Review，在新的 `C:\tmp` 冷副本中从首条Godot editor scan开始完成全部门禁；执行者不得自行标记 `ACCEPTED`、归档、运行验证或评估提交。
+## 13. 中枢最终验收（2026-08-03）
+
+独立 Recovery Review 职责对话 `019fb7d5-cf0b-7871-a444-436115ba55a7` 在共享 Godot 完全退出后完成全新稳定复验，结论为 `REVIEW PASS`。本次没有复用旧冷副本、旧测试结果或旧截图；新证据根目录为 `C:\tmp\element-dungeon-task23-revalidation-20260803-143309995`。
+
+- Overlay 精确保持 `b98a9c223f87caa983bb97d14639d73c62957337`、26785字节、SHA-256 `e30e02d82ddecd6056f06a72683b7e5641013e09a8531e6be2837d7be23f6b68`；`result.run_snapshot` 2处、错误字段0处，其余任务12最终补丁全部匹配。
+- 冷复制1122/1122；首条Godot命令为4.7.1 headless editor scan且日志全零。
+- 任务12 `13/110`、任务16 `11/209`、任务18 `9/124`、18/18 runners（224/1683）及180帧 smoke 全部通过。
+- 12张新生成的非headless实际 Viewport 截图已逐张人工检查，九类任务12视觉与交互语义全部通过。
+- 验收窗口前后Godot进程均为0；共享 `.godot` 672项、三脚本、任务20 35项、任务21 17项、任务22/23文档证据、共享复制范围及两个胶囊逐项零漂移。
+
+中枢据此接受任务23，状态更新为 `ACCEPTED` 并归档。任务20继续 `BLOCKED`；任务23不自动授权继续任务20。
