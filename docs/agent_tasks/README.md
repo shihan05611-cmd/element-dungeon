@@ -2,6 +2,8 @@
 
 本目录只管理已明确立项的 Agent 任务。
 
+中枢 Agent 的职责、对话复用、任务分发、自动回传、独立验收、Git 与安全规则统一见 `docs/agent_tasks/CENTRAL_REVIEW_RULES.md`。该文件是中枢规则的唯一入口；本 README 主要保留任务文档格式、项目通用 UI 口径、当前依赖和历史基线。
+
 ## 协调优先级
 
 - 项目执行与 Review 一律以质量优先，成本仅作次级考虑。
@@ -87,13 +89,16 @@
 11. `22_recovery_task20_ui_to_task12_baseline.md`：`ACCEPTED` 并归档。任务23纠正错误 Overlay 候选后，三份正式UI脚本均精确回到任务12最终基线；稳定复验全部通过。
 12. `23_recovery_task12_overlay_final_baseline.md`：`ACCEPTED` 并归档。Overlay 精确为任务12最终对象 `b98a9c223f87caa983bb97d14639d73c62957337`；稳定复验在共享Godot关闭后通过全部自动化、视觉与不变性门禁。
 13. `24_agent_e2_compact_hud_reward_reimplementation.md`：`ACCEPTED` 并归档。方案 A 主 HUD 与权威 1/2/3 奖励页通过独立冷副本复验；目标元素附着的正式文字面板、跟随标签和离屏文字回退不进入本任务，后续另以 VFX 表达。
+14. `25_agent_e3_immediate_shop_skill_equip.md`：`ACCEPTED` 并归档。商店技能装配、换槽和卸下现由 RunSession 权威事务即时生效；属性分配与离店仍保留确认，任务24奖励领取确认不变。独立 Review 通过 20/20 runners、242 tests / 2115 assertions、180帧 smoke、实际 Viewport 人工检查与共享区零漂移门禁。
 
-任务 05～19、21～24 已验收并归档；任务 20 继续作为历史 `BLOCKED`。恢复与本轮 UI 重新实现阶段已经完成，后续不得把任务20未接受的实现、测试或证据冒充为已接受基线。美术不得反向改变碰撞范围或战斗时序。后续任务只能在依赖通过 Review 后开工，不得让多个执行职责同时修改重叠文件。
+任务 05～19、21～25 已验收并归档；任务 20 继续作为历史 `BLOCKED`；当前没有执行中的编号任务。后续不得把任务20未接受的实现、测试或证据冒充为已接受基线。美术不得反向改变碰撞范围或战斗时序。后续任务只能在依赖通过 Review 后开工，不得让多个执行职责同时修改重叠文件。
 
 ## 当前 Git 审计边界（2026-08-03）
 
-- 任务24独立 Review 的提交前基线 `HEAD` 为 `b309a095e65188d20a402339f85318cc98b60b24`，`origin/main` 为 `d1c019f72ae7ba1301786e05caf491b4de079453`；本地 main 在提交前 ahead 1。
+- 任务25派发基线 `HEAD` 为 `a0c736b031be7bd13f42a6f025585aa35b22e5cd`，`origin/main` 为 `d1c019f72ae7ba1301786e05caf491b4de079453`；本地 main ahead 2。
 - 任务23本轮稳定复验已确认三脚本、任务20 35项、任务21 17项、任务22/23文档证据、两个胶囊与共享 `.godot` 均满足验收门禁。
 - 任务20仍为 `BLOCKED`；其测试与证据虽然已存在于Git历史中，但不得据此视为已接受实现，也不得进入任务12基线汇总。
-- 工作树中的 `.workbuddy/memory/2026-07-31.md`、`docs/架构评估与扩展性改进建议.md` 与 `docs/design/元素地牢_关卡流程竞品探测与适配设计报告.md` 明确不属于任务24，继续排除。
+- 工作树中的 `.workbuddy/memory/2026-07-31.md`、`docs/架构评估与扩展性改进建议.md` 与 `docs/design/元素地牢_关卡流程竞品探测与适配设计报告.md` 明确不属于任务24/25，继续排除。
+- 共享编辑器在任务25独立零漂移复核后生成 `growth/tests/run_task25_immediate_shop_equip_tests.gd.uid`、`combat/tests/capture_task25_shop_equip_visual.gd.uid` 与任务25 PNG 的 `.import` sidecar；三者未进入验收冷副本，保持未跟踪并从任务25检查点排除。
 - 任务24检查点只允许三个 UI 脚本、两个任务24 harness、任务书/证据、协调索引及任务20的历史分流说明；任务20 runner、capture、证据和未接受实现不得进入。
+- 任务25检查点只包含任务书列出的 RunSession、ShopDraft、Overlay、新 runner/capture、任务书/证据，以及用户要求的中枢规则整合与 README 协调更新；三份明确排除文档和任务20未接受内容不得进入。

@@ -143,6 +143,20 @@ func validate_baseline(
 	return RunCommandResult.success()
 
 
+func rebase_after_immediate_loadout(
+		current_run_revision: int,
+		current_progression: ProgressionSnapshot,
+		committed_loadout: RuntimeLoadoutSnapshot
+) -> void:
+	# RunSession calls this only after the RuntimeLoadout replacement succeeds.
+	# Updating these four fields cannot reject and deliberately leaves the three
+	# pending stat counters unchanged.
+	_baseline_run_revision = current_run_revision
+	_baseline_progression = current_progression
+	_baseline_loadout = committed_loadout
+	_working_entries = committed_loadout.entries
+
+
 func mark_confirmed() -> void:
 	_confirmed = true
 

@@ -183,6 +183,57 @@ func open_shop_draft() -> ShopDraftOpenResult:
 	return ShopDraftOpenResult.success(_active_shop_draft)
 
 
+func apply_shop_loadout_immediately(
+		draft: ShopDraft,
+		candidate: RuntimeLoadoutSnapshot
+) -> RunCommandResult:
+	if _director.snapshot().phase != RunPhase.SHOP:
+		return RunCommandResult.rejected(RunCommandResult.RejectReason.INVALID_STATE, &"shop_loadout_outside_shop")
+	if draft == null or draft != _active_shop_draft:
+		return RunCommandResult.rejected(RunCommandResult.RejectReason.STALE_DRAFT, &"draft_is_not_active")
+	var progression_current := _progression.snapshot()
+	var loadout_current := _current_loadout_snapshot()
+	var baseline_validation := draft.validate_baseline(
+		_run_revision,
+		progression_current,
+		loadout_current
+	)
+	if not baseline_validation.accepted:
+		return baseline_validation
+	if _runtime_loadout_port == null:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.LOADOUT_REJECTED,
+			&"runtime_loadout_port_not_configured"
+		)
+	var ownership_validation := _validate_loadout_ownership(candidate)
+	if not ownership_validation.accepted:
+		return ownership_validation
+	var loadout_validation := _runtime_loadout_port.validate_snapshot(candidate)
+	if not loadout_validation.accepted:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.LOADOUT_REJECTED,
+			loadout_validation.detail
+		)
+	# Validation still runs for an identical request, but an already-authoritative
+	# mapping must not create another RuntimeLoadout or aggregate notification.
+	if loadout_current.same_mapping(candidate):
+		return RunCommandResult.success(snapshot())
+	var loadout_commit := _runtime_loadout_port.try_replace_snapshot(candidate)
+	if not loadout_commit.accepted:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.LOADOUT_REJECTED,
+			loadout_commit.detail
+		)
+	_run_revision += 1
+	var loadout_after := _current_loadout_snapshot()
+	# Rebase before publishing so every observer sees an active draft aligned to
+	# the exact authoritative run/loadout revisions. Pending stats are untouched.
+	draft.rebase_after_immediate_loadout(_run_revision, progression_current, loadout_after)
+	var current := snapshot()
+	snapshot_changed.emit(current, &"shop_loadout_applied")
+	return RunCommandResult.success(current)
+
+
 func confirm_shop(draft: ShopDraft, complete_run: bool = false) -> RunCommandResult:
 	if _director.snapshot().phase != RunPhase.SHOP:
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.INVALID_STATE, &"shop_confirm_outside_shop")
@@ -197,6 +248,10 @@ func confirm_shop(draft: ShopDraft, complete_run: bool = false) -> RunCommandRes
 	var allocation_validation := _progression.validate_allocation(allocation)
 	if not allocation_validation.accepted:
 		return allocation_validation
+	# The task-25 UI always rebases the draft after an immediate loadout commit,
+	# so its final confirmation reaches this compatibility branch unchanged and
+	# commits only stats plus the shop exit. Direct draft callers from frozen
+	# pre-task25 contracts remain supported without causing a second UI commit.
 	var loadout_candidate := draft.preview_loadout()
 	var ownership_validation := _validate_loadout_ownership(loadout_candidate)
 	if not ownership_validation.accepted:

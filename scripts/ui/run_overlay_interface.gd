@@ -26,6 +26,7 @@ var _reward_selected_index: int = -1
 var _reward_submitting: bool = false
 var _reward_submit_count: int = 0
 var _reward_cards: Array[Button] = []
+var _skill_cards: Dictionary = {}
 
 var _panel: PanelContainer
 var _outer_margin: MarginContainer
@@ -110,12 +111,12 @@ func show_loadout(snapshot_override: RuntimeLoadoutSnapshot = null) -> void:
 		)
 	_title.text = "共享配装 · ACTIVE 1–3 + PASSIVE 1"
 	_subtitle.text = (
-		"商店草稿 · 拖放或先选技能再点槽位 · 确认后原子生效"
+		"商店 · 技能装配即时生效；属性分配在离店时确认"
 		if _shop_draft != null
 		else "战斗只读预览 · 按 L 关闭 · 四槽在所有元素间共享"
 	)
 	_confirm.disabled = _shop_draft == null
-	_confirm.text = "确认配装与属性" if _shop_draft != null else "仅商店阶段可确认"
+	_confirm.text = "确认属性并离开" if _shop_draft != null else "仅商店阶段可离开"
 	_refresh_loadout()
 	_show_overlay()
 
@@ -239,18 +240,33 @@ func try_preview_assignment(skill_id: StringName, slot_id: StringName) -> String
 	if _host == null or _working_loadout == null:
 		return &"missing_loadout_ui_context"
 	var candidate := _candidate_with_assignment(_working_loadout, slot_id, skill_id)
+	if _shop_draft != null:
+		var before := _working_loadout
+		var result := _host.run_session.apply_shop_loadout_immediately(_shop_draft, candidate)
+		if not result.accepted:
+			_snapshot = _host.run_session.snapshot()
+			_working_loadout = _snapshot.loadout
+			if not skill_id.is_empty():
+				_selected_skill_id = skill_id
+			_publish_detail(_detail_text(result.detail), &"error")
+			_refresh_loadout()
+			_restore_shop_selection_focus()
+			return result.detail
+		_snapshot = result.run_snapshot
+		_working_loadout = _shop_draft.preview_loadout()
+		_publish_detail(
+			_assignment_committed_text(before, _working_loadout, skill_id, slot_id),
+			&"success"
+		)
+		_refresh_loadout()
+		return &""
+	# Compatibility-only preview API for the frozen task-12 runner. Formal
+	# combat input paths below are guarded read-only and never call this branch.
 	var validation := _host.runtime_loadout.validate_snapshot(candidate)
 	if not validation.accepted:
 		_publish_detail(_detail_text(validation.detail), &"error")
 		return validation.detail
-	if _shop_draft != null:
-		var draft_result := _shop_draft.try_assign_slot(slot_id, skill_id)
-		if not draft_result.accepted:
-			_publish_detail(_detail_text(draft_result.detail), &"error")
-			return draft_result.detail
-		_working_loadout = _shop_draft.preview_loadout()
-	else:
-		_working_loadout = candidate
+	_working_loadout = candidate
 	_publish_detail(_assignment_preview_text(skill_id, slot_id), &"success")
 	_refresh_loadout()
 	return &""
@@ -405,10 +421,14 @@ func _build() -> void:
 	var clear_button := Button.new()
 	clear_button.text = "清空所选槽"
 	clear_button.custom_minimum_size = Vector2(124, 44)
+	clear_button.focus_mode = Control.FOCUS_ALL
+	clear_button.add_theme_stylebox_override(&"focus", UI.focus_style())
 	clear_button.pressed.connect(_clear_selected_slot)
 	footer.add_child(clear_button)
 	_confirm = Button.new()
 	_confirm.custom_minimum_size = Vector2(176, 44)
+	_confirm.focus_mode = Control.FOCUS_ALL
+	_confirm.add_theme_stylebox_override(&"focus", UI.focus_style())
 	_confirm.pressed.connect(_confirm_shop)
 	footer.add_child(_confirm)
 
@@ -675,12 +695,15 @@ func _refresh_loadout() -> void:
 	for slot_id: StringName in SLOT_ORDER:
 		_slot_row.add_child(_build_slot_card(slot_id, _working_loadout.get_skill_id(slot_id)))
 	_clear_children(_inventory)
+	_skill_cards.clear()
 	var owned := _snapshot.skills.owned_skill_ids if _snapshot != null else []
 	for skill_id: StringName in owned:
 		var content := _catalog.content_for(skill_id)
 		if content == null or not content.equippable:
 			continue
-		_inventory.add_child(_build_skill_card(content))
+		var card := _build_skill_card(content)
+		_skill_cards[skill_id] = card
+		_inventory.add_child(card)
 	_refresh_warning()
 	_refresh_passives()
 	_refresh_relics()
@@ -779,6 +802,7 @@ func _build_skill_card(content: SkillContentDefinition) -> Button:
 			UI.BORDER_FOCUS if _selected_skill_id == content.skill_id else UI.BORDER
 		)
 	)
+	card.add_theme_stylebox_override(&"focus", UI.focus_style())
 	card.pressed.connect(_select_skill.bind(content.skill_id))
 	card.set_drag_forwarding(
 		Callable(self, "_skill_drag_data").bind(content.skill_id),
@@ -790,6 +814,9 @@ func _build_skill_card(content: SkillContentDefinition) -> Button:
 
 
 func _select_skill(skill_id: StringName) -> void:
+	if _shop_draft == null:
+		_publish_detail("战斗阶段为只读预览；请在商店调整技能。", &"info")
+		return
 	_selected_skill_id = skill_id
 	var content := _catalog.content_for(skill_id)
 	_publish_detail(
@@ -801,15 +828,23 @@ func _select_skill(skill_id: StringName) -> void:
 
 func _on_slot_input(event: InputEvent, slot_id: StringName) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if _shop_draft == null:
+			_publish_detail("战斗阶段为只读预览；请在商店调整技能。", &"info")
+			return
 		if not _selected_skill_id.is_empty():
-			try_preview_assignment(_selected_skill_id, slot_id)
-			_selected_skill_id = &""
+			var detail := try_preview_assignment(_selected_skill_id, slot_id)
+			if detail.is_empty():
+				_selected_skill_id = &""
+				_refresh_loadout()
 		else:
 			_selected_skill_id = _working_loadout.get_skill_id(slot_id)
 			_status.text = "已选择槽位 %s；“清空所选槽”可移除。" % String(slot_id)
 
 
 func _skill_drag_data(_position: Vector2, skill_id: StringName) -> Variant:
+	if _shop_draft == null:
+		_publish_detail("战斗阶段为只读预览；请在商店调整技能。", &"info")
+		return null
 	var preview := Label.new()
 	var content := _catalog.content_for(skill_id)
 	preview.text = content.display_name if content != null else String(skill_id)
@@ -831,6 +866,8 @@ func _skill_drop(_position: Vector2, _data: Variant) -> void:
 
 
 func _slot_drag_data(_position: Vector2, slot_id: StringName) -> Variant:
+	if _shop_draft == null:
+		return null
 	var skill_id := _working_loadout.get_skill_id(slot_id)
 	if skill_id.is_empty():
 		return null
@@ -838,14 +875,24 @@ func _slot_drag_data(_position: Vector2, slot_id: StringName) -> Variant:
 
 
 func _slot_can_drop(_position: Vector2, data: Variant, _slot_id: StringName) -> bool:
-	return data is Dictionary and data.has("skill_id")
+	return _shop_draft != null and data is Dictionary and data.has("skill_id")
 
 
 func _slot_drop(_position: Vector2, data: Variant, slot_id: StringName) -> void:
-	try_preview_assignment(StringName(data.get("skill_id", &"")), slot_id)
+	if _shop_draft == null:
+		_publish_detail("战斗阶段为只读预览；请在商店调整技能。", &"info")
+		return
+	var skill_id := StringName(data.get("skill_id", &""))
+	var detail := try_preview_assignment(skill_id, slot_id)
+	if detail.is_empty():
+		_selected_skill_id = &""
+		_refresh_loadout()
 
 
 func _clear_selected_slot() -> void:
+	if _shop_draft == null:
+		_publish_detail("战斗阶段为只读预览；请在商店调整技能。", &"info")
+		return
 	if _selected_skill_id.is_empty():
 		_publish_detail("先点击一个已装备槽位。", &"warning")
 		return
@@ -857,8 +904,10 @@ func _clear_selected_slot() -> void:
 	if found_slot.is_empty():
 		_publish_detail("所选技能当前未装备。", &"warning")
 		return
-	try_preview_assignment(&"", found_slot)
-	_selected_skill_id = &""
+	var detail := try_preview_assignment(&"", found_slot)
+	if detail.is_empty():
+		_selected_skill_id = &""
+		_refresh_loadout()
 
 
 func _confirm_shop() -> void:
@@ -868,7 +917,7 @@ func _confirm_shop() -> void:
 	if not result.accepted:
 		_publish_detail(_detail_text(result.detail), &"error")
 		return
-	_publish_detail("配装与属性已提交。", &"success")
+	_publish_detail("属性已提交，已离开商店。", &"success")
 	hide_overlay()
 
 
@@ -952,8 +1001,8 @@ func _choose_route(option_id: StringName) -> void:
 
 func _on_snapshot_changed(snapshot: RunSnapshot, _cause: StringName) -> void:
 	_snapshot = snapshot
-	if visible and _loadout_area.visible and _shop_draft == null:
-		_working_loadout = snapshot.loadout
+	if visible and _loadout_area.visible:
+		_working_loadout = _shop_draft.preview_loadout() if _shop_draft != null else snapshot.loadout
 		_refresh_loadout()
 
 
@@ -965,7 +1014,7 @@ func _refresh_warning() -> void:
 			active_count += 1
 	_warning.visible = active_count == 0
 	_warning.text = (
-		"无可按键技能 · 战斗将依赖普通攻击与被动（合法配置，可继续确认）"
+		"无可按键技能 · 战斗将依赖普通攻击与被动（合法配置，可直接离店）"
 		if _warning.visible
 		else "当前可按键主动：%d / 3" % active_count
 	)
@@ -1091,6 +1140,40 @@ func _assignment_preview_text(skill_id: StringName, slot_id: StringName) -> Stri
 	]
 
 
+func _assignment_committed_text(
+		before: RuntimeLoadoutSnapshot,
+		after: RuntimeLoadoutSnapshot,
+		skill_id: StringName,
+		slot_id: StringName
+) -> String:
+	if before.same_mapping(after):
+		return "%s 已是权威配装 · 无需重复提交" % String(slot_id).to_upper()
+	if skill_id.is_empty():
+		var removed_id := before.get_skill_id(slot_id)
+		var removed := _catalog.content_for(removed_id)
+		return "%s 已卸下 · 即时生效" % (
+			removed.display_name if removed != null else String(slot_id).to_upper()
+		)
+	var content := _catalog.content_for(skill_id)
+	var display_name := content.display_name if content != null else String(skill_id)
+	var previous_slot: StringName = &""
+	for candidate_slot: StringName in SLOT_ORDER:
+		if before.get_skill_id(candidate_slot) == skill_id:
+			previous_slot = candidate_slot
+			break
+	if not previous_slot.is_empty() and previous_slot != slot_id:
+		return "%s 已换至 %s · 即时生效" % [display_name, String(slot_id).to_upper()]
+	return "%s 已装配至 %s · 即时生效" % [display_name, String(slot_id).to_upper()]
+
+
+func _restore_shop_selection_focus() -> void:
+	if _selected_skill_id.is_empty():
+		return
+	var card := _skill_cards.get(_selected_skill_id) as Button
+	if card != null:
+		card.call_deferred(&"grab_focus")
+
+
 func _publish_detail(message: String, tone: StringName) -> void:
 	_status.text = message
 	_status.add_theme_color_override(&"font_color", _tone_color(tone))
@@ -1105,8 +1188,12 @@ func _detail_text(detail: StringName) -> String:
 			return "拒绝：同一技能只能装备一次。"
 		&"loadout_contains_unowned_skill":
 			return "拒绝：只能装备本局已拥有的技能。"
-		&"stale_loadout_revision", &"run_changed_since_draft_opened":
+		&"unknown_shared_slot", &"missing_shared_slot", &"expected_four_shared_slots", &"unknown_loadout_slot":
+			return "拒绝：目标槽位无效；请使用 ACTIVE 1–3 或 PASSIVE 1。"
+		&"stale_loadout_revision", &"run_changed_since_draft_opened", &"loadout_changed_since_draft_opened", &"loadout_mapping_changed_since_draft_opened", &"draft_is_not_active":
 			return "草稿已过期；请重新打开商店。"
+		&"shop_loadout_outside_shop":
+			return "战斗阶段为只读预览；请在商店调整技能。"
 		_:
 			return "操作未提交：%s" % String(detail)
 
