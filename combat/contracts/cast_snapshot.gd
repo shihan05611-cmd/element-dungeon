@@ -32,6 +32,10 @@ var stat_snapshot: CombatStatSnapshot:
 	get:
 		return _stat_snapshot
 
+var level_effect: ActiveSkillLevelEffectSnapshot:
+	get:
+		return _level_effect
+
 var validation_error: StringName:
 	get:
 		return _validation_error
@@ -43,6 +47,7 @@ var _caster_id: int
 var _team_id: StringName
 var _cast_element_id: StringName
 var _stat_snapshot: CombatStatSnapshot
+var _level_effect: ActiveSkillLevelEffectSnapshot
 var _validation_error: StringName = &""
 
 
@@ -53,7 +58,8 @@ func _init(
 		p_caster_id: int,
 		p_team_id: StringName,
 		p_cast_element_id: StringName,
-		p_stat_snapshot: CombatStatSnapshot
+		p_stat_snapshot: CombatStatSnapshot,
+		p_level_effect: ActiveSkillLevelEffectSnapshot = null
 ) -> void:
 	_cast_id = p_cast_id
 	_skill_id = p_skill_id
@@ -62,6 +68,11 @@ func _init(
 	_team_id = p_team_id
 	_cast_element_id = p_cast_element_id
 	_stat_snapshot = p_stat_snapshot
+	_level_effect = (
+		p_level_effect
+		if p_level_effect != null
+		else ActiveSkillLevelEffectSnapshot.neutral(p_skill_id)
+	)
 	_validation_error = _validate_values()
 
 
@@ -84,4 +95,8 @@ func _validate_values() -> StringName:
 		return &"unknown_cast_element_id"
 	if _stat_snapshot == null or not _stat_snapshot.is_valid():
 		return &"invalid_stat_snapshot"
+	if _level_effect == null or not _level_effect.is_valid():
+		return &"invalid_active_skill_level_effect"
+	if not _level_effect.skill_id.is_empty() and _level_effect.skill_id != _skill_id:
+		return &"active_skill_level_effect_id_mismatch"
 	return &""

@@ -1,0 +1,29 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+PASS: experience_below_threshold
+PASS: experience_exact_level
+PASS: experience_crosses_multiple_levels
+PASS: negative_experience_is_atomic
+PASS: level_only_grants_unspent_points
+PASS: stat_allocation_preview_and_commit
+PASS: stat_draft_rejects_invalid_allocations
+PASS: reward_generation_is_deterministic
+PASS: reward_filters_owned_and_duplicates
+PASS: first_room_requires_three_candidates
+PASS: relic_reward_filters_owned
+PASS: pending_reward_reopens_and_claims_once
+PASS: exhausted_skill_pool_removes_route
+PASS: relic_cooldown_room_limit_and_identity
+PASS: reaction_relic_threshold_and_temporary_attack
+PASS: room_completion_and_acquire_relic_effects
+PASS: relic_runtime_isolated_across_sessions
+PASS: run_phase_legal_and_illegal_transitions
+PASS: kill_and_room_experience_are_deduplicated
+PASS: shop_confirm_commits_stats_and_loadout
+PASS: shop_failure_has_no_partial_commit
+PASS: shop_draft_cannot_confirm_twice
+PASS: notifications_observe_complete_state
+PASS: snapshot_collections_are_copied
+PASS: invalid_events_do_not_mutate_run
+GROWTH TESTS PASSED: 25 tests, 155 assertions
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)

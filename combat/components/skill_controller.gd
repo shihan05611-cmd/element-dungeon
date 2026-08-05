@@ -174,6 +174,13 @@ func set_external_manual_element_gate(gate: Callable) -> void:
 	_flush_buffered_element_if_allowed()
 
 
+func set_active_skill_level_effect_port(port: ActiveSkillLevelEffectPort) -> bool:
+	if _executor == null:
+		return false
+	_executor.set_active_skill_level_effect_port(port)
+	return true
+
+
 func clear_buffered_element_request() -> void:
 	_buffered_element_id = &""
 	_buffered_request_sequence = 0
@@ -290,4 +297,3 @@ func _resolve_dependencies_from_paths() -> void:
 	if _executor == null and not executor_path.is_empty():
 		_executor = get_node_or_null(executor_path) as SkillExecutor
 	_connect_executor_phase()
-

@@ -25,6 +25,19 @@ enum RejectReason {
 	OPTION_NOT_FOUND,
 	ALREADY_CLAIMED,
 	ALREADY_OWNED,
+	FEATURE_DISABLED,
+	STALE_RUN_REVISION,
+	STALE_SHOP_SESSION,
+	COMMAND_ID_REUSED,
+	UNKNOWN_OFFER,
+	INSUFFICIENT_DREAM_DUST,
+	PASSIVE_HAS_NO_LEVELS,
+	ACTIVE_LEVEL_DATA_MISSING,
+	MAX_LEVEL_REACHED,
+	NO_UPGRADE_INVESTMENT,
+	LOADOUT_TYPE_MISMATCH,
+	DUPLICATE_EQUIPPED_SKILL,
+	RUN_ALREADY_FINISHED,
 }
 
 var accepted: bool:
@@ -99,5 +112,9 @@ static func success(
 	)
 
 
-static func rejected(reason: RejectReason, p_detail: StringName = &"") -> RunCommandResult:
-	return RunCommandResult.new(false, reason, p_detail)
+static func rejected(
+		reason: RejectReason,
+		p_detail: StringName = &"",
+		p_run_snapshot: RunSnapshot = null
+) -> RunCommandResult:
+	return RunCommandResult.new(false, reason, p_detail, p_run_snapshot)

@@ -7,6 +7,14 @@ var spawn_snapshot: DeliverySpawnSnapshot
 var energy_before: int
 var maximum_energy: int
 
+var level_effect: ActiveSkillLevelEffectSnapshot:
+	get:
+		return (
+			cast_snapshot.level_effect
+			if cast_snapshot != null
+			else ActiveSkillLevelEffectSnapshot.neutral()
+		)
+
 
 func _init(
 		p_skill: SkillDefinition,

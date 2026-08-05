@@ -44,6 +44,7 @@ var _content_catalog: RunContentCatalog
 var _basic_attack_definition: SkillDefinition
 var _active_beam_ref: WeakRef
 var _active_beam_snapshot: ChannelExecutionSnapshot
+var _skill_level_effect_adapter: RunSkillLevelEffectAdapter
 
 
 func _ready() -> void:
@@ -182,11 +183,25 @@ func configure_run_runtime(
 		return false
 	_content_catalog = content_catalog
 	_basic_attack_definition = basic_attack
+	var reclaim_port := RangeElementReclaimPort.new(
+		self,
+		energy_component,
+		160.0,
+		8,
+		256
+	)
 	if not skill_executor.set_execution_services(SkillExecutionServices.new(
-		RangeElementReclaimPort.new(self, energy_component, 160.0, 8, 256)
+		reclaim_port
 	)):
 		return false
 	return skill_controller.configure_runtime(current_element_controller, skill_executor, loadout)
+
+
+func configure_run_skill_level_effects(session: RunSession) -> bool:
+	if session == null:
+		return false
+	_skill_level_effect_adapter = RunSkillLevelEffectAdapter.new(session)
+	return skill_controller.set_active_skill_level_effect_port(_skill_level_effect_adapter)
 
 
 func release_channel_for_slot(slot_id: StringName) -> bool:

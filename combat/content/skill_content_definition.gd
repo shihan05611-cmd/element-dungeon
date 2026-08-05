@@ -26,6 +26,10 @@ extends Resource
 @export_group("Growth Projection")
 @export var allowed_form_ids: Array[StringName] = []
 
+@export_group("Run Economy")
+@export_range(0, 1000000, 1, "or_greater") var purchase_price: int = 0
+@export var active_progression: ActiveSkillProgressionDefinition
+
 
 func validation_error() -> StringName:
 	if skill_id.is_empty():
@@ -52,8 +56,17 @@ func validation_error() -> StringName:
 		seen_forms.append(form_id)
 	if initial_reward_pool and not reward_pool:
 		return &"initial_reward_requires_reward_pool"
+	if purchase_price < 0:
+		return &"negative_skill_purchase_price"
 	if fixed_basic_attack:
-		if initially_owned or reward_pool or equippable or not default_slot_id.is_empty():
+		if (
+			initially_owned
+			or reward_pool
+			or equippable
+			or not default_slot_id.is_empty()
+			or purchase_price != 0
+			or active_progression != null
+		):
 			return &"fixed_basic_attack_has_shared_progression"
 		if not gameplay_definition.is_active_skill():
 			return &"fixed_basic_attack_must_be_active"
@@ -71,6 +84,15 @@ func validation_error() -> StringName:
 			and not gameplay_definition.is_passive_skill()
 		):
 			return &"active_skill_in_passive_default_slot"
+	if gameplay_definition.is_passive_skill():
+		if active_progression != null:
+			return &"passive_skill_has_level_data"
+	elif active_progression != null:
+		var progression_error := active_progression.validation_error()
+		if not progression_error.is_empty():
+			return progression_error
+	elif purchase_price > 0:
+		return &"purchasable_active_missing_level_data"
 	return &""
 
 
@@ -88,3 +110,22 @@ func project_reward_definition() -> SkillRewardDefinition:
 	projection.initial_pool = initial_reward_pool
 	projection.allowed_form_ids = allowed_form_ids.duplicate()
 	return projection
+
+
+func is_shop_purchasable() -> bool:
+	return (
+		not fixed_basic_attack
+		and equippable
+		and purchase_price > 0
+		and is_valid()
+	)
+
+
+func level_effect(level: int) -> ActiveSkillLevelEffectSnapshot:
+	if (
+		gameplay_definition == null
+		or not gameplay_definition.is_active_skill()
+		or active_progression == null
+	):
+		return ActiveSkillLevelEffectSnapshot.neutral(skill_id, maxi(1, level))
+	return active_progression.effect_snapshot(skill_id, level)

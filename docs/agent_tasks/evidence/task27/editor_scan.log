@@ -1,0 +1,856 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[   0% ] first_scan_filesystem | Started 项目初始化 (5 steps)
+[   0% ] first_scan_filesystem | 正在扫描文件结构……
+[  16% ] first_scan_filesystem | 正在加载全局类名……
+[  33% ] first_scan_filesystem | 正在校验 GDExtension……
+[  50% ] first_scan_filesystem | 正在创建自动加载脚本……
+[  66% ] first_scan_filesystem | 正在初始化插件……
+MCP | plugin disabled in headless mode
+[  83% ] first_scan_filesystem | 正在启动文件扫描……
+[ DONE ] first_scan_filesystem
+
+[   0% ] update_scripts_classes | Started 正在注册全局类…… (326 steps)
+[   0% ] update_scripts_classes | McpAtomicWrite
+[   0% ] update_scripts_classes | McpClient
+[   0% ] update_scripts_classes | McpCliExec
+[   0% ] update_scripts_classes | McpCliFinder
+[   1% ] update_scripts_classes | McpCliStrategy
+[   1% ] update_scripts_classes | McpJsonStrategy
+[   1% ] update_scripts_classes | McpManualCommand
+[   2% ] update_scripts_classes | McpPathTemplate
+[   2% ] update_scripts_classes | McpClientRegistry
+[   2% ] update_scripts_classes | McpTomlStrategy
+[   3% ] update_scripts_classes | McpYamlStrategy
+[   3% ] update_scripts_classes | 
+[   3% ] update_scripts_classes | 
+[   3% ] update_scripts_classes | 
+[   4% ] update_scripts_classes | 
+[   4% ] update_scripts_classes | 
+[   4% ] update_scripts_classes | 
+[   5% ] update_scripts_classes | 
+[   5% ] update_scripts_classes | 
+[   5% ] update_scripts_classes | 
+[   6% ] update_scripts_classes | 
+[   6% ] update_scripts_classes | 
+[   6% ] update_scripts_classes | 
+[   7% ] update_scripts_classes | 
+[   7% ] update_scripts_classes | 
+[   7% ] update_scripts_classes | 
+[   7% ] update_scripts_classes | 
+[   8% ] update_scripts_classes | 
+[   8% ] update_scripts_classes | 
+[   8% ] update_scripts_classes | 
+[   9% ] update_scripts_classes | 
+[   9% ] update_scripts_classes | 
+[   9% ] update_scripts_classes | 
+[  10% ] update_scripts_classes | McpDebuggerPlugin
+[  10% ] update_scripts_classes | 
+[  10% ] update_scripts_classes | 
+[  11% ] update_scripts_classes | 
+[  11% ] update_scripts_classes | McpNodeValidator
+[  11% ] update_scripts_classes | McpParamValidators
+[  11% ] update_scripts_classes | McpPropertyErrors
+[  12% ] update_scripts_classes | 
+[  12% ] update_scripts_classes | 
+[  12% ] update_scripts_classes | 
+[  13% ] update_scripts_classes | 
+[  13% ] update_scripts_classes | 
+[  13% ] update_scripts_classes | 
+[  14% ] update_scripts_classes | 
+[  14% ] update_scripts_classes | 
+[  14% ] update_scripts_classes | 
+[  14% ] update_scripts_classes | 
+[  15% ] update_scripts_classes | 
+[  15% ] update_scripts_classes | 
+[  15% ] update_scripts_classes | 
+[  16% ] update_scripts_classes | 
+[  16% ] update_scripts_classes | 
+[  16% ] update_scripts_classes | 
+[  17% ] update_scripts_classes | 
+[  17% ] update_scripts_classes | 
+[  17% ] update_scripts_classes | 
+[  18% ] update_scripts_classes | 
+[  18% ] update_scripts_classes | 
+[  18% ] update_scripts_classes | 
+[  18% ] update_scripts_classes | 
+[  19% ] update_scripts_classes | 
+[  19% ] update_scripts_classes | 
+[  19% ] update_scripts_classes | 
+[  20% ] update_scripts_classes | 
+[  20% ] update_scripts_classes | 
+[  20% ] update_scripts_classes | 
+[  21% ] update_scripts_classes | 
+[  21% ] update_scripts_classes | 
+[  21% ] update_scripts_classes | 
+[  22% ] update_scripts_classes | 
+[  22% ] update_scripts_classes | 
+[  22% ] update_scripts_classes | 
+[  22% ] update_scripts_classes | 
+[  23% ] update_scripts_classes | 
+[  23% ] update_scripts_classes | 
+[  23% ] update_scripts_classes | 
+[  24% ] update_scripts_classes | 
+[  24% ] update_scripts_classes | 
+[  24% ] update_scripts_classes | 
+[  25% ] update_scripts_classes | McpTestRunner
+[  25% ] update_scripts_classes | McpTestSuite
+[  25% ] update_scripts_classes | McpAllowHosts
+[  25% ] update_scripts_classes | 
+[  26% ] update_scripts_classes | McpDiagnosticsCapture
+[  26% ] update_scripts_classes | McpEditorLogBuffer
+[  26% ] update_scripts_classes | McpErrorCodes
+[  27% ] update_scripts_classes | 
+[  27% ] update_scripts_classes | McpGameLogBuffer
+[  27% ] update_scripts_classes | McpJsonValues
+[  28% ] update_scripts_classes | McpLogBacktrace
+[  28% ] update_scripts_classes | McpLogBuffer
+[  28% ] update_scripts_classes | McpAdoptionLabel
+[  29% ] update_scripts_classes | McpClientRefreshState
+[  29% ] update_scripts_classes | McpServerState
+[  29% ] update_scripts_classes | McpStartupPath
+[  29% ] update_scripts_classes | McpPathValidator
+[  30% ] update_scripts_classes | McpPortResolver
+[  30% ] update_scripts_classes | McpResourceIO
+[  30% ] update_scripts_classes | McpScenePath
+[  31% ] update_scripts_classes | McpScreenshotEncode
+[  31% ] update_scripts_classes | McpServerLifecycleManager
+[  31% ] update_scripts_classes | McpServerVersionCheck
+[  32% ] update_scripts_classes | McpSettings
+[  32% ] update_scripts_classes | McpStructuredLogRing
+[  32% ] update_scripts_classes | McpSurfacedErrorTracker
+[  33% ] update_scripts_classes | McpUpdateManager
+[  33% ] update_scripts_classes | 
+[  33% ] update_scripts_classes | McpUvCacheCleanup
+[  33% ] update_scripts_classes | 
+[  34% ] update_scripts_classes | McpWindowsPortReservation
+[  34% ] update_scripts_classes | McpClientConfigurator
+[  34% ] update_scripts_classes | McpConnection
+[  35% ] update_scripts_classes | McpDispatcher
+[  35% ] update_scripts_classes | McpDock
+[  35% ] update_scripts_classes | 
+[  36% ] update_scripts_classes | 
+[  36% ] update_scripts_classes | McpToolCatalog
+[  36% ] update_scripts_classes | 
+[  37% ] update_scripts_classes | CombatReceiver
+[  37% ] update_scripts_classes | CurrentElementController
+[  37% ] update_scripts_classes | DamageReceiver
+[  37% ] update_scripts_classes | ElementCarrier
+[  38% ] update_scripts_classes | EnergyComponent
+[  38% ] update_scripts_classes | SkillController
+[  38% ] update_scripts_classes | SkillCooldowns
+[  39% ] update_scripts_classes | SkillExecutor
+[  39% ] update_scripts_classes | RunContentCatalog
+[  39% ] update_scripts_classes | SkillContentDefinition
+[  40% ] update_scripts_classes | BasicAttackCommittedEvent
+[  40% ] update_scripts_classes | CastAttemptResult
+[  40% ] update_scripts_classes | CastSnapshot
+[  40% ] update_scripts_classes | CombatPlan
+[  41% ] update_scripts_classes | CombatResult
+[  41% ] update_scripts_classes | CombatStatus
+[  41% ] update_scripts_classes | CombatStatSnapshot
+[  42% ] update_scripts_classes | DamageResolution
+[  42% ] update_scripts_classes | DeliverySpawnSnapshot
+[  42% ] update_scripts_classes | ElementChangeResult
+[  43% ] update_scripts_classes | ElementLayerConsumePlan
+[  43% ] update_scripts_classes | ElementResolution
+[  43% ] update_scripts_classes | ElementSnapshot
+[  44% ] update_scripts_classes | HitRequest
+[  44% ] update_scripts_classes | RuntimeAttackPayload
+[  44% ] update_scripts_classes | AttackPayloadDefinition
+[  44% ] update_scripts_classes | ElementDefinition
+[  45% ] update_scripts_classes | SkillDefinition
+[  45% ] update_scripts_classes | SkillLoadout
+[  45% ] update_scripts_classes | CombatHurtbox
+[  46% ] update_scripts_classes | DelayedAreaDelivery
+[  46% ] update_scripts_classes | DeliveryBase
+[  46% ] update_scripts_classes | ElementBeamDelivery
+[  47% ] update_scripts_classes | ElementRageDelivery
+[  47% ] update_scripts_classes | MeleeDelivery
+[  47% ] update_scripts_classes | ProjectileDelivery
+[  48% ] update_scripts_classes | AllEnergyBurstExecution
+[  48% ] update_scripts_classes | AllEnergyBurstExecutionSnapshot
+[  48% ] update_scripts_classes | ChannelExecution
+[  48% ] update_scripts_classes | ChannelExecutionRuntime
+[  49% ] update_scripts_classes | ChannelExecutionSnapshot
+[  49% ] update_scripts_classes | ChannelTickSnapshot
+[  49% ] update_scripts_classes | ElementReclaimExecution
+[  50% ] update_scripts_classes | ElementReclaimExecutionSnapshot
+[  50% ] update_scripts_classes | ElementReclaimPort
+[  50% ] update_scripts_classes | ElementReclaimPrepareResult
+[  51% ] update_scripts_classes | ElementReclaimRequest
+[  51% ] update_scripts_classes | InstantDeliveryExecution
+[  51% ] update_scripts_classes | InstantDeliveryExecutionSnapshot
+[  51% ] update_scripts_classes | SkillExecutionBoundaryResult
+[  52% ] update_scripts_classes | SkillExecutionCommitTransaction
+[  52% ] update_scripts_classes | SkillExecutionContext
+[  52% ] update_scripts_classes | SkillExecutionDefinition
+[  53% ] update_scripts_classes | SkillExecutionEndResult
+[  53% ] update_scripts_classes | SkillExecutionPrepareResult
+[  53% ] update_scripts_classes | SkillExecutionRuntime
+[  54% ] update_scripts_classes | SkillExecutionServices
+[  54% ] update_scripts_classes | SkillExecutionSnapshot
+[  54% ] update_scripts_classes | LegacyElementLoadoutMigrator
+[  55% ] update_scripts_classes | LegacyElementLoadoutSnapshot
+[  55% ] update_scripts_classes | LegacyLoadoutMigrationResult
+[  55% ] update_scripts_classes | RuntimeSkillLoadout
+[  55% ] update_scripts_classes | SkillSlotIds
+[  56% ] update_scripts_classes | BurningPassiveEffectDefinition
+[  56% ] update_scripts_classes | BurningPassiveEffectRuntime
+[  56% ] update_scripts_classes | PassiveDamageRequest
+[  57% ] update_scripts_classes | PassiveEffectBinding
+[  57% ] update_scripts_classes | PassiveEffectDefinition
+[  57% ] update_scripts_classes | PassiveEffectPort
+[  58% ] update_scripts_classes | PassiveEffectRuntime
+[  58% ] update_scripts_classes | PassiveOwnerPort
+[  58% ] update_scripts_classes | PassiveRuntimeContext
+[  59% ] update_scripts_classes | PassiveSkillController
+[  59% ] update_scripts_classes | PassiveStatModifierSnapshot
+[  59% ] update_scripts_classes | PassiveTargetPort
+[  59% ] update_scripts_classes | PassiveTargetSnapshot
+[  60% ] update_scripts_classes | StatModifierPassiveEffectDefinition
+[  60% ] update_scripts_classes | StatModifierPassiveEffectRuntime
+[  60% ] update_scripts_classes | UnendingPassiveEffectDefinition
+[  61% ] update_scripts_classes | UnendingPassiveEffectRuntime
+[  61% ] update_scripts_classes | ActiveSkillLevelEffectPort
+[  61% ] update_scripts_classes | DamageResolver
+[  62% ] update_scripts_classes | WaterFireResolver
+[  62% ] update_scripts_classes | CombatTargetCandidate2D
+[  62% ] update_scripts_classes | CombatTargetQuery2D
+[  62% ] update_scripts_classes | ElementReclaimTargetPlan
+[  63% ] update_scripts_classes | RangeElementReclaimPort
+[  63% ] update_scripts_classes | RangeElementReclaimTransaction
+[  63% ] update_scripts_classes | 
+[  64% ] update_scripts_classes | 
+[  64% ] update_scripts_classes | 
+[  64% ] update_scripts_classes | 
+[  65% ] update_scripts_classes | 
+[  65% ] update_scripts_classes | RecordingSkillDelivery
+[  65% ] update_scripts_classes | 
+[  66% ] update_scripts_classes | 
+[  66% ] update_scripts_classes | 
+[  66% ] update_scripts_classes | 
+[  66% ] update_scripts_classes | 
+[  67% ] update_scripts_classes | 
+[  67% ] update_scripts_classes | 
+[  67% ] update_scripts_classes | 
+[  68% ] update_scripts_classes | 
+[  68% ] update_scripts_classes | 
+[  68% ] update_scripts_classes | 
+[  69% ] update_scripts_classes | 
+[  69% ] update_scripts_classes | 
+[  69% ] update_scripts_classes | 
+[  70% ] update_scripts_classes | 
+[  70% ] update_scripts_classes | 
+[  70% ] update_scripts_classes | ElementIds
+[  70% ] update_scripts_classes | ActiveSkillLevelEffectSnapshot
+[  71% ] update_scripts_classes | AllocatedStatsSnapshot
+[  71% ] update_scripts_classes | DreamDustSnapshot
+[  71% ] update_scripts_classes | ExperienceGainPlan
+[  72% ] update_scripts_classes | GrowthStatIds
+[  72% ] update_scripts_classes | ProgressionSnapshot
+[  72% ] update_scripts_classes | RelicDispatchResult
+[  73% ] update_scripts_classes | RelicDisplayState
+[  73% ] update_scripts_classes | RelicInventorySnapshot
+[  73% ] update_scripts_classes | RewardOffer
+[  74% ] update_scripts_classes | RewardOption
+[  74% ] update_scripts_classes | RewardType
+[  74% ] update_scripts_classes | RoomRewardContext
+[  74% ] update_scripts_classes | RouteOption
+[  75% ] update_scripts_classes | RouteSnapshot
+[  75% ] update_scripts_classes | RuntimeLoadoutChangeResult
+[  75% ] update_scripts_classes | RuntimeLoadoutSlotSnapshot
+[  76% ] update_scripts_classes | RuntimeLoadoutSnapshot
+[  76% ] update_scripts_classes | RunCommandResult
+[  76% ] update_scripts_classes | RunFeatureMode
+[  77% ] update_scripts_classes | RunPhase
+[  77% ] update_scripts_classes | RunRulesSnapshot
+[  77% ] update_scripts_classes | RunSnapshot
+[  77% ] update_scripts_classes | ShopCommitSummary
+[  78% ] update_scripts_classes | ShopDraftOpenResult
+[  78% ] update_scripts_classes | ShopOfferSnapshot
+[  78% ] update_scripts_classes | ShopSnapshot
+[  79% ] update_scripts_classes | SkillInventorySnapshot
+[  79% ] update_scripts_classes | SkillProgressSnapshot
+[  79% ] update_scripts_classes | ActiveSkillLevelDefinition
+[  80% ] update_scripts_classes | ActiveSkillProgressionDefinition
+[  80% ] update_scripts_classes | RelicDefinition
+[  80% ] update_scripts_classes | SkillRewardDefinition
+[  81% ] update_scripts_classes | CombatCommittedEvent
+[  81% ] update_scripts_classes | EnemyKilledEvent
+[  81% ] update_scripts_classes | FormChangedEvent
+[  81% ] update_scripts_classes | RelicAcquiredEvent
+[  82% ] update_scripts_classes | RoomCompletedEvent
+[  82% ] update_scripts_classes | RunEvent
+[  82% ] update_scripts_classes | GrowthEffectPort
+[  83% ] update_scripts_classes | RuntimeLoadoutPort
+[  83% ] update_scripts_classes | AcquireMaximumStatEffect
+[  83% ] update_scripts_classes | FormChangeRelicDefinition
+[  84% ] update_scripts_classes | FormChangeResponsePolicy
+[  84% ] update_scripts_classes | FormSwitchEnergyEffect
+[  84% ] update_scripts_classes | ReactionEnergyEffect
+[  85% ] update_scripts_classes | ReactionTemporaryAttackEffect
+[  85% ] update_scripts_classes | RelicController
+[  85% ] update_scripts_classes | RelicEffect
+[  85% ] update_scripts_classes | RelicEffectRegistry
+[  86% ] update_scripts_classes | RoomCompleteHealEffect
+[  86% ] update_scripts_classes | ExperienceService
+[  86% ] update_scripts_classes | RewardGenerator
+[  87% ] update_scripts_classes | ShopDraft
+[  87% ] update_scripts_classes | PendingRewardState
+[  87% ] update_scripts_classes | ProgressionState
+[  88% ] update_scripts_classes | RelicInventoryState
+[  88% ] update_scripts_classes | RelicRuntimeState
+[  88% ] update_scripts_classes | RouteState
+[  88% ] update_scripts_classes | RunEconomyState
+[  89% ] update_scripts_classes | SkillInventoryState
+[  89% ] update_scripts_classes | 
+[  89% ] update_scripts_classes | 
+[  90% ] update_scripts_classes | 
+[  90% ] update_scripts_classes | 
+[  90% ] update_scripts_classes | 
+[  91% ] update_scripts_classes | 
+[  91% ] update_scripts_classes | 
+[  91% ] update_scripts_classes | RunDirector
+[  92% ] update_scripts_classes | RunSession
+[  92% ] update_scripts_classes | PrototypeElementBolt
+[  92% ] update_scripts_classes | PrototypeSkillCaster
+[  92% ] update_scripts_classes | CombatUiTokens
+[  93% ] update_scripts_classes | RunOverlayInterface
+[  93% ] update_scripts_classes | EnemyPassiveVfxPresentation
+[  93% ] update_scripts_classes | FuryVfxPresentation
+[  94% ] update_scripts_classes | LaserVfxPresentation
+[  94% ] update_scripts_classes | ReclaimVfxEvent
+[  94% ] update_scripts_classes | ReclaimVfxPort
+[  95% ] update_scripts_classes | ReclaimVfxPresentation
+[  95% ] update_scripts_classes | SkillVfxCoordinator
+[  95% ] update_scripts_classes | VfxSpriteSheetFrames
+[  96% ] update_scripts_classes | CombatFeedback
+[  96% ] update_scripts_classes | CombatHUD
+[  96% ] update_scripts_classes | ElementProjectile
+[  96% ] update_scripts_classes | CombatEnemy
+[  97% ] update_scripts_classes | PassiveEffectAdapter
+[  97% ] update_scripts_classes | PlayerCharacter
+[  97% ] update_scripts_classes | PlayerGrowthAdapter
+[  98% ] update_scripts_classes | RunSessionHost
+[  98% ] update_scripts_classes | RunSkillLevelEffectAdapter
+[  98% ] update_scripts_classes | SharedLoadoutPersistenceAdapter
+[  99% ] update_scripts_classes | 
+[  99% ] update_scripts_classes | TransientMeleeDelivery
+[ DONE ] update_scripts_classes
+
+[   0% ] _update_scan_actions | Started 正在扫描动作…… (166 steps)
+[   0% ] _update_scan_actions | cat_attack.png
+[   0% ] _update_scan_actions | cat_fire_attack.png
+[   1% ] _update_scan_actions | cat_fire_idle.png
+[   1% ] _update_scan_actions | cat_fire_jump.png
+[   2% ] _update_scan_actions | cat_fire_walk.png
+[   2% ] _update_scan_actions | cat_hurt.png
+[   3% ] _update_scan_actions | cat_idle.png
+[   4% ] _update_scan_actions | cat_jump.png
+[   4% ] _update_scan_actions | cat_walk.png
+[   5% ] _update_scan_actions | cat_water_attack.png
+[   5% ] _update_scan_actions | cat_water_idle.png
+[   6% ] _update_scan_actions | cat_water_jump.png
+[   7% ] _update_scan_actions | cat_water_walk.png
+[   7% ] _update_scan_actions | orc_attack.png
+[   8% ] _update_scan_actions | orc_hurt.png
+[   8% ] _update_scan_actions | orc_idle.png
+[   9% ] _update_scan_actions | orc_walk.png
+[  10% ] _update_scan_actions | soldier_attack.png
+[  10% ] _update_scan_actions | soldier_hurt.png
+[  11% ] _update_scan_actions | soldier_idle.png
+[  11% ] _update_scan_actions | soldier_walk.png
+[  12% ] _update_scan_actions | p01_003_reclaim_vortex.png
+[  13% ] _update_scan_actions | p02_069_burning_flame.png
+[  13% ] _update_scan_actions | p04_174_fury_dissipate.png
+[  14% ] _update_scan_actions | p04_184_fury_ring.png
+[  14% ] _update_scan_actions | p06_273_hit_spark.png
+[  15% ] _update_scan_actions | p06_283_laser_hit.png
+[  16% ] _update_scan_actions | p06_293_reclaim_particle_ring.png
+[  16% ] _update_scan_actions | p08_375_bolt_projectile.png
+[  17% ] _update_scan_actions | p09_427_burst_core.png
+[  17% ] _update_scan_actions | p09_446_reclaim_orbit.png
+[  18% ] _update_scan_actions | p10_465_unending_ripple.png
+[  19% ] _update_scan_actions | p10_467_unending_splash.png
+[  19% ] _update_scan_actions | p12_579_bolt_straight.png
+[  20% ] _update_scan_actions | icon_alpha_full_v1.png
+[  20% ] _update_scan_actions | icon_alpha_full_v2.png
+[  21% ] _update_scan_actions | icon_chromakey_v1.png
+[  22% ] _update_scan_actions | fire_marker_color_candidate.png
+[  22% ] _update_scan_actions | burning_enemy_loop.png
+[  23% ] _update_scan_actions | burning_enemy_loop_v1.png
+[  23% ] _update_scan_actions | burning_tick.png
+[  24% ] _update_scan_actions | burning_tick_v1.png
+[  25% ] _update_scan_actions | icon.png
+[  25% ] _update_scan_actions | burning_concept_v1.png
+[  26% ] _update_scan_actions | elemental_fury_concept_v1.png
+[  26% ] _update_scan_actions | elemental_laser_concept_v1.png
+[  27% ] _update_scan_actions | element_bolt_concept_v1.png
+[  28% ] _update_scan_actions | element_reclaim_concept_v1.png
+[  28% ] _update_scan_actions | stage1_overview_v1.png
+[  29% ] _update_scan_actions | style_baseline_v1.png
+[  29% ] _update_scan_actions | unending_concept_v1.png
+[  30% ] _update_scan_actions | icon_alpha_full_v1.png
+[  31% ] _update_scan_actions | icon_alpha_full_v2.png
+[  31% ] _update_scan_actions | icon_chromakey_v1.png
+[  32% ] _update_scan_actions | burst_core_neutral_candidate.png
+[  32% ] _update_scan_actions | dissipate_neutral_candidate.png
+[  33% ] _update_scan_actions | shock_ring_neutral_candidate.png
+[  34% ] _update_scan_actions | burst_core.png
+[  34% ] _update_scan_actions | burst_core_neutral_v1.png
+[  35% ] _update_scan_actions | icon.png
+[  35% ] _update_scan_actions | icon_alpha_full_v1.png
+[  36% ] _update_scan_actions | icon_alpha_full_v2.png
+[  37% ] _update_scan_actions | icon_chromakey_v1.png
+[  37% ] _update_scan_actions | hit_pulse_neutral_candidate.png
+[  38% ] _update_scan_actions | origin_charge_neutral_candidate.png
+[  38% ] _update_scan_actions | beam_segment_fire.png
+[  39% ] _update_scan_actions | beam_segment_fire_mask.png
+[  40% ] _update_scan_actions | beam_segment_fire_v1.png
+[  40% ] _update_scan_actions | beam_segment_water.png
+[  41% ] _update_scan_actions | beam_segment_water_mask.png
+[  41% ] _update_scan_actions | beam_segment_water_v1.png
+[  42% ] _update_scan_actions | beam_tick_fire.png
+[  43% ] _update_scan_actions | beam_tick_fire_mask.png
+[  43% ] _update_scan_actions | beam_tick_fire_v1.png
+[  44% ] _update_scan_actions | beam_tick_water.png
+[  44% ] _update_scan_actions | beam_tick_water_mask.png
+[  45% ] _update_scan_actions | beam_tick_water_v1.png
+[  46% ] _update_scan_actions | icon.png
+[  46% ] _update_scan_actions | icon_alpha_full_v1.png
+[  47% ] _update_scan_actions | icon_alpha_full_v2.png
+[  47% ] _update_scan_actions | icon_chromakey_v1.png
+[  48% ] _update_scan_actions | bolt_projectile_neutral_candidate.png
+[  49% ] _update_scan_actions | bolt_straight_neutral_candidate.png
+[  49% ] _update_scan_actions | hit_spark_neutral_candidate.png
+[  50% ] _update_scan_actions | icon.png
+[  50% ] _update_scan_actions | projectile_fire_no_jitter_spritesheet.png
+[  51% ] _update_scan_actions | projectile_water_no_jitter_spritesheet.png
+[  52% ] _update_scan_actions | icon_alpha_full_v1.png
+[  52% ] _update_scan_actions | icon_alpha_full_v2.png
+[  53% ] _update_scan_actions | icon_chromakey_v1.png
+[  53% ] _update_scan_actions | icon_reclaim_third_element_rejected_v1.png
+[  54% ] _update_scan_actions | orbit_neutral_candidate.png
+[  55% ] _update_scan_actions | particle_ring_neutral_candidate.png
+[  55% ] _update_scan_actions | vortex_neutral_candidate.png
+[  56% ] _update_scan_actions | icon.png
+[  56% ] _update_scan_actions | reclaim_arrival_neutral.png
+[  57% ] _update_scan_actions | reclaim_arrival_neutral_v1.png
+[  58% ] _update_scan_actions | reclaim_extract_neutral.png
+[  58% ] _update_scan_actions | reclaim_extract_neutral_v1.png
+[  59% ] _update_scan_actions | reclaim_particle_fire.png
+[  59% ] _update_scan_actions | reclaim_particle_fire_v1.png
+[  60% ] _update_scan_actions | reclaim_particle_water.png
+[  61% ] _update_scan_actions | reclaim_particle_water_v1.png
+[  61% ] _update_scan_actions | icon_alpha_full_v1.png
+[  62% ] _update_scan_actions | icon_alpha_full_v2.png
+[  62% ] _update_scan_actions | icon_chromakey_v1.png
+[  63% ] _update_scan_actions | ripple_color_candidate.png
+[  64% ] _update_scan_actions | splash_color_candidate.png
+[  64% ] _update_scan_actions | icon.png
+[  65% ] _update_scan_actions | unending_enemy_loop.png
+[  65% ] _update_scan_actions | unending_enemy_loop_v1.png
+[  66% ] _update_scan_actions | unending_trigger.png
+[  67% ] _update_scan_actions | unending_trigger_v1.png
+[  67% ] _update_scan_actions | python_synthesis_overview_v1.png
+[  68% ] _update_scan_actions | source_candidate_overview_v1.png
+[  68% ] _update_scan_actions | 01_combat_hud_1152x648.png
+[  69% ] _update_scan_actions | 02_combat_hud_scaled_900x540.png
+[  70% ] _update_scan_actions | 03_colorblind_target_layers.png
+[  70% ] _update_scan_actions | 04_reduced_motion_locked_element.png
+[  71% ] _update_scan_actions | 05_active_slot_passive_preview.png
+[  71% ] _update_scan_actions | 06_passive_slot_rejects_active.png
+[  72% ] _update_scan_actions | 07_zero_active_four_passive_warning.png
+[  73% ] _update_scan_actions | 08_single_final_damage_reaction.png
+[  73% ] _update_scan_actions | 09_reward_ui_catalog_copy.png
+[  74% ] _update_scan_actions | fury_192_runtime.png
+[  74% ] _update_scan_actions | laser_fire_tick_runtime.png
+[  75% ] _update_scan_actions | passives_enemy_attached_runtime.png
+[  76% ] _update_scan_actions | reclaim_water_runtime.png
+[  76% ] _update_scan_actions | 01b_hud_2560x1440_scale.png
+[  77% ] _update_scan_actions | 01c_hud_3840x2160_scale.png
+[  77% ] _update_scan_actions | 01d_hud_1152x648_logic.png
+[  78% ] _update_scan_actions | 01_hud_1152x648.png
+[  79% ] _update_scan_actions | 01_hud_1920x1080_main.png
+[  79% ] _update_scan_actions | 02_hud_900x540.png
+[  80% ] _update_scan_actions | 03_states_cooldown_energy_busy_failure.png
+[  80% ] _update_scan_actions | 04_target_follow.png
+[  81% ] _update_scan_actions | 05_target_fallback.png
+[  82% ] _update_scan_actions | 06_reward_three.png
+[  82% ] _update_scan_actions | 07_reward_two.png
+[  83% ] _update_scan_actions | 08_reward_one_explicit_confirm.png
+[  83% ] _update_scan_actions | 09_reward_long_copy.png
+[  84% ] _update_scan_actions | 10_colorblind.png
+[  85% ] _update_scan_actions | 11_reduced_motion.png
+[  85% ] _update_scan_actions | 12_task18_vfx_unobscured.png
+[  86% ] _update_scan_actions | 01_hud_1920x1080.png
+[  86% ] _update_scan_actions | 02_hud_2560x1440.png
+[  87% ] _update_scan_actions | 03_hud_2560x1600.png
+[  88% ] _update_scan_actions | 04_hud_3840x2160.png
+[  88% ] _update_scan_actions | 05_hud_3440x1440.png
+[  89% ] _update_scan_actions | 06_hud_900x540_stress.png
+[  89% ] _update_scan_actions | 07_states_cooldown_energy_failure_passive.png
+[  90% ] _update_scan_actions | 08_reward_three.png
+[  91% ] _update_scan_actions | 09_reward_two_centered.png
+[  91% ] _update_scan_actions | 10_reward_one_explicit_confirm.png
+[  92% ] _update_scan_actions | 11_reward_long_copy_900x540.png
+[  92% ] _update_scan_actions | 12_colorblind_shape_text.png
+[  93% ] _update_scan_actions | 13_reduced_motion.png
+[  94% ] _update_scan_actions | 14_fury_laser_reclaim_unobscured.png
+[  94% ] _update_scan_actions | 01_shop_immediate_equip_1920x1080.png
+[  95% ] _update_scan_actions | 01_authoritative_lv2_element_bolt_1920x1080.png
+[  95% ] _update_scan_actions | stage2_final_overview.png
+[  96% ] _update_scan_actions | stage2_icons_scale_qa.png
+[  97% ] _update_scan_actions | stage2_range_overlay_qa.png
+[  97% ] _update_scan_actions | stage2_testroom_particles_qa.png
+[  98% ] _update_scan_actions | testroom_runtime_base.png
+[  98% ] _update_scan_actions | icon.svg
+[ DONE ] _update_scan_actions
+
+[   0% ] reimport | Started 正在导入或重新导入资产 (166 steps)
+[   0% ] reimport | 正在准备重新导入文件……
+[   0% ] reimport | 正在准备重新导入文件……
+[   1% ] reimport | 正在准备重新导入文件……
+[   1% ] reimport | 正在准备重新导入文件……
+[   2% ] reimport | 正在准备重新导入文件……
+[   2% ] reimport | 正在准备重新导入文件……
+[   3% ] reimport | 正在准备重新导入文件……
+[   4% ] reimport | 正在准备重新导入文件……
+[   4% ] reimport | 正在准备重新导入文件……
+[   5% ] reimport | 正在准备重新导入文件……
+[   5% ] reimport | 正在准备重新导入文件……
+[   6% ] reimport | 正在准备重新导入文件……
+[   7% ] reimport | 正在准备重新导入文件……
+[   7% ] reimport | 正在准备重新导入文件……
+[   8% ] reimport | 正在准备重新导入文件……
+[   8% ] reimport | 正在准备重新导入文件……
+[   9% ] reimport | 正在准备重新导入文件……
+[  10% ] reimport | 正在准备重新导入文件……
+[  10% ] reimport | 正在准备重新导入文件……
+[  11% ] reimport | 正在准备重新导入文件……
+[  11% ] reimport | 正在准备重新导入文件……
+[  12% ] reimport | 正在准备重新导入文件……
+[  13% ] reimport | 正在准备重新导入文件……
+[  13% ] reimport | 正在准备重新导入文件……
+[  14% ] reimport | 正在准备重新导入文件……
+[  14% ] reimport | 正在准备重新导入文件……
+[  15% ] reimport | 正在准备重新导入文件……
+[  16% ] reimport | 正在准备重新导入文件……
+[  16% ] reimport | 正在准备重新导入文件……
+[  17% ] reimport | 正在准备重新导入文件……
+[  17% ] reimport | 正在准备重新导入文件……
+[  18% ] reimport | 正在准备重新导入文件……
+[  19% ] reimport | 正在准备重新导入文件……
+[  19% ] reimport | 正在准备重新导入文件……
+[  20% ] reimport | 正在准备重新导入文件……
+[  20% ] reimport | 正在准备重新导入文件……
+[  21% ] reimport | 正在准备重新导入文件……
+[  22% ] reimport | 正在准备重新导入文件……
+[  22% ] reimport | 正在准备重新导入文件……
+[  23% ] reimport | 正在准备重新导入文件……
+[  23% ] reimport | 正在准备重新导入文件……
+[  24% ] reimport | 正在准备重新导入文件……
+[  25% ] reimport | 正在准备重新导入文件……
+[  25% ] reimport | 正在准备重新导入文件……
+[  26% ] reimport | 正在准备重新导入文件……
+[  26% ] reimport | 正在准备重新导入文件……
+[  27% ] reimport | 正在准备重新导入文件……
+[  28% ] reimport | 正在准备重新导入文件……
+[  28% ] reimport | 正在准备重新导入文件……
+[  29% ] reimport | 正在准备重新导入文件……
+[  29% ] reimport | 正在准备重新导入文件……
+[  30% ] reimport | 正在准备重新导入文件……
+[  31% ] reimport | 正在准备重新导入文件……
+[  31% ] reimport | 正在准备重新导入文件……
+[  32% ] reimport | 正在准备重新导入文件……
+[  32% ] reimport | 正在准备重新导入文件……
+[  33% ] reimport | 正在准备重新导入文件……
+[  34% ] reimport | 正在准备重新导入文件……
+[  34% ] reimport | 正在准备重新导入文件……
+[  35% ] reimport | 正在准备重新导入文件……
+[  35% ] reimport | 正在准备重新导入文件……
+[  36% ] reimport | 正在准备重新导入文件……
+[  37% ] reimport | 正在准备重新导入文件……
+[  37% ] reimport | 正在准备重新导入文件……
+[  38% ] reimport | 正在准备重新导入文件……
+[  38% ] reimport | 正在准备重新导入文件……
+[  39% ] reimport | 正在准备重新导入文件……
+[  40% ] reimport | 正在准备重新导入文件……
+[  40% ] reimport | 正在准备重新导入文件……
+[  41% ] reimport | 正在准备重新导入文件……
+[  41% ] reimport | 正在准备重新导入文件……
+[  42% ] reimport | 正在准备重新导入文件……
+[  43% ] reimport | 正在准备重新导入文件……
+[  43% ] reimport | 正在准备重新导入文件……
+[  44% ] reimport | 正在准备重新导入文件……
+[  44% ] reimport | 正在准备重新导入文件……
+[  45% ] reimport | 正在准备重新导入文件……
+[  46% ] reimport | 正在准备重新导入文件……
+[  46% ] reimport | 正在准备重新导入文件……
+[  47% ] reimport | 正在准备重新导入文件……
+[  47% ] reimport | 正在准备重新导入文件……
+[  48% ] reimport | 正在准备重新导入文件……
+[  49% ] reimport | 正在准备重新导入文件……
+[  49% ] reimport | 正在准备重新导入文件……
+[  50% ] reimport | 正在准备重新导入文件……
+[  50% ] reimport | 正在准备重新导入文件……
+[  51% ] reimport | 正在准备重新导入文件……
+[  52% ] reimport | 正在准备重新导入文件……
+[  52% ] reimport | 正在准备重新导入文件……
+[  53% ] reimport | 正在准备重新导入文件……
+[  53% ] reimport | 正在准备重新导入文件……
+[  54% ] reimport | 正在准备重新导入文件……
+[  55% ] reimport | 正在准备重新导入文件……
+[  55% ] reimport | 正在准备重新导入文件……
+[  56% ] reimport | 正在准备重新导入文件……
+[  56% ] reimport | 正在准备重新导入文件……
+[  57% ] reimport | 正在准备重新导入文件……
+[  58% ] reimport | 正在准备重新导入文件……
+[  58% ] reimport | 正在准备重新导入文件……
+[  59% ] reimport | 正在准备重新导入文件……
+[  59% ] reimport | 正在准备重新导入文件……
+[  60% ] reimport | 正在准备重新导入文件……
+[  61% ] reimport | 正在准备重新导入文件……
+[  61% ] reimport | 正在准备重新导入文件……
+[  62% ] reimport | 正在准备重新导入文件……
+[  62% ] reimport | 正在准备重新导入文件……
+[  63% ] reimport | 正在准备重新导入文件……
+[  64% ] reimport | 正在准备重新导入文件……
+[  64% ] reimport | 正在准备重新导入文件……
+[  65% ] reimport | 正在准备重新导入文件……
+[  65% ] reimport | 正在准备重新导入文件……
+[  66% ] reimport | 正在准备重新导入文件……
+[  67% ] reimport | 正在准备重新导入文件……
+[  67% ] reimport | 正在准备重新导入文件……
+[  68% ] reimport | 正在准备重新导入文件……
+[  68% ] reimport | 正在准备重新导入文件……
+[  69% ] reimport | 正在准备重新导入文件……
+[  70% ] reimport | 正在准备重新导入文件……
+[  70% ] reimport | 正在准备重新导入文件……
+[  71% ] reimport | 正在准备重新导入文件……
+[  71% ] reimport | 正在准备重新导入文件……
+[  72% ] reimport | 正在准备重新导入文件……
+[  73% ] reimport | 正在准备重新导入文件……
+[  73% ] reimport | 正在准备重新导入文件……
+[  74% ] reimport | 正在准备重新导入文件……
+[  74% ] reimport | 正在准备重新导入文件……
+[  75% ] reimport | 正在准备重新导入文件……
+[  76% ] reimport | 正在准备重新导入文件……
+[  76% ] reimport | 正在准备重新导入文件……
+[  77% ] reimport | 正在准备重新导入文件……
+[  77% ] reimport | 正在准备重新导入文件……
+[  78% ] reimport | 正在准备重新导入文件……
+[  79% ] reimport | 正在准备重新导入文件……
+[  79% ] reimport | 正在准备重新导入文件……
+[  80% ] reimport | 正在准备重新导入文件……
+[  80% ] reimport | 正在准备重新导入文件……
+[  81% ] reimport | 正在准备重新导入文件……
+[  82% ] reimport | 正在准备重新导入文件……
+[  82% ] reimport | 正在准备重新导入文件……
+[  83% ] reimport | 正在准备重新导入文件……
+[  83% ] reimport | 正在准备重新导入文件……
+[  84% ] reimport | 正在准备重新导入文件……
+[  85% ] reimport | 正在准备重新导入文件……
+[  85% ] reimport | 正在准备重新导入文件……
+[  86% ] reimport | 正在准备重新导入文件……
+[  86% ] reimport | 正在准备重新导入文件……
+[  87% ] reimport | 正在准备重新导入文件……
+[  88% ] reimport | 正在准备重新导入文件……
+[  88% ] reimport | 正在准备重新导入文件……
+[  89% ] reimport | 正在准备重新导入文件……
+[  89% ] reimport | 正在准备重新导入文件……
+[  90% ] reimport | 正在准备重新导入文件……
+[  91% ] reimport | 正在准备重新导入文件……
+[  91% ] reimport | 正在准备重新导入文件……
+[  92% ] reimport | 正在准备重新导入文件……
+[  92% ] reimport | 正在准备重新导入文件……
+[  93% ] reimport | 正在准备重新导入文件……
+[  94% ] reimport | 正在准备重新导入文件……
+[  94% ] reimport | 正在准备重新导入文件……
+[  95% ] reimport | 正在准备重新导入文件……
+[  95% ] reimport | 正在准备重新导入文件……
+[  96% ] reimport | 正在准备重新导入文件……
+[  97% ] reimport | 正在准备重新导入文件……
+[  97% ] reimport | 正在准备重新导入文件……
+[  98% ] reimport | 正在准备重新导入文件……
+[  98% ] reimport | 正在准备重新导入文件……
+[   0% ] reimport | 正在执行重新导入的前置操作……
+[   0% ] reimport | icon_alpha_full_v2.png
+[   0% ] reimport | icon_chromakey_v1.png
+[   1% ] reimport | ripple_color_candidate.png
+[   1% ] reimport | splash_color_candidate.png
+[   2% ] reimport | icon.png
+[   2% ] reimport | unending_enemy_loop.png
+[   3% ] reimport | unending_enemy_loop_v1.png
+[   4% ] reimport | unending_trigger.png
+[   4% ] reimport | unending_trigger_v1.png
+[   5% ] reimport | python_synthesis_overview_v1.png
+[   5% ] reimport | source_candidate_overview_v1.png
+[   6% ] reimport | 01_combat_hud_1152x648.png
+[   7% ] reimport | 02_combat_hud_scaled_900x540.png
+[   7% ] reimport | 03_colorblind_target_layers.png
+[   8% ] reimport | 04_reduced_motion_locked_element.png
+[   8% ] reimport | 05_active_slot_passive_preview.png
+[   9% ] reimport | 06_passive_slot_rejects_active.png
+[  10% ] reimport | 07_zero_active_four_passive_warning.png
+[  10% ] reimport | 08_single_final_damage_reaction.png
+[  11% ] reimport | 09_reward_ui_catalog_copy.png
+[  11% ] reimport | hit_spark_neutral_candidate.png
+[  12% ] reimport | icon.png
+[  13% ] reimport | projectile_fire_no_jitter_spritesheet.png
+[  13% ] reimport | projectile_water_no_jitter_spritesheet.png
+[  14% ] reimport | icon_alpha_full_v1.png
+[  14% ] reimport | icon_alpha_full_v2.png
+[  15% ] reimport | icon_chromakey_v1.png
+[  16% ] reimport | icon_reclaim_third_element_rejected_v1.png
+[  16% ] reimport | orbit_neutral_candidate.png
+[  17% ] reimport | particle_ring_neutral_candidate.png
+[  17% ] reimport | vortex_neutral_candidate.png
+[  18% ] reimport | icon.png
+[  19% ] reimport | reclaim_arrival_neutral.png
+[  19% ] reimport | reclaim_arrival_neutral_v1.png
+[  20% ] reimport | reclaim_extract_neutral.png
+[  20% ] reimport | reclaim_extract_neutral_v1.png
+[  21% ] reimport | reclaim_particle_fire.png
+[  22% ] reimport | reclaim_particle_fire_v1.png
+[  22% ] reimport | reclaim_particle_water.png
+[  23% ] reimport | reclaim_particle_water_v1.png
+[  23% ] reimport | icon_alpha_full_v1.png
+[  24% ] reimport | 02_hud_2560x1440.png
+[  25% ] reimport | 03_hud_2560x1600.png
+[  25% ] reimport | 04_hud_3840x2160.png
+[  26% ] reimport | 05_hud_3440x1440.png
+[  26% ] reimport | 06_hud_900x540_stress.png
+[  27% ] reimport | 07_states_cooldown_energy_failure_passive.png
+[  28% ] reimport | 08_reward_three.png
+[  28% ] reimport | 09_reward_two_centered.png
+[  29% ] reimport | 10_reward_one_explicit_confirm.png
+[  29% ] reimport | 11_reward_long_copy_900x540.png
+[  30% ] reimport | 12_colorblind_shape_text.png
+[  31% ] reimport | 13_reduced_motion.png
+[  31% ] reimport | 14_fury_laser_reclaim_unobscured.png
+[  32% ] reimport | 01_shop_immediate_equip_1920x1080.png
+[  32% ] reimport | 01_authoritative_lv2_element_bolt_1920x1080.png
+[  33% ] reimport | stage2_final_overview.png
+[  34% ] reimport | stage2_icons_scale_qa.png
+[  34% ] reimport | stage2_range_overlay_qa.png
+[  35% ] reimport | stage2_testroom_particles_qa.png
+[  35% ] reimport | testroom_runtime_base.png
+[  36% ] reimport | icon.svg
+[  37% ] reimport | fury_192_runtime.png
+[  37% ] reimport | laser_fire_tick_runtime.png
+[  38% ] reimport | passives_enemy_attached_runtime.png
+[  38% ] reimport | reclaim_water_runtime.png
+[  39% ] reimport | 01b_hud_2560x1440_scale.png
+[  40% ] reimport | 01c_hud_3840x2160_scale.png
+[  40% ] reimport | 01d_hud_1152x648_logic.png
+[  41% ] reimport | 01_hud_1152x648.png
+[  41% ] reimport | 01_hud_1920x1080_main.png
+[  42% ] reimport | 02_hud_900x540.png
+[  43% ] reimport | 03_states_cooldown_energy_busy_failure.png
+[  43% ] reimport | 04_target_follow.png
+[  44% ] reimport | 05_target_fallback.png
+[  44% ] reimport | 06_reward_three.png
+[  45% ] reimport | 07_reward_two.png
+[  46% ] reimport | 08_reward_one_explicit_confirm.png
+[  46% ] reimport | 09_reward_long_copy.png
+[  47% ] reimport | 10_colorblind.png
+[  47% ] reimport | 11_reduced_motion.png
+[  48% ] reimport | 12_task18_vfx_unobscured.png
+[  49% ] reimport | 01_hud_1920x1080.png
+[  49% ] reimport | p01_003_reclaim_vortex.png
+[  50% ] reimport | p02_069_burning_flame.png
+[  50% ] reimport | p04_174_fury_dissipate.png
+[  51% ] reimport | p04_184_fury_ring.png
+[  52% ] reimport | p06_273_hit_spark.png
+[  52% ] reimport | p06_283_laser_hit.png
+[  53% ] reimport | p06_293_reclaim_particle_ring.png
+[  53% ] reimport | p08_375_bolt_projectile.png
+[  54% ] reimport | p09_427_burst_core.png
+[  55% ] reimport | p09_446_reclaim_orbit.png
+[  55% ] reimport | p10_465_unending_ripple.png
+[  56% ] reimport | p10_467_unending_splash.png
+[  56% ] reimport | p12_579_bolt_straight.png
+[  57% ] reimport | icon_alpha_full_v1.png
+[  58% ] reimport | icon_alpha_full_v2.png
+[  58% ] reimport | icon_chromakey_v1.png
+[  59% ] reimport | fire_marker_color_candidate.png
+[  59% ] reimport | burning_enemy_loop.png
+[  60% ] reimport | burning_enemy_loop_v1.png
+[  61% ] reimport | burning_tick.png
+[  61% ] reimport | cat_attack.png
+[  62% ] reimport | cat_fire_attack.png
+[  62% ] reimport | cat_fire_idle.png
+[  63% ] reimport | cat_fire_jump.png
+[  64% ] reimport | cat_fire_walk.png
+[  64% ] reimport | cat_hurt.png
+[  65% ] reimport | cat_idle.png
+[  65% ] reimport | cat_jump.png
+[  66% ] reimport | cat_walk.png
+[  67% ] reimport | cat_water_attack.png
+[  67% ] reimport | cat_water_idle.png
+[  68% ] reimport | cat_water_jump.png
+[  68% ] reimport | cat_water_walk.png
+[  69% ] reimport | orc_attack.png
+[  70% ] reimport | orc_hurt.png
+[  70% ] reimport | orc_idle.png
+[  71% ] reimport | orc_walk.png
+[  71% ] reimport | soldier_attack.png
+[  72% ] reimport | soldier_hurt.png
+[  73% ] reimport | soldier_idle.png
+[  73% ] reimport | soldier_walk.png
+[  74% ] reimport | icon_chromakey_v1.png
+[  74% ] reimport | hit_pulse_neutral_candidate.png
+[  75% ] reimport | origin_charge_neutral_candidate.png
+[  76% ] reimport | beam_segment_fire.png
+[  76% ] reimport | beam_segment_fire_mask.png
+[  77% ] reimport | beam_segment_fire_v1.png
+[  77% ] reimport | beam_segment_water.png
+[  78% ] reimport | beam_segment_water_mask.png
+[  79% ] reimport | beam_segment_water_v1.png
+[  79% ] reimport | beam_tick_fire.png
+[  80% ] reimport | beam_tick_fire_mask.png
+[  80% ] reimport | beam_tick_fire_v1.png
+[  81% ] reimport | beam_tick_water.png
+[  82% ] reimport | beam_tick_water_mask.png
+[  82% ] reimport | beam_tick_water_v1.png
+[  83% ] reimport | icon.png
+[  83% ] reimport | icon_alpha_full_v1.png
+[  84% ] reimport | icon_alpha_full_v2.png
+[  85% ] reimport | icon_chromakey_v1.png
+[  85% ] reimport | bolt_projectile_neutral_candidate.png
+[  86% ] reimport | bolt_straight_neutral_candidate.png
+[  86% ] reimport | burning_tick_v1.png
+[  87% ] reimport | icon.png
+[  88% ] reimport | burning_concept_v1.png
+[  88% ] reimport | elemental_fury_concept_v1.png
+[  89% ] reimport | elemental_laser_concept_v1.png
+[  89% ] reimport | element_bolt_concept_v1.png
+[  90% ] reimport | element_reclaim_concept_v1.png
+[  91% ] reimport | stage1_overview_v1.png
+[  91% ] reimport | style_baseline_v1.png
+[  92% ] reimport | unending_concept_v1.png
+[  92% ] reimport | icon_alpha_full_v1.png
+[  93% ] reimport | icon_alpha_full_v2.png
+[  94% ] reimport | icon_chromakey_v1.png
+[  94% ] reimport | burst_core_neutral_candidate.png
+[  95% ] reimport | dissipate_neutral_candidate.png
+[  95% ] reimport | shock_ring_neutral_candidate.png
+[  96% ] reimport | burst_core.png
+[  97% ] reimport | burst_core_neutral_v1.png
+[  97% ] reimport | icon.png
+[  98% ] reimport | icon_alpha_full_v1.png
+[  98% ] reimport | icon_alpha_full_v2.png
+[  99% ] reimport | 正在结束资产导入……
+[ DONE ] reimport
+
+[   0% ] reimport | Started 正在导入或重新导入资产 (166 steps)
+[   0% ] reimport | 正在执行重新导入的后置操作……
+[ DONE ] reimport
+
+[   0% ] loading_editor_layout | Started 正在加载编辑器 (5 steps)
+[   0% ] loading_editor_layout | 正在加载编辑器布局……
+[  16% ] loading_editor_layout | 正在加载停靠面板……
+[ DONE ] loading_editor_layout
+

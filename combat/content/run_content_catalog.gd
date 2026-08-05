@@ -123,6 +123,17 @@ func obtainable_contents() -> Array[SkillContentDefinition]:
 	return result
 
 
+func shop_contents() -> Array[SkillContentDefinition]:
+	var result: Array[SkillContentDefinition] = []
+	for content: SkillContentDefinition in skill_contents:
+		if content != null and content.is_shop_purchasable():
+			result.append(content)
+	result.sort_custom(func(a: SkillContentDefinition, b: SkillContentDefinition) -> bool:
+		return String(a.skill_id) < String(b.skill_id)
+	)
+	return result
+
+
 func initial_owned_skill_ids() -> Array[StringName]:
 	var result: Array[StringName] = []
 	for content: SkillContentDefinition in skill_contents:
@@ -138,6 +149,10 @@ func reward_definitions() -> Array[SkillRewardDefinition]:
 			continue
 		var projection := content.project_reward_definition()
 		if projection != null:
+			# Compatibility bridge for the existing RunSessionHost constructor.
+			# The metadata references only this immutable static catalog; no run
+			# state is written into the Resource.
+			projection.set_meta(&"run_content_catalog", self)
 			result.append(projection)
 	return result
 

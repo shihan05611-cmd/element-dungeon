@@ -1,10 +1,31 @@
-[gd_resource type="Resource" script_class="SkillContentDefinition" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="SkillContentDefinition" load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="1_content"]
 [ext_resource type="Resource" path="res://resources/skills/elemental_laser.tres" id="2_gameplay"]
 [ext_resource type="PackedScene" path="res://combat/delivery/element_beam_delivery.tscn" id="3_delivery"]
 [ext_resource type="Texture2D" path="res://assets/generated/vfx/elemental_laser/icon.png" id="4_icon"]
 [ext_resource type="PackedScene" path="res://scenes/vfx/elemental_laser_presentation.tscn" id="5_presentation"]
+[ext_resource type="Script" path="res://growth/definitions/active_skill_level_definition.gd" id="6_level"]
+[ext_resource type="Script" path="res://growth/definitions/active_skill_progression_definition.gd" id="7_progression"]
+
+[sub_resource type="Resource" id="Resource_laser_lv1"]
+script = ExtResource("6_level")
+
+[sub_resource type="Resource" id="Resource_laser_lv2"]
+script = ExtResource("6_level")
+level = 2
+upgrade_price = 65
+damage_scale = 1.2
+
+[sub_resource type="Resource" id="Resource_laser_lv3"]
+script = ExtResource("6_level")
+level = 3
+upgrade_price = 110
+damage_scale = 1.45
+
+[sub_resource type="Resource" id="Resource_laser_progression"]
+script = ExtResource("7_progression")
+levels = Array[ExtResource("6_level")]([SubResource("Resource_laser_lv1"), SubResource("Resource_laser_lv2"), SubResource("Resource_laser_lv3")])
 
 [resource]
 script = ExtResource("1_content")
@@ -18,4 +39,5 @@ runtime_delivery_scene = ExtResource("3_delivery")
 reward_pool = true
 initial_reward_pool = true
 allowed_form_ids = Array[StringName]([&"water", &"fire"])
-
+purchase_price = 120
+active_progression = SubResource("Resource_laser_progression")

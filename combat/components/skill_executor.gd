@@ -88,6 +88,7 @@ var _execution_services := SkillExecutionServices.new()
 var _external_action_gate: Callable
 var _stat_snapshot_provider: Callable
 var _spawn_snapshot_provider: Callable
+var _active_skill_level_effect_port: ActiveSkillLevelEffectPort
 
 var _current_cast_snapshot: CastSnapshot
 var _current_execution_snapshot: SkillExecutionSnapshot
@@ -181,6 +182,10 @@ func set_stat_snapshot_provider(provider: Callable) -> void:
 ## Callable contract: provider.call(skill: SkillDefinition) -> DeliverySpawnSnapshot.
 func set_spawn_snapshot_provider(provider: Callable) -> void:
 	_spawn_snapshot_provider = provider
+
+
+func set_active_skill_level_effect_port(port: ActiveSkillLevelEffectPort) -> void:
+	_active_skill_level_effect_port = port
 
 
 func set_delivery_parent(delivery_parent: Node) -> bool:
@@ -310,6 +315,15 @@ func _try_cast_locked(skill: SkillDefinition, slot_id: StringName) -> CastAttemp
 			slot_id
 		)
 
+	var level_effect := _capture_active_skill_level_effect(skill.skill_id)
+	stat_snapshot = _apply_damage_level_effect(stat_snapshot, level_effect)
+	if stat_snapshot == null or not stat_snapshot.is_valid():
+		return _reject(
+			CastAttemptResult.RejectReason.INVALID_CONFIGURATION,
+			skill.skill_id,
+			slot_id,
+			&"invalid_level_scaled_stat_snapshot"
+		)
 	var cast_id := _allocate_cast_id()
 	var cast_snapshot := CastSnapshot.new(
 		cast_id,
@@ -318,7 +332,8 @@ func _try_cast_locked(skill: SkillDefinition, slot_id: StringName) -> CastAttemp
 		caster_id,
 		team_id,
 		cast_element,
-		stat_snapshot
+		stat_snapshot,
+		level_effect
 	)
 	if not cast_snapshot.is_valid():
 		return _reject(
@@ -334,7 +349,10 @@ func _try_cast_locked(skill: SkillDefinition, slot_id: StringName) -> CastAttemp
 		_energy.current_energy,
 		_energy.maximum
 	)
-	var prepared := skill.execution_definition.prepare(context, _execution_services)
+	var prepared := skill.execution_definition.prepare(
+		context,
+		_execution_services_for_accepted_cast(level_effect)
+	)
 	if prepared == null:
 		return _reject(
 			CastAttemptResult.RejectReason.INVALID_CONFIGURATION,
@@ -745,6 +763,53 @@ func _capture_stat_snapshot(skill: SkillDefinition) -> CombatStatSnapshot:
 		return CombatStatSnapshot.new()
 	var result: Variant = _stat_snapshot_provider.call(skill)
 	return result as CombatStatSnapshot
+
+
+func _capture_active_skill_level_effect(
+		skill_id: StringName
+) -> ActiveSkillLevelEffectSnapshot:
+	if _active_skill_level_effect_port == null:
+		return ActiveSkillLevelEffectSnapshot.neutral(skill_id)
+	var effect := _active_skill_level_effect_port.effect_for(skill_id)
+	if (
+		effect == null
+		or not effect.is_valid()
+		or (not effect.skill_id.is_empty() and effect.skill_id != skill_id)
+	):
+		return ActiveSkillLevelEffectSnapshot.neutral(skill_id)
+	return effect
+
+
+func _apply_damage_level_effect(
+		stats: CombatStatSnapshot,
+		effect: ActiveSkillLevelEffectSnapshot
+) -> CombatStatSnapshot:
+	if stats == null or effect == null or not effect.is_valid():
+		return stats
+	return CombatStatSnapshot.new(
+		stats.attack_multiplier * effect.damage_scale,
+		stats.flat_damage_bonus * effect.damage_scale
+	)
+
+
+func _execution_services_for_accepted_cast(
+		effect: ActiveSkillLevelEffectSnapshot
+) -> SkillExecutionServices:
+	if (
+		effect == null
+		or not effect.is_valid()
+		or is_equal_approx(effect.resource_gain_scale, 1.0)
+		or _execution_services == null
+		or _execution_services.reclaim_port == null
+		or _execution_services.reclaim_port is ElementReclaimExecution.LevelScaledReclaimPort
+	):
+		return _execution_services
+	return SkillExecutionServices.new(
+		ElementReclaimExecution.LevelScaledReclaimPort.new(
+			_execution_services.reclaim_port,
+			_energy
+		)
+	)
 
 
 func _capture_spawn_snapshot(skill: SkillDefinition) -> DeliverySpawnSnapshot:

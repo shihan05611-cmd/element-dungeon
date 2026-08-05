@@ -12,6 +12,10 @@ var skills: SkillInventorySnapshot:
 	get:
 		return _skills
 
+var skill_inventory: SkillInventorySnapshot:
+	get:
+		return _skills
+
 var relics: RelicInventorySnapshot:
 	get:
 		return _relics
@@ -40,6 +44,26 @@ var revision: int:
 	get:
 		return _revision
 
+var rules: RunRulesSnapshot:
+	get:
+		return _rules
+
+var economy: DreamDustSnapshot:
+	get:
+		return _economy
+
+var shop: ShopSnapshot:
+	get:
+		return _shop
+
+var observed_experience: int:
+	get:
+		return _observed_experience
+
+var observed_relic_events: int:
+	get:
+		return _observed_relic_events
+
 var _progression: ProgressionSnapshot
 var _skills: SkillInventorySnapshot
 var _relics: RelicInventorySnapshot
@@ -49,6 +73,11 @@ var _pending_reward: RewardOffer
 var _pending_reward_claimed: bool
 var _unlocked_form_ids: Array[StringName] = []
 var _revision: int
+var _rules: RunRulesSnapshot
+var _economy: DreamDustSnapshot
+var _shop: ShopSnapshot
+var _observed_experience: int
+var _observed_relic_events: int
 
 
 func _init(
@@ -60,7 +89,12 @@ func _init(
 		p_pending_reward: RewardOffer = null,
 		p_pending_reward_claimed: bool = false,
 		p_unlocked_form_ids: Array[StringName] = [],
-		p_revision: int = 0
+		p_revision: int = 0,
+		p_rules: RunRulesSnapshot = null,
+		p_economy: DreamDustSnapshot = null,
+		p_shop: ShopSnapshot = null,
+		p_observed_experience: int = 0,
+		p_observed_relic_events: int = 0
 ) -> void:
 	_progression = p_progression
 	_skills = p_skills
@@ -71,3 +105,8 @@ func _init(
 	_pending_reward_claimed = p_pending_reward_claimed
 	_unlocked_form_ids = p_unlocked_form_ids.duplicate()
 	_revision = maxi(0, p_revision)
+	_rules = p_rules.copy() if p_rules != null else RunRulesSnapshot.legacy_enabled()
+	_economy = p_economy if p_economy != null else DreamDustSnapshot.new()
+	_shop = p_shop
+	_observed_experience = maxi(0, p_observed_experience)
+	_observed_relic_events = maxi(0, p_observed_relic_events)

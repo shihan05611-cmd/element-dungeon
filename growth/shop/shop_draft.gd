@@ -19,6 +19,10 @@ var confirmed: bool:
 	get:
 		return _confirmed
 
+var shop_session_id: StringName:
+	get:
+		return _shop_session_id
+
 var _baseline_run_revision: int
 var _baseline_progression: ProgressionSnapshot
 var _baseline_loadout: RuntimeLoadoutSnapshot
@@ -27,16 +31,22 @@ var _pending_vitality: int = 0
 var _pending_energy: int = 0
 var _working_entries: Array[RuntimeLoadoutSlotSnapshot] = []
 var _confirmed: bool = false
+var _progression_allocation_enabled: bool = true
+var _shop_session_id: StringName = &""
 
 
 func _init(
 		p_baseline_run_revision: int,
 		p_baseline_progression: ProgressionSnapshot,
-		p_baseline_loadout: RuntimeLoadoutSnapshot
+		p_baseline_loadout: RuntimeLoadoutSnapshot,
+		p_progression_allocation_enabled: bool = true,
+		p_shop_session_id: StringName = &""
 ) -> void:
 	_baseline_run_revision = p_baseline_run_revision
 	_baseline_progression = p_baseline_progression
 	_baseline_loadout = p_baseline_loadout
+	_progression_allocation_enabled = p_progression_allocation_enabled
+	_shop_session_id = p_shop_session_id
 	_working_entries = p_baseline_loadout.entries if p_baseline_loadout != null else []
 
 
@@ -67,6 +77,11 @@ func preview_loadout() -> RuntimeLoadoutSnapshot:
 func try_allocate(stat_id: StringName, additional_points: int) -> RunCommandResult:
 	if _confirmed:
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.ALREADY_CONFIRMED, &"shop_draft_already_confirmed")
+	if not _progression_allocation_enabled:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.FEATURE_DISABLED,
+			&"progression_allocation_disabled"
+		)
 	if not GrowthStatIds.is_valid(stat_id):
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.UNKNOWN_STAT, &"unknown_stat_id")
 	if additional_points < 0:
@@ -89,6 +104,11 @@ func try_allocate(stat_id: StringName, additional_points: int) -> RunCommandResu
 func try_set_allocation(stat_id: StringName, points: int) -> RunCommandResult:
 	if _confirmed:
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.ALREADY_CONFIRMED, &"shop_draft_already_confirmed")
+	if not _progression_allocation_enabled:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.FEATURE_DISABLED,
+			&"progression_allocation_disabled"
+		)
 	if not GrowthStatIds.is_valid(stat_id):
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.UNKNOWN_STAT, &"unknown_stat_id")
 	if points < 0:
@@ -155,6 +175,20 @@ func rebase_after_immediate_loadout(
 	_baseline_progression = current_progression
 	_baseline_loadout = committed_loadout
 	_working_entries = committed_loadout.entries
+
+
+func rebase_after_authoritative_shop_transaction(
+		current_run_revision: int,
+		current_progression: ProgressionSnapshot,
+		current_loadout: RuntimeLoadoutSnapshot
+) -> void:
+	# Purchase/upgrade/reset never own draft balances, prices or skill progress.
+	# They only advance the authority baseline so pending Task25 loadout/stat UI
+	# state cannot become stale after a successful economy command.
+	_baseline_run_revision = current_run_revision
+	_baseline_progression = current_progression
+	_baseline_loadout = current_loadout
+	_working_entries = current_loadout.entries
 
 
 func mark_confirmed() -> void:

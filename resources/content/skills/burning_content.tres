@@ -16,4 +16,4 @@ gameplay_definition = ExtResource("2_gameplay")
 reward_pool = true
 initial_reward_pool = true
 allowed_form_ids = Array[StringName]([&"water", &"fire"])
-
+purchase_price = 75
