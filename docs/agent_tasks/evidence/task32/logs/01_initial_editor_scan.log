@@ -1,0 +1,2045 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+Using "default" pen tablet driver...
+
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+CORE API HASH: 3769296884
+EDITOR API HASH: 3146738256
+SceneTreeFTI: traversal method DEFAULT
+EditorTheme: Generating new theme for the config '3810048042'.
+EditorTheme: Generating new icons.
+EditorTheme: Generating new fonts.
+EditorTheme: Generating new styles.
+Regenerating editor help cache
+Class 'AbstractPolygon2DEditor' is not exposed, skipping.
+Class 'AbstractPolygon2DEditorPlugin' is not exposed, skipping.
+Class 'ActionMapEditor' is not exposed, skipping.
+Class 'AnchorPresetPicker' is not exposed, skipping.
+Class 'AnimationBezierTrackEdit' is not exposed, skipping.
+Class 'AnimationLibraryEditor' is not exposed, skipping.
+Class 'AnimationMarkerEdit' is not exposed, skipping.
+Class 'AnimationMarkerKeyEditEditorPlugin' is not exposed, skipping.
+Class 'AnimationNodeBlendSpace1DEditor' is not exposed, skipping.
+Class 'AnimationNodeBlendSpace2DEditor' is not exposed, skipping.
+Class 'AnimationNodeBlendTreeEditor' is not exposed, skipping.
+Class 'AnimationNodeStateMachineEditor' is not exposed, skipping.
+Class 'AnimationPlayerEditor' is not exposed, skipping.
+Class 'AnimationPlayerEditorPlugin' is not exposed, skipping.
+Class 'AnimationTimelineEdit' is not exposed, skipping.
+Class 'AnimationTrackEditDefaultPlugin' is not exposed, skipping.
+Class 'AnimationTrackEditPlugin' is not exposed, skipping.
+Class 'AnimationTrackEditor' is not exposed, skipping.
+Class 'AnimationTrackKeyEditEditorPlugin' is not exposed, skipping.
+Class 'AnimationTreeEditor' is not exposed, skipping.
+Class 'AnimationTreeEditorPlugin' is not exposed, skipping.
+Class 'AnimationTreeNodeEditorPlugin' is not exposed, skipping.
+Class 'AssetLibraryEditorPlugin' is not exposed, skipping.
+Class 'AtlasMergingDialog' is not exposed, skipping.
+Class 'AudioBusesEditorPlugin' is not exposed, skipping.
+Class 'AudioStreamEditorPlugin' is not exposed, skipping.
+Class 'AudioStreamImportSettingsDialog' is not exposed, skipping.
+Class 'AudioStreamInteractiveEditorPlugin' is not exposed, skipping.
+Class 'AudioStreamInteractiveTransitionEditor' is not exposed, skipping.
+Class 'AudioStreamPlayerInternal' is not exposed, skipping.
+Class 'AudioStreamPreviewGenerator' is not exposed, skipping.
+Class 'AudioStreamRandomizerEditorPlugin' is not exposed, skipping.
+Class 'BackgroundProgress' is not exposed, skipping.
+Class 'BitMapEditorPlugin' is not exposed, skipping.
+Class 'BlitMaterialConversionPlugin' is not exposed, skipping.
+Class 'BoneMapEditorPlugin' is not exposed, skipping.
+Class 'BottomSideDockTabContainer' is not exposed, skipping.
+Class 'CPUParticles2DEditorPlugin' is not exposed, skipping.
+Class 'CPUParticles3DEditorPlugin' is not exposed, skipping.
+Class 'CSGShape3DGizmoPlugin' is not exposed, skipping.
+Class 'CSGShapeEditor' is not exposed, skipping.
+Class 'Camera2DEditor' is not exposed, skipping.
+Class 'Camera2DEditorPlugin' is not exposed, skipping.
+Class 'Camera3DEditorPlugin' is not exposed, skipping.
+Class 'CanvasItemEditor' is not exposed, skipping.
+Class 'CanvasItemEditorPlugin' is not exposed, skipping.
+Class 'CanvasItemEditorViewport' is not exposed, skipping.
+Class 'CanvasItemMaterialConversionPlugin' is not exposed, skipping.
+Class 'Cast2DEditor' is not exposed, skipping.
+Class 'Cast2DEditorPlugin' is not exposed, skipping.
+Class 'CollisionPolygon2DEditor' is not exposed, skipping.
+Class 'CollisionPolygon2DEditorPlugin' is not exposed, skipping.
+Class 'CollisionShape2DEditor' is not exposed, skipping.
+Class 'CollisionShape2DEditorPlugin' is not exposed, skipping.
+Class 'ColorPickerShape' is not exposed, skipping.
+Class 'ColorPickerShapeCircle' is not exposed, skipping.
+Class 'ColorPickerShapeOKHLRectangle' is not exposed, skipping.
+Class 'ColorPickerShapeOKHSLCircle' is not exposed, skipping.
+Class 'ColorPickerShapeOKHSRectangle' is not exposed, skipping.
+Class 'ColorPickerShapeVHSCircle' is not exposed, skipping.
+Class 'ColorPickerShapeWheel' is not exposed, skipping.
+Class 'ConnectDialog' is not exposed, skipping.
+Class 'ConnectDialogBinds' is not exposed, skipping.
+Class 'ConnectionsDock' is not exposed, skipping.
+Class 'ControlEditorPlugin' is not exposed, skipping.
+Class 'ControlEditorPopupButton' is not exposed, skipping.
+Class 'ControlEditorPresetPicker' is not exposed, skipping.
+Class 'ControlEditorToolbar' is not exposed, skipping.
+Class 'ControlOffsetTransformPreview' is not exposed, skipping.
+Class 'CreateDialog' is not exposed, skipping.
+Class 'CurveEditorPlugin' is not exposed, skipping.
+Class 'CurvePreviewGenerator' is not exposed, skipping.
+Class 'DebugAdapterParser' is not exposed, skipping.
+Class 'DebugAdapterServer' is not exposed, skipping.
+Class 'DebuggerEditorPlugin' is not exposed, skipping.
+Class 'DefaultThemeEditorPreview' is not exposed, skipping.
+Class 'DependencyEditor' is not exposed, skipping.
+Class 'DependencyEditorOwners' is not exposed, skipping.
+Class 'DependencyErrorDialog' is not exposed, skipping.
+Class 'DependencyRemoveDialog' is not exposed, skipping.
+Class 'DirectoryCreateDialog' is not exposed, skipping.
+Class 'DockContextPopup' is not exposed, skipping.
+Class 'DockShortcutHandler' is not exposed, skipping.
+Class 'DockSlotGrid' is not exposed, skipping.
+Class 'DockSplitContainer' is not exposed, skipping.
+Class 'DockTabContainer' is not exposed, skipping.
+Class 'DynamicFontImportSettingsData' is not exposed, skipping.
+Class 'DynamicFontImportSettingsDialog' is not exposed, skipping.
+Class 'EditorAbout' is not exposed, skipping.
+Class 'EditorAssetLibrary' is not exposed, skipping.
+Class 'EditorAudioBuses' is not exposed, skipping.
+Class 'EditorAudioStreamPreviewPlugin' is not exposed, skipping.
+Class 'EditorAudioStreamTooltipPlugin' is not exposed, skipping.
+Class 'EditorAutoloadSettings' is not exposed, skipping.
+Class 'EditorBitmapPreviewPlugin' is not exposed, skipping.
+Class 'EditorBottomPanel' is not exposed, skipping.
+Class 'EditorBuildProfileManager' is not exposed, skipping.
+Class 'EditorConfigFileSyntaxHighlighter' is not exposed, skipping.
+Class 'EditorContextMenuPluginManager' is not exposed, skipping.
+Class 'EditorDebuggerInspector' is not exposed, skipping.
+Class 'EditorDebuggerNode' is not exposed, skipping.
+Class 'EditorDebuggerRemoteObjects' is not exposed, skipping.
+Class 'EditorDebuggerTree' is not exposed, skipping.
+Class 'EditorDirDialog' is not exposed, skipping.
+Class 'EditorDockDragHint' is not exposed, skipping.
+Class 'EditorDockManager' is not exposed, skipping.
+Class 'EditorEventSearchBar' is not exposed, skipping.
+Class 'EditorExport' is not exposed, skipping.
+Class 'EditorExportGDScript' is not exposed, skipping.
+Class 'EditorExpressionEvaluator' is not exposed, skipping.
+Class 'EditorFeatureProfileManager' is not exposed, skipping.
+Class 'EditorFileServer' is not exposed, skipping.
+Class 'EditorFileSystemImportFormatSupportQueryBlend' is not exposed, skipping.
+Class 'EditorFontPreviewPlugin' is not exposed, skipping.
+Class 'EditorGradientPreviewPlugin' is not exposed, skipping.
+Class 'EditorHelpBit' is not exposed, skipping.
+Class 'EditorHelpSearch' is not exposed, skipping.
+Class 'EditorImagePreviewPlugin' is not exposed, skipping.
+Class 'EditorImportBlendRunner' is not exposed, skipping.
+Class 'EditorInspectorCategory' is not exposed, skipping.
+Class 'EditorInspectorDefaultPlugin' is not exposed, skipping.
+Class 'EditorInspectorParticleProcessMaterialPlugin' is not exposed, skipping.
+Class 'EditorInspectorPlugin3DTexture' is not exposed, skipping.
+Class 'EditorInspectorPluginAnimationMarkerKeyEdit' is not exposed, skipping.
+Class 'EditorInspectorPluginAnimationNodeAnimation' is not exposed, skipping.
+Class 'EditorInspectorPluginAnimationTrackKeyEdit' is not exposed, skipping.
+Class 'EditorInspectorPluginAudioStream' is not exposed, skipping.
+Class 'EditorInspectorPluginAudioStreamInteractive' is not exposed, skipping.
+Class 'EditorInspectorPluginBitMap' is not exposed, skipping.
+Class 'EditorInspectorPluginBoneMap' is not exposed, skipping.
+Class 'EditorInspectorPluginCamera3DPreview' is not exposed, skipping.
+Class 'EditorInspectorPluginControl' is not exposed, skipping.
+Class 'EditorInspectorPluginCurve' is not exposed, skipping.
+Class 'EditorInspectorPluginFontPreview' is not exposed, skipping.
+Class 'EditorInspectorPluginFontVariation' is not exposed, skipping.
+Class 'EditorInspectorPluginGradient' is not exposed, skipping.
+Class 'EditorInspectorPluginGradientTexture2D' is not exposed, skipping.
+Class 'EditorInspectorPluginInputEvent' is not exposed, skipping.
+Class 'EditorInspectorPluginLayeredTexture' is not exposed, skipping.
+Class 'EditorInspectorPluginMaterial' is not exposed, skipping.
+Class 'EditorInspectorPluginMesh' is not exposed, skipping.
+Class 'EditorInspectorPluginPackedScene' is not exposed, skipping.
+Class 'EditorInspectorPluginSkeleton' is not exposed, skipping.
+Class 'EditorInspectorPluginStyleBox' is not exposed, skipping.
+Class 'EditorInspectorPluginSubViewportPreview' is not exposed, skipping.
+Class 'EditorInspectorPluginSystemFont' is not exposed, skipping.
+Class 'EditorInspectorPluginTexture' is not exposed, skipping.
+Class 'EditorInspectorPluginTextureRegion' is not exposed, skipping.
+Class 'EditorInspectorPluginTileData' is not exposed, skipping.
+Class 'EditorInspectorRootMotionPlugin' is not exposed, skipping.
+Class 'EditorInspectorToolButtonPlugin' is not exposed, skipping.
+Class 'EditorInspectorVisualShaderModePlugin' is not exposed, skipping.
+Class 'EditorJSONSyntaxHighlighter' is not exposed, skipping.
+Class 'EditorLayoutsDialog' is not exposed, skipping.
+Class 'EditorLocaleDialog' is not exposed, skipping.
+Class 'EditorLog' is not exposed, skipping.
+Class 'EditorMainScreen' is not exposed, skipping.
+Class 'EditorMarkdownSyntaxHighlighter' is not exposed, skipping.
+Class 'EditorMaterialPreviewPlugin' is not exposed, skipping.
+Class 'EditorMeshPreviewPlugin' is not exposed, skipping.
+Class 'EditorNativeShaderSourceVisualizer' is not exposed, skipping.
+Class 'EditorNode' is not exposed, skipping.
+Class 'EditorOBJImporter' is not exposed, skipping.
+Class 'EditorObjectSelector' is not exposed, skipping.
+Class 'EditorPackedScenePreviewPlugin' is not exposed, skipping.
+Class 'EditorPerformanceProfiler' is not exposed, skipping.
+Class 'EditorPluginCSG' is not exposed, skipping.
+Class 'EditorPluginSettings' is not exposed, skipping.
+Class 'EditorProfiler' is not exposed, skipping.
+Class 'EditorPropertyInteger' is not exposed, skipping.
+Class 'EditorPropertyNameProcessor' is not exposed, skipping.
+Class 'EditorPropertyPath' is not exposed, skipping.
+Class 'EditorPropertyVector2i' is not exposed, skipping.
+Class 'EditorPropertyVectorN' is not exposed, skipping.
+Class 'EditorQuickOpenDialog' is not exposed, skipping.
+Class 'EditorRunBar' is not exposed, skipping.
+Class 'EditorRunNative' is not exposed, skipping.
+Class 'EditorSceneExporterGLTFSettings' is not exposed, skipping.
+Class 'EditorSceneFormatImporterCollada' is not exposed, skipping.
+Class 'EditorSceneFormatImporterESCN' is not exposed, skipping.
+Class 'EditorSceneTabs' is not exposed, skipping.
+Class 'EditorScriptPlugin' is not exposed, skipping.
+Class 'EditorScriptPreviewPlugin' is not exposed, skipping.
+Class 'EditorSettingsDialog' is not exposed, skipping.
+Class 'EditorSettingsInspectorPlugin' is not exposed, skipping.
+Class 'EditorShaderLanguagePlugin' is not exposed, skipping.
+Class 'EditorTexturePreviewPlugin' is not exposed, skipping.
+Class 'EditorTextureTooltipPlugin' is not exposed, skipping.
+Class 'EditorTheme' is not exposed, skipping.
+Class 'EditorTitleBar' is not exposed, skipping.
+Class 'EditorTranslationPreviewButton' is not exposed, skipping.
+Class 'EditorTranslationPreviewMenu' is not exposed, skipping.
+Class 'EditorValidationPanel' is not exposed, skipping.
+Class 'EditorVariantTypeOptionButton' is not exposed, skipping.
+Class 'EditorVersionButton' is not exposed, skipping.
+Class 'EditorVisualProfiler' is not exposed, skipping.
+Class 'EditorZoomWidget' is not exposed, skipping.
+Class 'EmbeddedProcess' is not exposed, skipping.
+Class 'EmbeddedProcessBase' is not exposed, skipping.
+Class 'EventListenerLineEdit' is not exposed, skipping.
+Class 'ExportTemplateManager' is not exposed, skipping.
+Class 'FBXImporterManager' is not exposed, skipping.
+Class 'FileSystemList' is not exposed, skipping.
+Class 'FilterLineEdit' is not exposed, skipping.
+Class 'FindInFiles' is not exposed, skipping.
+Class 'FindInFilesContainer' is not exposed, skipping.
+Class 'FindInFilesDialog' is not exposed, skipping.
+Class 'FindReplaceBar' is not exposed, skipping.
+Class 'FogMaterialConversionPlugin' is not exposed, skipping.
+Class 'FontEditorPlugin' is not exposed, skipping.
+Class 'GDScriptEditorTranslationParserPlugin' is not exposed, skipping.
+Class 'GDScriptFunctionState' is not exposed, skipping.
+Class 'GDScriptLanguageServer' is not exposed, skipping.
+Class 'GDScriptNativeClass' is not exposed, skipping.
+Class 'GLTFDocumentExtensionPhysics' is not exposed, skipping.
+Class 'GLTFDocumentExtensionTextureKTX' is not exposed, skipping.
+Class 'GLTFDocumentExtensionTextureWebP' is not exposed, skipping.
+Class 'GPUParticles2DEditorPlugin' is not exposed, skipping.
+Class 'GPUParticles3DEditorPlugin' is not exposed, skipping.
+Class 'GPUParticlesCollisionSDF3DEditorPlugin' is not exposed, skipping.
+Class 'GameView' is not exposed, skipping.
+Class 'GameViewDebugger' is not exposed, skipping.
+Class 'GameViewPlugin' is not exposed, skipping.
+Class 'GameViewPluginBase' is not exposed, skipping.
+Class 'Gizmo3DHelper' is not exposed, skipping.
+Class 'GodotNavigationServer2D' is not exposed, skipping.
+Class 'GodotPhysicsServer2D' is not exposed, skipping.
+Class 'GradientEditorPlugin' is not exposed, skipping.
+Class 'GradientTexture2DEditorPlugin' is not exposed, skipping.
+Class 'GraphEditFilter' is not exposed, skipping.
+Class 'GraphEditMinimap' is not exposed, skipping.
+Class 'GroupSettingsEditor' is not exposed, skipping.
+Class 'GroupsDock' is not exposed, skipping.
+Class 'GroupsEditor' is not exposed, skipping.
+Class 'HistoryDock' is not exposed, skipping.
+Class 'IPWindows' is not exposed, skipping.
+Class 'ImportDefaultsEditor' is not exposed, skipping.
+Class 'ImportDefaultsEditorSettings' is not exposed, skipping.
+Class 'ImportDock' is not exposed, skipping.
+Class 'ImportDockParameters' is not exposed, skipping.
+Class 'InputEventConfigurationDialog' is not exposed, skipping.
+Class 'InputEventEditorPlugin' is not exposed, skipping.
+Class 'InspectorDock' is not exposed, skipping.
+Class 'JoltPhysicsServer3D' is not exposed, skipping.
+Class 'LightOccluder2DEditor' is not exposed, skipping.
+Class 'LightOccluder2DEditorPlugin' is not exposed, skipping.
+Class 'LightmapGIEditorPlugin' is not exposed, skipping.
+Class 'Line2DEditor' is not exposed, skipping.
+Class 'Line2DEditorPlugin' is not exposed, skipping.
+Class 'LocalizationEditor' is not exposed, skipping.
+Class 'MarginContainerEditorPlugin' is not exposed, skipping.
+Class 'MaterialEditorPlugin' is not exposed, skipping.
+Class 'MeshEditorPlugin' is not exposed, skipping.
+Class 'MeshInstance3DEditor' is not exposed, skipping.
+Class 'MeshInstance3DEditorPlugin' is not exposed, skipping.
+Class 'MeshLibraryEditor' is not exposed, skipping.
+Class 'MeshLibraryEditorPlugin' is not exposed, skipping.
+Class 'MovieWriterMJPEG' is not exposed, skipping.
+Class 'MovieWriterOGV' is not exposed, skipping.
+Class 'MovieWriterPNGWAV' is not exposed, skipping.
+Class 'MultiMeshEditor' is not exposed, skipping.
+Class 'MultiMeshEditorPlugin' is not exposed, skipping.
+Class 'MultiplayerEditorDebugger' is not exposed, skipping.
+Class 'MultiplayerEditorPlugin' is not exposed, skipping.
+Class 'NavigationLink2DEditor' is not exposed, skipping.
+Class 'NavigationLink2DEditorPlugin' is not exposed, skipping.
+Class 'NavigationLink3DEditorPlugin' is not exposed, skipping.
+Class 'NavigationLink3DGizmoPlugin' is not exposed, skipping.
+Class 'NavigationObstacle2DEditor' is not exposed, skipping.
+Class 'NavigationObstacle2DEditorPlugin' is not exposed, skipping.
+Class 'NavigationObstacle3DEditorPlugin' is not exposed, skipping.
+Class 'NavigationObstacle3DGizmoPlugin' is not exposed, skipping.
+Class 'NavigationRegion2DEditor' is not exposed, skipping.
+Class 'NavigationRegion2DEditorPlugin' is not exposed, skipping.
+Class 'NavigationRegion3DEditor' is not exposed, skipping.
+Class 'NavigationRegion3DEditorPlugin' is not exposed, skipping.
+Class 'NavigationRegion3DGizmoPlugin' is not exposed, skipping.
+Class 'Node3DEditor' is not exposed, skipping.
+Class 'Node3DEditorPlugin' is not exposed, skipping.
+Class 'Node3DEditorViewport' is not exposed, skipping.
+Class 'Node3DEditorViewportContainer' is not exposed, skipping.
+Class 'NoiseEditorInspectorPlugin' is not exposed, skipping.
+Class 'NoiseEditorPlugin' is not exposed, skipping.
+Class 'ORMMaterial3DConversionPlugin' is not exposed, skipping.
+Class 'ObjectDBProfilerDebuggerPlugin' is not exposed, skipping.
+Class 'ObjectDBProfilerPlugin' is not exposed, skipping.
+Class 'OccluderInstance3DEditorPlugin' is not exposed, skipping.
+Class 'OpenXREditorPlugin' is not exposed, skipping.
+Class 'OrphanResourcesDialog' is not exposed, skipping.
+Class 'PackedSceneEditorPlugin' is not exposed, skipping.
+Class 'PackedSceneEditorTranslationParserPlugin' is not exposed, skipping.
+Class 'PanoramaSkyMaterialConversionPlugin' is not exposed, skipping.
+Class 'ParallaxBackgroundEditorPlugin' is not exposed, skipping.
+Class 'ParticleProcessMaterialConversionPlugin' is not exposed, skipping.
+Class 'Particles2DEditorPlugin' is not exposed, skipping.
+Class 'Particles3DEditorPlugin' is not exposed, skipping.
+Class 'ParticlesEditorPlugin' is not exposed, skipping.
+Class 'Path2DEditor' is not exposed, skipping.
+Class 'Path2DEditorPlugin' is not exposed, skipping.
+Class 'Path3DEditorPlugin' is not exposed, skipping.
+Class 'Path3DGizmoPlugin' is not exposed, skipping.
+Class 'PhysicalBone3DEditorPlugin' is not exposed, skipping.
+Class 'PhysicalSkyMaterialConversionPlugin' is not exposed, skipping.
+Class 'PluginConfigDialog' is not exposed, skipping.
+Class 'Polygon2DEditor' is not exposed, skipping.
+Class 'Polygon2DEditorPlugin' is not exposed, skipping.
+Class 'Polygon3DEditor' is not exposed, skipping.
+Class 'Polygon3DEditorPlugin' is not exposed, skipping.
+Class 'PopupMenuItems' is not exposed, skipping.
+Class 'PostImportPluginSkeletonRenamer' is not exposed, skipping.
+Class 'PostImportPluginSkeletonRestFixer' is not exposed, skipping.
+Class 'PostImportPluginSkeletonTrackOrganizer' is not exposed, skipping.
+Class 'PreviewSunEnvPopup' is not exposed, skipping.
+Class 'ProceduralSkyMaterialConversionPlugin' is not exposed, skipping.
+Class 'ProgressDialog' is not exposed, skipping.
+Class 'ProgressIndicator' is not exposed, skipping.
+Class 'ProjectExportDialog' is not exposed, skipping.
+Class 'ProjectExportTextureFormatError' is not exposed, skipping.
+Class 'ProjectSettingsEditor' is not exposed, skipping.
+Class 'ProjectSettingsGDExtension' is not exposed, skipping.
+Class 'ProjectUpgradeTool' is not exposed, skipping.
+Class 'PropertySelector' is not exposed, skipping.
+Class 'QuickOpenResultContainer' is not exposed, skipping.
+Class 'RenameDialog' is not exposed, skipping.
+Class 'ReparentDialog' is not exposed, skipping.
+Class 'ReplicationEditor' is not exposed, skipping.
+Class 'ResourceFormatImporterSaver' is not exposed, skipping.
+Class 'ResourcePreloaderEditor' is not exposed, skipping.
+Class 'ResourcePreloaderEditorPlugin' is not exposed, skipping.
+Class 'RunInstancesDialog' is not exposed, skipping.
+Class 'ScalableContainer' is not exposed, skipping.
+Class 'SceneCacheInterface' is not exposed, skipping.
+Class 'SceneCreateDialog' is not exposed, skipping.
+Class 'SceneExporterGLTFPlugin' is not exposed, skipping.
+Class 'SceneImportSettingsData' is not exposed, skipping.
+Class 'SceneImportSettingsDialog' is not exposed, skipping.
+Class 'ScenePaint2DEditor' is not exposed, skipping.
+Class 'ScenePaint2DEditorPlugin' is not exposed, skipping.
+Class 'SceneRPCInterface' is not exposed, skipping.
+Class 'SceneReplicationInterface' is not exposed, skipping.
+SceneTreeFTI: traversal method DEFAULT
+Class 'SceneTreeDialog' is not exposed, skipping.
+Class 'SceneTreeDock' is not exposed, skipping.
+Class 'SceneTreeEditor' is not exposed, skipping.
+Class 'ScreenSelect' is not exposed, skipping.
+Class 'ScriptEditorDebugger' is not exposed, skipping.
+Class 'ScriptEditorPlugin' is not exposed, skipping.
+Class 'SectionedInspector' is not exposed, skipping.
+Class 'SectionedInspectorFilter' is not exposed, skipping.
+Class 'ShaderBakerExportPluginPlatform' is not exposed, skipping.
+Class 'ShaderBakerExportPluginPlatformD3D12' is not exposed, skipping.
+Class 'ShaderBakerExportPluginPlatformVulkan' is not exposed, skipping.
+Class 'ShaderCreateDialog' is not exposed, skipping.
+Class 'ShaderEditorPlugin' is not exposed, skipping.
+Class 'ShaderFileEditor' is not exposed, skipping.
+Class 'ShaderFileEditorPlugin' is not exposed, skipping.
+Class 'ShaderGlobalsEditor' is not exposed, skipping.
+Class 'ShaderGlobalsEditorInterface' is not exposed, skipping.
+Class 'SideDockTabContainer' is not exposed, skipping.
+Class 'SignalsDock' is not exposed, skipping.
+Class 'SizeFlagPresetPicker' is not exposed, skipping.
+Class 'Skeleton2DEditor' is not exposed, skipping.
+Class 'Skeleton2DEditorPlugin' is not exposed, skipping.
+Class 'Skeleton3DEditorPlugin' is not exposed, skipping.
+Class 'Skeleton3DGizmoPlugin' is not exposed, skipping.
+Class 'SkeletonIK3DEditorPlugin' is not exposed, skipping.
+Class 'SnapDialog' is not exposed, skipping.
+Class 'SpinBoxLineEdit' is not exposed, skipping.
+Class 'SplitContainerDragger' is not exposed, skipping.
+Class 'Sprite2DEditor' is not exposed, skipping.
+Class 'Sprite2DEditorPlugin' is not exposed, skipping.
+Class 'SpriteFramesEditor' is not exposed, skipping.
+Class 'SpriteFramesEditorPlugin' is not exposed, skipping.
+Class 'StandardMaterial3DConversionPlugin' is not exposed, skipping.
+Class 'StyleBoxEditorPlugin' is not exposed, skipping.
+Class 'SubViewportPreviewEditorPlugin' is not exposed, skipping.
+Class 'SwitchSeparator' is not exposed, skipping.
+Class 'TemplateDownloader' is not exposed, skipping.
+Class 'TextShaderLanguagePlugin' is not exposed, skipping.
+Class 'Texture3DEditorPlugin' is not exposed, skipping.
+Class 'TextureEditorPlugin' is not exposed, skipping.
+Class 'TextureLayeredEditorPlugin' is not exposed, skipping.
+Class 'TextureRegionEditor' is not exposed, skipping.
+Class 'TextureRegionEditorPlugin' is not exposed, skipping.
+Class 'ThemeContext' is not exposed, skipping.
+Class 'ThemeEditor' is not exposed, skipping.
+Class 'ThemeEditorPlugin' is not exposed, skipping.
+Class 'ThemeEditorPreview' is not exposed, skipping.
+Class 'ThemeItemEditorDialog' is not exposed, skipping.
+Class 'ThemeItemImportTree' is not exposed, skipping.
+Class 'ThemeTypeDialog' is not exposed, skipping.
+Class 'ThemeTypeEditor' is not exposed, skipping.
+Class 'TileAtlasView' is not exposed, skipping.
+Class 'TileMapEditorPlugin' is not exposed, skipping.
+Class 'TileMapLayerEditor' is not exposed, skipping.
+Class 'TileMapLayerEditorTerrainsPlugin' is not exposed, skipping.
+Class 'TileMapLayerEditorTilesPlugin' is not exposed, skipping.
+Class 'TileProxiesManagerDialog' is not exposed, skipping.
+Class 'TileSetAtlasSourceEditor' is not exposed, skipping.
+Class 'TileSetEditor' is not exposed, skipping.
+Class 'TileSetEditorPlugin' is not exposed, skipping.
+Class 'TileSetScenesCollectionSourceEditor' is not exposed, skipping.
+Class 'TileSetSourceItemList' is not exposed, skipping.
+Class 'TileSourceInspectorPlugin' is not exposed, skipping.
+Class 'TilesEditorUtils' is not exposed, skipping.
+Class 'ToolButtonEditorPlugin' is not exposed, skipping.
+Class 'VersionControlEditorPlugin' is not exposed, skipping.
+Class 'View3DController' is not exposed, skipping.
+Class 'ViewPanner' is not exposed, skipping.
+Class 'ViewportNavigationControl' is not exposed, skipping.
+Class 'ViewportRotationControl' is not exposed, skipping.
+Class 'VirtualJoystickEditorPlugin' is not exposed, skipping.
+Class 'VisualShaderConversionPlugin' is not exposed, skipping.
+Class 'VisualShaderLanguagePlugin' is not exposed, skipping.
+Class 'VoxelGIEditorPlugin' is not exposed, skipping.
+Class 'WindowWrapper' is not exposed, skipping.
+Loaded system CA certificates
+Failed to bind socket. Error: 3.
+[   0% ] first_scan_filesystem | Started 项目初始化 (5 steps)
+[   0% ] first_scan_filesystem | 正在扫描文件结构……
+[  16% ] first_scan_filesystem | 正在加载全局类名……
+[  33% ] first_scan_filesystem | 正在校验 GDExtension……
+[  50% ] first_scan_filesystem | 正在创建自动加载脚本……
+Loading resource: res://addons/godot_ai/runtime/game_helper.gd remapped: res://addons/godot_ai/runtime/game_helper.gd
+Completed load for: 'res://addons/godot_ai/runtime/game_helper.gd' remapped 'res://addons/godot_ai/runtime/game_helper.gd' at thread -1
+[  66% ] first_scan_filesystem | 正在初始化插件……
+Loading resource: res://addons/godot_ai/plugin.gd remapped: res://addons/godot_ai/plugin.gd
+Completed load for: 'res://addons/godot_ai/plugin.gd' remapped 'res://addons/godot_ai/plugin.gd' at thread -1
+MCP | plugin disabled in headless mode
+[  83% ] first_scan_filesystem | 正在启动文件扫描……
+[ DONE ] first_scan_filesystem
+
+[   0% ] update_scripts_classes | Started 正在注册全局类…… (348 steps)
+[   0% ] update_scripts_classes | McpAtomicWrite
+[   0% ] update_scripts_classes | McpClient
+[   0% ] update_scripts_classes | McpCliExec
+[   0% ] update_scripts_classes | McpCliFinder
+[   1% ] update_scripts_classes | McpCliStrategy
+[   1% ] update_scripts_classes | McpJsonStrategy
+[   1% ] update_scripts_classes | McpManualCommand
+[   2% ] update_scripts_classes | McpPathTemplate
+[   2% ] update_scripts_classes | McpClientRegistry
+[   2% ] update_scripts_classes | McpTomlStrategy
+[   2% ] update_scripts_classes | McpYamlStrategy
+[   3% ] update_scripts_classes | 
+[   3% ] update_scripts_classes | 
+[   3% ] update_scripts_classes | 
+[   4% ] update_scripts_classes | 
+[   4% ] update_scripts_classes | 
+[   4% ] update_scripts_classes | 
+[   4% ] update_scripts_classes | 
+[   5% ] update_scripts_classes | 
+[   5% ] update_scripts_classes | 
+[   5% ] update_scripts_classes | 
+[   6% ] update_scripts_classes | 
+[   6% ] update_scripts_classes | 
+[   6% ] update_scripts_classes | 
+[   6% ] update_scripts_classes | 
+[   7% ] update_scripts_classes | 
+[   7% ] update_scripts_classes | 
+[   7% ] update_scripts_classes | 
+[   8% ] update_scripts_classes | 
+[   8% ] update_scripts_classes | 
+[   8% ] update_scripts_classes | 
+[   8% ] update_scripts_classes | 
+[   9% ] update_scripts_classes | 
+[   9% ] update_scripts_classes | McpDebuggerPlugin
+[   9% ] update_scripts_classes | 
+[  10% ] update_scripts_classes | 
+[  10% ] update_scripts_classes | 
+[  10% ] update_scripts_classes | McpNodeValidator
+[  10% ] update_scripts_classes | McpParamValidators
+[  11% ] update_scripts_classes | McpPropertyErrors
+[  11% ] update_scripts_classes | 
+[  11% ] update_scripts_classes | 
+[  12% ] update_scripts_classes | 
+[  12% ] update_scripts_classes | 
+[  12% ] update_scripts_classes | 
+[  12% ] update_scripts_classes | 
+[  13% ] update_scripts_classes | 
+[  13% ] update_scripts_classes | 
+[  13% ] update_scripts_classes | 
+[  14% ] update_scripts_classes | 
+[  14% ] update_scripts_classes | 
+[  14% ] update_scripts_classes | 
+[  14% ] update_scripts_classes | 
+[  15% ] update_scripts_classes | 
+[  15% ] update_scripts_classes | 
+[  15% ] update_scripts_classes | 
+[  16% ] update_scripts_classes | 
+[  16% ] update_scripts_classes | 
+[  16% ] update_scripts_classes | 
+[  16% ] update_scripts_classes | 
+[  17% ] update_scripts_classes | 
+[  17% ] update_scripts_classes | 
+[  17% ] update_scripts_classes | 
+[  18% ] update_scripts_classes | 
+[  18% ] update_scripts_classes | 
+[  18% ] update_scripts_classes | 
+[  18% ] update_scripts_classes | 
+[  19% ] update_scripts_classes | 
+[  19% ] update_scripts_classes | 
+[  19% ] update_scripts_classes | 
+[  20% ] update_scripts_classes | 
+[  20% ] update_scripts_classes | 
+[  20% ] update_scripts_classes | 
+[  20% ] update_scripts_classes | 
+[  21% ] update_scripts_classes | 
+[  21% ] update_scripts_classes | 
+[  21% ] update_scripts_classes | 
+[  22% ] update_scripts_classes | 
+[  22% ] update_scripts_classes | 
+[  22% ] update_scripts_classes | 
+[  22% ] update_scripts_classes | 
+[  23% ] update_scripts_classes | 
+[  23% ] update_scripts_classes | McpTestRunner
+[  23% ] update_scripts_classes | McpTestSuite
+[  24% ] update_scripts_classes | McpAllowHosts
+[  24% ] update_scripts_classes | 
+[  24% ] update_scripts_classes | McpDiagnosticsCapture
+[  24% ] update_scripts_classes | McpEditorLogBuffer
+[  25% ] update_scripts_classes | McpErrorCodes
+[  25% ] update_scripts_classes | 
+[  25% ] update_scripts_classes | McpGameLogBuffer
+[  26% ] update_scripts_classes | McpJsonValues
+[  26% ] update_scripts_classes | McpLogBacktrace
+[  26% ] update_scripts_classes | McpLogBuffer
+[  26% ] update_scripts_classes | McpAdoptionLabel
+[  27% ] update_scripts_classes | McpClientRefreshState
+[  27% ] update_scripts_classes | McpServerState
+[  27% ] update_scripts_classes | McpStartupPath
+[  28% ] update_scripts_classes | McpPathValidator
+[  28% ] update_scripts_classes | McpPortResolver
+[  28% ] update_scripts_classes | McpResourceIO
+[  28% ] update_scripts_classes | McpScenePath
+[  29% ] update_scripts_classes | McpScreenshotEncode
+[  29% ] update_scripts_classes | McpServerLifecycleManager
+[  29% ] update_scripts_classes | McpServerVersionCheck
+[  30% ] update_scripts_classes | McpSettings
+[  30% ] update_scripts_classes | McpStructuredLogRing
+[  30% ] update_scripts_classes | McpSurfacedErrorTracker
+[  30% ] update_scripts_classes | McpUpdateManager
+[  31% ] update_scripts_classes | 
+[  31% ] update_scripts_classes | McpUvCacheCleanup
+[  31% ] update_scripts_classes | 
+[  32% ] update_scripts_classes | McpWindowsPortReservation
+[  32% ] update_scripts_classes | McpClientConfigurator
+[  32% ] update_scripts_classes | McpConnection
+[  32% ] update_scripts_classes | McpDispatcher
+[  33% ] update_scripts_classes | McpDock
+[  33% ] update_scripts_classes | 
+[  33% ] update_scripts_classes | 
+[  34% ] update_scripts_classes | McpToolCatalog
+[  34% ] update_scripts_classes | 
+[  34% ] update_scripts_classes | CombatReceiver
+[  34% ] update_scripts_classes | CurrentElementController
+[  35% ] update_scripts_classes | DamageReceiver
+[  35% ] update_scripts_classes | ElementCarrier
+[  35% ] update_scripts_classes | EnergyComponent
+[  36% ] update_scripts_classes | SkillController
+[  36% ] update_scripts_classes | SkillCooldowns
+[  36% ] update_scripts_classes | SkillExecutor
+[  36% ] update_scripts_classes | RunContentCatalog
+[  37% ] update_scripts_classes | SkillContentDefinition
+[  37% ] update_scripts_classes | BasicAttackCommittedEvent
+[  37% ] update_scripts_classes | CastAttemptResult
+[  38% ] update_scripts_classes | CastSnapshot
+[  38% ] update_scripts_classes | CombatPlan
+[  38% ] update_scripts_classes | CombatResult
+[  38% ] update_scripts_classes | CombatStatus
+[  39% ] update_scripts_classes | CombatStatSnapshot
+[  39% ] update_scripts_classes | DamageResolution
+[  39% ] update_scripts_classes | DeliverySpawnSnapshot
+[  40% ] update_scripts_classes | ElementChangeResult
+[  40% ] update_scripts_classes | ElementLayerConsumePlan
+[  40% ] update_scripts_classes | ElementResolution
+[  40% ] update_scripts_classes | ElementSnapshot
+[  41% ] update_scripts_classes | HitRequest
+[  41% ] update_scripts_classes | RuntimeAttackPayload
+[  41% ] update_scripts_classes | AttackPayloadDefinition
+[  42% ] update_scripts_classes | ElementDefinition
+[  42% ] update_scripts_classes | SkillDefinition
+[  42% ] update_scripts_classes | SkillLoadout
+[  42% ] update_scripts_classes | CombatHurtbox
+[  43% ] update_scripts_classes | DelayedAreaDelivery
+[  43% ] update_scripts_classes | DeliveryBase
+[  43% ] update_scripts_classes | ElementBeamDelivery
+[  44% ] update_scripts_classes | ElementRageDelivery
+[  44% ] update_scripts_classes | MeleeDelivery
+[  44% ] update_scripts_classes | ProjectileDelivery
+[  44% ] update_scripts_classes | AllEnergyBurstExecution
+[  45% ] update_scripts_classes | AllEnergyBurstExecutionSnapshot
+[  45% ] update_scripts_classes | ChannelExecution
+[  45% ] update_scripts_classes | ChannelExecutionRuntime
+[  46% ] update_scripts_classes | ChannelExecutionSnapshot
+[  46% ] update_scripts_classes | ChannelTickSnapshot
+[  46% ] update_scripts_classes | ElementReclaimExecution
+[  46% ] update_scripts_classes | ElementReclaimExecutionSnapshot
+[  47% ] update_scripts_classes | ElementReclaimPort
+[  47% ] update_scripts_classes | ElementReclaimPrepareResult
+[  47% ] update_scripts_classes | ElementReclaimRequest
+[  48% ] update_scripts_classes | InstantDeliveryExecution
+[  48% ] update_scripts_classes | InstantDeliveryExecutionSnapshot
+[  48% ] update_scripts_classes | SkillExecutionBoundaryResult
+[  48% ] update_scripts_classes | SkillExecutionCommitTransaction
+[  49% ] update_scripts_classes | SkillExecutionContext
+[  49% ] update_scripts_classes | SkillExecutionDefinition
+[  49% ] update_scripts_classes | SkillExecutionEndResult
+[  50% ] update_scripts_classes | SkillExecutionPrepareResult
+[  50% ] update_scripts_classes | SkillExecutionRuntime
+[  50% ] update_scripts_classes | SkillExecutionServices
+[  51% ] update_scripts_classes | SkillExecutionSnapshot
+[  51% ] update_scripts_classes | LegacyElementLoadoutMigrator
+[  51% ] update_scripts_classes | LegacyElementLoadoutSnapshot
+[  51% ] update_scripts_classes | LegacyLoadoutMigrationResult
+[  52% ] update_scripts_classes | RuntimeSkillLoadout
+[  52% ] update_scripts_classes | SevenSlotMigrationResult
+[  52% ] update_scripts_classes | SharedFourSlotToSevenSlotMigrator
+[  53% ] update_scripts_classes | SkillSlotIds
+[  53% ] update_scripts_classes | BurningPassiveEffectDefinition
+[  53% ] update_scripts_classes | BurningPassiveEffectRuntime
+[  53% ] update_scripts_classes | PassiveDamageRequest
+[  54% ] update_scripts_classes | PassiveEffectBinding
+[  54% ] update_scripts_classes | PassiveEffectDefinition
+[  54% ] update_scripts_classes | PassiveEffectPort
+[  55% ] update_scripts_classes | PassiveEffectRuntime
+[  55% ] update_scripts_classes | PassiveOwnerPort
+[  55% ] update_scripts_classes | PassiveRuntimeContext
+[  55% ] update_scripts_classes | PassiveSkillController
+[  56% ] update_scripts_classes | PassiveStatModifierSnapshot
+[  56% ] update_scripts_classes | PassiveTargetPort
+[  56% ] update_scripts_classes | PassiveTargetSnapshot
+[  57% ] update_scripts_classes | StatModifierPassiveEffectDefinition
+[  57% ] update_scripts_classes | StatModifierPassiveEffectRuntime
+[  57% ] update_scripts_classes | UnendingPassiveEffectDefinition
+[  57% ] update_scripts_classes | UnendingPassiveEffectRuntime
+[  58% ] update_scripts_classes | ActiveSkillLevelEffectPort
+[  58% ] update_scripts_classes | DamageResolver
+[  58% ] update_scripts_classes | WaterFireResolver
+[  59% ] update_scripts_classes | CombatTargetCandidate2D
+[  59% ] update_scripts_classes | CombatTargetQuery2D
+[  59% ] update_scripts_classes | ElementReclaimTargetPlan
+[  59% ] update_scripts_classes | RangeElementReclaimPort
+[  60% ] update_scripts_classes | RangeElementReclaimTransaction
+[  60% ] update_scripts_classes | 
+[  60% ] update_scripts_classes | 
+[  61% ] update_scripts_classes | 
+[  61% ] update_scripts_classes | 
+[  61% ] update_scripts_classes | 
+[  61% ] update_scripts_classes | 
+[  62% ] update_scripts_classes | 
+[  62% ] update_scripts_classes | 
+[  62% ] update_scripts_classes | 
+[  63% ] update_scripts_classes | RecordingSkillDelivery
+[  63% ] update_scripts_classes | 
+[  63% ] update_scripts_classes | 
+[  63% ] update_scripts_classes | 
+[  64% ] update_scripts_classes | 
+[  64% ] update_scripts_classes | 
+[  64% ] update_scripts_classes | 
+[  65% ] update_scripts_classes | 
+[  65% ] update_scripts_classes | 
+[  65% ] update_scripts_classes | 
+[  65% ] update_scripts_classes | 
+[  66% ] update_scripts_classes | 
+[  66% ] update_scripts_classes | 
+[  66% ] update_scripts_classes | 
+[  67% ] update_scripts_classes | 
+[  67% ] update_scripts_classes | 
+[  67% ] update_scripts_classes | 
+[  67% ] update_scripts_classes | 
+[  68% ] update_scripts_classes | 
+[  68% ] update_scripts_classes | 
+[  68% ] update_scripts_classes | ElementIds
+[  69% ] update_scripts_classes | ActiveSkillLevelEffectSnapshot
+[  69% ] update_scripts_classes | AllocatedStatsSnapshot
+[  69% ] update_scripts_classes | DreamDustSnapshot
+[  69% ] update_scripts_classes | ExperienceGainPlan
+[  70% ] update_scripts_classes | GrowthStatIds
+[  70% ] update_scripts_classes | ProgressionSnapshot
+[  70% ] update_scripts_classes | RelicDispatchResult
+[  71% ] update_scripts_classes | RelicDisplayState
+[  71% ] update_scripts_classes | RelicInventorySnapshot
+[  71% ] update_scripts_classes | RewardOffer
+[  71% ] update_scripts_classes | RewardOption
+[  72% ] update_scripts_classes | RewardType
+[  72% ] update_scripts_classes | RoomRewardContext
+[  72% ] update_scripts_classes | RouteOption
+[  73% ] update_scripts_classes | RouteSnapshot
+[  73% ] update_scripts_classes | RuntimeLoadoutChangeResult
+[  73% ] update_scripts_classes | RuntimeLoadoutSlotSnapshot
+[  73% ] update_scripts_classes | RuntimeLoadoutSnapshot
+[  74% ] update_scripts_classes | RunCommandResult
+[  74% ] update_scripts_classes | RunFeatureMode
+[  74% ] update_scripts_classes | RunNodeSnapshot
+[  75% ] update_scripts_classes | RunPhase
+[  75% ] update_scripts_classes | RunResultSnapshot
+[  75% ] update_scripts_classes | RunRulesSnapshot
+[  75% ] update_scripts_classes | RunSnapshot
+[  76% ] update_scripts_classes | ShopCommitSummary
+[  76% ] update_scripts_classes | ShopDraftOpenResult
+[  76% ] update_scripts_classes | ShopOfferSnapshot
+[  77% ] update_scripts_classes | ShopSnapshot
+[  77% ] update_scripts_classes | SkillInventorySnapshot
+[  77% ] update_scripts_classes | SkillProgressSnapshot
+[  77% ] update_scripts_classes | ActiveSkillLevelDefinition
+[  78% ] update_scripts_classes | ActiveSkillProgressionDefinition
+[  78% ] update_scripts_classes | RelicDefinition
+[  78% ] update_scripts_classes | SkillRewardDefinition
+[  79% ] update_scripts_classes | CombatCommittedEvent
+[  79% ] update_scripts_classes | EnemyKilledEvent
+[  79% ] update_scripts_classes | FormChangedEvent
+[  79% ] update_scripts_classes | RelicAcquiredEvent
+[  80% ] update_scripts_classes | RoomCompletedEvent
+[  80% ] update_scripts_classes | RunEvent
+[  80% ] update_scripts_classes | CombatRoomDefinition
+[  81% ] update_scripts_classes | EnemySpawnDefinition
+[  81% ] update_scripts_classes | RouteBranchDefinition
+[  81% ] update_scripts_classes | RunFlowDefinition
+[  81% ] update_scripts_classes | RunNodeDefinition
+[  82% ] update_scripts_classes | RunNodeKind
+[  82% ] update_scripts_classes | GrowthEffectPort
+[  82% ] update_scripts_classes | RuntimeLoadoutPort
+[  83% ] update_scripts_classes | AcquireMaximumStatEffect
+[  83% ] update_scripts_classes | FormChangeRelicDefinition
+[  83% ] update_scripts_classes | FormChangeResponsePolicy
+[  83% ] update_scripts_classes | FormSwitchEnergyEffect
+[  84% ] update_scripts_classes | ReactionEnergyEffect
+[  84% ] update_scripts_classes | ReactionTemporaryAttackEffect
+[  84% ] update_scripts_classes | RelicController
+[  85% ] update_scripts_classes | RelicEffect
+[  85% ] update_scripts_classes | RelicEffectRegistry
+[  85% ] update_scripts_classes | RoomCompleteHealEffect
+[  85% ] update_scripts_classes | ExperienceService
+[  86% ] update_scripts_classes | RewardGenerator
+[  86% ] update_scripts_classes | ShopDraft
+[  86% ] update_scripts_classes | PendingRewardState
+[  87% ] update_scripts_classes | ProgressionState
+[  87% ] update_scripts_classes | RelicInventoryState
+[  87% ] update_scripts_classes | RelicRuntimeState
+[  87% ] update_scripts_classes | RouteState
+[  88% ] update_scripts_classes | RunEconomyState
+[  88% ] update_scripts_classes | SkillInventoryState
+[  88% ] update_scripts_classes | 
+[  89% ] update_scripts_classes | 
+[  89% ] update_scripts_classes | 
+[  89% ] update_scripts_classes | 
+[  89% ] update_scripts_classes | 
+[  90% ] update_scripts_classes | 
+[  90% ] update_scripts_classes | 
+[  90% ] update_scripts_classes | 
+[  91% ] update_scripts_classes | 
+[  91% ] update_scripts_classes | RunDirector
+[  91% ] update_scripts_classes | RunSession
+[  91% ] update_scripts_classes | PrototypeElementBolt
+[  92% ] update_scripts_classes | PrototypeSkillCaster
+[  92% ] update_scripts_classes | RunFlowCoordinator
+[  92% ] update_scripts_classes | RunFlowSmokePanel
+[  93% ] update_scripts_classes | RunRoomInstance
+[  93% ] update_scripts_classes | CombatUiTokens
+[  93% ] update_scripts_classes | RunOverlayInterface
+[  93% ] update_scripts_classes | EnemyPassiveVfxPresentation
+[  94% ] update_scripts_classes | FuryVfxPresentation
+[  94% ] update_scripts_classes | LaserVfxPresentation
+[  94% ] update_scripts_classes | ReclaimVfxEvent
+[  95% ] update_scripts_classes | ReclaimVfxPort
+[  95% ] update_scripts_classes | ReclaimVfxPresentation
+[  95% ] update_scripts_classes | SkillVfxCoordinator
+[  95% ] update_scripts_classes | VfxSpriteSheetFrames
+[  96% ] update_scripts_classes | CombatFeedback
+[  96% ] update_scripts_classes | CombatHUD
+[  96% ] update_scripts_classes | ElementProjectile
+[  97% ] update_scripts_classes | CombatEnemy
+[  97% ] update_scripts_classes | PassiveEffectAdapter
+[  97% ] update_scripts_classes | PlayerCharacter
+[  97% ] update_scripts_classes | PlayerGrowthAdapter
+[  98% ] update_scripts_classes | RunSessionHost
+[  98% ] update_scripts_classes | RunSkillLevelEffectAdapter
+[  98% ] update_scripts_classes | SharedLoadoutPersistenceAdapter
+[  99% ] update_scripts_classes | 
+[  99% ] update_scripts_classes | TransientMeleeDelivery
+[ DONE ] update_scripts_classes
+
+[   0% ] _update_scan_actions | Started 正在扫描动作…… (193 steps)
+[   0% ] _update_scan_actions | cat_attack.png
+[   0% ] _update_scan_actions | cat_fire_attack.png
+[   1% ] _update_scan_actions | cat_fire_idle.png
+[   1% ] _update_scan_actions | cat_fire_jump.png
+[   2% ] _update_scan_actions | cat_fire_walk.png
+[   2% ] _update_scan_actions | cat_hurt.png
+[   3% ] _update_scan_actions | cat_idle.png
+[   3% ] _update_scan_actions | cat_jump.png
+[   4% ] _update_scan_actions | cat_walk.png
+[   4% ] _update_scan_actions | cat_water_attack.png
+[   5% ] _update_scan_actions | cat_water_idle.png
+[   5% ] _update_scan_actions | cat_water_jump.png
+[   6% ] _update_scan_actions | cat_water_walk.png
+[   6% ] _update_scan_actions | orc_attack.png
+[   7% ] _update_scan_actions | orc_hurt.png
+[   7% ] _update_scan_actions | orc_idle.png
+[   8% ] _update_scan_actions | orc_walk.png
+[   8% ] _update_scan_actions | soldier_attack.png
+[   9% ] _update_scan_actions | soldier_hurt.png
+[   9% ] _update_scan_actions | soldier_idle.png
+[  10% ] _update_scan_actions | soldier_walk.png
+[  10% ] _update_scan_actions | p01_003_reclaim_vortex.png
+[  11% ] _update_scan_actions | p02_069_burning_flame.png
+[  11% ] _update_scan_actions | p04_174_fury_dissipate.png
+[  12% ] _update_scan_actions | p04_184_fury_ring.png
+[  12% ] _update_scan_actions | p06_273_hit_spark.png
+[  13% ] _update_scan_actions | p06_283_laser_hit.png
+[  13% ] _update_scan_actions | p06_293_reclaim_particle_ring.png
+[  14% ] _update_scan_actions | p08_375_bolt_projectile.png
+[  14% ] _update_scan_actions | p09_427_burst_core.png
+[  15% ] _update_scan_actions | p09_446_reclaim_orbit.png
+[  15% ] _update_scan_actions | p10_465_unending_ripple.png
+[  16% ] _update_scan_actions | p10_467_unending_splash.png
+[  17% ] _update_scan_actions | p12_579_bolt_straight.png
+[  17% ] _update_scan_actions | icon_alpha_full_v1.png
+[  18% ] _update_scan_actions | icon_alpha_full_v2.png
+[  18% ] _update_scan_actions | icon_chromakey_v1.png
+[  19% ] _update_scan_actions | fire_marker_color_candidate.png
+[  19% ] _update_scan_actions | burning_enemy_loop.png
+[  20% ] _update_scan_actions | burning_enemy_loop_v1.png
+[  20% ] _update_scan_actions | burning_tick.png
+[  21% ] _update_scan_actions | burning_tick_v1.png
+[  21% ] _update_scan_actions | icon.png
+[  22% ] _update_scan_actions | burning_concept_v1.png
+[  22% ] _update_scan_actions | elemental_fury_concept_v1.png
+[  23% ] _update_scan_actions | elemental_laser_concept_v1.png
+[  23% ] _update_scan_actions | element_bolt_concept_v1.png
+[  24% ] _update_scan_actions | element_reclaim_concept_v1.png
+[  24% ] _update_scan_actions | stage1_overview_v1.png
+[  25% ] _update_scan_actions | style_baseline_v1.png
+[  25% ] _update_scan_actions | unending_concept_v1.png
+[  26% ] _update_scan_actions | icon_alpha_full_v1.png
+[  26% ] _update_scan_actions | icon_alpha_full_v2.png
+[  27% ] _update_scan_actions | icon_chromakey_v1.png
+[  27% ] _update_scan_actions | burst_core_neutral_candidate.png
+[  28% ] _update_scan_actions | dissipate_neutral_candidate.png
+[  28% ] _update_scan_actions | shock_ring_neutral_candidate.png
+[  29% ] _update_scan_actions | burst_core.png
+[  29% ] _update_scan_actions | burst_core_neutral_v1.png
+[  30% ] _update_scan_actions | icon.png
+[  30% ] _update_scan_actions | icon_alpha_full_v1.png
+[  31% ] _update_scan_actions | icon_alpha_full_v2.png
+[  31% ] _update_scan_actions | icon_chromakey_v1.png
+[  32% ] _update_scan_actions | hit_pulse_neutral_candidate.png
+[  32% ] _update_scan_actions | origin_charge_neutral_candidate.png
+[  33% ] _update_scan_actions | beam_segment_fire.png
+[  34% ] _update_scan_actions | beam_segment_fire_mask.png
+[  34% ] _update_scan_actions | beam_segment_fire_v1.png
+[  35% ] _update_scan_actions | beam_segment_water.png
+[  35% ] _update_scan_actions | beam_segment_water_mask.png
+[  36% ] _update_scan_actions | beam_segment_water_v1.png
+[  36% ] _update_scan_actions | beam_tick_fire.png
+[  37% ] _update_scan_actions | beam_tick_fire_mask.png
+[  37% ] _update_scan_actions | beam_tick_fire_v1.png
+[  38% ] _update_scan_actions | beam_tick_water.png
+[  38% ] _update_scan_actions | beam_tick_water_mask.png
+[  39% ] _update_scan_actions | beam_tick_water_v1.png
+[  39% ] _update_scan_actions | icon.png
+[  40% ] _update_scan_actions | icon_alpha_full_v1.png
+[  40% ] _update_scan_actions | icon_alpha_full_v2.png
+[  41% ] _update_scan_actions | icon_chromakey_v1.png
+[  41% ] _update_scan_actions | bolt_projectile_neutral_candidate.png
+[  42% ] _update_scan_actions | bolt_straight_neutral_candidate.png
+[  42% ] _update_scan_actions | hit_spark_neutral_candidate.png
+[  43% ] _update_scan_actions | icon.png
+[  43% ] _update_scan_actions | projectile_fire_no_jitter_spritesheet.png
+[  44% ] _update_scan_actions | projectile_water_no_jitter_spritesheet.png
+[  44% ] _update_scan_actions | icon_alpha_full_v1.png
+[  45% ] _update_scan_actions | icon_alpha_full_v2.png
+[  45% ] _update_scan_actions | icon_chromakey_v1.png
+[  46% ] _update_scan_actions | icon_reclaim_third_element_rejected_v1.png
+[  46% ] _update_scan_actions | orbit_neutral_candidate.png
+[  47% ] _update_scan_actions | particle_ring_neutral_candidate.png
+[  47% ] _update_scan_actions | vortex_neutral_candidate.png
+[  48% ] _update_scan_actions | icon.png
+[  48% ] _update_scan_actions | reclaim_arrival_neutral.png
+[  49% ] _update_scan_actions | reclaim_arrival_neutral_v1.png
+[  50% ] _update_scan_actions | reclaim_extract_neutral.png
+[  50% ] _update_scan_actions | reclaim_extract_neutral_v1.png
+[  51% ] _update_scan_actions | reclaim_particle_fire.png
+[  51% ] _update_scan_actions | reclaim_particle_fire_v1.png
+[  52% ] _update_scan_actions | reclaim_particle_water.png
+[  52% ] _update_scan_actions | reclaim_particle_water_v1.png
+[  53% ] _update_scan_actions | icon.png
+[  53% ] _update_scan_actions | icon.png
+[  54% ] _update_scan_actions | icon_alpha_full_v1.png
+[  54% ] _update_scan_actions | icon_alpha_full_v2.png
+[  55% ] _update_scan_actions | icon_chromakey_v1.png
+[  55% ] _update_scan_actions | ripple_color_candidate.png
+[  56% ] _update_scan_actions | splash_color_candidate.png
+[  56% ] _update_scan_actions | icon.png
+[  57% ] _update_scan_actions | unending_enemy_loop.png
+[  57% ] _update_scan_actions | unending_enemy_loop_v1.png
+[  58% ] _update_scan_actions | unending_trigger.png
+[  58% ] _update_scan_actions | unending_trigger_v1.png
+[  59% ] _update_scan_actions | python_synthesis_overview_v1.png
+[  59% ] _update_scan_actions | source_candidate_overview_v1.png
+[  60% ] _update_scan_actions | 01_combat_hud_1152x648.png
+[  60% ] _update_scan_actions | 02_combat_hud_scaled_900x540.png
+[  61% ] _update_scan_actions | 03_colorblind_target_layers.png
+[  61% ] _update_scan_actions | 04_reduced_motion_locked_element.png
+[  62% ] _update_scan_actions | 05_active_slot_passive_preview.png
+[  62% ] _update_scan_actions | 06_passive_slot_rejects_active.png
+[  63% ] _update_scan_actions | 07_zero_active_four_passive_warning.png
+[  63% ] _update_scan_actions | 08_single_final_damage_reaction.png
+[  64% ] _update_scan_actions | 09_reward_ui_catalog_copy.png
+[  64% ] _update_scan_actions | fury_192_runtime.png
+[  65% ] _update_scan_actions | laser_fire_tick_runtime.png
+[  65% ] _update_scan_actions | passives_enemy_attached_runtime.png
+[  66% ] _update_scan_actions | reclaim_water_runtime.png
+[  67% ] _update_scan_actions | 01b_hud_2560x1440_scale.png
+[  67% ] _update_scan_actions | 01c_hud_3840x2160_scale.png
+[  68% ] _update_scan_actions | 01d_hud_1152x648_logic.png
+[  68% ] _update_scan_actions | 01_hud_1152x648.png
+[  69% ] _update_scan_actions | 01_hud_1920x1080_main.png
+[  69% ] _update_scan_actions | 02_hud_900x540.png
+[  70% ] _update_scan_actions | 03_states_cooldown_energy_busy_failure.png
+[  70% ] _update_scan_actions | 04_target_follow.png
+[  71% ] _update_scan_actions | 05_target_fallback.png
+[  71% ] _update_scan_actions | 06_reward_three.png
+[  72% ] _update_scan_actions | 07_reward_two.png
+[  72% ] _update_scan_actions | 08_reward_one_explicit_confirm.png
+[  73% ] _update_scan_actions | 09_reward_long_copy.png
+[  73% ] _update_scan_actions | 10_colorblind.png
+[  74% ] _update_scan_actions | 11_reduced_motion.png
+[  74% ] _update_scan_actions | 12_task18_vfx_unobscured.png
+[  75% ] _update_scan_actions | 01_hud_1920x1080.png
+[  75% ] _update_scan_actions | 02_hud_2560x1440.png
+[  76% ] _update_scan_actions | 03_hud_2560x1600.png
+[  76% ] _update_scan_actions | 04_hud_3840x2160.png
+[  77% ] _update_scan_actions | 05_hud_3440x1440.png
+[  77% ] _update_scan_actions | 06_hud_900x540_stress.png
+[  78% ] _update_scan_actions | 07_states_cooldown_energy_failure_passive.png
+[  78% ] _update_scan_actions | 08_reward_three.png
+[  79% ] _update_scan_actions | 09_reward_two_centered.png
+[  79% ] _update_scan_actions | 10_reward_one_explicit_confirm.png
+[  80% ] _update_scan_actions | 11_reward_long_copy_900x540.png
+[  80% ] _update_scan_actions | 12_colorblind_shape_text.png
+[  81% ] _update_scan_actions | 13_reduced_motion.png
+[  81% ] _update_scan_actions | 14_fury_laser_reclaim_unobscured.png
+[  82% ] _update_scan_actions | 01_shop_immediate_equip_1920x1080.png
+[  82% ] _update_scan_actions | 01_authoritative_lv2_element_bolt_1920x1080.png
+[  83% ] _update_scan_actions | 01_four_passive_runtime_1920x1080.png
+[  84% ] _update_scan_actions | 01_combat_01_entry_1920x1080.png
+[  84% ] _update_scan_actions | 02_route_01_choice_1920x1080.png
+[  85% ] _update_scan_actions | 03_platform_room_1920x1080.png
+[  85% ] _update_scan_actions | 04_boss_result_1920x1080.png
+[  86% ] _update_scan_actions | 01_combat_hud_1920x1080.png
+[  86% ] _update_scan_actions | 02_combat_hud_2560x1440.png
+[  87% ] _update_scan_actions | 03_combat_hud_1366x768.png
+[  87% ] _update_scan_actions | 04b_colorblind_reduced_motion_2560x1440.png
+[  88% ] _update_scan_actions | 04c_colorblind_reduced_motion_1366x768.png
+[  88% ] _update_scan_actions | 04_colorblind_reduced_motion_1920x1080.png
+[  89% ] _update_scan_actions | 05_early_shop_1920x1080.png
+[  89% ] _update_scan_actions | 06_early_shop_2560x1440.png
+[  90% ] _update_scan_actions | 07_early_shop_1366x768.png
+[  90% ] _update_scan_actions | 08_shop_seven_slot_zones_1920x1080.png
+[  91% ] _update_scan_actions | 09_route_focused_1920x1080.png
+[  91% ] _update_scan_actions | 10_route_focused_2560x1440.png
+[  92% ] _update_scan_actions | 11_route_focused_1366x768.png
+[  92% ] _update_scan_actions | 12_stale_route_recovery_1920x1080.png
+[  93% ] _update_scan_actions | 13_complete_result_1920x1080.png
+[  93% ] _update_scan_actions | 14_complete_result_2560x1440.png
+[  94% ] _update_scan_actions | 15_failed_result_1920x1080.png
+[  94% ] _update_scan_actions | 16_laser_damage_1920x1080.png
+[  95% ] _update_scan_actions | 17_reclaim_authority_1920x1080.png
+[  95% ] _update_scan_actions | 18_fury_damage_1920x1080.png
+[  96% ] _update_scan_actions | stage2_final_overview.png
+[  96% ] _update_scan_actions | stage2_icons_scale_qa.png
+[  97% ] _update_scan_actions | stage2_range_overlay_qa.png
+[  97% ] _update_scan_actions | stage2_testroom_particles_qa.png
+[  98% ] _update_scan_actions | testroom_runtime_base.png
+[  98% ] _update_scan_actions | icon.svg
+[ DONE ] _update_scan_actions
+
+[   0% ] reimport | Started 正在导入或重新导入资产 (193 steps)
+[   0% ] reimport | 正在准备重新导入文件……
+[   0% ] reimport | 正在准备重新导入文件……
+[   1% ] reimport | 正在准备重新导入文件……
+[   1% ] reimport | 正在准备重新导入文件……
+[   2% ] reimport | 正在准备重新导入文件……
+[   2% ] reimport | 正在准备重新导入文件……
+[   3% ] reimport | 正在准备重新导入文件……
+[   3% ] reimport | 正在准备重新导入文件……
+[   4% ] reimport | 正在准备重新导入文件……
+[   4% ] reimport | 正在准备重新导入文件……
+[   5% ] reimport | 正在准备重新导入文件……
+[   5% ] reimport | 正在准备重新导入文件……
+[   6% ] reimport | 正在准备重新导入文件……
+[   6% ] reimport | 正在准备重新导入文件……
+[   7% ] reimport | 正在准备重新导入文件……
+[   7% ] reimport | 正在准备重新导入文件……
+[   8% ] reimport | 正在准备重新导入文件……
+[   8% ] reimport | 正在准备重新导入文件……
+[   9% ] reimport | 正在准备重新导入文件……
+[   9% ] reimport | 正在准备重新导入文件……
+[  10% ] reimport | 正在准备重新导入文件……
+[  10% ] reimport | 正在准备重新导入文件……
+[  11% ] reimport | 正在准备重新导入文件……
+[  11% ] reimport | 正在准备重新导入文件……
+[  12% ] reimport | 正在准备重新导入文件……
+[  12% ] reimport | 正在准备重新导入文件……
+[  13% ] reimport | 正在准备重新导入文件……
+[  13% ] reimport | 正在准备重新导入文件……
+[  14% ] reimport | 正在准备重新导入文件……
+[  14% ] reimport | 正在准备重新导入文件……
+[  15% ] reimport | 正在准备重新导入文件……
+[  15% ] reimport | 正在准备重新导入文件……
+[  16% ] reimport | 正在准备重新导入文件……
+[  17% ] reimport | 正在准备重新导入文件……
+[  17% ] reimport | 正在准备重新导入文件……
+[  18% ] reimport | 正在准备重新导入文件……
+[  18% ] reimport | 正在准备重新导入文件……
+[  19% ] reimport | 正在准备重新导入文件……
+[  19% ] reimport | 正在准备重新导入文件……
+[  20% ] reimport | 正在准备重新导入文件……
+[  20% ] reimport | 正在准备重新导入文件……
+[  21% ] reimport | 正在准备重新导入文件……
+[  21% ] reimport | 正在准备重新导入文件……
+[  22% ] reimport | 正在准备重新导入文件……
+[  22% ] reimport | 正在准备重新导入文件……
+[  23% ] reimport | 正在准备重新导入文件……
+[  23% ] reimport | 正在准备重新导入文件……
+[  24% ] reimport | 正在准备重新导入文件……
+[  24% ] reimport | 正在准备重新导入文件……
+[  25% ] reimport | 正在准备重新导入文件……
+[  25% ] reimport | 正在准备重新导入文件……
+[  26% ] reimport | 正在准备重新导入文件……
+[  26% ] reimport | 正在准备重新导入文件……
+[  27% ] reimport | 正在准备重新导入文件……
+[  27% ] reimport | 正在准备重新导入文件……
+[  28% ] reimport | 正在准备重新导入文件……
+[  28% ] reimport | 正在准备重新导入文件……
+[  29% ] reimport | 正在准备重新导入文件……
+[  29% ] reimport | 正在准备重新导入文件……
+[  30% ] reimport | 正在准备重新导入文件……
+[  30% ] reimport | 正在准备重新导入文件……
+[  31% ] reimport | 正在准备重新导入文件……
+[  31% ] reimport | 正在准备重新导入文件……
+[  32% ] reimport | 正在准备重新导入文件……
+[  32% ] reimport | 正在准备重新导入文件……
+[  33% ] reimport | 正在准备重新导入文件……
+[  34% ] reimport | 正在准备重新导入文件……
+[  34% ] reimport | 正在准备重新导入文件……
+[  35% ] reimport | 正在准备重新导入文件……
+[  35% ] reimport | 正在准备重新导入文件……
+[  36% ] reimport | 正在准备重新导入文件……
+[  36% ] reimport | 正在准备重新导入文件……
+[  37% ] reimport | 正在准备重新导入文件……
+[  37% ] reimport | 正在准备重新导入文件……
+[  38% ] reimport | 正在准备重新导入文件……
+[  38% ] reimport | 正在准备重新导入文件……
+[  39% ] reimport | 正在准备重新导入文件……
+[  39% ] reimport | 正在准备重新导入文件……
+[  40% ] reimport | 正在准备重新导入文件……
+[  40% ] reimport | 正在准备重新导入文件……
+[  41% ] reimport | 正在准备重新导入文件……
+[  41% ] reimport | 正在准备重新导入文件……
+[  42% ] reimport | 正在准备重新导入文件……
+[  42% ] reimport | 正在准备重新导入文件……
+[  43% ] reimport | 正在准备重新导入文件……
+[  43% ] reimport | 正在准备重新导入文件……
+[  44% ] reimport | 正在准备重新导入文件……
+[  44% ] reimport | 正在准备重新导入文件……
+[  45% ] reimport | 正在准备重新导入文件……
+[  45% ] reimport | 正在准备重新导入文件……
+[  46% ] reimport | 正在准备重新导入文件……
+[  46% ] reimport | 正在准备重新导入文件……
+[  47% ] reimport | 正在准备重新导入文件……
+[  47% ] reimport | 正在准备重新导入文件……
+[  48% ] reimport | 正在准备重新导入文件……
+[  48% ] reimport | 正在准备重新导入文件……
+[  49% ] reimport | 正在准备重新导入文件……
+[  50% ] reimport | 正在准备重新导入文件……
+[  50% ] reimport | 正在准备重新导入文件……
+[  51% ] reimport | 正在准备重新导入文件……
+[  51% ] reimport | 正在准备重新导入文件……
+[  52% ] reimport | 正在准备重新导入文件……
+[  52% ] reimport | 正在准备重新导入文件……
+[  53% ] reimport | 正在准备重新导入文件……
+[  53% ] reimport | 正在准备重新导入文件……
+[  54% ] reimport | 正在准备重新导入文件……
+[  54% ] reimport | 正在准备重新导入文件……
+[  55% ] reimport | 正在准备重新导入文件……
+[  55% ] reimport | 正在准备重新导入文件……
+[  56% ] reimport | 正在准备重新导入文件……
+[  56% ] reimport | 正在准备重新导入文件……
+[  57% ] reimport | 正在准备重新导入文件……
+[  57% ] reimport | 正在准备重新导入文件……
+[  58% ] reimport | 正在准备重新导入文件……
+[  58% ] reimport | 正在准备重新导入文件……
+[  59% ] reimport | 正在准备重新导入文件……
+[  59% ] reimport | 正在准备重新导入文件……
+[  60% ] reimport | 正在准备重新导入文件……
+[  60% ] reimport | 正在准备重新导入文件……
+[  61% ] reimport | 正在准备重新导入文件……
+[  61% ] reimport | 正在准备重新导入文件……
+[  62% ] reimport | 正在准备重新导入文件……
+[  62% ] reimport | 正在准备重新导入文件……
+[  63% ] reimport | 正在准备重新导入文件……
+[  63% ] reimport | 正在准备重新导入文件……
+[  64% ] reimport | 正在准备重新导入文件……
+[  64% ] reimport | 正在准备重新导入文件……
+[  65% ] reimport | 正在准备重新导入文件……
+[  65% ] reimport | 正在准备重新导入文件……
+[  66% ] reimport | 正在准备重新导入文件……
+[  67% ] reimport | 正在准备重新导入文件……
+[  67% ] reimport | 正在准备重新导入文件……
+[  68% ] reimport | 正在准备重新导入文件……
+[  68% ] reimport | 正在准备重新导入文件……
+[  69% ] reimport | 正在准备重新导入文件……
+[  69% ] reimport | 正在准备重新导入文件……
+[  70% ] reimport | 正在准备重新导入文件……
+[  70% ] reimport | 正在准备重新导入文件……
+[  71% ] reimport | 正在准备重新导入文件……
+[  71% ] reimport | 正在准备重新导入文件……
+[  72% ] reimport | 正在准备重新导入文件……
+[  72% ] reimport | 正在准备重新导入文件……
+[  73% ] reimport | 正在准备重新导入文件……
+[  73% ] reimport | 正在准备重新导入文件……
+[  74% ] reimport | 正在准备重新导入文件……
+[  74% ] reimport | 正在准备重新导入文件……
+[  75% ] reimport | 正在准备重新导入文件……
+[  75% ] reimport | 正在准备重新导入文件……
+[  76% ] reimport | 正在准备重新导入文件……
+[  76% ] reimport | 正在准备重新导入文件……
+[  77% ] reimport | 正在准备重新导入文件……
+[  77% ] reimport | 正在准备重新导入文件……
+[  78% ] reimport | 正在准备重新导入文件……
+[  78% ] reimport | 正在准备重新导入文件……
+[  79% ] reimport | 正在准备重新导入文件……
+[  79% ] reimport | 正在准备重新导入文件……
+[  80% ] reimport | 正在准备重新导入文件……
+[  80% ] reimport | 正在准备重新导入文件……
+[  81% ] reimport | 正在准备重新导入文件……
+[  81% ] reimport | 正在准备重新导入文件……
+[  82% ] reimport | 正在准备重新导入文件……
+[  82% ] reimport | 正在准备重新导入文件……
+[  83% ] reimport | 正在准备重新导入文件……
+[  84% ] reimport | 正在准备重新导入文件……
+[  84% ] reimport | 正在准备重新导入文件……
+[  85% ] reimport | 正在准备重新导入文件……
+[  85% ] reimport | 正在准备重新导入文件……
+[  86% ] reimport | 正在准备重新导入文件……
+[  86% ] reimport | 正在准备重新导入文件……
+[  87% ] reimport | 正在准备重新导入文件……
+[  87% ] reimport | 正在准备重新导入文件……
+[  88% ] reimport | 正在准备重新导入文件……
+[  88% ] reimport | 正在准备重新导入文件……
+[  89% ] reimport | 正在准备重新导入文件……
+[  89% ] reimport | 正在准备重新导入文件……
+[  90% ] reimport | 正在准备重新导入文件……
+[  90% ] reimport | 正在准备重新导入文件……
+[  91% ] reimport | 正在准备重新导入文件……
+[  91% ] reimport | 正在准备重新导入文件……
+[  92% ] reimport | 正在准备重新导入文件……
+[  92% ] reimport | 正在准备重新导入文件……
+[  93% ] reimport | 正在准备重新导入文件……
+[  93% ] reimport | 正在准备重新导入文件……
+[  94% ] reimport | 正在准备重新导入文件……
+[  94% ] reimport | 正在准备重新导入文件……
+[  95% ] reimport | 正在准备重新导入文件……
+[  95% ] reimport | 正在准备重新导入文件……
+[  96% ] reimport | 正在准备重新导入文件……
+[  96% ] reimport | 正在准备重新导入文件……
+[  97% ] reimport | 正在准备重新导入文件……
+[  97% ] reimport | 正在准备重新导入文件……
+[  98% ] reimport | 正在准备重新导入文件……
+[  98% ] reimport | 正在准备重新导入文件……
+[   0% ] reimport | 正在执行重新导入的前置操作……
+[   0% ] reimport | 05_active_slot_passive_preview.png
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task12/05_active_slot_passive_preview.png
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task12/06_passive_slot_rejects_active.png
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task12/09_reward_ui_catalog_copy.png
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task12/08_single_final_damage_reaction.png
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task18/fury_192_runtime.png
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task12/07_zero_active_four_passive_warning.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task12/09_reward_ui_catalog_copy.png" import took 157 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task18/laser_fire_tick_runtime.png
+[   0% ] reimport | 06_passive_slot_rejects_active.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task18/fury_192_runtime.png" import took 174 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task18/passives_enemy_attached_runtime.png
+[   1% ] reimport | 07_zero_active_four_passive_warning.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task12/06_passive_slot_rejects_active.png" import took 182 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task18/reclaim_water_runtime.png
+[   1% ] reimport | 08_single_final_damage_reaction.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task12/05_active_slot_passive_preview.png" import took 183 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/01b_hud_2560x1440_scale.png
+[   2% ] reimport | 09_reward_ui_catalog_copy.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task12/08_single_final_damage_reaction.png" import took 188 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/01c_hud_3840x2160_scale.png
+[   2% ] reimport | fury_192_runtime.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task12/07_zero_active_four_passive_warning.png" import took 193 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/01d_hud_1152x648_logic.png
+[   3% ] reimport | laser_fire_tick_runtime.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/01d_hud_1152x648_logic.png" import took 54 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/01_hud_1152x648.png
+[   3% ] reimport | passives_enemy_attached_runtime.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/01_hud_1152x648.png" import took 55 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/01_hud_1920x1080_main.png
+[   4% ] reimport | reclaim_water_runtime.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task18/laser_fire_tick_runtime.png" import took 168 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/02_hud_900x540.png
+[   4% ] reimport | 01b_hud_2560x1440_scale.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task18/passives_enemy_attached_runtime.png" import took 163 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/03_states_cooldown_energy_busy_failure.png
+[   5% ] reimport | 01c_hud_3840x2160_scale.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task18/reclaim_water_runtime.png" import took 165 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/04_target_follow.png
+[   5% ] reimport | 01d_hud_1152x648_logic.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/02_hud_900x540.png" import took 114 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/05_target_fallback.png
+[   6% ] reimport | 01_hud_1152x648.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/01_hud_1920x1080_main.png" import took 386 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/06_reward_three.png
+[   6% ] reimport | 01_hud_1920x1080_main.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/03_states_cooldown_energy_busy_failure.png" import took 397 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/07_reward_two.png
+[   7% ] reimport | 02_hud_900x540.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/04_target_follow.png" import took 393 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/08_reward_one_explicit_confirm.png
+[   7% ] reimport | 03_states_cooldown_energy_busy_failure.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/01b_hud_2560x1440_scale.png" import took 562 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/09_reward_long_copy.png
+[   8% ] reimport | 04_target_follow.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/05_target_fallback.png" import took 385 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/10_colorblind.png
+[   8% ] reimport | 05_target_fallback.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/06_reward_three.png" import took 395 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/11_reduced_motion.png
+[   9% ] reimport | 06_reward_three.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/08_reward_one_explicit_confirm.png" import took 361 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral.png
+[   9% ] reimport | 07_reward_two.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/07_reward_two.png" import took 389 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral_v1.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral.png" import took 22 ms.
+[  10% ] reimport | 08_reward_one_explicit_confirm.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/reclaim_particle_fire.png
+[  10% ] reimport | 09_reward_long_copy.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/reclaim_particle_fire.png" import took 17 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/reclaim_particle_fire_v1.png
+[  11% ] reimport | 10_colorblind.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral_v1.png" import took 25 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/reclaim_particle_water.png
+[  11% ] reimport | 11_reduced_motion.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/09_reward_long_copy.png" import took 408 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/reclaim_particle_water_v1.png
+[  12% ] reimport | reclaim_extract_neutral.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/reclaim_particle_fire_v1.png" import took 18 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/passive_energy/icon.png
+[  12% ] reimport | reclaim_extract_neutral_v1.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/reclaim_particle_water_v1.png" import took 18 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/passive_vitality/icon.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/reclaim_particle_water.png" import took 22 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/unending/_sources/icon_alpha_full_v1.png
+[  13% ] reimport | reclaim_particle_fire.png
+[  13% ] reimport | reclaim_particle_fire_v1.png
+EditorFileSystem: "res://assets/generated/vfx/passive_energy/icon.png" import took 35 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/unending/_sources/icon_alpha_full_v2.png
+[  14% ] reimport | reclaim_particle_water.png
+EditorFileSystem: "res://assets/generated/vfx/passive_vitality/icon.png" import took 34 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/unending/_sources/icon_chromakey_v1.png
+[  14% ] reimport | reclaim_particle_water_v1.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/10_colorblind.png" import took 389 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/unending/source_candidates/ripple_color_candidate.png
+[  15% ] reimport | icon.png
+EditorFileSystem: "res://assets/generated/vfx/unending/source_candidates/ripple_color_candidate.png" import took 21 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/unending/source_candidates/splash_color_candidate.png
+[  15% ] reimport | icon.png
+EditorFileSystem: "res://assets/generated/vfx/unending/source_candidates/splash_color_candidate.png" import took 22 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/unending/icon.png
+[  16% ] reimport | icon_alpha_full_v1.png
+EditorFileSystem: "res://assets/generated/vfx/unending/icon.png" import took 35 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/unending/unending_enemy_loop.png
+[  17% ] reimport | icon_alpha_full_v2.png
+EditorFileSystem: "res://assets/generated/vfx/unending/unending_enemy_loop.png" import took 21 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/unending/unending_enemy_loop_v1.png
+[  17% ] reimport | icon_chromakey_v1.png
+EditorFileSystem: "res://assets/generated/vfx/unending/unending_enemy_loop_v1.png" import took 22 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/unending/unending_trigger.png
+[  18% ] reimport | ripple_color_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/unending/unending_trigger.png" import took 19 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/unending/unending_trigger_v1.png
+[  18% ] reimport | splash_color_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/unending/unending_trigger_v1.png" import took 19 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/python_synthesis_overview_v1.png
+[  19% ] reimport | icon.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/01c_hud_3840x2160_scale.png" import took 1217 ms.
+[  19% ] reimport | unending_enemy_loop.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/source_candidate_overview_v1.png
+EditorFileSystem: "res://assets/generated/vfx/python_synthesis_overview_v1.png" import took 85 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task12/01_combat_hud_1152x648.png
+[  20% ] reimport | unending_enemy_loop_v1.png
+EditorFileSystem: "res://assets/generated/vfx/source_candidate_overview_v1.png" import took 80 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task12/02_combat_hud_scaled_900x540.png
+[  20% ] reimport | unending_trigger.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/11_reduced_motion.png" import took 409 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task12/03_colorblind_target_layers.png
+[  21% ] reimport | unending_trigger_v1.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task12/01_combat_hud_1152x648.png" import took 57 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task12/04_reduced_motion_locked_element.png
+[  21% ] reimport | python_synthesis_overview_v1.png
+EditorFileSystem: "res://assets/generated/vfx/unending/_sources/icon_alpha_full_v1.png" import took 438 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/03_combat_hud_1366x768.png
+[  22% ] reimport | source_candidate_overview_v1.png
+EditorFileSystem: "res://assets/generated/vfx/unending/_sources/icon_chromakey_v1.png" import took 407 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/04b_colorblind_reduced_motion_2560x1440.png
+[  22% ] reimport | 01_combat_hud_1152x648.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task12/02_combat_hud_scaled_900x540.png" import took 128 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/04c_colorblind_reduced_motion_1366x768.png
+[  23% ] reimport | 02_combat_hud_scaled_900x540.png
+EditorFileSystem: "res://assets/generated/vfx/unending/_sources/icon_alpha_full_v2.png" import took 461 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/04_colorblind_reduced_motion_1920x1080.png
+[  23% ] reimport | 03_colorblind_target_layers.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task12/03_colorblind_target_layers.png" import took 170 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/05_early_shop_1920x1080.png
+[  24% ] reimport | 04_reduced_motion_locked_element.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task12/04_reduced_motion_locked_element.png" import took 175 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/06_early_shop_2560x1440.png
+[  24% ] reimport | 03_combat_hud_1366x768.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/03_combat_hud_1366x768.png" import took 200 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/07_early_shop_1366x768.png
+[  25% ] reimport | 04b_colorblind_reduced_motion_2560x1440.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/04c_colorblind_reduced_motion_1366x768.png" import took 202 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/08_shop_seven_slot_zones_1920x1080.png
+[  25% ] reimport | 04c_colorblind_reduced_motion_1366x768.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/04_colorblind_reduced_motion_1920x1080.png" import took 360 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/09_route_focused_1920x1080.png
+[  26% ] reimport | 04_colorblind_reduced_motion_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/07_early_shop_1366x768.png" import took 218 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/10_route_focused_2560x1440.png
+[  26% ] reimport | 05_early_shop_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/05_early_shop_1920x1080.png" import took 411 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/11_route_focused_1366x768.png
+[  27% ] reimport | 06_early_shop_2560x1440.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/04b_colorblind_reduced_motion_2560x1440.png" import took 508 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/12_stale_route_recovery_1920x1080.png
+[  27% ] reimport | 07_early_shop_1366x768.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/08_shop_seven_slot_zones_1920x1080.png" import took 401 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/13_complete_result_1920x1080.png
+[  28% ] reimport | 08_shop_seven_slot_zones_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/06_early_shop_2560x1440.png" import took 560 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/14_complete_result_2560x1440.png
+[  28% ] reimport | 09_route_focused_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/11_route_focused_1366x768.png" import took 181 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/15_failed_result_1920x1080.png
+[  29% ] reimport | 10_route_focused_2560x1440.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/09_route_focused_1920x1080.png" import took 341 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/16_laser_damage_1920x1080.png
+[  29% ] reimport | 11_route_focused_1366x768.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/12_stale_route_recovery_1920x1080.png" import took 348 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/17_reclaim_authority_1920x1080.png
+[  30% ] reimport | 12_stale_route_recovery_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/10_route_focused_2560x1440.png" import took 492 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/18_fury_damage_1920x1080.png
+[  30% ] reimport | 13_complete_result_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/13_complete_result_1920x1080.png" import took 353 ms.
+EditorFileSystem: Importing file: res://docs/vfx/qa/stage2_final_overview.png
+[  31% ] reimport | 14_complete_result_2560x1440.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/15_failed_result_1920x1080.png" import took 355 ms.
+EditorFileSystem: Importing file: res://docs/vfx/qa/stage2_icons_scale_qa.png
+[  31% ] reimport | 15_failed_result_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/16_laser_damage_1920x1080.png" import took 366 ms.
+EditorFileSystem: Importing file: res://docs/vfx/qa/stage2_range_overlay_qa.png
+[  32% ] reimport | 16_laser_damage_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/14_complete_result_2560x1440.png" import took 511 ms.
+EditorFileSystem: Importing file: res://docs/vfx/qa/stage2_testroom_particles_qa.png
+[  32% ] reimport | 17_reclaim_authority_1920x1080.png
+EditorFileSystem: "res://docs/vfx/qa/stage2_icons_scale_qa.png" import took 180 ms.
+EditorFileSystem: Importing file: res://docs/vfx/qa/testroom_runtime_base.png
+[  33% ] reimport | 18_fury_damage_1920x1080.png
+EditorFileSystem: "res://docs/vfx/qa/stage2_final_overview.png" import took 226 ms.
+EditorFileSystem: Importing file: res://icon.svg
+[  34% ] reimport | stage2_final_overview.png
+EditorFileSystem: "res://icon.svg" import took 14 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task20/12_task18_vfx_unobscured.png
+[  34% ] reimport | stage2_icons_scale_qa.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/17_reclaim_authority_1920x1080.png" import took 373 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/01_hud_1920x1080.png
+[  35% ] reimport | stage2_range_overlay_qa.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/18_fury_damage_1920x1080.png" import took 387 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/02_hud_2560x1440.png
+[  35% ] reimport | stage2_testroom_particles_qa.png
+EditorFileSystem: "res://docs/vfx/qa/stage2_testroom_particles_qa.png" import took 166 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/03_hud_2560x1600.png
+[  36% ] reimport | testroom_runtime_base.png
+EditorFileSystem: "res://docs/vfx/qa/stage2_range_overlay_qa.png" import took 286 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/04_hud_3840x2160.png
+[  36% ] reimport | icon.svg
+EditorFileSystem: "res://docs/agent_tasks/evidence/task20/12_task18_vfx_unobscured.png" import took 402 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/05_hud_3440x1440.png
+[  37% ] reimport | 12_task18_vfx_unobscured.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/01_hud_1920x1080.png" import took 374 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/06_hud_900x540_stress.png
+[  37% ] reimport | 01_hud_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/06_hud_900x540_stress.png" import took 39 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/07_states_cooldown_energy_failure_passive.png
+[  38% ] reimport | 02_hud_2560x1440.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/02_hud_2560x1440.png" import took 556 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/08_reward_three.png
+[  38% ] reimport | 03_hud_2560x1600.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/03_hud_2560x1600.png" import took 603 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/09_reward_two_centered.png
+[  39% ] reimport | 04_hud_3840x2160.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/07_states_cooldown_energy_failure_passive.png" import took 406 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/10_reward_one_explicit_confirm.png
+[  39% ] reimport | 05_hud_3440x1440.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/08_reward_three.png" import took 457 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/11_reward_long_copy_900x540.png
+[  40% ] reimport | 06_hud_900x540_stress.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/09_reward_two_centered.png" import took 454 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/12_colorblind_shape_text.png
+[  40% ] reimport | 07_states_cooldown_energy_failure_passive.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/05_hud_3440x1440.png" import took 786 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/13_reduced_motion.png
+[  41% ] reimport | 08_reward_three.png
+EditorFileSystem: "res://docs/vfx/qa/testroom_runtime_base.png" import took 1235 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task24/14_fury_laser_reclaim_unobscured.png
+[  41% ] reimport | 09_reward_two_centered.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/11_reward_long_copy_900x540.png" import took 134 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task25/01_shop_immediate_equip_1920x1080.png
+[  42% ] reimport | 10_reward_one_explicit_confirm.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/10_reward_one_explicit_confirm.png" import took 407 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task27/01_authoritative_lv2_element_bolt_1920x1080.png
+[  42% ] reimport | 11_reward_long_copy_900x540.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/04_hud_3840x2160.png" import took 1221 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task28/01_four_passive_runtime_1920x1080.png
+[  43% ] reimport | 12_colorblind_shape_text.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/13_reduced_motion.png" import took 396 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task29/01_combat_01_entry_1920x1080.png
+[  43% ] reimport | 13_reduced_motion.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/12_colorblind_shape_text.png" import took 414 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task29/02_route_01_choice_1920x1080.png
+[  44% ] reimport | 14_fury_laser_reclaim_unobscured.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task24/14_fury_laser_reclaim_unobscured.png" import took 441 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task29/03_platform_room_1920x1080.png
+[  44% ] reimport | 01_shop_immediate_equip_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task27/01_authoritative_lv2_element_bolt_1920x1080.png" import took 421 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task29/04_boss_result_1920x1080.png
+[  45% ] reimport | 01_authoritative_lv2_element_bolt_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task25/01_shop_immediate_equip_1920x1080.png" import took 483 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/01_combat_hud_1920x1080.png
+[  45% ] reimport | 01_four_passive_runtime_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task28/01_four_passive_runtime_1920x1080.png" import took 416 ms.
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task30/viewport/02_combat_hud_2560x1440.png
+[  46% ] reimport | 01_combat_01_entry_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task29/01_combat_01_entry_1920x1080.png" import took 435 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p04_184_fury_ring.png
+[  46% ] reimport | 02_route_01_choice_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task29/04_boss_result_1920x1080.png" import took 429 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p06_273_hit_spark.png
+[  47% ] reimport | 03_platform_room_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task29/02_route_01_choice_1920x1080.png" import took 582 ms.
+[  47% ] reimport | 04_boss_result_1920x1080.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p06_283_laser_hit.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p06_273_hit_spark.png" import took 121 ms.
+[  48% ] reimport | 01_combat_hud_1920x1080.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p06_293_reclaim_particle_ring.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p04_184_fury_ring.png" import took 214 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p08_375_bolt_projectile.png
+[  48% ] reimport | 02_combat_hud_2560x1440.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task29/03_platform_room_1920x1080.png" import took 579 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p09_427_burst_core.png
+[  49% ] reimport | p04_184_fury_ring.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/01_combat_hud_1920x1080.png" import took 520 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p09_446_reclaim_orbit.png
+[  50% ] reimport | p06_273_hit_spark.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p06_283_laser_hit.png" import took 141 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p10_465_unending_ripple.png
+[  50% ] reimport | p06_283_laser_hit.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p08_375_bolt_projectile.png" import took 111 ms.
+[  51% ] reimport | p06_293_reclaim_particle_ring.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p10_467_unending_splash.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p09_427_burst_core.png" import took 118 ms.
+[  51% ] reimport | p08_375_bolt_projectile.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p12_579_bolt_straight.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task30/viewport/02_combat_hud_2560x1440.png" import took 532 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/burning/_sources/icon_alpha_full_v1.png
+[  52% ] reimport | p09_427_burst_core.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p06_293_reclaim_particle_ring.png" import took 138 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/burning/_sources/icon_alpha_full_v2.png
+[  52% ] reimport | p09_446_reclaim_orbit.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p09_446_reclaim_orbit.png" import took 144 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/burning/_sources/icon_chromakey_v1.png
+[  53% ] reimport | p10_465_unending_ripple.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p10_465_unending_ripple.png" import took 152 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/burning/source_candidates/fire_marker_color_candidate.png
+[  53% ] reimport | p10_467_unending_splash.png
+EditorFileSystem: "res://assets/generated/vfx/burning/source_candidates/fire_marker_color_candidate.png" import took 23 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/burning/burning_enemy_loop.png
+[  54% ] reimport | p12_579_bolt_straight.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p10_467_unending_splash.png" import took 148 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/burning/burning_enemy_loop_v1.png
+[  54% ] reimport | icon_alpha_full_v1.png
+EditorFileSystem: "res://assets/generated/vfx/burning/burning_enemy_loop.png" import took 23 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/burning/burning_tick.png
+[  55% ] reimport | icon_alpha_full_v2.png
+EditorFileSystem: "res://assets/generated/vfx/burning/burning_enemy_loop_v1.png" import took 24 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/burning/burning_tick_v1.png
+[  55% ] reimport | icon_chromakey_v1.png
+EditorFileSystem: "res://assets/generated/vfx/burning/burning_tick.png" import took 23 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/burning/icon.png
+[  56% ] reimport | fire_marker_color_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p12_579_bolt_straight.png" import took 182 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/concepts/burning_concept_v1.png
+[  56% ] reimport | burning_enemy_loop.png
+EditorFileSystem: "res://assets/generated/vfx/burning/burning_tick_v1.png" import took 22 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/concepts/elemental_fury_concept_v1.png
+[  57% ] reimport | burning_enemy_loop_v1.png
+EditorFileSystem: "res://assets/generated/vfx/burning/icon.png" import took 34 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/concepts/elemental_laser_concept_v1.png
+[  57% ] reimport | burning_tick.png
+EditorFileSystem: "res://assets/generated/vfx/burning/_sources/icon_chromakey_v1.png" import took 384 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/concepts/element_bolt_concept_v1.png
+[  58% ] reimport | burning_tick_v1.png
+EditorFileSystem: "res://assets/generated/vfx/burning/_sources/icon_alpha_full_v2.png" import took 419 ms.
+[  58% ] reimport | icon.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/concepts/element_reclaim_concept_v1.png
+EditorFileSystem: "res://assets/generated/vfx/burning/_sources/icon_alpha_full_v1.png" import took 445 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_attack.png
+[  59% ] reimport | burning_concept_v1.png
+EditorFileSystem: "res://assets/characters/cat/cat_attack.png" import took 25 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_fire_attack.png
+[  59% ] reimport | elemental_fury_concept_v1.png
+EditorFileSystem: "res://assets/characters/cat/cat_fire_attack.png" import took 24 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_fire_idle.png
+[  60% ] reimport | elemental_laser_concept_v1.png
+EditorFileSystem: "res://assets/characters/cat/cat_fire_idle.png" import took 19 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_fire_jump.png
+[  60% ] reimport | element_bolt_concept_v1.png
+EditorFileSystem: "res://assets/characters/cat/cat_fire_jump.png" import took 17 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_fire_walk.png
+[  61% ] reimport | element_reclaim_concept_v1.png
+EditorFileSystem: "res://assets/characters/cat/cat_fire_walk.png" import took 24 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_hurt.png
+[  61% ] reimport | cat_attack.png
+EditorFileSystem: "res://assets/characters/cat/cat_hurt.png" import took 20 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_idle.png
+[  62% ] reimport | cat_fire_attack.png
+EditorFileSystem: "res://assets/characters/cat/cat_idle.png" import took 26 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_jump.png
+[  62% ] reimport | cat_fire_idle.png
+EditorFileSystem: "res://assets/characters/cat/cat_jump.png" import took 18 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_walk.png
+[  63% ] reimport | cat_fire_jump.png
+EditorFileSystem: "res://assets/generated/vfx/concepts/elemental_fury_concept_v1.png" import took 462 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_water_attack.png
+EditorFileSystem: "res://assets/characters/cat/cat_walk.png" import took 22 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_water_idle.png
+[  63% ] reimport | cat_fire_walk.png
+[  64% ] reimport | cat_hurt.png
+EditorFileSystem: "res://assets/generated/vfx/concepts/burning_concept_v1.png" import took 484 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_water_jump.png
+[  64% ] reimport | cat_idle.png
+EditorFileSystem: "res://assets/characters/cat/cat_water_idle.png" import took 21 ms.
+EditorFileSystem: Importing file: res://assets/characters/cat/cat_water_walk.png
+[  65% ] reimport | cat_jump.png
+EditorFileSystem: "res://assets/characters/cat/cat_water_attack.png" import took 32 ms.
+EditorFileSystem: Importing file: res://assets/characters/orc_attack.png
+[  65% ] reimport | cat_walk.png
+EditorFileSystem: "res://assets/characters/cat/cat_water_jump.png" import took 24 ms.
+EditorFileSystem: Importing file: res://assets/characters/orc_hurt.png
+[  66% ] reimport | cat_water_attack.png
+EditorFileSystem: "res://assets/characters/cat/cat_water_walk.png" import took 36 ms.
+EditorFileSystem: Importing file: res://assets/characters/orc_idle.png
+[  67% ] reimport | cat_water_idle.png
+EditorFileSystem: "res://assets/characters/orc_attack.png" import took 31 ms.
+EditorFileSystem: Importing file: res://assets/characters/orc_walk.png
+[  67% ] reimport | cat_water_jump.png
+EditorFileSystem: "res://assets/characters/orc_hurt.png" import took 27 ms.
+EditorFileSystem: Importing file: res://assets/characters/soldier_attack.png
+[  68% ] reimport | cat_water_walk.png
+EditorFileSystem: "res://assets/characters/orc_idle.png" import took 26 ms.
+EditorFileSystem: Importing file: res://assets/characters/soldier_hurt.png
+[  68% ] reimport | orc_attack.png
+EditorFileSystem: "res://assets/characters/soldier_attack.png" import took 27 ms.
+EditorFileSystem: Importing file: res://assets/characters/soldier_idle.png
+[  69% ] reimport | orc_hurt.png
+EditorFileSystem: "res://assets/characters/orc_walk.png" import took 45 ms.
+EditorFileSystem: Importing file: res://assets/characters/soldier_walk.png
+EditorFileSystem: "res://assets/characters/soldier_hurt.png" import took 22 ms.
+[  69% ] reimport | orc_idle.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p01_003_reclaim_vortex.png
+[  70% ] reimport | orc_walk.png
+EditorFileSystem: "res://assets/characters/soldier_idle.png" import took 27 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p02_069_burning_flame.png
+[  70% ] reimport | soldier_attack.png
+EditorFileSystem: "res://assets/characters/soldier_walk.png" import took 36 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/_licensed_source/bdragon1727/p04_174_fury_dissipate.png
+[  71% ] reimport | soldier_hurt.png
+EditorFileSystem: "res://assets/generated/vfx/concepts/elemental_laser_concept_v1.png" import took 590 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_tick_fire_v1.png
+[  71% ] reimport | soldier_idle.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_tick_fire_v1.png" import took 27 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_tick_water.png
+[  72% ] reimport | soldier_walk.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_tick_water.png" import took 28 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_tick_water_mask.png
+[  72% ] reimport | p01_003_reclaim_vortex.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_tick_water_mask.png" import took 19 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_tick_water_v1.png
+[  73% ] reimport | p02_069_burning_flame.png
+EditorFileSystem: "res://assets/generated/vfx/concepts/element_bolt_concept_v1.png" import took 482 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/icon.png
+[  73% ] reimport | p04_174_fury_dissipate.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_tick_water_v1.png" import took 24 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_bolt/_sources/icon_alpha_full_v1.png
+[  74% ] reimport | beam_tick_fire_v1.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/icon.png" import took 39 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_bolt/_sources/icon_alpha_full_v2.png
+[  74% ] reimport | beam_tick_water.png
+EditorFileSystem: "res://assets/generated/vfx/concepts/element_reclaim_concept_v1.png" import took 513 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_bolt/_sources/icon_chromakey_v1.png
+[  75% ] reimport | beam_tick_water_mask.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p02_069_burning_flame.png" import took 191 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_bolt/source_candidates/bolt_projectile_neutral_candidate.png
+[  75% ] reimport | beam_tick_water_v1.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p01_003_reclaim_vortex.png" import took 212 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_bolt/source_candidates/bolt_straight_neutral_candidate.png
+[  76% ] reimport | icon.png
+EditorFileSystem: "res://assets/generated/vfx/_licensed_source/bdragon1727/p04_174_fury_dissipate.png" import took 194 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_bolt/source_candidates/hit_spark_neutral_candidate.png
+[  76% ] reimport | icon_alpha_full_v1.png
+EditorFileSystem: "res://assets/generated/vfx/element_bolt/source_candidates/bolt_projectile_neutral_candidate.png" import took 23 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_bolt/icon.png
+[  77% ] reimport | icon_alpha_full_v2.png
+EditorFileSystem: "res://assets/generated/vfx/element_bolt/source_candidates/bolt_straight_neutral_candidate.png" import took 28 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png
+[  77% ] reimport | icon_chromakey_v1.png
+EditorFileSystem: "res://assets/generated/vfx/element_bolt/source_candidates/hit_spark_neutral_candidate.png" import took 26 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png
+[  78% ] reimport | bolt_projectile_neutral_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/element_bolt/icon.png" import took 50 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/_sources/icon_alpha_full_v1.png
+[  78% ] reimport | bolt_straight_neutral_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png" import took 95 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/_sources/icon_alpha_full_v2.png
+[  79% ] reimport | hit_spark_neutral_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png" import took 101 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/_sources/icon_chromakey_v1.png
+[  79% ] reimport | icon.png
+EditorFileSystem: "res://assets/generated/vfx/element_bolt/_sources/icon_chromakey_v1.png" import took 470 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/discarded/icon_reclaim_third_element_rejected_v1.png
+[  80% ] reimport | projectile_fire_no_jitter_spritesheet.png
+EditorFileSystem: "res://assets/generated/vfx/element_bolt/_sources/icon_alpha_full_v1.png" import took 516 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/source_candidates/orbit_neutral_candidate.png
+[  80% ] reimport | projectile_water_no_jitter_spritesheet.png
+EditorFileSystem: "res://assets/generated/vfx/element_bolt/_sources/icon_alpha_full_v2.png" import took 495 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/source_candidates/particle_ring_neutral_candidate.png
+[  81% ] reimport | icon_alpha_full_v1.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/source_candidates/orbit_neutral_candidate.png" import took 24 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/source_candidates/vortex_neutral_candidate.png
+[  81% ] reimport | icon_alpha_full_v2.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/source_candidates/particle_ring_neutral_candidate.png" import took 26 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/icon.png
+[  82% ] reimport | icon_chromakey_v1.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/source_candidates/vortex_neutral_candidate.png" import took 31 ms.
+[  82% ] reimport | icon_reclaim_third_element_rejected_v1.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral.png" import took 24 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral_v1.png
+[  83% ] reimport | orbit_neutral_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/icon.png" import took 47 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/concepts/stage1_overview_v1.png
+[  84% ] reimport | particle_ring_neutral_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral_v1.png" import took 21 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/concepts/style_baseline_v1.png
+[  84% ] reimport | vortex_neutral_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/_sources/icon_chromakey_v1.png" import took 473 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/concepts/unending_concept_v1.png
+[  85% ] reimport | icon.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/_sources/icon_alpha_full_v1.png" import took 586 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_fury/_sources/icon_alpha_full_v1.png
+[  85% ] reimport | reclaim_arrival_neutral.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/_sources/icon_alpha_full_v2.png" import took 542 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_fury/_sources/icon_alpha_full_v2.png
+[  86% ] reimport | reclaim_arrival_neutral_v1.png
+EditorFileSystem: "res://assets/generated/vfx/element_reclaim/discarded/icon_reclaim_third_element_rejected_v1.png" import took 457 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_fury/_sources/icon_chromakey_v1.png
+[  86% ] reimport | stage1_overview_v1.png
+EditorFileSystem: "res://assets/generated/vfx/concepts/style_baseline_v1.png" import took 514 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_fury/source_candidates/burst_core_neutral_candidate.png
+[  87% ] reimport | style_baseline_v1.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_fury/source_candidates/burst_core_neutral_candidate.png" import took 32 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_fury/source_candidates/dissipate_neutral_candidate.png
+[  87% ] reimport | unending_concept_v1.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_fury/source_candidates/dissipate_neutral_candidate.png" import took 39 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_fury/source_candidates/shock_ring_neutral_candidate.png
+[  88% ] reimport | icon_alpha_full_v1.png
+EditorFileSystem: "res://assets/generated/vfx/concepts/unending_concept_v1.png" import took 522 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_fury/burst_core.png
+[  88% ] reimport | icon_alpha_full_v2.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_fury/burst_core.png" import took 32 ms.
+[  89% ] reimport | icon_chromakey_v1.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_fury/burst_core_neutral_v1.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_fury/source_candidates/shock_ring_neutral_candidate.png" import took 40 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_fury/icon.png
+[  89% ] reimport | burst_core_neutral_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_fury/burst_core_neutral_v1.png" import took 37 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/_sources/icon_alpha_full_v1.png
+[  90% ] reimport | dissipate_neutral_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_fury/icon.png" import took 62 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/_sources/icon_alpha_full_v2.png
+[  90% ] reimport | shock_ring_neutral_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_fury/_sources/icon_alpha_full_v2.png" import took 588 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/_sources/icon_chromakey_v1.png
+[  91% ] reimport | burst_core.png
+EditorFileSystem: "res://assets/generated/vfx/concepts/stage1_overview_v1.png" import took 760 ms.
+[  91% ] reimport | burst_core_neutral_v1.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/source_candidates/hit_pulse_neutral_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/source_candidates/hit_pulse_neutral_candidate.png" import took 34 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/source_candidates/origin_charge_neutral_candidate.png
+[  92% ] reimport | icon.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/source_candidates/origin_charge_neutral_candidate.png" import took 37 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_segment_fire.png
+[  92% ] reimport | icon_alpha_full_v1.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_fury/_sources/icon_alpha_full_v1.png" import took 717 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_segment_fire_mask.png
+[  93% ] reimport | icon_alpha_full_v2.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_segment_fire.png" import took 41 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_segment_fire_v1.png
+[  93% ] reimport | icon_chromakey_v1.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_segment_fire_mask.png" import took 37 ms.
+[  94% ] reimport | hit_pulse_neutral_candidate.png
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_segment_water.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_segment_fire_v1.png" import took 23 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_segment_water_mask.png
+[  94% ] reimport | origin_charge_neutral_candidate.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_segment_water.png" import took 31 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_segment_water_v1.png
+[  95% ] reimport | beam_segment_fire.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_segment_water_mask.png" import took 25 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_tick_fire.png
+[  95% ] reimport | beam_segment_fire_mask.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_fury/_sources/icon_chromakey_v1.png" import took 562 ms.
+EditorFileSystem: Importing file: res://assets/generated/vfx/elemental_laser/beam_tick_fire_mask.png
+[  96% ] reimport | beam_segment_fire_v1.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_segment_water_v1.png" import took 23 ms.
+[  96% ] reimport | beam_segment_water.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_tick_fire_mask.png" import took 18 ms.
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/beam_tick_fire.png" import took 23 ms.
+[  97% ] reimport | beam_segment_water_mask.png
+[  97% ] reimport | beam_segment_water_v1.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/_sources/icon_chromakey_v1.png" import took 422 ms.
+[  98% ] reimport | beam_tick_fire.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/_sources/icon_alpha_full_v1.png" import took 546 ms.
+[  98% ] reimport | beam_tick_fire_mask.png
+EditorFileSystem: "res://assets/generated/vfx/elemental_laser/_sources/icon_alpha_full_v2.png" import took 521 ms.
+[  99% ] reimport | 正在结束资产导入……
+[ DONE ] reimport
+
+[   0% ] reimport | Started 正在导入或重新导入资产 (193 steps)
+[   0% ] reimport | 正在执行重新导入的后置操作……
+[ DONE ] reimport
+
+[   0% ] loading_editor_layout | Started 正在加载编辑器 (5 steps)
+[   0% ] loading_editor_layout | 正在加载编辑器布局……
+[  16% ] loading_editor_layout | 正在加载停靠面板……
+[ DONE ] loading_editor_layout
+
+Loading resource: res://scenes/run/run_game.tscn remapped: res://scenes/run/run_game.tscn
+Loading resource: res://scripts/run/run_flow_coordinator.gd remapped: res://scripts/run/run_flow_coordinator.gd
+Loading resource: res://scenes/transient_melee_delivery.tscn remapped: res://scenes/transient_melee_delivery.tscn
+Loading resource: res://scripts/transient_melee_delivery.gd remapped: res://scripts/transient_melee_delivery.gd
+Completed load for: 'res://scripts/transient_melee_delivery.gd' remapped 'res://scripts/transient_melee_delivery.gd' at thread -1
+Completed load for: 'res://scenes/transient_melee_delivery.tscn' remapped 'res://scenes/transient_melee_delivery.tscn' at thread -1
+Loading resource: res://resources/vfx/reclaim_particle_water_frames.tres remapped: res://resources/vfx/reclaim_particle_water_frames.tres
+Loading resource: res://scripts/vfx/vfx_sprite_sheet_frames.gd remapped: res://scripts/vfx/vfx_sprite_sheet_frames.gd
+Completed load for: 'res://scripts/vfx/vfx_sprite_sheet_frames.gd' remapped 'res://scripts/vfx/vfx_sprite_sheet_frames.gd' at thread -1
+Loading resource: res://assets/generated/vfx/element_reclaim/reclaim_particle_water.png remapped: res://assets/generated/vfx/element_reclaim/reclaim_particle_water.png
+Loading resource: res://.godot/imported/reclaim_particle_water.png-2f1bc0137abe48d9fdfe2e828048de4d.ctex remapped: res://.godot/imported/reclaim_particle_water.png-2f1bc0137abe48d9fdfe2e828048de4d.ctex
+Completed load for: 'res://assets/generated/vfx/element_reclaim/reclaim_particle_water.png' remapped 'res://assets/generated/vfx/element_reclaim/reclaim_particle_water.png' at thread -1
+Completed load for: 'res://resources/vfx/reclaim_particle_water_frames.tres' remapped 'res://resources/vfx/reclaim_particle_water_frames.tres' at thread -1
+Loading resource: res://resources/vfx/reclaim_particle_fire_frames.tres remapped: res://resources/vfx/reclaim_particle_fire_frames.tres
+Loading resource: res://assets/generated/vfx/element_reclaim/reclaim_particle_fire.png remapped: res://assets/generated/vfx/element_reclaim/reclaim_particle_fire.png
+Loading resource: res://.godot/imported/reclaim_particle_fire.png-9e8f97a423d442a387efca95df3ef4b0.ctex remapped: res://.godot/imported/reclaim_particle_fire.png-9e8f97a423d442a387efca95df3ef4b0.ctex
+Completed load for: 'res://assets/generated/vfx/element_reclaim/reclaim_particle_fire.png' remapped 'res://assets/generated/vfx/element_reclaim/reclaim_particle_fire.png' at thread -1
+Completed load for: 'res://resources/vfx/reclaim_particle_fire_frames.tres' remapped 'res://resources/vfx/reclaim_particle_fire_frames.tres' at thread -1
+Loading resource: res://resources/vfx/reclaim_extract_frames.tres remapped: res://resources/vfx/reclaim_extract_frames.tres
+Loading resource: res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral.png remapped: res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral.png
+Loading resource: res://.godot/imported/reclaim_extract_neutral.png-8fd38998f485433f1d4ce9d20e3022bd.ctex remapped: res://.godot/imported/reclaim_extract_neutral.png-8fd38998f485433f1d4ce9d20e3022bd.ctex
+Completed load for: 'res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral.png' remapped 'res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral.png' at thread -1
+Completed load for: 'res://resources/vfx/reclaim_extract_frames.tres' remapped 'res://resources/vfx/reclaim_extract_frames.tres' at thread -1
+Loading resource: res://resources/vfx/reclaim_arrival_frames.tres remapped: res://resources/vfx/reclaim_arrival_frames.tres
+Loading resource: res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral.png remapped: res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral.png
+Loading resource: res://.godot/imported/reclaim_arrival_neutral.png-8443618256bb2b584c5b64352f19afd7.ctex remapped: res://.godot/imported/reclaim_arrival_neutral.png-8443618256bb2b584c5b64352f19afd7.ctex
+Completed load for: 'res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral.png' remapped 'res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral.png' at thread -1
+Completed load for: 'res://resources/vfx/reclaim_arrival_frames.tres' remapped 'res://resources/vfx/reclaim_arrival_frames.tres' at thread -1
+Loading resource: res://assets/generated/vfx/elemental_laser/beam_segment_water.png remapped: res://assets/generated/vfx/elemental_laser/beam_segment_water.png
+Loading resource: res://.godot/imported/beam_segment_water.png-6ec884f8ecc12444f4270539c3cf34ec.ctex remapped: res://.godot/imported/beam_segment_water.png-6ec884f8ecc12444f4270539c3cf34ec.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_laser/beam_segment_water.png' remapped 'res://assets/generated/vfx/elemental_laser/beam_segment_water.png' at thread -1
+Loading resource: res://assets/generated/vfx/elemental_laser/beam_segment_fire.png remapped: res://assets/generated/vfx/elemental_laser/beam_segment_fire.png
+Loading resource: res://.godot/imported/beam_segment_fire.png-ca0f76eafb40333234d70a1fdcad79a6.ctex remapped: res://.godot/imported/beam_segment_fire.png-ca0f76eafb40333234d70a1fdcad79a6.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_laser/beam_segment_fire.png' remapped 'res://assets/generated/vfx/elemental_laser/beam_segment_fire.png' at thread -1
+Loading resource: res://resources/vfx/laser_tick_water_frames.tres remapped: res://resources/vfx/laser_tick_water_frames.tres
+Loading resource: res://assets/generated/vfx/elemental_laser/beam_tick_water.png remapped: res://assets/generated/vfx/elemental_laser/beam_tick_water.png
+Loading resource: res://.godot/imported/beam_tick_water.png-8534fdc0722746a3aa2882bd786c7ce6.ctex remapped: res://.godot/imported/beam_tick_water.png-8534fdc0722746a3aa2882bd786c7ce6.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_laser/beam_tick_water.png' remapped 'res://assets/generated/vfx/elemental_laser/beam_tick_water.png' at thread -1
+Completed load for: 'res://resources/vfx/laser_tick_water_frames.tres' remapped 'res://resources/vfx/laser_tick_water_frames.tres' at thread -1
+Loading resource: res://resources/vfx/laser_tick_fire_frames.tres remapped: res://resources/vfx/laser_tick_fire_frames.tres
+Loading resource: res://assets/generated/vfx/elemental_laser/beam_tick_fire.png remapped: res://assets/generated/vfx/elemental_laser/beam_tick_fire.png
+Loading resource: res://.godot/imported/beam_tick_fire.png-21ccee48dffa9f271e50e7769995375c.ctex remapped: res://.godot/imported/beam_tick_fire.png-21ccee48dffa9f271e50e7769995375c.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_laser/beam_tick_fire.png' remapped 'res://assets/generated/vfx/elemental_laser/beam_tick_fire.png' at thread -1
+Completed load for: 'res://resources/vfx/laser_tick_fire_frames.tres' remapped 'res://resources/vfx/laser_tick_fire_frames.tres' at thread -1
+Completed load for: 'res://scripts/run/run_flow_coordinator.gd' remapped 'res://scripts/run/run_flow_coordinator.gd' at thread -1
+Loading resource: res://resources/run/flows/prototype_two_layer_six_combat.tres remapped: res://resources/run/flows/prototype_two_layer_six_combat.tres
+Loading resource: res://resources/run/rooms/combat_01_entry.tres remapped: res://resources/run/rooms/combat_01_entry.tres
+Loading resource: res://scenes/run/rooms/room_arena_flat.tscn remapped: res://scenes/run/rooms/room_arena_flat.tscn
+Completed load for: 'res://scenes/run/rooms/room_arena_flat.tscn' remapped 'res://scenes/run/rooms/room_arena_flat.tscn' at thread -1
+Loading resource: res://scenes/enemy.tscn remapped: res://scenes/enemy.tscn
+Loading resource: res://resources/animations/enemy_frames.tres remapped: res://resources/animations/enemy_frames.tres
+Loading resource: res://assets/characters/orc_attack.png remapped: res://assets/characters/orc_attack.png
+Loading resource: res://.godot/imported/orc_attack.png-4833c6dfd0d00b2e1431a4d607d19006.ctex remapped: res://.godot/imported/orc_attack.png-4833c6dfd0d00b2e1431a4d607d19006.ctex
+Completed load for: 'res://assets/characters/orc_attack.png' remapped 'res://assets/characters/orc_attack.png' at thread -1
+Loading resource: res://assets/characters/orc_hurt.png remapped: res://assets/characters/orc_hurt.png
+Loading resource: res://.godot/imported/orc_hurt.png-1b85330ece09f1fcc800c5b5fdf5fdf4.ctex remapped: res://.godot/imported/orc_hurt.png-1b85330ece09f1fcc800c5b5fdf5fdf4.ctex
+Completed load for: 'res://assets/characters/orc_hurt.png' remapped 'res://assets/characters/orc_hurt.png' at thread -1
+Loading resource: res://assets/characters/orc_idle.png remapped: res://assets/characters/orc_idle.png
+Loading resource: res://.godot/imported/orc_idle.png-12b41475d6d46f03ad7ca98a14d5ad7a.ctex remapped: res://.godot/imported/orc_idle.png-12b41475d6d46f03ad7ca98a14d5ad7a.ctex
+Completed load for: 'res://assets/characters/orc_idle.png' remapped 'res://assets/characters/orc_idle.png' at thread -1
+Loading resource: res://assets/characters/orc_walk.png remapped: res://assets/characters/orc_walk.png
+Loading resource: res://.godot/imported/orc_walk.png-3015cdddc5796cc0d47b3c155dca68b4.ctex remapped: res://.godot/imported/orc_walk.png-3015cdddc5796cc0d47b3c155dca68b4.ctex
+Completed load for: 'res://assets/characters/orc_walk.png' remapped 'res://assets/characters/orc_walk.png' at thread -1
+Completed load for: 'res://resources/animations/enemy_frames.tres' remapped 'res://resources/animations/enemy_frames.tres' at thread -1
+Completed load for: 'res://scenes/enemy.tscn' remapped 'res://scenes/enemy.tscn' at thread -1
+Completed load for: 'res://resources/run/rooms/combat_01_entry.tres' remapped 'res://resources/run/rooms/combat_01_entry.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_02_swarm.tres remapped: res://resources/run/rooms/combat_02_swarm.tres
+Completed load for: 'res://resources/run/rooms/combat_02_swarm.tres' remapped 'res://resources/run/rooms/combat_02_swarm.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_02_pressure.tres remapped: res://resources/run/rooms/combat_02_pressure.tres
+Loading resource: res://scenes/run/rooms/room_arena_platforms.tscn remapped: res://scenes/run/rooms/room_arena_platforms.tscn
+Completed load for: 'res://scenes/run/rooms/room_arena_platforms.tscn' remapped 'res://scenes/run/rooms/room_arena_platforms.tscn' at thread -1
+Completed load for: 'res://resources/run/rooms/combat_02_pressure.tres' remapped 'res://resources/run/rooms/combat_02_pressure.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_03_layer_elite.tres remapped: res://resources/run/rooms/combat_03_layer_elite.tres
+Completed load for: 'res://resources/run/rooms/combat_03_layer_elite.tres' remapped 'res://resources/run/rooms/combat_03_layer_elite.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_04_validation.tres remapped: res://resources/run/rooms/combat_04_validation.tres
+Completed load for: 'res://resources/run/rooms/combat_04_validation.tres' remapped 'res://resources/run/rooms/combat_04_validation.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_05_stable.tres remapped: res://resources/run/rooms/combat_05_stable.tres
+Completed load for: 'res://resources/run/rooms/combat_05_stable.tres' remapped 'res://resources/run/rooms/combat_05_stable.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_05_risk.tres remapped: res://resources/run/rooms/combat_05_risk.tres
+Loading resource: res://scenes/run/rooms/room_arena_corridor.tscn remapped: res://scenes/run/rooms/room_arena_corridor.tscn
+Completed load for: 'res://scenes/run/rooms/room_arena_corridor.tscn' remapped 'res://scenes/run/rooms/room_arena_corridor.tscn' at thread -1
+Completed load for: 'res://resources/run/rooms/combat_05_risk.tres' remapped 'res://resources/run/rooms/combat_05_risk.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_06_final_boss.tres remapped: res://resources/run/rooms/combat_06_final_boss.tres
+Loading resource: res://scenes/run/rooms/room_arena_boss.tscn remapped: res://scenes/run/rooms/room_arena_boss.tscn
+Completed load for: 'res://scenes/run/rooms/room_arena_boss.tscn' remapped 'res://scenes/run/rooms/room_arena_boss.tscn' at thread -1
+Completed load for: 'res://resources/run/rooms/combat_06_final_boss.tres' remapped 'res://resources/run/rooms/combat_06_final_boss.tres' at thread -1
+Completed load for: 'res://resources/run/flows/prototype_two_layer_six_combat.tres' remapped 'res://resources/run/flows/prototype_two_layer_six_combat.tres' at thread -1
+Loading resource: res://resources/content/run_content_catalog.tres remapped: res://resources/content/run_content_catalog.tres
+Loading resource: res://resources/content/skills/element_slash_content.tres remapped: res://resources/content/skills/element_slash_content.tres
+Loading resource: res://resources/element_slash.tres remapped: res://resources/element_slash.tres
+Completed load for: 'res://resources/element_slash.tres' remapped 'res://resources/element_slash.tres' at thread -1
+Completed load for: 'res://resources/content/skills/element_slash_content.tres' remapped 'res://resources/content/skills/element_slash_content.tres' at thread -1
+Loading resource: res://resources/content/skills/element_bolt_content.tres remapped: res://resources/content/skills/element_bolt_content.tres
+Loading resource: res://resources/element_bolt.tres remapped: res://resources/element_bolt.tres
+Loading resource: res://scenes/element_projectile.tscn remapped: res://scenes/element_projectile.tscn
+Loading resource: res://scripts/element_projectile.gd remapped: res://scripts/element_projectile.gd
+Completed load for: 'res://scripts/element_projectile.gd' remapped 'res://scripts/element_projectile.gd' at thread -1
+Loading resource: res://resources/animations/element_projectile_frames.tres remapped: res://resources/animations/element_projectile_frames.tres
+Loading resource: res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png remapped: res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png
+Loading resource: res://.godot/imported/projectile_water_no_jitter_spritesheet.png-526df90e366cd31871e98f0d9928233b.ctex remapped: res://.godot/imported/projectile_water_no_jitter_spritesheet.png-526df90e366cd31871e98f0d9928233b.ctex
+Completed load for: 'res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png' remapped 'res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png' at thread -1
+Loading resource: res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png remapped: res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png
+Loading resource: res://.godot/imported/projectile_fire_no_jitter_spritesheet.png-c043f90b3c503c732253416ccaa8e4a9.ctex remapped: res://.godot/imported/projectile_fire_no_jitter_spritesheet.png-c043f90b3c503c732253416ccaa8e4a9.ctex
+Completed load for: 'res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png' remapped 'res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png' at thread -1
+Completed load for: 'res://resources/animations/element_projectile_frames.tres' remapped 'res://resources/animations/element_projectile_frames.tres' at thread -1
+Completed load for: 'res://scenes/element_projectile.tscn' remapped 'res://scenes/element_projectile.tscn' at thread -1
+Completed load for: 'res://resources/element_bolt.tres' remapped 'res://resources/element_bolt.tres' at thread -1
+Loading resource: res://assets/generated/vfx/element_bolt/icon.png remapped: res://assets/generated/vfx/element_bolt/icon.png
+Loading resource: res://.godot/imported/icon.png-8f0ccb8104e2fad63cc4960fa3cfa4fd.ctex remapped: res://.godot/imported/icon.png-8f0ccb8104e2fad63cc4960fa3cfa4fd.ctex
+Completed load for: 'res://assets/generated/vfx/element_bolt/icon.png' remapped 'res://assets/generated/vfx/element_bolt/icon.png' at thread -1
+Completed load for: 'res://resources/content/skills/element_bolt_content.tres' remapped 'res://resources/content/skills/element_bolt_content.tres' at thread -1
+Loading resource: res://resources/content/skills/elemental_fury_content.tres remapped: res://resources/content/skills/elemental_fury_content.tres
+Loading resource: res://resources/skills/elemental_fury.tres remapped: res://resources/skills/elemental_fury.tres
+Completed load for: 'res://resources/skills/elemental_fury.tres' remapped 'res://resources/skills/elemental_fury.tres' at thread -1
+Loading resource: res://combat/delivery/element_rage_delivery.tscn remapped: res://combat/delivery/element_rage_delivery.tscn
+Completed load for: 'res://combat/delivery/element_rage_delivery.tscn' remapped 'res://combat/delivery/element_rage_delivery.tscn' at thread -1
+Loading resource: res://assets/generated/vfx/elemental_fury/icon.png remapped: res://assets/generated/vfx/elemental_fury/icon.png
+Loading resource: res://.godot/imported/icon.png-7f89c2d0f1ea8cfbaae4edd9ebcedb9c.ctex remapped: res://.godot/imported/icon.png-7f89c2d0f1ea8cfbaae4edd9ebcedb9c.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_fury/icon.png' remapped 'res://assets/generated/vfx/elemental_fury/icon.png' at thread -1
+Loading resource: res://scenes/vfx/elemental_fury_presentation.tscn remapped: res://scenes/vfx/elemental_fury_presentation.tscn
+Loading resource: res://resources/vfx/fury_burst_frames.tres remapped: res://resources/vfx/fury_burst_frames.tres
+Loading resource: res://assets/generated/vfx/elemental_fury/burst_core.png remapped: res://assets/generated/vfx/elemental_fury/burst_core.png
+Loading resource: res://.godot/imported/burst_core.png-9d0fa34ad61c7b71e9b4f2a0684e6abc.ctex remapped: res://.godot/imported/burst_core.png-9d0fa34ad61c7b71e9b4f2a0684e6abc.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_fury/burst_core.png' remapped 'res://assets/generated/vfx/elemental_fury/burst_core.png' at thread -1
+Completed load for: 'res://resources/vfx/fury_burst_frames.tres' remapped 'res://resources/vfx/fury_burst_frames.tres' at thread -1
+Completed load for: 'res://scenes/vfx/elemental_fury_presentation.tscn' remapped 'res://scenes/vfx/elemental_fury_presentation.tscn' at thread -1
+Completed load for: 'res://resources/content/skills/elemental_fury_content.tres' remapped 'res://resources/content/skills/elemental_fury_content.tres' at thread -1
+Loading resource: res://resources/content/skills/elemental_laser_content.tres remapped: res://resources/content/skills/elemental_laser_content.tres
+Loading resource: res://resources/skills/elemental_laser.tres remapped: res://resources/skills/elemental_laser.tres
+Completed load for: 'res://resources/skills/elemental_laser.tres' remapped 'res://resources/skills/elemental_laser.tres' at thread -1
+Loading resource: res://combat/delivery/element_beam_delivery.tscn remapped: res://combat/delivery/element_beam_delivery.tscn
+Completed load for: 'res://combat/delivery/element_beam_delivery.tscn' remapped 'res://combat/delivery/element_beam_delivery.tscn' at thread -1
+Loading resource: res://assets/generated/vfx/elemental_laser/icon.png remapped: res://assets/generated/vfx/elemental_laser/icon.png
+Loading resource: res://.godot/imported/icon.png-0e463ae0490d82d45d009bd86934dc37.ctex remapped: res://.godot/imported/icon.png-0e463ae0490d82d45d009bd86934dc37.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_laser/icon.png' remapped 'res://assets/generated/vfx/elemental_laser/icon.png' at thread -1
+Loading resource: res://scenes/vfx/elemental_laser_presentation.tscn remapped: res://scenes/vfx/elemental_laser_presentation.tscn
+Completed load for: 'res://scenes/vfx/elemental_laser_presentation.tscn' remapped 'res://scenes/vfx/elemental_laser_presentation.tscn' at thread -1
+Completed load for: 'res://resources/content/skills/elemental_laser_content.tres' remapped 'res://resources/content/skills/elemental_laser_content.tres' at thread -1
+Loading resource: res://resources/content/skills/element_reclaim_content.tres remapped: res://resources/content/skills/element_reclaim_content.tres
+Loading resource: res://resources/skills/element_reclaim.tres remapped: res://resources/skills/element_reclaim.tres
+Completed load for: 'res://resources/skills/element_reclaim.tres' remapped 'res://resources/skills/element_reclaim.tres' at thread -1
+Loading resource: res://assets/generated/vfx/element_reclaim/icon.png remapped: res://assets/generated/vfx/element_reclaim/icon.png
+Loading resource: res://.godot/imported/icon.png-a861cd126e0383fa6f146c77e94b9eab.ctex remapped: res://.godot/imported/icon.png-a861cd126e0383fa6f146c77e94b9eab.ctex
+Completed load for: 'res://assets/generated/vfx/element_reclaim/icon.png' remapped 'res://assets/generated/vfx/element_reclaim/icon.png' at thread -1
+Loading resource: res://scenes/vfx/element_reclaim_presentation.tscn remapped: res://scenes/vfx/element_reclaim_presentation.tscn
+Completed load for: 'res://scenes/vfx/element_reclaim_presentation.tscn' remapped 'res://scenes/vfx/element_reclaim_presentation.tscn' at thread -1
+Completed load for: 'res://resources/content/skills/element_reclaim_content.tres' remapped 'res://resources/content/skills/element_reclaim_content.tres' at thread -1
+Loading resource: res://resources/content/skills/burning_content.tres remapped: res://resources/content/skills/burning_content.tres
+Loading resource: res://resources/skills/burning.tres remapped: res://resources/skills/burning.tres
+Completed load for: 'res://resources/skills/burning.tres' remapped 'res://resources/skills/burning.tres' at thread -1
+Loading resource: res://assets/generated/vfx/burning/icon.png remapped: res://assets/generated/vfx/burning/icon.png
+Loading resource: res://.godot/imported/icon.png-8cd4dd00bad1a4d685cdb2fec01f8e15.ctex remapped: res://.godot/imported/icon.png-8cd4dd00bad1a4d685cdb2fec01f8e15.ctex
+Completed load for: 'res://assets/generated/vfx/burning/icon.png' remapped 'res://assets/generated/vfx/burning/icon.png' at thread -1
+Loading resource: res://scenes/vfx/burning_presentation.tscn remapped: res://scenes/vfx/burning_presentation.tscn
+Loading resource: res://resources/vfx/burning_loop_frames.tres remapped: res://resources/vfx/burning_loop_frames.tres
+Loading resource: res://assets/generated/vfx/burning/burning_enemy_loop.png remapped: res://assets/generated/vfx/burning/burning_enemy_loop.png
+Loading resource: res://.godot/imported/burning_enemy_loop.png-a07c08c299194b3f4cd56c4e9be437ac.ctex remapped: res://.godot/imported/burning_enemy_loop.png-a07c08c299194b3f4cd56c4e9be437ac.ctex
+Completed load for: 'res://assets/generated/vfx/burning/burning_enemy_loop.png' remapped 'res://assets/generated/vfx/burning/burning_enemy_loop.png' at thread -1
+Completed load for: 'res://resources/vfx/burning_loop_frames.tres' remapped 'res://resources/vfx/burning_loop_frames.tres' at thread -1
+Loading resource: res://resources/vfx/burning_tick_frames.tres remapped: res://resources/vfx/burning_tick_frames.tres
+Loading resource: res://assets/generated/vfx/burning/burning_tick.png remapped: res://assets/generated/vfx/burning/burning_tick.png
+Loading resource: res://.godot/imported/burning_tick.png-93dcb32d494f61b2c60da4979fb19cd5.ctex remapped: res://.godot/imported/burning_tick.png-93dcb32d494f61b2c60da4979fb19cd5.ctex
+Completed load for: 'res://assets/generated/vfx/burning/burning_tick.png' remapped 'res://assets/generated/vfx/burning/burning_tick.png' at thread -1
+Completed load for: 'res://resources/vfx/burning_tick_frames.tres' remapped 'res://resources/vfx/burning_tick_frames.tres' at thread -1
+Completed load for: 'res://scenes/vfx/burning_presentation.tscn' remapped 'res://scenes/vfx/burning_presentation.tscn' at thread -1
+Completed load for: 'res://resources/content/skills/burning_content.tres' remapped 'res://resources/content/skills/burning_content.tres' at thread -1
+Loading resource: res://resources/content/skills/unending_content.tres remapped: res://resources/content/skills/unending_content.tres
+Loading resource: res://resources/skills/unending.tres remapped: res://resources/skills/unending.tres
+Completed load for: 'res://resources/skills/unending.tres' remapped 'res://resources/skills/unending.tres' at thread -1
+Loading resource: res://assets/generated/vfx/unending/icon.png remapped: res://assets/generated/vfx/unending/icon.png
+Loading resource: res://.godot/imported/icon.png-02c32fa379bc2dcb93e88dff9f0573c4.ctex remapped: res://.godot/imported/icon.png-02c32fa379bc2dcb93e88dff9f0573c4.ctex
+Completed load for: 'res://assets/generated/vfx/unending/icon.png' remapped 'res://assets/generated/vfx/unending/icon.png' at thread -1
+Loading resource: res://scenes/vfx/unending_presentation.tscn remapped: res://scenes/vfx/unending_presentation.tscn
+Loading resource: res://resources/vfx/unending_loop_frames.tres remapped: res://resources/vfx/unending_loop_frames.tres
+Loading resource: res://assets/generated/vfx/unending/unending_enemy_loop.png remapped: res://assets/generated/vfx/unending/unending_enemy_loop.png
+Loading resource: res://.godot/imported/unending_enemy_loop.png-2b93aa438afc4c850dfd2468d7c70705.ctex remapped: res://.godot/imported/unending_enemy_loop.png-2b93aa438afc4c850dfd2468d7c70705.ctex
+Completed load for: 'res://assets/generated/vfx/unending/unending_enemy_loop.png' remapped 'res://assets/generated/vfx/unending/unending_enemy_loop.png' at thread -1
+Completed load for: 'res://resources/vfx/unending_loop_frames.tres' remapped 'res://resources/vfx/unending_loop_frames.tres' at thread -1
+Loading resource: res://resources/vfx/unending_trigger_frames.tres remapped: res://resources/vfx/unending_trigger_frames.tres
+Loading resource: res://assets/generated/vfx/unending/unending_trigger.png remapped: res://assets/generated/vfx/unending/unending_trigger.png
+Loading resource: res://.godot/imported/unending_trigger.png-5634bdca3b5a88e10723b2518eef06b4.ctex remapped: res://.godot/imported/unending_trigger.png-5634bdca3b5a88e10723b2518eef06b4.ctex
+Completed load for: 'res://assets/generated/vfx/unending/unending_trigger.png' remapped 'res://assets/generated/vfx/unending/unending_trigger.png' at thread -1
+Completed load for: 'res://resources/vfx/unending_trigger_frames.tres' remapped 'res://resources/vfx/unending_trigger_frames.tres' at thread -1
+Completed load for: 'res://scenes/vfx/unending_presentation.tscn' remapped 'res://scenes/vfx/unending_presentation.tscn' at thread -1
+Completed load for: 'res://resources/content/skills/unending_content.tres' remapped 'res://resources/content/skills/unending_content.tres' at thread -1
+Loading resource: res://resources/growth/relics/manual_spring.tres remapped: res://resources/growth/relics/manual_spring.tres
+Completed load for: 'res://resources/growth/relics/manual_spring.tres' remapped 'res://resources/growth/relics/manual_spring.tres' at thread -1
+Loading resource: res://resources/growth/relics/auto_spark.tres remapped: res://resources/growth/relics/auto_spark.tres
+Completed load for: 'res://resources/growth/relics/auto_spark.tres' remapped 'res://resources/growth/relics/auto_spark.tres' at thread -1
+Loading resource: res://resources/growth/relics/reaction_focus.tres remapped: res://resources/growth/relics/reaction_focus.tres
+Completed load for: 'res://resources/growth/relics/reaction_focus.tres' remapped 'res://resources/growth/relics/reaction_focus.tres' at thread -1
+Loading resource: res://resources/content/skills/passive_vitality_content.tres remapped: res://resources/content/skills/passive_vitality_content.tres
+Loading resource: res://resources/skills/passive_vitality.tres remapped: res://resources/skills/passive_vitality.tres
+Loading resource: res://combat/passives/stat_modifier_passive_effect_definition.gd remapped: res://combat/passives/stat_modifier_passive_effect_definition.gd
+Completed load for: 'res://combat/passives/stat_modifier_passive_effect_definition.gd' remapped 'res://combat/passives/stat_modifier_passive_effect_definition.gd' at thread -1
+Completed load for: 'res://resources/skills/passive_vitality.tres' remapped 'res://resources/skills/passive_vitality.tres' at thread -1
+Loading resource: res://assets/generated/vfx/passive_vitality/icon.png remapped: res://assets/generated/vfx/passive_vitality/icon.png
+Loading resource: res://.godot/imported/icon.png-cd80ddee2858b62a54edcfde03cde021.ctex remapped: res://.godot/imported/icon.png-cd80ddee2858b62a54edcfde03cde021.ctex
+Completed load for: 'res://assets/generated/vfx/passive_vitality/icon.png' remapped 'res://assets/generated/vfx/passive_vitality/icon.png' at thread -1
+Completed load for: 'res://resources/content/skills/passive_vitality_content.tres' remapped 'res://resources/content/skills/passive_vitality_content.tres' at thread -1
+Loading resource: res://resources/content/skills/passive_energy_content.tres remapped: res://resources/content/skills/passive_energy_content.tres
+Loading resource: res://resources/skills/passive_energy.tres remapped: res://resources/skills/passive_energy.tres
+Completed load for: 'res://resources/skills/passive_energy.tres' remapped 'res://resources/skills/passive_energy.tres' at thread -1
+Loading resource: res://assets/generated/vfx/passive_energy/icon.png remapped: res://assets/generated/vfx/passive_energy/icon.png
+Loading resource: res://.godot/imported/icon.png-655762cfd2f6a7a07e8f590609cea1ef.ctex remapped: res://.godot/imported/icon.png-655762cfd2f6a7a07e8f590609cea1ef.ctex
+Completed load for: 'res://assets/generated/vfx/passive_energy/icon.png' remapped 'res://assets/generated/vfx/passive_energy/icon.png' at thread -1
+Completed load for: 'res://resources/content/skills/passive_energy_content.tres' remapped 'res://resources/content/skills/passive_energy_content.tres' at thread -1
+Completed load for: 'res://resources/content/run_content_catalog.tres' remapped 'res://resources/content/run_content_catalog.tres' at thread -1
+Loading resource: res://scenes/player.tscn remapped: res://scenes/player.tscn
+Loading resource: res://resources/animations/player_frames.tres remapped: res://resources/animations/player_frames.tres
+Loading resource: res://assets/characters/cat/cat_attack.png remapped: res://assets/characters/cat/cat_attack.png
+Loading resource: res://.godot/imported/cat_attack.png-34721ce4e1bda87d9bdbf26eade3be63.ctex remapped: res://.godot/imported/cat_attack.png-34721ce4e1bda87d9bdbf26eade3be63.ctex
+Completed load for: 'res://assets/characters/cat/cat_attack.png' remapped 'res://assets/characters/cat/cat_attack.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_hurt.png remapped: res://assets/characters/cat/cat_hurt.png
+Loading resource: res://.godot/imported/cat_hurt.png-f8fea60e06b7c35c8883330542999ee5.ctex remapped: res://.godot/imported/cat_hurt.png-f8fea60e06b7c35c8883330542999ee5.ctex
+Completed load for: 'res://assets/characters/cat/cat_hurt.png' remapped 'res://assets/characters/cat/cat_hurt.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_idle.png remapped: res://assets/characters/cat/cat_idle.png
+Loading resource: res://.godot/imported/cat_idle.png-40c249f603fe1723b5458f4e518f6c0e.ctex remapped: res://.godot/imported/cat_idle.png-40c249f603fe1723b5458f4e518f6c0e.ctex
+Completed load for: 'res://assets/characters/cat/cat_idle.png' remapped 'res://assets/characters/cat/cat_idle.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_walk.png remapped: res://assets/characters/cat/cat_walk.png
+Loading resource: res://.godot/imported/cat_walk.png-d4e495984e8db4f4f2077135d35f24eb.ctex remapped: res://.godot/imported/cat_walk.png-d4e495984e8db4f4f2077135d35f24eb.ctex
+Completed load for: 'res://assets/characters/cat/cat_walk.png' remapped 'res://assets/characters/cat/cat_walk.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_jump.png remapped: res://assets/characters/cat/cat_jump.png
+Loading resource: res://.godot/imported/cat_jump.png-dde1048a9dc5fc431213b0d18a47dde9.ctex remapped: res://.godot/imported/cat_jump.png-dde1048a9dc5fc431213b0d18a47dde9.ctex
+Completed load for: 'res://assets/characters/cat/cat_jump.png' remapped 'res://assets/characters/cat/cat_jump.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_fire_attack.png remapped: res://assets/characters/cat/cat_fire_attack.png
+Loading resource: res://.godot/imported/cat_fire_attack.png-7ea469756b7929e69bdec7560c8ea8ed.ctex remapped: res://.godot/imported/cat_fire_attack.png-7ea469756b7929e69bdec7560c8ea8ed.ctex
+Completed load for: 'res://assets/characters/cat/cat_fire_attack.png' remapped 'res://assets/characters/cat/cat_fire_attack.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_fire_idle.png remapped: res://assets/characters/cat/cat_fire_idle.png
+Loading resource: res://.godot/imported/cat_fire_idle.png-2e178e9cd751680458847547c0c70df0.ctex remapped: res://.godot/imported/cat_fire_idle.png-2e178e9cd751680458847547c0c70df0.ctex
+Completed load for: 'res://assets/characters/cat/cat_fire_idle.png' remapped 'res://assets/characters/cat/cat_fire_idle.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_fire_walk.png remapped: res://assets/characters/cat/cat_fire_walk.png
+Loading resource: res://.godot/imported/cat_fire_walk.png-0c9a44b81e17f562cf34523dacca2836.ctex remapped: res://.godot/imported/cat_fire_walk.png-0c9a44b81e17f562cf34523dacca2836.ctex
+Completed load for: 'res://assets/characters/cat/cat_fire_walk.png' remapped 'res://assets/characters/cat/cat_fire_walk.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_fire_jump.png remapped: res://assets/characters/cat/cat_fire_jump.png
+Loading resource: res://.godot/imported/cat_fire_jump.png-5a50575207d7e6a26577a991ccbd12c1.ctex remapped: res://.godot/imported/cat_fire_jump.png-5a50575207d7e6a26577a991ccbd12c1.ctex
+Completed load for: 'res://assets/characters/cat/cat_fire_jump.png' remapped 'res://assets/characters/cat/cat_fire_jump.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_water_attack.png remapped: res://assets/characters/cat/cat_water_attack.png
+Loading resource: res://.godot/imported/cat_water_attack.png-c5763d82ddac0d51bfa62e93b7cb98a9.ctex remapped: res://.godot/imported/cat_water_attack.png-c5763d82ddac0d51bfa62e93b7cb98a9.ctex
+Completed load for: 'res://assets/characters/cat/cat_water_attack.png' remapped 'res://assets/characters/cat/cat_water_attack.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_water_idle.png remapped: res://assets/characters/cat/cat_water_idle.png
+Loading resource: res://.godot/imported/cat_water_idle.png-943df8086662d5044648125f6596fcbf.ctex remapped: res://.godot/imported/cat_water_idle.png-943df8086662d5044648125f6596fcbf.ctex
+Completed load for: 'res://assets/characters/cat/cat_water_idle.png' remapped 'res://assets/characters/cat/cat_water_idle.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_water_walk.png remapped: res://assets/characters/cat/cat_water_walk.png
+Loading resource: res://.godot/imported/cat_water_walk.png-fadeab3fb672aa1ff2e0c8c757ce57bb.ctex remapped: res://.godot/imported/cat_water_walk.png-fadeab3fb672aa1ff2e0c8c757ce57bb.ctex
+Completed load for: 'res://assets/characters/cat/cat_water_walk.png' remapped 'res://assets/characters/cat/cat_water_walk.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_water_jump.png remapped: res://assets/characters/cat/cat_water_jump.png
+Loading resource: res://.godot/imported/cat_water_jump.png-1bce0f4c67f20b0bb9ba49ed5ad7c641.ctex remapped: res://.godot/imported/cat_water_jump.png-1bce0f4c67f20b0bb9ba49ed5ad7c641.ctex
+Completed load for: 'res://assets/characters/cat/cat_water_jump.png' remapped 'res://assets/characters/cat/cat_water_jump.png' at thread -1
+Completed load for: 'res://resources/animations/player_frames.tres' remapped 'res://resources/animations/player_frames.tres' at thread -1
+Loading resource: res://resources/shared_skill_loadout.tres remapped: res://resources/shared_skill_loadout.tres
+Completed load for: 'res://resources/shared_skill_loadout.tres' remapped 'res://resources/shared_skill_loadout.tres' at thread -1
+Loading resource: res://resources/water_element.tres remapped: res://resources/water_element.tres
+Completed load for: 'res://resources/water_element.tres' remapped 'res://resources/water_element.tres' at thread -1
+Loading resource: res://resources/fire_element.tres remapped: res://resources/fire_element.tres
+Completed load for: 'res://resources/fire_element.tres' remapped 'res://resources/fire_element.tres' at thread -1
+Completed load for: 'res://scenes/player.tscn' remapped 'res://scenes/player.tscn' at thread -1
+Loading resource: res://scenes/vfx/skill_vfx_coordinator.tscn remapped: res://scenes/vfx/skill_vfx_coordinator.tscn
+Completed load for: 'res://scenes/vfx/skill_vfx_coordinator.tscn' remapped 'res://scenes/vfx/skill_vfx_coordinator.tscn' at thread -1
+Loading resource: res://scenes/combat_hud.tscn remapped: res://scenes/combat_hud.tscn
+Completed load for: 'res://scenes/combat_hud.tscn' remapped 'res://scenes/combat_hud.tscn' at thread -1
+Completed load for: 'res://scenes/run/run_game.tscn' remapped 'res://scenes/run/run_game.tscn' at thread -1
+Failed to bind socket. Error: 3.
+Unloading addon: res://addons/godot_ai/plugin.cfg
+Script docs haven't been properly loaded or regenerated, so don't save them to disk.
+EditorSettings: Save OK!

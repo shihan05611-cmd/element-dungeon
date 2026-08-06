@@ -19,7 +19,7 @@
 3. 水火附着、反应、伤害结算及锁定攻击快照。
 4. 角色等级、属性点、奖励、遗物、拥有技能库和商店换装。
 5. 房间级 `RunSessionHost` 对本局状态、持久快照和成长事件的集成。
-6. 首批六个可获取技能、固定普通攻击及其正式图标和运行时 VFX。
+6. 八个可购买技能、固定普通攻击及其正式图标；其中六个首批技能保留既有运行时 VFX，两项常驻数值被动不新增世界 VFX。
 
 当前正式内容只配置水、火元素；底层切换契约读取有序可用元素列表，不把技能栏或切换逻辑绑定成只能有水火两项。
 
@@ -138,7 +138,7 @@ REQUEST → VALIDATE / PREPARE → ACCEPT / COMMIT → RUNTIME → END
 
 ## 6. 当前正式技能内容
 
-`RunContentCatalog` 是唯一正式静态注册源。正式目录包含一个固定普通攻击和六个可获取技能。
+`RunContentCatalog` 是唯一正式静态注册源。正式目录包含一个固定普通攻击和八个可购买技能（四主动、四被动）。
 
 ### 6.1 固定普通攻击
 
@@ -148,7 +148,7 @@ REQUEST → VALIDATE / PREPARE → ACCEPT / COMMIT → RUNTIME → END
 - 当前为 `NEUTRAL` 近战，伤害倍率 50%，元素附着为 0。
 - 成功提交普通攻击命中时会发布类型化事件，供“不息”等被动消费。
 
-### 6.2 六个可获取技能
+### 6.2 八个可购买技能
 
 | ID / 名称 | 类型与元素语义 | 当前正式规则 |
 |---|---|---|
@@ -158,6 +158,8 @@ REQUEST → VALIDATE / PREPARE → ACCEPT / COMMIT → RUNTIME → END
 | `element_reclaim` / 回收 | ACTIVE，`CURRENT_ELEMENT` | 奖励池；不耗能、冷却 5 秒；原子消耗范围内全部匹配的当前元素层，每层理论恢复 5 能量；无匹配层或能量已满时原子拒绝 |
 | `burning` / 燃烧 | PASSIVE，固定火语义 | 奖励池；每秒按目标当前火层数 × 5% 攻击力造成伤害；不消耗火层，不读取玩家 `CurrentElement` |
 | `unending` / 不息 | PASSIVE，固定水语义 | 奖励池；固定普通攻击成功命中时，按目标水层数 × 1 恢复生命；不消耗水层，不读取玩家 `CurrentElement` |
+| `passive_vitality` / 坚韧体魄 | PASSIVE，`NEUTRAL` | 仅梦尘购买；严格被动槽；常驻增加 20 点最大生命；无等级、无免费奖励、无默认槽、无世界 VFX |
+| `passive_energy` / 元素储备 | PASSIVE，`NEUTRAL` | 仅梦尘购买；严格被动槽；常驻增加 10 点最大 SP；无等级、无免费奖励、无默认槽、无世界 VFX |
 
 元素之怒的冻结快照公式为：
 
@@ -167,7 +169,7 @@ REQUEST → VALIDATE / PREPARE → ACCEPT / COMMIT → RUNTIME → END
 半径倍率 = 1 + floor(实际消耗能量 / 最大能量 × 10) × 0.10
 ```
 
-`water_lance`、`fire_lance` 和四个旧属性被动只保留为 legacy/test fixture，不属于首批正式奖励目录，也不构成第二套按元素切换的正式配装。
+`water_lance`、`fire_lance`、`passive_focus` 和 `passive_balance` 只保留为 legacy/test fixture，不进入正式 catalog。`passive_vitality` 与 `passive_energy` 已作为只可购买的正式被动注册，但不增加历史免费奖励投影。
 
 ## 7. 成长、奖励、遗物、商店与本局数据流
 

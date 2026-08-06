@@ -1,0 +1,342 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+Using "default" pen tablet driver...
+
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+CORE API HASH: 3769296884
+EDITOR API HASH: 3146738256
+SceneTreeFTI: traversal method DEFAULT
+Loading resource: C:/tmp/element-dungeon-task32-exec-20260806-01/profile/Roaming/Godot/editor_settings-4.7.tres remapped: C:/tmp/element-dungeon-task32-exec-20260806-01/profile/Roaming/Godot/editor_settings-4.7.tres
+Completed load for: 'C:/tmp/element-dungeon-task32-exec-20260806-01/profile/Roaming/Godot/editor_settings-4.7.tres' remapped 'C:/tmp/element-dungeon-task32-exec-20260806-01/profile/Roaming/Godot/editor_settings-4.7.tres' at thread -1
+EditorSettings: Load OK!
+EditorTheme: Generating new theme for the config '3810048042'.
+EditorTheme: Generating new icons.
+EditorTheme: Generating new fonts.
+EditorTheme: Generating new styles.
+Loading resource: C:/tmp/element-dungeon-task32-exec-20260806-01/profile/Local/Godot/editor_doc_cache-4.7.res remapped: C:/tmp/element-dungeon-task32-exec-20260806-01/profile/Local/Godot/editor_doc_cache-4.7.res
+Loaded system CA certificates
+Completed load for: 'C:/tmp/element-dungeon-task32-exec-20260806-01/profile/Local/Godot/editor_doc_cache-4.7.res' remapped 'C:/tmp/element-dungeon-task32-exec-20260806-01/profile/Local/Godot/editor_doc_cache-4.7.res' at thread -1
+Failed to bind socket. Error: 3.
+[   0% ] first_scan_filesystem | Started 项目初始化 (5 steps)
+[   0% ] first_scan_filesystem | 正在扫描文件结构……
+[  16% ] first_scan_filesystem | 正在加载全局类名……
+[  33% ] first_scan_filesystem | 正在校验 GDExtension……
+[  50% ] first_scan_filesystem | 正在创建自动加载脚本……
+Loading resource: res://addons/godot_ai/runtime/game_helper.gd remapped: res://addons/godot_ai/runtime/game_helper.gd
+Completed load for: 'res://addons/godot_ai/runtime/game_helper.gd' remapped 'res://addons/godot_ai/runtime/game_helper.gd' at thread -1
+[  66% ] first_scan_filesystem | 正在初始化插件……
+Loading resource: res://addons/godot_ai/plugin.gd remapped: res://addons/godot_ai/plugin.gd
+Completed load for: 'res://addons/godot_ai/plugin.gd' remapped 'res://addons/godot_ai/plugin.gd' at thread -1
+MCP | plugin disabled in headless mode
+[  83% ] first_scan_filesystem | 正在启动文件扫描……
+[ DONE ] first_scan_filesystem
+
+[   0% ] update_scripts_classes | Started 正在注册全局类…… (2 steps)
+[   0% ] update_scripts_classes | 
+[  33% ] update_scripts_classes | 
+[ DONE ] update_scripts_classes
+
+[   0% ] _update_scan_actions | Started 正在扫描动作…… (4 steps)
+[   0% ] _update_scan_actions | 01_shop_four_passives_1920x1080.png
+[  20% ] _update_scan_actions | 02_shop_four_passives_2560x1440.png
+[  40% ] _update_scan_actions | 03_combat_p1_p4_1920x1080.png
+[  60% ] _update_scan_actions | 04_combat_p1_p4_2560x1440.png
+[ DONE ] _update_scan_actions
+
+[   0% ] reimport | Started 正在导入或重新导入资产 (4 steps)
+[   0% ] reimport | 正在准备重新导入文件……
+[  20% ] reimport | 正在准备重新导入文件……
+[  40% ] reimport | 正在准备重新导入文件……
+[  60% ] reimport | 正在准备重新导入文件……
+[   0% ] reimport | 正在执行重新导入的前置操作……
+[   0% ] reimport | 01_shop_four_passives_1920x1080.png
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task32/viewport/01_shop_four_passives_1920x1080.png
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task32/viewport/04_combat_p1_p4_2560x1440.png
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task32/viewport/02_shop_four_passives_2560x1440.png
+EditorFileSystem: Importing file: res://docs/agent_tasks/evidence/task32/viewport/03_combat_p1_p4_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task32/viewport/03_combat_p1_p4_1920x1080.png" import took 378 ms.
+[  20% ] reimport | 02_shop_four_passives_2560x1440.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task32/viewport/01_shop_four_passives_1920x1080.png" import took 392 ms.
+[  40% ] reimport | 03_combat_p1_p4_1920x1080.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task32/viewport/04_combat_p1_p4_2560x1440.png" import took 501 ms.
+[  60% ] reimport | 04_combat_p1_p4_2560x1440.png
+EditorFileSystem: "res://docs/agent_tasks/evidence/task32/viewport/02_shop_four_passives_2560x1440.png" import took 540 ms.
+[  80% ] reimport | 正在结束资产导入……
+[ DONE ] reimport
+
+[   0% ] reimport | Started 正在导入或重新导入资产 (4 steps)
+[   0% ] reimport | 正在执行重新导入的后置操作……
+[ DONE ] reimport
+
+[   0% ] loading_editor_layout | Started 正在加载编辑器 (5 steps)
+[   0% ] loading_editor_layout | 正在加载编辑器布局……
+[  16% ] loading_editor_layout | 正在加载停靠面板……
+[ DONE ] loading_editor_layout
+
+Loading resource: res://scenes/run/run_game.tscn remapped: res://scenes/run/run_game.tscn
+Loading resource: res://scripts/run/run_flow_coordinator.gd remapped: res://scripts/run/run_flow_coordinator.gd
+Loading resource: res://scenes/transient_melee_delivery.tscn remapped: res://scenes/transient_melee_delivery.tscn
+Loading resource: res://scripts/transient_melee_delivery.gd remapped: res://scripts/transient_melee_delivery.gd
+Completed load for: 'res://scripts/transient_melee_delivery.gd' remapped 'res://scripts/transient_melee_delivery.gd' at thread -1
+Completed load for: 'res://scenes/transient_melee_delivery.tscn' remapped 'res://scenes/transient_melee_delivery.tscn' at thread -1
+Loading resource: res://resources/vfx/reclaim_particle_water_frames.tres remapped: res://resources/vfx/reclaim_particle_water_frames.tres
+Loading resource: res://scripts/vfx/vfx_sprite_sheet_frames.gd remapped: res://scripts/vfx/vfx_sprite_sheet_frames.gd
+Completed load for: 'res://scripts/vfx/vfx_sprite_sheet_frames.gd' remapped 'res://scripts/vfx/vfx_sprite_sheet_frames.gd' at thread -1
+Loading resource: res://assets/generated/vfx/element_reclaim/reclaim_particle_water.png remapped: res://assets/generated/vfx/element_reclaim/reclaim_particle_water.png
+Loading resource: res://.godot/imported/reclaim_particle_water.png-2f1bc0137abe48d9fdfe2e828048de4d.ctex remapped: res://.godot/imported/reclaim_particle_water.png-2f1bc0137abe48d9fdfe2e828048de4d.ctex
+Completed load for: 'res://assets/generated/vfx/element_reclaim/reclaim_particle_water.png' remapped 'res://assets/generated/vfx/element_reclaim/reclaim_particle_water.png' at thread -1
+Completed load for: 'res://resources/vfx/reclaim_particle_water_frames.tres' remapped 'res://resources/vfx/reclaim_particle_water_frames.tres' at thread -1
+Loading resource: res://resources/vfx/reclaim_particle_fire_frames.tres remapped: res://resources/vfx/reclaim_particle_fire_frames.tres
+Loading resource: res://assets/generated/vfx/element_reclaim/reclaim_particle_fire.png remapped: res://assets/generated/vfx/element_reclaim/reclaim_particle_fire.png
+Loading resource: res://.godot/imported/reclaim_particle_fire.png-9e8f97a423d442a387efca95df3ef4b0.ctex remapped: res://.godot/imported/reclaim_particle_fire.png-9e8f97a423d442a387efca95df3ef4b0.ctex
+Completed load for: 'res://assets/generated/vfx/element_reclaim/reclaim_particle_fire.png' remapped 'res://assets/generated/vfx/element_reclaim/reclaim_particle_fire.png' at thread -1
+Completed load for: 'res://resources/vfx/reclaim_particle_fire_frames.tres' remapped 'res://resources/vfx/reclaim_particle_fire_frames.tres' at thread -1
+Loading resource: res://resources/vfx/reclaim_extract_frames.tres remapped: res://resources/vfx/reclaim_extract_frames.tres
+Loading resource: res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral.png remapped: res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral.png
+Loading resource: res://.godot/imported/reclaim_extract_neutral.png-8fd38998f485433f1d4ce9d20e3022bd.ctex remapped: res://.godot/imported/reclaim_extract_neutral.png-8fd38998f485433f1d4ce9d20e3022bd.ctex
+Completed load for: 'res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral.png' remapped 'res://assets/generated/vfx/element_reclaim/reclaim_extract_neutral.png' at thread -1
+Completed load for: 'res://resources/vfx/reclaim_extract_frames.tres' remapped 'res://resources/vfx/reclaim_extract_frames.tres' at thread -1
+Loading resource: res://resources/vfx/reclaim_arrival_frames.tres remapped: res://resources/vfx/reclaim_arrival_frames.tres
+Loading resource: res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral.png remapped: res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral.png
+Loading resource: res://.godot/imported/reclaim_arrival_neutral.png-8443618256bb2b584c5b64352f19afd7.ctex remapped: res://.godot/imported/reclaim_arrival_neutral.png-8443618256bb2b584c5b64352f19afd7.ctex
+Completed load for: 'res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral.png' remapped 'res://assets/generated/vfx/element_reclaim/reclaim_arrival_neutral.png' at thread -1
+Completed load for: 'res://resources/vfx/reclaim_arrival_frames.tres' remapped 'res://resources/vfx/reclaim_arrival_frames.tres' at thread -1
+Loading resource: res://assets/generated/vfx/elemental_laser/beam_segment_water.png remapped: res://assets/generated/vfx/elemental_laser/beam_segment_water.png
+Loading resource: res://.godot/imported/beam_segment_water.png-6ec884f8ecc12444f4270539c3cf34ec.ctex remapped: res://.godot/imported/beam_segment_water.png-6ec884f8ecc12444f4270539c3cf34ec.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_laser/beam_segment_water.png' remapped 'res://assets/generated/vfx/elemental_laser/beam_segment_water.png' at thread -1
+Loading resource: res://assets/generated/vfx/elemental_laser/beam_segment_fire.png remapped: res://assets/generated/vfx/elemental_laser/beam_segment_fire.png
+Loading resource: res://.godot/imported/beam_segment_fire.png-ca0f76eafb40333234d70a1fdcad79a6.ctex remapped: res://.godot/imported/beam_segment_fire.png-ca0f76eafb40333234d70a1fdcad79a6.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_laser/beam_segment_fire.png' remapped 'res://assets/generated/vfx/elemental_laser/beam_segment_fire.png' at thread -1
+Loading resource: res://resources/vfx/laser_tick_water_frames.tres remapped: res://resources/vfx/laser_tick_water_frames.tres
+Loading resource: res://assets/generated/vfx/elemental_laser/beam_tick_water.png remapped: res://assets/generated/vfx/elemental_laser/beam_tick_water.png
+Loading resource: res://.godot/imported/beam_tick_water.png-8534fdc0722746a3aa2882bd786c7ce6.ctex remapped: res://.godot/imported/beam_tick_water.png-8534fdc0722746a3aa2882bd786c7ce6.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_laser/beam_tick_water.png' remapped 'res://assets/generated/vfx/elemental_laser/beam_tick_water.png' at thread -1
+Completed load for: 'res://resources/vfx/laser_tick_water_frames.tres' remapped 'res://resources/vfx/laser_tick_water_frames.tres' at thread -1
+Loading resource: res://resources/vfx/laser_tick_fire_frames.tres remapped: res://resources/vfx/laser_tick_fire_frames.tres
+Loading resource: res://assets/generated/vfx/elemental_laser/beam_tick_fire.png remapped: res://assets/generated/vfx/elemental_laser/beam_tick_fire.png
+Loading resource: res://.godot/imported/beam_tick_fire.png-21ccee48dffa9f271e50e7769995375c.ctex remapped: res://.godot/imported/beam_tick_fire.png-21ccee48dffa9f271e50e7769995375c.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_laser/beam_tick_fire.png' remapped 'res://assets/generated/vfx/elemental_laser/beam_tick_fire.png' at thread -1
+Completed load for: 'res://resources/vfx/laser_tick_fire_frames.tres' remapped 'res://resources/vfx/laser_tick_fire_frames.tres' at thread -1
+Completed load for: 'res://scripts/run/run_flow_coordinator.gd' remapped 'res://scripts/run/run_flow_coordinator.gd' at thread -1
+Loading resource: res://resources/run/flows/prototype_two_layer_six_combat.tres remapped: res://resources/run/flows/prototype_two_layer_six_combat.tres
+Loading resource: res://resources/run/rooms/combat_01_entry.tres remapped: res://resources/run/rooms/combat_01_entry.tres
+Loading resource: res://scenes/run/rooms/room_arena_flat.tscn remapped: res://scenes/run/rooms/room_arena_flat.tscn
+Completed load for: 'res://scenes/run/rooms/room_arena_flat.tscn' remapped 'res://scenes/run/rooms/room_arena_flat.tscn' at thread -1
+Loading resource: res://scenes/enemy.tscn remapped: res://scenes/enemy.tscn
+Loading resource: res://resources/animations/enemy_frames.tres remapped: res://resources/animations/enemy_frames.tres
+Loading resource: res://assets/characters/orc_attack.png remapped: res://assets/characters/orc_attack.png
+Loading resource: res://.godot/imported/orc_attack.png-4833c6dfd0d00b2e1431a4d607d19006.ctex remapped: res://.godot/imported/orc_attack.png-4833c6dfd0d00b2e1431a4d607d19006.ctex
+Completed load for: 'res://assets/characters/orc_attack.png' remapped 'res://assets/characters/orc_attack.png' at thread -1
+Loading resource: res://assets/characters/orc_hurt.png remapped: res://assets/characters/orc_hurt.png
+Loading resource: res://.godot/imported/orc_hurt.png-1b85330ece09f1fcc800c5b5fdf5fdf4.ctex remapped: res://.godot/imported/orc_hurt.png-1b85330ece09f1fcc800c5b5fdf5fdf4.ctex
+Completed load for: 'res://assets/characters/orc_hurt.png' remapped 'res://assets/characters/orc_hurt.png' at thread -1
+Loading resource: res://assets/characters/orc_idle.png remapped: res://assets/characters/orc_idle.png
+Loading resource: res://.godot/imported/orc_idle.png-12b41475d6d46f03ad7ca98a14d5ad7a.ctex remapped: res://.godot/imported/orc_idle.png-12b41475d6d46f03ad7ca98a14d5ad7a.ctex
+Completed load for: 'res://assets/characters/orc_idle.png' remapped 'res://assets/characters/orc_idle.png' at thread -1
+Loading resource: res://assets/characters/orc_walk.png remapped: res://assets/characters/orc_walk.png
+Loading resource: res://.godot/imported/orc_walk.png-3015cdddc5796cc0d47b3c155dca68b4.ctex remapped: res://.godot/imported/orc_walk.png-3015cdddc5796cc0d47b3c155dca68b4.ctex
+Completed load for: 'res://assets/characters/orc_walk.png' remapped 'res://assets/characters/orc_walk.png' at thread -1
+Completed load for: 'res://resources/animations/enemy_frames.tres' remapped 'res://resources/animations/enemy_frames.tres' at thread -1
+Completed load for: 'res://scenes/enemy.tscn' remapped 'res://scenes/enemy.tscn' at thread -1
+Completed load for: 'res://resources/run/rooms/combat_01_entry.tres' remapped 'res://resources/run/rooms/combat_01_entry.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_02_swarm.tres remapped: res://resources/run/rooms/combat_02_swarm.tres
+Completed load for: 'res://resources/run/rooms/combat_02_swarm.tres' remapped 'res://resources/run/rooms/combat_02_swarm.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_02_pressure.tres remapped: res://resources/run/rooms/combat_02_pressure.tres
+Loading resource: res://scenes/run/rooms/room_arena_platforms.tscn remapped: res://scenes/run/rooms/room_arena_platforms.tscn
+Completed load for: 'res://scenes/run/rooms/room_arena_platforms.tscn' remapped 'res://scenes/run/rooms/room_arena_platforms.tscn' at thread -1
+Completed load for: 'res://resources/run/rooms/combat_02_pressure.tres' remapped 'res://resources/run/rooms/combat_02_pressure.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_03_layer_elite.tres remapped: res://resources/run/rooms/combat_03_layer_elite.tres
+Completed load for: 'res://resources/run/rooms/combat_03_layer_elite.tres' remapped 'res://resources/run/rooms/combat_03_layer_elite.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_04_validation.tres remapped: res://resources/run/rooms/combat_04_validation.tres
+Completed load for: 'res://resources/run/rooms/combat_04_validation.tres' remapped 'res://resources/run/rooms/combat_04_validation.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_05_stable.tres remapped: res://resources/run/rooms/combat_05_stable.tres
+Completed load for: 'res://resources/run/rooms/combat_05_stable.tres' remapped 'res://resources/run/rooms/combat_05_stable.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_05_risk.tres remapped: res://resources/run/rooms/combat_05_risk.tres
+Loading resource: res://scenes/run/rooms/room_arena_corridor.tscn remapped: res://scenes/run/rooms/room_arena_corridor.tscn
+Completed load for: 'res://scenes/run/rooms/room_arena_corridor.tscn' remapped 'res://scenes/run/rooms/room_arena_corridor.tscn' at thread -1
+Completed load for: 'res://resources/run/rooms/combat_05_risk.tres' remapped 'res://resources/run/rooms/combat_05_risk.tres' at thread -1
+Loading resource: res://resources/run/rooms/combat_06_final_boss.tres remapped: res://resources/run/rooms/combat_06_final_boss.tres
+Loading resource: res://scenes/run/rooms/room_arena_boss.tscn remapped: res://scenes/run/rooms/room_arena_boss.tscn
+Completed load for: 'res://scenes/run/rooms/room_arena_boss.tscn' remapped 'res://scenes/run/rooms/room_arena_boss.tscn' at thread -1
+Completed load for: 'res://resources/run/rooms/combat_06_final_boss.tres' remapped 'res://resources/run/rooms/combat_06_final_boss.tres' at thread -1
+Completed load for: 'res://resources/run/flows/prototype_two_layer_six_combat.tres' remapped 'res://resources/run/flows/prototype_two_layer_six_combat.tres' at thread -1
+Loading resource: res://resources/content/run_content_catalog.tres remapped: res://resources/content/run_content_catalog.tres
+Loading resource: res://resources/content/skills/element_slash_content.tres remapped: res://resources/content/skills/element_slash_content.tres
+Loading resource: res://resources/element_slash.tres remapped: res://resources/element_slash.tres
+Completed load for: 'res://resources/element_slash.tres' remapped 'res://resources/element_slash.tres' at thread -1
+Completed load for: 'res://resources/content/skills/element_slash_content.tres' remapped 'res://resources/content/skills/element_slash_content.tres' at thread -1
+Loading resource: res://resources/content/skills/element_bolt_content.tres remapped: res://resources/content/skills/element_bolt_content.tres
+Loading resource: res://resources/element_bolt.tres remapped: res://resources/element_bolt.tres
+Loading resource: res://scenes/element_projectile.tscn remapped: res://scenes/element_projectile.tscn
+Loading resource: res://scripts/element_projectile.gd remapped: res://scripts/element_projectile.gd
+Completed load for: 'res://scripts/element_projectile.gd' remapped 'res://scripts/element_projectile.gd' at thread -1
+Loading resource: res://resources/animations/element_projectile_frames.tres remapped: res://resources/animations/element_projectile_frames.tres
+Loading resource: res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png remapped: res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png
+Loading resource: res://.godot/imported/projectile_water_no_jitter_spritesheet.png-526df90e366cd31871e98f0d9928233b.ctex remapped: res://.godot/imported/projectile_water_no_jitter_spritesheet.png-526df90e366cd31871e98f0d9928233b.ctex
+Completed load for: 'res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png' remapped 'res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png' at thread -1
+Loading resource: res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png remapped: res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png
+Loading resource: res://.godot/imported/projectile_fire_no_jitter_spritesheet.png-c043f90b3c503c732253416ccaa8e4a9.ctex remapped: res://.godot/imported/projectile_fire_no_jitter_spritesheet.png-c043f90b3c503c732253416ccaa8e4a9.ctex
+Completed load for: 'res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png' remapped 'res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png' at thread -1
+Completed load for: 'res://resources/animations/element_projectile_frames.tres' remapped 'res://resources/animations/element_projectile_frames.tres' at thread -1
+Completed load for: 'res://scenes/element_projectile.tscn' remapped 'res://scenes/element_projectile.tscn' at thread -1
+Completed load for: 'res://resources/element_bolt.tres' remapped 'res://resources/element_bolt.tres' at thread -1
+Loading resource: res://assets/generated/vfx/element_bolt/icon.png remapped: res://assets/generated/vfx/element_bolt/icon.png
+Loading resource: res://.godot/imported/icon.png-8f0ccb8104e2fad63cc4960fa3cfa4fd.ctex remapped: res://.godot/imported/icon.png-8f0ccb8104e2fad63cc4960fa3cfa4fd.ctex
+Completed load for: 'res://assets/generated/vfx/element_bolt/icon.png' remapped 'res://assets/generated/vfx/element_bolt/icon.png' at thread -1
+Completed load for: 'res://resources/content/skills/element_bolt_content.tres' remapped 'res://resources/content/skills/element_bolt_content.tres' at thread -1
+Loading resource: res://resources/content/skills/elemental_fury_content.tres remapped: res://resources/content/skills/elemental_fury_content.tres
+Loading resource: res://resources/skills/elemental_fury.tres remapped: res://resources/skills/elemental_fury.tres
+Completed load for: 'res://resources/skills/elemental_fury.tres' remapped 'res://resources/skills/elemental_fury.tres' at thread -1
+Loading resource: res://combat/delivery/element_rage_delivery.tscn remapped: res://combat/delivery/element_rage_delivery.tscn
+Completed load for: 'res://combat/delivery/element_rage_delivery.tscn' remapped 'res://combat/delivery/element_rage_delivery.tscn' at thread -1
+Loading resource: res://assets/generated/vfx/elemental_fury/icon.png remapped: res://assets/generated/vfx/elemental_fury/icon.png
+Loading resource: res://.godot/imported/icon.png-7f89c2d0f1ea8cfbaae4edd9ebcedb9c.ctex remapped: res://.godot/imported/icon.png-7f89c2d0f1ea8cfbaae4edd9ebcedb9c.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_fury/icon.png' remapped 'res://assets/generated/vfx/elemental_fury/icon.png' at thread -1
+Loading resource: res://scenes/vfx/elemental_fury_presentation.tscn remapped: res://scenes/vfx/elemental_fury_presentation.tscn
+Loading resource: res://resources/vfx/fury_burst_frames.tres remapped: res://resources/vfx/fury_burst_frames.tres
+Loading resource: res://assets/generated/vfx/elemental_fury/burst_core.png remapped: res://assets/generated/vfx/elemental_fury/burst_core.png
+Loading resource: res://.godot/imported/burst_core.png-9d0fa34ad61c7b71e9b4f2a0684e6abc.ctex remapped: res://.godot/imported/burst_core.png-9d0fa34ad61c7b71e9b4f2a0684e6abc.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_fury/burst_core.png' remapped 'res://assets/generated/vfx/elemental_fury/burst_core.png' at thread -1
+Completed load for: 'res://resources/vfx/fury_burst_frames.tres' remapped 'res://resources/vfx/fury_burst_frames.tres' at thread -1
+Completed load for: 'res://scenes/vfx/elemental_fury_presentation.tscn' remapped 'res://scenes/vfx/elemental_fury_presentation.tscn' at thread -1
+Completed load for: 'res://resources/content/skills/elemental_fury_content.tres' remapped 'res://resources/content/skills/elemental_fury_content.tres' at thread -1
+Loading resource: res://resources/content/skills/elemental_laser_content.tres remapped: res://resources/content/skills/elemental_laser_content.tres
+Loading resource: res://resources/skills/elemental_laser.tres remapped: res://resources/skills/elemental_laser.tres
+Completed load for: 'res://resources/skills/elemental_laser.tres' remapped 'res://resources/skills/elemental_laser.tres' at thread -1
+Loading resource: res://combat/delivery/element_beam_delivery.tscn remapped: res://combat/delivery/element_beam_delivery.tscn
+Completed load for: 'res://combat/delivery/element_beam_delivery.tscn' remapped 'res://combat/delivery/element_beam_delivery.tscn' at thread -1
+Loading resource: res://assets/generated/vfx/elemental_laser/icon.png remapped: res://assets/generated/vfx/elemental_laser/icon.png
+Loading resource: res://.godot/imported/icon.png-0e463ae0490d82d45d009bd86934dc37.ctex remapped: res://.godot/imported/icon.png-0e463ae0490d82d45d009bd86934dc37.ctex
+Completed load for: 'res://assets/generated/vfx/elemental_laser/icon.png' remapped 'res://assets/generated/vfx/elemental_laser/icon.png' at thread -1
+Loading resource: res://scenes/vfx/elemental_laser_presentation.tscn remapped: res://scenes/vfx/elemental_laser_presentation.tscn
+Completed load for: 'res://scenes/vfx/elemental_laser_presentation.tscn' remapped 'res://scenes/vfx/elemental_laser_presentation.tscn' at thread -1
+Completed load for: 'res://resources/content/skills/elemental_laser_content.tres' remapped 'res://resources/content/skills/elemental_laser_content.tres' at thread -1
+Loading resource: res://resources/content/skills/element_reclaim_content.tres remapped: res://resources/content/skills/element_reclaim_content.tres
+Loading resource: res://resources/skills/element_reclaim.tres remapped: res://resources/skills/element_reclaim.tres
+Completed load for: 'res://resources/skills/element_reclaim.tres' remapped 'res://resources/skills/element_reclaim.tres' at thread -1
+Loading resource: res://assets/generated/vfx/element_reclaim/icon.png remapped: res://assets/generated/vfx/element_reclaim/icon.png
+Loading resource: res://.godot/imported/icon.png-a861cd126e0383fa6f146c77e94b9eab.ctex remapped: res://.godot/imported/icon.png-a861cd126e0383fa6f146c77e94b9eab.ctex
+Completed load for: 'res://assets/generated/vfx/element_reclaim/icon.png' remapped 'res://assets/generated/vfx/element_reclaim/icon.png' at thread -1
+Loading resource: res://scenes/vfx/element_reclaim_presentation.tscn remapped: res://scenes/vfx/element_reclaim_presentation.tscn
+Completed load for: 'res://scenes/vfx/element_reclaim_presentation.tscn' remapped 'res://scenes/vfx/element_reclaim_presentation.tscn' at thread -1
+Completed load for: 'res://resources/content/skills/element_reclaim_content.tres' remapped 'res://resources/content/skills/element_reclaim_content.tres' at thread -1
+Loading resource: res://resources/content/skills/burning_content.tres remapped: res://resources/content/skills/burning_content.tres
+Loading resource: res://resources/skills/burning.tres remapped: res://resources/skills/burning.tres
+Completed load for: 'res://resources/skills/burning.tres' remapped 'res://resources/skills/burning.tres' at thread -1
+Loading resource: res://assets/generated/vfx/burning/icon.png remapped: res://assets/generated/vfx/burning/icon.png
+Loading resource: res://.godot/imported/icon.png-8cd4dd00bad1a4d685cdb2fec01f8e15.ctex remapped: res://.godot/imported/icon.png-8cd4dd00bad1a4d685cdb2fec01f8e15.ctex
+Completed load for: 'res://assets/generated/vfx/burning/icon.png' remapped 'res://assets/generated/vfx/burning/icon.png' at thread -1
+Loading resource: res://scenes/vfx/burning_presentation.tscn remapped: res://scenes/vfx/burning_presentation.tscn
+Loading resource: res://resources/vfx/burning_loop_frames.tres remapped: res://resources/vfx/burning_loop_frames.tres
+Loading resource: res://assets/generated/vfx/burning/burning_enemy_loop.png remapped: res://assets/generated/vfx/burning/burning_enemy_loop.png
+Loading resource: res://.godot/imported/burning_enemy_loop.png-a07c08c299194b3f4cd56c4e9be437ac.ctex remapped: res://.godot/imported/burning_enemy_loop.png-a07c08c299194b3f4cd56c4e9be437ac.ctex
+Completed load for: 'res://assets/generated/vfx/burning/burning_enemy_loop.png' remapped 'res://assets/generated/vfx/burning/burning_enemy_loop.png' at thread -1
+Completed load for: 'res://resources/vfx/burning_loop_frames.tres' remapped 'res://resources/vfx/burning_loop_frames.tres' at thread -1
+Loading resource: res://resources/vfx/burning_tick_frames.tres remapped: res://resources/vfx/burning_tick_frames.tres
+Loading resource: res://assets/generated/vfx/burning/burning_tick.png remapped: res://assets/generated/vfx/burning/burning_tick.png
+Loading resource: res://.godot/imported/burning_tick.png-93dcb32d494f61b2c60da4979fb19cd5.ctex remapped: res://.godot/imported/burning_tick.png-93dcb32d494f61b2c60da4979fb19cd5.ctex
+Completed load for: 'res://assets/generated/vfx/burning/burning_tick.png' remapped 'res://assets/generated/vfx/burning/burning_tick.png' at thread -1
+Completed load for: 'res://resources/vfx/burning_tick_frames.tres' remapped 'res://resources/vfx/burning_tick_frames.tres' at thread -1
+Completed load for: 'res://scenes/vfx/burning_presentation.tscn' remapped 'res://scenes/vfx/burning_presentation.tscn' at thread -1
+Completed load for: 'res://resources/content/skills/burning_content.tres' remapped 'res://resources/content/skills/burning_content.tres' at thread -1
+Loading resource: res://resources/content/skills/unending_content.tres remapped: res://resources/content/skills/unending_content.tres
+Loading resource: res://resources/skills/unending.tres remapped: res://resources/skills/unending.tres
+Completed load for: 'res://resources/skills/unending.tres' remapped 'res://resources/skills/unending.tres' at thread -1
+Loading resource: res://assets/generated/vfx/unending/icon.png remapped: res://assets/generated/vfx/unending/icon.png
+Loading resource: res://.godot/imported/icon.png-02c32fa379bc2dcb93e88dff9f0573c4.ctex remapped: res://.godot/imported/icon.png-02c32fa379bc2dcb93e88dff9f0573c4.ctex
+Completed load for: 'res://assets/generated/vfx/unending/icon.png' remapped 'res://assets/generated/vfx/unending/icon.png' at thread -1
+Loading resource: res://scenes/vfx/unending_presentation.tscn remapped: res://scenes/vfx/unending_presentation.tscn
+Loading resource: res://resources/vfx/unending_loop_frames.tres remapped: res://resources/vfx/unending_loop_frames.tres
+Loading resource: res://assets/generated/vfx/unending/unending_enemy_loop.png remapped: res://assets/generated/vfx/unending/unending_enemy_loop.png
+Loading resource: res://.godot/imported/unending_enemy_loop.png-2b93aa438afc4c850dfd2468d7c70705.ctex remapped: res://.godot/imported/unending_enemy_loop.png-2b93aa438afc4c850dfd2468d7c70705.ctex
+Completed load for: 'res://assets/generated/vfx/unending/unending_enemy_loop.png' remapped 'res://assets/generated/vfx/unending/unending_enemy_loop.png' at thread -1
+Completed load for: 'res://resources/vfx/unending_loop_frames.tres' remapped 'res://resources/vfx/unending_loop_frames.tres' at thread -1
+Loading resource: res://resources/vfx/unending_trigger_frames.tres remapped: res://resources/vfx/unending_trigger_frames.tres
+Loading resource: res://assets/generated/vfx/unending/unending_trigger.png remapped: res://assets/generated/vfx/unending/unending_trigger.png
+Loading resource: res://.godot/imported/unending_trigger.png-5634bdca3b5a88e10723b2518eef06b4.ctex remapped: res://.godot/imported/unending_trigger.png-5634bdca3b5a88e10723b2518eef06b4.ctex
+Completed load for: 'res://assets/generated/vfx/unending/unending_trigger.png' remapped 'res://assets/generated/vfx/unending/unending_trigger.png' at thread -1
+Completed load for: 'res://resources/vfx/unending_trigger_frames.tres' remapped 'res://resources/vfx/unending_trigger_frames.tres' at thread -1
+Completed load for: 'res://scenes/vfx/unending_presentation.tscn' remapped 'res://scenes/vfx/unending_presentation.tscn' at thread -1
+Completed load for: 'res://resources/content/skills/unending_content.tres' remapped 'res://resources/content/skills/unending_content.tres' at thread -1
+Loading resource: res://resources/growth/relics/manual_spring.tres remapped: res://resources/growth/relics/manual_spring.tres
+Completed load for: 'res://resources/growth/relics/manual_spring.tres' remapped 'res://resources/growth/relics/manual_spring.tres' at thread -1
+Loading resource: res://resources/growth/relics/auto_spark.tres remapped: res://resources/growth/relics/auto_spark.tres
+Completed load for: 'res://resources/growth/relics/auto_spark.tres' remapped 'res://resources/growth/relics/auto_spark.tres' at thread -1
+Loading resource: res://resources/growth/relics/reaction_focus.tres remapped: res://resources/growth/relics/reaction_focus.tres
+Completed load for: 'res://resources/growth/relics/reaction_focus.tres' remapped 'res://resources/growth/relics/reaction_focus.tres' at thread -1
+Loading resource: res://resources/content/skills/passive_vitality_content.tres remapped: res://resources/content/skills/passive_vitality_content.tres
+Loading resource: res://resources/skills/passive_vitality.tres remapped: res://resources/skills/passive_vitality.tres
+Loading resource: res://combat/passives/stat_modifier_passive_effect_definition.gd remapped: res://combat/passives/stat_modifier_passive_effect_definition.gd
+Completed load for: 'res://combat/passives/stat_modifier_passive_effect_definition.gd' remapped 'res://combat/passives/stat_modifier_passive_effect_definition.gd' at thread -1
+Completed load for: 'res://resources/skills/passive_vitality.tres' remapped 'res://resources/skills/passive_vitality.tres' at thread -1
+Loading resource: res://assets/generated/vfx/passive_vitality/icon.png remapped: res://assets/generated/vfx/passive_vitality/icon.png
+Loading resource: res://.godot/imported/icon.png-cd80ddee2858b62a54edcfde03cde021.ctex remapped: res://.godot/imported/icon.png-cd80ddee2858b62a54edcfde03cde021.ctex
+Completed load for: 'res://assets/generated/vfx/passive_vitality/icon.png' remapped 'res://assets/generated/vfx/passive_vitality/icon.png' at thread -1
+Completed load for: 'res://resources/content/skills/passive_vitality_content.tres' remapped 'res://resources/content/skills/passive_vitality_content.tres' at thread -1
+Loading resource: res://resources/content/skills/passive_energy_content.tres remapped: res://resources/content/skills/passive_energy_content.tres
+Loading resource: res://resources/skills/passive_energy.tres remapped: res://resources/skills/passive_energy.tres
+Completed load for: 'res://resources/skills/passive_energy.tres' remapped 'res://resources/skills/passive_energy.tres' at thread -1
+Loading resource: res://assets/generated/vfx/passive_energy/icon.png remapped: res://assets/generated/vfx/passive_energy/icon.png
+Loading resource: res://.godot/imported/icon.png-655762cfd2f6a7a07e8f590609cea1ef.ctex remapped: res://.godot/imported/icon.png-655762cfd2f6a7a07e8f590609cea1ef.ctex
+Completed load for: 'res://assets/generated/vfx/passive_energy/icon.png' remapped 'res://assets/generated/vfx/passive_energy/icon.png' at thread -1
+Completed load for: 'res://resources/content/skills/passive_energy_content.tres' remapped 'res://resources/content/skills/passive_energy_content.tres' at thread -1
+Completed load for: 'res://resources/content/run_content_catalog.tres' remapped 'res://resources/content/run_content_catalog.tres' at thread -1
+Loading resource: res://scenes/player.tscn remapped: res://scenes/player.tscn
+Loading resource: res://resources/animations/player_frames.tres remapped: res://resources/animations/player_frames.tres
+Loading resource: res://assets/characters/cat/cat_attack.png remapped: res://assets/characters/cat/cat_attack.png
+Loading resource: res://.godot/imported/cat_attack.png-34721ce4e1bda87d9bdbf26eade3be63.ctex remapped: res://.godot/imported/cat_attack.png-34721ce4e1bda87d9bdbf26eade3be63.ctex
+Completed load for: 'res://assets/characters/cat/cat_attack.png' remapped 'res://assets/characters/cat/cat_attack.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_hurt.png remapped: res://assets/characters/cat/cat_hurt.png
+Loading resource: res://.godot/imported/cat_hurt.png-f8fea60e06b7c35c8883330542999ee5.ctex remapped: res://.godot/imported/cat_hurt.png-f8fea60e06b7c35c8883330542999ee5.ctex
+Completed load for: 'res://assets/characters/cat/cat_hurt.png' remapped 'res://assets/characters/cat/cat_hurt.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_idle.png remapped: res://assets/characters/cat/cat_idle.png
+Loading resource: res://.godot/imported/cat_idle.png-40c249f603fe1723b5458f4e518f6c0e.ctex remapped: res://.godot/imported/cat_idle.png-40c249f603fe1723b5458f4e518f6c0e.ctex
+Completed load for: 'res://assets/characters/cat/cat_idle.png' remapped 'res://assets/characters/cat/cat_idle.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_walk.png remapped: res://assets/characters/cat/cat_walk.png
+Loading resource: res://.godot/imported/cat_walk.png-d4e495984e8db4f4f2077135d35f24eb.ctex remapped: res://.godot/imported/cat_walk.png-d4e495984e8db4f4f2077135d35f24eb.ctex
+Completed load for: 'res://assets/characters/cat/cat_walk.png' remapped 'res://assets/characters/cat/cat_walk.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_jump.png remapped: res://assets/characters/cat/cat_jump.png
+Loading resource: res://.godot/imported/cat_jump.png-dde1048a9dc5fc431213b0d18a47dde9.ctex remapped: res://.godot/imported/cat_jump.png-dde1048a9dc5fc431213b0d18a47dde9.ctex
+Completed load for: 'res://assets/characters/cat/cat_jump.png' remapped 'res://assets/characters/cat/cat_jump.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_fire_attack.png remapped: res://assets/characters/cat/cat_fire_attack.png
+Loading resource: res://.godot/imported/cat_fire_attack.png-7ea469756b7929e69bdec7560c8ea8ed.ctex remapped: res://.godot/imported/cat_fire_attack.png-7ea469756b7929e69bdec7560c8ea8ed.ctex
+Completed load for: 'res://assets/characters/cat/cat_fire_attack.png' remapped 'res://assets/characters/cat/cat_fire_attack.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_fire_idle.png remapped: res://assets/characters/cat/cat_fire_idle.png
+Loading resource: res://.godot/imported/cat_fire_idle.png-2e178e9cd751680458847547c0c70df0.ctex remapped: res://.godot/imported/cat_fire_idle.png-2e178e9cd751680458847547c0c70df0.ctex
+Completed load for: 'res://assets/characters/cat/cat_fire_idle.png' remapped 'res://assets/characters/cat/cat_fire_idle.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_fire_walk.png remapped: res://assets/characters/cat/cat_fire_walk.png
+Loading resource: res://.godot/imported/cat_fire_walk.png-0c9a44b81e17f562cf34523dacca2836.ctex remapped: res://.godot/imported/cat_fire_walk.png-0c9a44b81e17f562cf34523dacca2836.ctex
+Completed load for: 'res://assets/characters/cat/cat_fire_walk.png' remapped 'res://assets/characters/cat/cat_fire_walk.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_fire_jump.png remapped: res://assets/characters/cat/cat_fire_jump.png
+Loading resource: res://.godot/imported/cat_fire_jump.png-5a50575207d7e6a26577a991ccbd12c1.ctex remapped: res://.godot/imported/cat_fire_jump.png-5a50575207d7e6a26577a991ccbd12c1.ctex
+Completed load for: 'res://assets/characters/cat/cat_fire_jump.png' remapped 'res://assets/characters/cat/cat_fire_jump.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_water_attack.png remapped: res://assets/characters/cat/cat_water_attack.png
+Loading resource: res://.godot/imported/cat_water_attack.png-c5763d82ddac0d51bfa62e93b7cb98a9.ctex remapped: res://.godot/imported/cat_water_attack.png-c5763d82ddac0d51bfa62e93b7cb98a9.ctex
+Completed load for: 'res://assets/characters/cat/cat_water_attack.png' remapped 'res://assets/characters/cat/cat_water_attack.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_water_idle.png remapped: res://assets/characters/cat/cat_water_idle.png
+Loading resource: res://.godot/imported/cat_water_idle.png-943df8086662d5044648125f6596fcbf.ctex remapped: res://.godot/imported/cat_water_idle.png-943df8086662d5044648125f6596fcbf.ctex
+Completed load for: 'res://assets/characters/cat/cat_water_idle.png' remapped 'res://assets/characters/cat/cat_water_idle.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_water_walk.png remapped: res://assets/characters/cat/cat_water_walk.png
+Loading resource: res://.godot/imported/cat_water_walk.png-fadeab3fb672aa1ff2e0c8c757ce57bb.ctex remapped: res://.godot/imported/cat_water_walk.png-fadeab3fb672aa1ff2e0c8c757ce57bb.ctex
+Completed load for: 'res://assets/characters/cat/cat_water_walk.png' remapped 'res://assets/characters/cat/cat_water_walk.png' at thread -1
+Loading resource: res://assets/characters/cat/cat_water_jump.png remapped: res://assets/characters/cat/cat_water_jump.png
+Loading resource: res://.godot/imported/cat_water_jump.png-1bce0f4c67f20b0bb9ba49ed5ad7c641.ctex remapped: res://.godot/imported/cat_water_jump.png-1bce0f4c67f20b0bb9ba49ed5ad7c641.ctex
+Completed load for: 'res://assets/characters/cat/cat_water_jump.png' remapped 'res://assets/characters/cat/cat_water_jump.png' at thread -1
+Completed load for: 'res://resources/animations/player_frames.tres' remapped 'res://resources/animations/player_frames.tres' at thread -1
+Loading resource: res://resources/shared_skill_loadout.tres remapped: res://resources/shared_skill_loadout.tres
+Completed load for: 'res://resources/shared_skill_loadout.tres' remapped 'res://resources/shared_skill_loadout.tres' at thread -1
+Loading resource: res://resources/water_element.tres remapped: res://resources/water_element.tres
+Completed load for: 'res://resources/water_element.tres' remapped 'res://resources/water_element.tres' at thread -1
+Loading resource: res://resources/fire_element.tres remapped: res://resources/fire_element.tres
+Completed load for: 'res://resources/fire_element.tres' remapped 'res://resources/fire_element.tres' at thread -1
+Completed load for: 'res://scenes/player.tscn' remapped 'res://scenes/player.tscn' at thread -1
+Loading resource: res://scenes/vfx/skill_vfx_coordinator.tscn remapped: res://scenes/vfx/skill_vfx_coordinator.tscn
+Completed load for: 'res://scenes/vfx/skill_vfx_coordinator.tscn' remapped 'res://scenes/vfx/skill_vfx_coordinator.tscn' at thread -1
+Loading resource: res://scenes/combat_hud.tscn remapped: res://scenes/combat_hud.tscn
+Completed load for: 'res://scenes/combat_hud.tscn' remapped 'res://scenes/combat_hud.tscn' at thread -1
+Completed load for: 'res://scenes/run/run_game.tscn' remapped 'res://scenes/run/run_game.tscn' at thread -1
+Failed to bind socket. Error: 3.
+Unloading addon: res://addons/godot_ai/plugin.cfg
+Script docs haven't been properly loaded or regenerated, so don't save them to disk.
+EditorSettings: Save OK!

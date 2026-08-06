@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RunContentCatalog" load_steps=14 format=3]
+[gd_resource type="Resource" script_class="RunContentCatalog" load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://combat/content/run_content_catalog.gd" id="1_catalog"]
 [ext_resource type="Resource" path="res://resources/content/skills/element_slash_content.tres" id="2_slash"]
@@ -13,9 +13,11 @@
 [ext_resource type="Resource" path="res://resources/growth/relics/reaction_focus.tres" id="11_focus"]
 [ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="12_content_script"]
 [ext_resource type="Script" path="res://growth/definitions/relic_definition.gd" id="13_relic_script"]
+[ext_resource type="Resource" path="res://resources/content/skills/passive_vitality_content.tres" id="14_vitality"]
+[ext_resource type="Resource" path="res://resources/content/skills/passive_energy_content.tres" id="15_energy"]
 
 [resource]
 script = ExtResource("1_catalog")
-skill_contents = Array[ExtResource("12_content_script")]([ExtResource("2_slash"), ExtResource("3_bolt"), ExtResource("4_fury"), ExtResource("5_laser"), ExtResource("6_reclaim"), ExtResource("7_burning"), ExtResource("8_unending")])
+skill_contents = Array[ExtResource("12_content_script")]([ExtResource("2_slash"), ExtResource("3_bolt"), ExtResource("4_fury"), ExtResource("5_laser"), ExtResource("6_reclaim"), ExtResource("7_burning"), ExtResource("8_unending"), ExtResource("14_vitality"), ExtResource("15_energy")])
 fixed_basic_attack_id = &"element_slash"
 relic_definitions = Array[ExtResource("13_relic_script")]([ExtResource("9_manual"), ExtResource("10_auto"), ExtResource("11_focus")])

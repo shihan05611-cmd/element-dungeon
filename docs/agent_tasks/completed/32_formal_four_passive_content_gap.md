@@ -1,6 +1,6 @@
 # 任务 32：补齐正式四被动内容与 Catalog 基线
 
-状态：PENDING
+状态：ACCEPTED
 负责人：Growth/Economy Domain Agent 2.0（threadId `019fd201-d2b5-7593-afbd-d73bd1908acf`，hostId `local`；本任务临时授权静态内容与两枚被动图标）
 依赖：任务 30 `ACCEPTED`；Task31 已确认 `BLOCKED`；开工基线由中枢提交后补发
 回传中枢：Review 5.0，threadId `019fc6c7-85e3-77f0-a99b-9cc9ee6055a2`，hostId `local`
@@ -132,3 +132,17 @@ Evidence README 必须给出：修改文件字节/SHA、两新内容完整字段
 开工置 `IN_PROGRESS`；全部通过只置 `REVIEW` 并冻结，不得自行 `ACCEPTED`。若旧 gameplay definition、正式商店或 UI 无法无代码修改地消费两项新内容，立即 `BLOCKED` 并回传，不能扩大 allowlist。
 
 完成或阻塞后必须直接调用 `send_message_to_thread` 回传中枢 Review 5.0：threadId `019fc6c7-85e3-77f0-a99b-9cc9ee6055a2`，hostId `local`；不要等待用户转述。回传后保持冻结，中枢将自动启动另一全新冷副本独立验收。
+
+## 9. Review 5.0 独立验收结论（2026-08-06）
+
+结论：`PASS / ACCEPTED`。
+
+- 正式 Review 冷副本为 `C:\tmp\element-dungeon-task32-review5-20260806-02\project`，独立 profile 位于同根 `profile\Roaming` / `profile\Local`。复制时按任务书保留 sidecar、排除 `.git/.godot/.workbuddy/cache`，核对 `1526/1526 files / 45,624,222 bytes / only-source 0 / only-cold 0 / mismatch 0`；首条 Godot 前 `.godot` 不存在。
+- 第一条 Godot 4.7.1 headless editor scan 与 capture 后 final rescan 均 exit `0`。正式 33 份 Review 日志中 `SCRIPT ERROR` / `Parse Error` / `ERROR:` / `WARNING:` / `CrashHandlerException` 均为 `0`。
+- 27 个正式 runner 全部 exit `0`，独立重新求和为 `287 tests / 3338 assertions`；Task32 专项 `5/173`、Task16 `11/231`、Task27 economy `11/307`，Task12 `13/113`、Task18 `9/124`、Task24 `10/237`、Task30 `9/172`。Task20 单列 `7/68`、exit `0`，继续历史 `BLOCKED`，未计入正式门禁。
+- `RunGame` 与 `TestRoom` 各 180 帧 smoke 均 exit `0`。全新非编辑器图形进程实际运行正式 RunGame，得到 `381 assertions / 4 images`、exit `0`；四次购买支出 300、余额 65，P1–P4 分别为 `burning`、`unending`、`passive_vitality`、`passive_energy`，跨房间整批注销/重建各一次。
+- Review 已逐张打开 1920×1080 与 2560×1440 的商店/战斗原图；钱包、支出、四被动名称/图标、HP 120、SP 110、玩家、敌人与正式 HUD 完整，无不可恢复裁切或关键遮挡。两枚 256×256 RGBA 原图及另行生成的 64px/32px QA 缩略图也已打开，心核护甲与三格储罐在小尺寸仍可凭轮廓区分。
+- 两份只读 gameplay 资源、RunSession/Director、七槽/被动 Runtime、Player/Enemy、RunFlow、HUD/Overlay、场景、房间、VFX runtime 与 `project.godot` 均为零 diff；共享 `.godot` 保持 `754 files / 37,416,266 bytes`，全部 sidecar 保持 `537 files / 198,428 bytes`，共享编辑器全程仅被动保持。
+- Review 曾建立一个不计门禁的候选副本 `...review5-20260806-01`，因 Review 额外排除 sidecar 而触发历史 UID 回退 WARNING；该候选立即废弃，没有据此评价产品。上述结论全部来自按任务书复制规则重新建立的 `...-02` 正式冷副本。
+
+Task32 已补齐 Task31 的正式四被动前置，允许 Task31 在本阶段检查点后恢复；不得降低 Task31 的四被动真实链路门禁。

@@ -109,8 +109,8 @@ func _run() -> void:
 
 func _test_formal_catalog_shape() -> void:
 	_expect(CATALOG != null and CATALOG.validation_error().is_empty(), "formal catalog validates")
-	_expect(CATALOG.gameplay_definitions().size() == 7, "catalog registers six obtainable skills plus basic attack")
-	_expect(CATALOG.obtainable_contents().size() == 6, "catalog exposes six obtainable contents")
+	_expect(CATALOG.gameplay_definitions().size() == 9, "catalog registers eight obtainable skills plus basic attack")
+	_expect(CATALOG.obtainable_contents().size() == 8, "catalog exposes eight obtainable contents")
 	_expect(CATALOG.reward_definitions().size() == 5, "catalog projects five chest rewards")
 	_expect(CATALOG.initial_owned_skill_ids() == [&"element_bolt"], "element bolt is the only initial owned skill")
 	var initial := CATALOG.default_loadout_snapshot()
@@ -125,13 +125,46 @@ func _test_formal_catalog_shape() -> void:
 	_expect(CATALOG.reward_definitions().all(func(reward: SkillRewardDefinition) -> bool:
 		return reward.skill_id != &"element_slash"
 	), "fixed basic attack is absent from rewards")
-	for legacy_id: StringName in [&"water_lance", &"fire_lance", &"passive_vitality", &"passive_energy", &"passive_focus", &"passive_balance"]:
+	for legacy_id: StringName in [&"water_lance", &"fire_lance", &"passive_focus", &"passive_balance"]:
 		_expect(CATALOG.content_for(legacy_id) == null, "legacy content is not double-registered: %s" % String(legacy_id))
+	var formal_stat_passives := {
+		&"passive_vitality": {
+			"name": "坚韧体魄",
+			"icon": "res://assets/generated/vfx/passive_vitality/icon.png",
+			"gameplay": "res://resources/skills/passive_vitality.tres",
+			"health": 20,
+			"energy": 0,
+		},
+		&"passive_energy": {
+			"name": "元素储备",
+			"icon": "res://assets/generated/vfx/passive_energy/icon.png",
+			"gameplay": "res://resources/skills/passive_energy.tres",
+			"health": 0,
+			"energy": 10,
+		},
+	}
+	for skill_id: StringName in formal_stat_passives:
+		var expected: Dictionary = formal_stat_passives[skill_id]
+		var content := CATALOG.content_for(skill_id)
+		_expect(content != null and content.display_name == expected["name"], "formal stat passive has its product name: %s" % String(skill_id))
+		_expect(content != null and content.description.contains("严格被动槽") and content.description.contains("最大"), "formal stat passive describes strict passive capacity: %s" % String(skill_id))
+		_expect(content != null and content.icon != null and content.icon.resource_path == expected["icon"], "formal stat passive has its independent icon: %s" % String(skill_id))
+		_expect(content != null and content.gameplay_definition.resource_path == expected["gameplay"], "formal stat passive points to the frozen gameplay resource: %s" % String(skill_id))
+		_expect(content != null and content.equippable and content.purchase_price == 75, "formal stat passive is purchasable and equippable: %s" % String(skill_id))
+		_expect(content != null and content.allowed_form_ids == [ElementIds.WATER, ElementIds.FIRE], "formal stat passive supports both formal forms: %s" % String(skill_id))
+		_expect(content != null and not content.initially_owned and content.default_slot_id.is_empty(), "formal stat passive has no initial ownership or default slot: %s" % String(skill_id))
+		_expect(content != null and not content.reward_pool and not content.initial_reward_pool, "formal stat passive does not expand historical rewards: %s" % String(skill_id))
+		_expect(content != null and content.active_progression == null, "formal stat passive has no active levels: %s" % String(skill_id))
+		_expect(content != null and content.presentation_scene == null and content.runtime_delivery_scene == null, "formal stat passive has no world presentation or delivery: %s" % String(skill_id))
+		var effect := content.gameplay_definition.passive_effect_definition as StatModifierPassiveEffectDefinition
+		_expect(effect != null and effect.maximum_health_bonus == expected["health"] and effect.maximum_energy_bonus == expected["energy"], "formal stat passive preserves its frozen modifier: %s" % String(skill_id))
 	for content: SkillContentDefinition in CATALOG.skill_contents:
 		if content.skill_id == &"element_slash":
 			_expect(content.icon == null and content.presentation_scene == null, "fixed basic attack keeps presentation empty")
 		elif content.skill_id == &"element_bolt":
 			_expect(content.icon != null and content.presentation_scene == null, "element bolt uses its stable icon and existing projectile presentation")
+		elif content.skill_id in [&"passive_vitality", &"passive_energy"]:
+			_expect(content.icon != null and content.presentation_scene == null, "stat passive uses an icon without fake world presentation: %s" % String(content.skill_id))
 		else:
 			_expect(content.icon != null and content.presentation_scene != null, "approved task-17 presentation fields are connected: %s" % String(content.skill_id))
 

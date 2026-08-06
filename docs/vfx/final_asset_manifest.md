@@ -40,3 +40,11 @@ Automated result: 25 final PNG files checked, 4/4 laser color/mask pairs exactly
 
 Task 17 did not modify Catalog, SkillDefinition, combat, growth, Player, Enemy, Host, HUD, Delivery, collision, or existing scene wiring. A later integration pass may point formal presentation fields at these stable assets using each skill's manifest parameters.
 
+## Task 32 formal stat-passive icon additions
+
+| Skill | Icon | World VFX |
+|---|---|---|
+| Passive Vitality / 坚韧体魄 | `assets/generated/vfx/passive_vitality/icon.png` | None; permanent `+20` maximum-health projection, `presentation_scene = null` |
+| Passive Energy / 元素储备 | `assets/generated/vfx/passive_energy/icon.png` | None; permanent `+10` maximum-SP projection, `presentation_scene = null` |
+
+Both Task32 icons are 256×256 RGBA alpha assets generated with the built-in `image_gen` workflow, removed from a flat chroma-key background with the official imagegen helper, and checked at original size plus 64×64 and 32×32. Their exact prompts, source hashes, final hashes, alpha statistics and usage boundaries are recorded in each skill directory's `prompt.md` and `manifest.md`. Task32 adds no animation sheet, particle, presentation scene, runtime delivery, world trigger or VFX script.
