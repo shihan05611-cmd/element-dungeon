@@ -1,8 +1,8 @@
 # 任务 31：基础内容、数值与整轮端到端回归
 
-状态：PENDING
+状态：BLOCKED
 负责人：Content/Balance & E2E Validation Agent（复用 Run Flow/Scene Integration Agent 2.0 职责对话，threadId `019fd63e-f9d7-7760-b68c-45b552c90881`，hostId `local`）
-依赖：任务 30 `ACCEPTED`；Task30 阶段检查点 `fa94956bbaa9be32cafa2a585d8bd2116da5882e`
+依赖：任务 30 `ACCEPTED`；Task30 阶段检查点 `fa94956bbaa9be32cafa2a585d8bd2116da5882e`；恢复执行前新增依赖任务 32 `ACCEPTED`
 回传中枢：Review 5.0，threadId `019fc6c7-85e3-77f0-a99b-9cc9ee6055a2`，hostId `local`
 
 ## 1. 目标与完成定义
@@ -174,3 +174,23 @@ Task31 evidence README 必须逐项列出任务 26 契约第 9 节的 14 场景�
 - 完成或阻塞后，直接调用 `send_message_to_thread` 回传中枢 Review 5.0：threadId `019fc6c7-85e3-77f0-a99b-9cc9ee6055a2`，hostId `local`；不要等待用户转述。
 - 回传必须包含状态、修改文件/SHA、最终数值表、两局测量、精确 runner/tests/assertions、scan/smoke/capture/rescan、视觉证据、allowlist/共享保护、风险和 Git 写操作为 0。
 - 回传后保持冻结。中枢收到 `REVIEW` 将自动建立另一全新冷副本独立验收；执行者交付不等于接受。
+
+## 11. 执行者阻塞记录（2026-08-06）
+
+必读材料、Task30 正式 runner/capture 与 Task31 allowlist/全仓调用点完成只读审计后，发现正式内容无法在本任务边界内满足本任务自身的“四被动”硬门禁：
+
+- 正式 catalog 被已接受的 Task16/Task27 契约冻结为一个固定基础攻击与六个可购买内容；六个可购买内容只有四个主动和 `burning`、`unending` 两个被动。
+- Task31 同时要求正式 `RunGame` E2E 覆盖“四被动跨房”、实际 Viewport 保存前断言“四被动”，并完成“主动加四被动”权威预算。
+- 七槽 Runtime 正确拒绝同一技能重复装备，因此两个正式被动最多只能合法占用两个被动槽。
+- 增加两个正式被动内容会违反本任务仅列六份技能内容的 allowlist，并使冻结的 Task16/Task27 精确 catalog 数量断言失败；修改旧 runner、在 Task31 runner 内注入夹具或重复技能均为任务书明确禁止的绕过。
+
+该缺口应退回任务 27 的正式内容/catalog 职责，补齐至少两个可购买被动并同步重新冻结 catalog 及其接受基线；任务 28 的四被动 Runtime 和任务 30 的四槽 UI 当前审计未发现结构缺陷。执行者未运行任何 Godot 命令，未创建冷副本，未新增 Task31 runner/capture，未调整静态数值，也未进行 Git 写操作。阻塞证据见 `docs/agent_tasks/evidence/task31/README.md`。
+
+## 12. 中枢 Review 5.0 阻塞审计与恢复条件（2026-08-06）
+
+中枢独立只读核对正式 catalog、六份内容资源、`RuntimeSkillLoadout` 唯一性、Task16/27 精确数量断言以及最高优先级需求文档第 4.1、12 节后，确认阻塞成立。最高优先级需求要求“四个不同被动同时装备”，不能把门禁降低为两个被动或用空槽/重复技能替代。
+
+- 新增前置任务 32，把已由 Task28 Runtime 验证的 `passive_vitality` 与 `passive_energy` 正式接入 catalog，补齐与现有风格一致的独立图标，并迁移 Task16/27 两条受影响的 catalog 数量/legacy 断言。
+- 任务 32 不新增被动机制：分别沿用现有 `+20` 最大生命和 `+10` 最大 SP 的静态被动定义；`passive_focus`、`passive_balance` 继续保持旧资源、不得注册。
+- 任务 32 必须独立验收并由中枢标记 `ACCEPTED` 后，本任务才可恢复；届时中枢将补发新的检查点、接受 runner 数字和 allowlist 基线。
+- 本次 Task31 阻塞记录与 evidence 保留，不作为失败实现；任务31继续冻结，当前不运行任何部分门禁。
