@@ -8,5 +8,8 @@ slots = {
 &"active_1": null,
 &"active_2": null,
 &"active_3": null,
-&"passive_1": null
+&"passive_1": null,
+&"passive_2": null,
+&"passive_3": null,
+&"passive_4": null
 }

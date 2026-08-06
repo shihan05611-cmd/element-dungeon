@@ -1,7 +1,7 @@
 class_name SkillLoadout
 extends Resource
 
-## Shared four-slot template. form_element_id and arbitrary legacy slot names
+## Shared seven-slot template. form_element_id and arbitrary legacy slot names
 ## are retained only so old resources can be read by the one-time migrator.
 
 @export_storage var form_element_id: StringName = ElementIds.NONE
@@ -9,7 +9,7 @@ extends Resource
 
 
 func validation_error() -> StringName:
-	if _has_shared_shape():
+	if form_element_id == ElementIds.NONE:
 		return shared_validation_error()
 	return legacy_validation_error()
 
@@ -17,7 +17,10 @@ func validation_error() -> StringName:
 func shared_validation_error() -> StringName:
 	var expected := SkillSlotIds.all()
 	if slots.size() != expected.size():
-		return &"expected_four_shared_slots"
+		return &"expected_seven_shared_slots"
+	for slot_id: StringName in slots:
+		if not SkillSlotIds.is_known(slot_id):
+			return &"unknown_shared_slot"
 	for slot_id: StringName in expected:
 		if not slots.has(slot_id):
 			return &"missing_shared_slot"
@@ -32,7 +35,9 @@ func shared_validation_error() -> StringName:
 		if seen_skill_ids.has(skill.skill_id):
 			return &"duplicate_equipped_skill"
 		seen_skill_ids.append(skill.skill_id)
-		if slot_id == SkillSlotIds.PASSIVE_1 and not skill.is_passive_skill():
+		if SkillSlotIds.is_active(slot_id) and not skill.is_active_skill():
+			return &"passive_skill_in_active_slot"
+		if SkillSlotIds.is_passive(slot_id) and not skill.is_passive_skill():
 			return &"active_skill_in_passive_slot"
 	return &""
 

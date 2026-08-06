@@ -6,6 +6,9 @@ const SLOTS: Array[StringName] = [
 	SkillSlotIds.ACTIVE_2,
 	SkillSlotIds.ACTIVE_3,
 	SkillSlotIds.PASSIVE_1,
+	SkillSlotIds.PASSIVE_2,
+	SkillSlotIds.PASSIVE_3,
+	SkillSlotIds.PASSIVE_4,
 ]
 
 class RecordingLoadoutPort:
@@ -16,6 +19,9 @@ class RecordingLoadoutPort:
 		SkillSlotIds.ACTIVE_2,
 		SkillSlotIds.ACTIVE_3,
 		SkillSlotIds.PASSIVE_1,
+		SkillSlotIds.PASSIVE_2,
+		SkillSlotIds.PASSIVE_3,
+		SkillSlotIds.PASSIVE_4,
 	]
 
 	var current: RuntimeLoadoutSnapshot
@@ -36,7 +42,7 @@ class RecordingLoadoutPort:
 		if candidate.revision != current.revision:
 			return RuntimeLoadoutChangeResult.rejected(&"stale_loadout_revision", snapshot())
 		if candidate.entries.size() != PORT_SLOTS.size():
-			return RuntimeLoadoutChangeResult.rejected(&"expected_four_shared_slots", snapshot())
+			return RuntimeLoadoutChangeResult.rejected(&"expected_seven_shared_slots", snapshot())
 		for slot_id: StringName in PORT_SLOTS:
 			if not candidate.has_slot(slot_id):
 				return RuntimeLoadoutChangeResult.rejected(&"missing_shared_slot", snapshot())
@@ -49,9 +55,14 @@ class RecordingLoadoutPort:
 			if seen.has(entry.skill_id):
 				return RuntimeLoadoutChangeResult.rejected(&"duplicate_equipped_skill", snapshot())
 			seen.append(entry.skill_id)
-		var passive_id := candidate.get_skill_id(SkillSlotIds.PASSIVE_1)
-		if not passive_id.is_empty() and not passive_skill_ids.has(passive_id):
-			return RuntimeLoadoutChangeResult.rejected(&"active_skill_in_passive_slot", snapshot())
+		for slot_id: StringName in SkillSlotIds.active():
+			var active_skill_id := candidate.get_skill_id(slot_id)
+			if not active_skill_id.is_empty() and passive_skill_ids.has(active_skill_id):
+				return RuntimeLoadoutChangeResult.rejected(&"passive_skill_in_active_slot", snapshot())
+		for slot_id: StringName in SkillSlotIds.passive():
+			var passive_skill_id := candidate.get_skill_id(slot_id)
+			if not passive_skill_id.is_empty() and not passive_skill_ids.has(passive_skill_id):
+				return RuntimeLoadoutChangeResult.rejected(&"active_skill_in_passive_slot", snapshot())
 		return RuntimeLoadoutChangeResult.success(candidate)
 
 	func try_replace_snapshot(candidate: RuntimeLoadoutSnapshot) -> RuntimeLoadoutChangeResult:
@@ -393,6 +404,9 @@ func _make_port() -> RecordingLoadoutPort:
 		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_2),
 		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_3),
 		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_1, &"passive_a"),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_2),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_3),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_4),
 	]
 	var passives: Array[StringName] = [&"passive_a"]
 	return RecordingLoadoutPort.new(RuntimeLoadoutSnapshot.new(entries, 3), passives)

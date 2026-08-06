@@ -7,6 +7,22 @@ var configuration_error: StringName:
 	get:
 		return _configuration_error
 
+var registered_passive_skill_ids: Array[StringName]:
+	get:
+		return _passive_controller.registered_skill_ids
+
+var registered_passive_slot_ids: Array[StringName]:
+	get:
+		return _passive_controller.registered_slot_ids
+
+var passive_registration_commit_count: int:
+	get:
+		return _passive_controller.registration_commit_count
+
+var passive_unregistration_commit_count: int:
+	get:
+		return _passive_controller.unregistration_commit_count
+
 
 var _catalog: Dictionary[StringName, SkillDefinition] = {}
 var _current: RuntimeLoadoutSnapshot
@@ -40,8 +56,14 @@ func _init(
 		if not validation.accepted:
 			_set_configuration_error(validation.detail)
 		else:
-			_current = RuntimeLoadoutSnapshot.new(initial.entries, initial.revision)
-			_passive_controller.commit_validated_replacement(_passive_bindings_for(_current))
+			_current = RuntimeLoadoutSnapshot.new(
+				validation.snapshot.entries,
+				validation.snapshot.revision
+			)
+			_passive_controller.commit_validated_replacement(
+				_passive_bindings_for(_current),
+				_passive_slot_ids_for(_current)
+			)
 
 
 func snapshot() -> RuntimeLoadoutSnapshot:
@@ -55,15 +77,25 @@ func validate_snapshot(candidate: RuntimeLoadoutSnapshot) -> RuntimeLoadoutChang
 		return RuntimeLoadoutChangeResult.rejected(&"invalid_snapshot_structure", snapshot())
 	if candidate.revision != _current.revision:
 		return RuntimeLoadoutChangeResult.rejected(&"stale_loadout_revision", snapshot())
-	if candidate.entries.size() != SkillSlotIds.all().size():
-		return RuntimeLoadoutChangeResult.rejected(&"expected_four_shared_slots", snapshot())
-	for slot_id: StringName in SkillSlotIds.all():
-		if not candidate.has_slot(slot_id):
-			return RuntimeLoadoutChangeResult.rejected(&"missing_shared_slot", snapshot())
-	var seen_skill_ids: Array[StringName] = []
-	for entry: RuntimeLoadoutSlotSnapshot in candidate.entries:
+	var normalized := candidate
+	if _has_legacy_four_slot_shape(candidate):
+		var migration := SharedFourSlotToSevenSlotMigrator.migrate(
+			candidate,
+			_catalog_definitions()
+		)
+		if not migration.accepted:
+			return RuntimeLoadoutChangeResult.rejected(migration.detail, snapshot())
+		normalized = migration.snapshot
+	if normalized.entries.size() != SkillSlotIds.all().size():
+		return RuntimeLoadoutChangeResult.rejected(&"expected_seven_shared_slots", snapshot())
+	for entry: RuntimeLoadoutSlotSnapshot in normalized.entries:
 		if not SkillSlotIds.is_known(entry.slot_id):
 			return RuntimeLoadoutChangeResult.rejected(&"unknown_shared_slot", snapshot())
+	for slot_id: StringName in SkillSlotIds.all():
+		if not normalized.has_slot(slot_id):
+			return RuntimeLoadoutChangeResult.rejected(&"missing_shared_slot", snapshot())
+	var seen_skill_ids: Array[StringName] = []
+	for entry: RuntimeLoadoutSlotSnapshot in normalized.entries:
 		if entry.skill_id.is_empty():
 			continue
 		if seen_skill_ids.has(entry.skill_id):
@@ -72,25 +104,36 @@ func validate_snapshot(candidate: RuntimeLoadoutSnapshot) -> RuntimeLoadoutChang
 		var skill := _catalog.get(entry.skill_id) as SkillDefinition
 		if skill == null:
 			return RuntimeLoadoutChangeResult.rejected(&"unknown_skill_id", snapshot())
-		if entry.slot_id == SkillSlotIds.PASSIVE_1 and not skill.is_passive_skill():
+		if SkillSlotIds.is_active(entry.slot_id) and not skill.is_active_skill():
+			return RuntimeLoadoutChangeResult.rejected(&"passive_skill_in_active_slot", snapshot())
+		if SkillSlotIds.is_passive(entry.slot_id) and not skill.is_passive_skill():
 			return RuntimeLoadoutChangeResult.rejected(&"active_skill_in_passive_slot", snapshot())
-	var bindings := _passive_bindings_for(candidate)
-	var passive_error := _passive_controller.validation_error(bindings)
+	var bindings := _passive_bindings_for(normalized)
+	var passive_error := _passive_controller.validation_error(
+		bindings,
+		_passive_slot_ids_for(normalized)
+	)
 	if not passive_error.is_empty():
 		return RuntimeLoadoutChangeResult.rejected(passive_error, snapshot())
-	return RuntimeLoadoutChangeResult.success(candidate)
+	return RuntimeLoadoutChangeResult.success(normalized)
 
 
 func try_replace_snapshot(candidate: RuntimeLoadoutSnapshot) -> RuntimeLoadoutChangeResult:
 	var validation := validate_snapshot(candidate)
 	if not validation.accepted:
 		return validation
+	var normalized := validation.snapshot
+	if _current.same_mapping(normalized):
+		return RuntimeLoadoutChangeResult.success(snapshot())
 	var previous := snapshot()
-	var committed := RuntimeLoadoutSnapshot.new(candidate.entries, _current.revision + 1)
+	var committed := RuntimeLoadoutSnapshot.new(normalized.entries, _current.revision + 1)
 	var bindings := _passive_bindings_for(committed)
 	# Both changes become observable only after pure validation has succeeded.
 	_current = committed
-	_passive_controller.commit_validated_replacement(bindings)
+	_passive_controller.commit_validated_replacement(
+		bindings,
+		_passive_slot_ids_for(committed)
+	)
 	loadout_replaced.emit(previous, snapshot())
 	return RuntimeLoadoutChangeResult.success(snapshot())
 
@@ -127,9 +170,13 @@ func clear_for_run_end() -> void:
 	_passive_controller.clear()
 
 
+func passive_runtime_for_slot(slot_id: StringName) -> PassiveEffectRuntime:
+	return _passive_controller.runtime_for_slot(slot_id)
+
+
 func _passive_bindings_for(candidate: RuntimeLoadoutSnapshot) -> Array[PassiveEffectBinding]:
 	var result: Array[PassiveEffectBinding] = []
-	for slot_id: StringName in SkillSlotIds.all():
+	for slot_id: StringName in SkillSlotIds.passive():
 		var skill_id := candidate.get_skill_id(slot_id)
 		var skill := _catalog.get(skill_id) as SkillDefinition
 		if skill == null or not skill.is_passive_skill():
@@ -143,9 +190,35 @@ func _passive_bindings_for(candidate: RuntimeLoadoutSnapshot) -> Array[PassiveEf
 	return result
 
 
+func _passive_slot_ids_for(candidate: RuntimeLoadoutSnapshot) -> Array[StringName]:
+	var result: Array[StringName] = []
+	for slot_id: StringName in SkillSlotIds.passive():
+		var skill_id := candidate.get_skill_id(slot_id)
+		var skill := _catalog.get(skill_id) as SkillDefinition
+		if skill != null and skill.is_passive_skill():
+			result.append(slot_id)
+	return result
+
+
 func _set_configuration_error(error: StringName) -> void:
 	if _configuration_error.is_empty():
 		_configuration_error = error
+
+
+func _catalog_definitions() -> Array[SkillDefinition]:
+	var result: Array[SkillDefinition] = []
+	for skill_id: StringName in _catalog:
+		result.append(_catalog[skill_id])
+	return result
+
+
+static func _has_legacy_four_slot_shape(candidate: RuntimeLoadoutSnapshot) -> bool:
+	if candidate == null or candidate.entries.size() != 4:
+		return false
+	for slot_id: StringName in SharedFourSlotToSevenSlotMigrator.LEGACY_FOUR_SLOT_IDS:
+		if not candidate.has_slot(slot_id):
+			return false
+	return true
 
 
 static func _execution_catalog_validation_error(skill: SkillDefinition) -> StringName:

@@ -355,11 +355,19 @@ func _test_unending_registration_trigger_cleanup() -> void:
 
 func _equip(skill_id: StringName) -> bool:
 	var current := _host.runtime_loadout.snapshot()
+	var definition := CATALOG.gameplay_for(skill_id)
+	if definition == null:
+		return false
+	var target_slot := (
+		SkillSlotIds.PASSIVE_1
+		if definition.is_passive_skill()
+		else SkillSlotIds.ACTIVE_1
+	)
 	var entries: Array[RuntimeLoadoutSlotSnapshot] = []
 	for slot_id: StringName in SkillSlotIds.all():
 		entries.append(RuntimeLoadoutSlotSnapshot.new(
 			slot_id,
-			skill_id if slot_id == SkillSlotIds.ACTIVE_1 else &""
+			skill_id if slot_id == target_slot else &""
 		))
 	var result := _host.runtime_loadout.try_replace_snapshot(
 		RuntimeLoadoutSnapshot.new(entries, current.revision)
@@ -449,4 +457,3 @@ func _expect(condition: bool, message: String) -> void:
 	_assertions += 1
 	if not condition:
 		_failures.append(message)
-

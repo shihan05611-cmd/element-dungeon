@@ -45,7 +45,7 @@ func _run() -> void:
 	_run_test("three_policy_and_future_element_preview", _test_three_policy_and_future_element_preview)
 	_run_test("structured_failure_feedback", _test_structured_failure_feedback)
 	_run_test("manual_lock_and_auto_feedback", _test_manual_lock_and_auto_feedback)
-	_run_test("active_slot_accepts_passive", _test_active_slot_accepts_passive)
+	_run_test("active_slot_rejects_passive", _test_active_slot_rejects_passive)
 	_run_test("passive_slot_rejects_active", _test_passive_slot_rejects_active)
 	_run_test("zero_active_four_passive_warning", _test_zero_active_four_passive_warning)
 	_run_test("single_final_number_two_layer_reaction", _test_single_final_number_two_layer_reaction)
@@ -176,15 +176,15 @@ func _test_manual_lock_and_auto_feedback() -> void:
 	_player.skill_executor.advance(2.0)
 
 
-func _test_active_slot_accepts_passive() -> void:
+func _test_active_slot_rejects_passive() -> void:
 	_overlay.show_loadout()
+	var before: RuntimeLoadoutSnapshot = _overlay.current_preview()
 	var detail: StringName = _overlay.try_preview_assignment(&"burning", SkillSlotIds.ACTIVE_2)
-	_expect(detail.is_empty(), "passive preview is allowed in ACTIVE slot")
-	var card: Control = _overlay.slot_card(SkillSlotIds.ACTIVE_2)
-	var text := _all_text(card)
-	_expect(not text.contains("按键 2"), "ACTIVE slot passive removes keycap preview")
-	_expect(text.contains("被动") and text.contains("不可释放"), "ACTIVE slot passive explains non-castable key")
-	_expect(not text.contains("能量 ≥") and not text.contains("CD "), "ACTIVE slot passive hides energy and cooldown")
+	var after: RuntimeLoadoutSnapshot = _overlay.current_preview()
+	_expect(detail == &"passive_skill_in_active_slot", "ACTIVE slot rejects PASSIVE through runtime validation")
+	_expect(after.same_mapping(before), "rejected passive drop does not mutate preview")
+	_expect(after.entries.size() == 7, "strict preview keeps the complete seven-slot snapshot")
+	_expect(after.get_skill_id(SkillSlotIds.ACTIVE_2).is_empty(), "rejected active slot stays empty")
 
 
 func _test_passive_slot_rejects_active() -> void:
@@ -198,10 +198,13 @@ func _test_passive_slot_rejects_active() -> void:
 
 func _test_zero_active_four_passive_warning() -> void:
 	var entries: Array[RuntimeLoadoutSlotSnapshot] = [
-		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_1, &"burning"),
-		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_2, &"unending"),
-		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_3, &"burning"),
-		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_1, &"unending"),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_1),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_2),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_3),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_1, &"burning"),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_2, &"unending"),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_3),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_4),
 	]
 	_overlay.set_preview_snapshot(RuntimeLoadoutSnapshot.new(entries, _host.runtime_loadout.snapshot().revision))
 	_expect(_overlay.zero_active_warning_visible(), "zero-active warning is visible")
@@ -210,9 +213,12 @@ func _test_zero_active_four_passive_warning() -> void:
 	for slot_id: StringName in [SkillSlotIds.ACTIVE_1, SkillSlotIds.ACTIVE_2, SkillSlotIds.ACTIVE_3, SkillSlotIds.PASSIVE_1]:
 		var slot_key := "按键 %s" % ("1" if slot_id == SkillSlotIds.ACTIVE_1 else "2" if slot_id == SkillSlotIds.ACTIVE_2 else "3" if slot_id == SkillSlotIds.ACTIVE_3 else "—")
 		_expect(not _all_text(_overlay.slot_card(slot_id)).contains(slot_key), "four-passive preview has no cast key: %s" % String(slot_id))
-	var passive_list := _overlay.get("_passive_list") as VBoxContainer
-	_expect(passive_list.get_child_count() == 2, "duplicate visual fixture entries are deduplicated in effective passive list")
-	_expect(_all_text(passive_list).count("燃烧") == 1 and _all_text(passive_list).count("不息") == 1, "each effective passive appears once")
+	_expect(_overlay.current_preview().entries.size() == 7, "legacy HUD preview retains the full seven-slot authority")
+	_expect(
+		_overlay.current_preview().get_skill_id(SkillSlotIds.PASSIVE_1) == &"burning"
+		and _overlay.current_preview().get_skill_id(SkillSlotIds.PASSIVE_2) == &"unending",
+		"strict passive mappings survive without prebuilding the task30 HUD"
+	)
 	_overlay.set_preview_snapshot(_host.runtime_loadout.snapshot())
 	_overlay.hide_overlay()
 

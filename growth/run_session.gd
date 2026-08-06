@@ -696,11 +696,69 @@ func _validate_reward_content(option: RewardOption) -> RunCommandResult:
 
 
 func _validate_loadout_ownership(candidate: RuntimeLoadoutSnapshot) -> RunCommandResult:
-	if candidate == null:
+	if candidate == null or not candidate.is_valid():
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.LOADOUT_REJECTED, &"missing_loadout_snapshot")
-	for entry in candidate.entries:
+	var current := _current_loadout_snapshot()
+	if candidate.revision != current.revision:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.LOADOUT_REJECTED,
+			&"stale_loadout_revision"
+		)
+	# A configured content catalog marks the formal runtime authority path and
+	# therefore always requires the complete typed seven-slot shape. Catalog-free
+	# sessions are frozen growth-domain fixtures whose port owns its legacy shape;
+	# they remain useful for non-loadout transaction regression without becoming
+	# a production mixed-slot entry point.
+	var formal_seven_slot_authority := _content_catalog != null
+	if formal_seven_slot_authority:
+		if candidate.entries.size() != SkillSlotIds.all().size():
+			return RunCommandResult.rejected(
+				RunCommandResult.RejectReason.LOADOUT_REJECTED,
+				&"expected_seven_shared_slots"
+			)
+		for entry: RuntimeLoadoutSlotSnapshot in candidate.entries:
+			if not SkillSlotIds.is_known(entry.slot_id):
+				return RunCommandResult.rejected(
+					RunCommandResult.RejectReason.LOADOUT_REJECTED,
+					&"unknown_shared_slot"
+				)
+		for slot_id: StringName in SkillSlotIds.all():
+			if not candidate.has_slot(slot_id):
+				return RunCommandResult.rejected(
+					RunCommandResult.RejectReason.LOADOUT_REJECTED,
+					&"missing_shared_slot"
+				)
+	var seen_skill_ids: Array[StringName] = []
+	for entry: RuntimeLoadoutSlotSnapshot in candidate.entries:
+		if entry.skill_id.is_empty():
+			continue
+		if seen_skill_ids.has(entry.skill_id):
+			return RunCommandResult.rejected(
+				RunCommandResult.RejectReason.LOADOUT_REJECTED,
+				&"duplicate_equipped_skill"
+			)
+		seen_skill_ids.append(entry.skill_id)
 		if not entry.skill_id.is_empty() and not _skill_inventory.owns(entry.skill_id):
 			return RunCommandResult.rejected(RunCommandResult.RejectReason.LOADOUT_REJECTED, &"loadout_contains_unowned_skill")
+		var content := _content_for(entry.skill_id)
+		if formal_seven_slot_authority and content == null:
+			return RunCommandResult.rejected(
+				RunCommandResult.RejectReason.LOADOUT_REJECTED,
+				&"unknown_skill_id"
+			)
+		if content == null or content.gameplay_definition == null:
+			continue
+		var skill := content.gameplay_definition
+		if SkillSlotIds.is_active(entry.slot_id) and not skill.is_active_skill():
+			return RunCommandResult.rejected(
+				RunCommandResult.RejectReason.LOADOUT_REJECTED,
+				&"passive_skill_in_active_slot"
+			)
+		if SkillSlotIds.is_passive(entry.slot_id) and not skill.is_passive_skill():
+			return RunCommandResult.rejected(
+				RunCommandResult.RejectReason.LOADOUT_REJECTED,
+				&"active_skill_in_passive_slot"
+			)
 	return RunCommandResult.success()
 
 

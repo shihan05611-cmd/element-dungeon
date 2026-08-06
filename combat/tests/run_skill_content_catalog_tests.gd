@@ -117,7 +117,9 @@ func _test_formal_catalog_shape() -> void:
 	_expect(initial.get_skill_id(SkillSlotIds.ACTIVE_1) == &"element_bolt", "element bolt defaults to active one")
 	_expect(initial.get_skill_id(SkillSlotIds.ACTIVE_2).is_empty(), "active two defaults empty")
 	_expect(initial.get_skill_id(SkillSlotIds.ACTIVE_3).is_empty(), "active three defaults empty")
-	_expect(initial.get_skill_id(SkillSlotIds.PASSIVE_1).is_empty(), "passive one defaults empty")
+	_expect(SkillSlotIds.passive().all(func(slot_id: StringName) -> bool:
+		return initial.get_skill_id(slot_id).is_empty()
+	), "all four passive slots default empty")
 	var slash := CATALOG.content_for(&"element_slash")
 	_expect(slash != null and slash.fixed_basic_attack and not slash.equippable, "fixed basic attack stays outside shared slots")
 	_expect(CATALOG.reward_definitions().all(func(reward: SkillRewardDefinition) -> bool:

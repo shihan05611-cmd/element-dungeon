@@ -53,7 +53,7 @@ func _initialize() -> void:
 
 func _run_all() -> void:
 	_run("static_skill_dimensions", _test_static_skill_dimensions)
-	_run("runtime_four_slots_revision_and_stale", _test_runtime_four_slots_revision_and_stale)
+	_run("runtime_seven_slots_revision_and_stale", _test_runtime_seven_slots_revision_and_stale)
 	_run("runtime_rejects_duplicate_and_active_in_passive_atomically", _test_runtime_rejects_duplicate_and_active_in_passive_atomically)
 	_run("four_passives_and_passive_button", _test_four_passives_and_passive_button)
 	_run("passive_lifecycle_has_no_leaks_or_duplicates", _test_passive_lifecycle_has_no_leaks_or_duplicates)
@@ -135,7 +135,7 @@ func _test_static_skill_dimensions() -> void:
 	_expect_eq(bad_active.validation_error(), &"missing_delivery_scene", "active requires delivery")
 
 
-func _test_runtime_four_slots_revision_and_stale() -> void:
+func _test_runtime_seven_slots_revision_and_stale() -> void:
 	var active := _active(&"active")
 	var passive := _passive(&"passive", &"effect")
 	var catalog: Array[SkillDefinition] = [active, passive]
@@ -144,11 +144,11 @@ func _test_runtime_four_slots_revision_and_stale() -> void:
 	var runtime := RuntimeSkillLoadout.new(catalog, restored, port)
 	_expect_eq(runtime.snapshot().revision, 7, "persisted revision restored exactly")
 	_expect_eq(runtime.snapshot().get_skill_id(SkillSlotIds.ACTIVE_1), &"active", "mapping restored")
-	var next := _snapshot(&"", &"passive", &"", &"", runtime.snapshot().revision)
+	var next := _snapshot(&"", &"active", &"", &"passive", runtime.snapshot().revision)
 	var result := runtime.try_replace_snapshot(next)
 	_expect(result.accepted, "valid replacement accepted")
 	_expect_eq(result.snapshot.revision, 8, "new replacement increments restored revision")
-	_expect_eq(runtime.get_skill_for_slot(SkillSlotIds.ACTIVE_2).skill_id, &"passive", "active slot accepts passive")
+	_expect_eq(runtime.get_skill_for_slot(SkillSlotIds.ACTIVE_2).skill_id, &"active", "active skill moves between active slots")
 	var stale := runtime.try_replace_snapshot(next)
 	_expect(not stale.accepted, "stale candidate rejected")
 	_expect_eq(stale.detail, &"stale_loadout_revision", "stale reason typed")
@@ -160,10 +160,10 @@ func _test_runtime_rejects_duplicate_and_active_in_passive_atomically() -> void:
 	var passive := _passive(&"passive", &"effect")
 	var catalog: Array[SkillDefinition] = [active, passive]
 	var port := RecordingPassivePort.new()
-	var runtime := RuntimeSkillLoadout.new(catalog, _snapshot(&"passive"), port)
+	var runtime := RuntimeSkillLoadout.new(catalog, _snapshot(&"", &"", &"", &"passive"), port)
 	var before := runtime.snapshot()
 	var commits := port.commit_count
-	var duplicate := _snapshot(&"passive", &"passive", &"", &"", before.revision)
+	var duplicate := _snapshot(&"", &"", &"", &"passive", before.revision, &"passive")
 	var duplicate_result := runtime.try_replace_snapshot(duplicate)
 	_expect_eq(duplicate_result.detail, &"duplicate_equipped_skill", "duplicate rejected")
 	_expect(runtime.snapshot().same_mapping(before), "duplicate preserves mapping")
@@ -183,11 +183,11 @@ func _test_four_passives_and_passive_button() -> void:
 		_passive(&"p4", &"e4"),
 	]
 	var port := RecordingPassivePort.new()
-	var rig := _make_rig(passives, _snapshot(&"p1", &"p2", &"p3", &"p4"), port)
+	var rig := _make_rig(passives, _snapshot(&"", &"", &"", &"p1", 0, &"p2", &"p3", &"p4"), port)
 	_expect_eq(port.skill_ids().size(), 4, "all four passives registered")
 	_expect_eq(_unique_count(port.skill_ids()), 4, "passives registered once by skill id")
 	var before_energy := rig.energy.current_energy
-	var result := rig.controller.try_cast_slot(SkillSlotIds.ACTIVE_1)
+	var result := rig.controller.try_cast_slot(SkillSlotIds.PASSIVE_1)
 	_expect(not result.accepted, "passive button rejected")
 	_expect_eq(result.reject_reason, CastAttemptResult.RejectReason.NOT_CASTABLE, "structured not-castable result")
 	_expect_eq(rig.energy.current_energy, before_energy, "passive button spends no energy")
@@ -201,8 +201,8 @@ func _test_passive_lifecycle_has_no_leaks_or_duplicates() -> void:
 	var p3 := _passive(&"p3", &"e3")
 	var catalog: Array[SkillDefinition] = [p1, p2, p3]
 	var port := RecordingPassivePort.new()
-	var runtime := RuntimeSkillLoadout.new(catalog, _snapshot(&"p1", &"p2", &"p3"), port)
-	_expect_eq(port.skill_ids().size(), 3, "three active-slot passives active")
+	var runtime := RuntimeSkillLoadout.new(catalog, _snapshot(&"", &"", &"", &"p1", 0, &"p2", &"p3"), port)
+	_expect_eq(port.skill_ids().size(), 3, "three passive-slot effects active")
 	runtime.on_owner_died()
 	_expect_eq(port.skill_ids().size(), 0, "death unregisters all")
 	var after_death := port.commit_count
@@ -217,7 +217,7 @@ func _test_passive_lifecycle_has_no_leaks_or_duplicates() -> void:
 	_expect_eq(_unique_count(port.skill_ids()), 3, "floor rebuild has no duplicates")
 	runtime.on_run_reloaded()
 	_expect_eq(_unique_count(port.skill_ids()), 3, "reload rebuild has no duplicates")
-	var replacement := _snapshot(&"", &"p2", &"", &"", runtime.snapshot().revision)
+	var replacement := _snapshot(&"", &"", &"", &"", runtime.snapshot().revision, &"p2")
 	_expect(runtime.try_replace_snapshot(replacement).accepted, "passive replacement accepted")
 	_expect_eq(port.skill_ids(), [&"p2"], "unequipped passives removed atomically")
 
@@ -772,13 +772,19 @@ func _snapshot(
 	active_2: StringName = &"",
 	active_3: StringName = &"",
 	passive_1: StringName = &"",
-	revision: int = 0
+	revision: int = 0,
+	passive_2: StringName = &"",
+	passive_3: StringName = &"",
+	passive_4: StringName = &""
 ) -> RuntimeLoadoutSnapshot:
 	var entries: Array[RuntimeLoadoutSlotSnapshot] = [
 		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_1, active_1),
 		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_2, active_2),
 		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_3, active_3),
 		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_1, passive_1),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_2, passive_2),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_3, passive_3),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_4, passive_4),
 	]
 	return RuntimeLoadoutSnapshot.new(entries, revision)
 

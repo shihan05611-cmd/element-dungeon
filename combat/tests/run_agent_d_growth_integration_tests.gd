@@ -118,7 +118,7 @@ func _test_formal_shared_runtime() -> void:
 	_expect(_player.skill_controller.runtime_loadout == _host.runtime_loadout, "player consumes the host runtime loadout")
 	_expect(_player.current_element_controller == _player.get_node("ElementFormController"), "player has one current-element source")
 	var snapshot := _host.runtime_loadout.snapshot()
-	_expect(snapshot.entries.size() == 4, "formal loadout has exactly four shared slots")
+	_expect(snapshot.entries.size() == 7, "formal loadout has exactly seven shared slots")
 	_expect(snapshot.get_skill_id(SkillSlotIds.ACTIVE_1) == ELEMENT_BOLT.skill_id, "formal active one contains the shared bolt")
 	_expect(not _snapshot_contains(snapshot, BASIC_SLASH.skill_id), "ordinary attack is outside the shared loadout")
 	_expect(not InputMap.has_action(&"cast_passive_1"), "passive slot has no release action")
@@ -193,18 +193,20 @@ func _test_exclusive_switch_transaction() -> void:
 
 
 func _test_passive_active_slot_and_lifecycle() -> void:
-	var one_passive := _replace_formal_loadout(PASSIVE_VITALITY.skill_id, ELEMENT_BOLT.skill_id, &"", &"")
-	_expect(one_passive.accepted, "passive can equip in an active slot")
-	_expect(_host.passive_adapter.registered_skill_ids() == [PASSIVE_VITALITY.skill_id], "active-slot passive registers once")
-	_expect(_player.damage_receiver.maximum_health == 120, "active-slot passive applies its effect")
-	_reset_cast_state()
-	var energy_before := _player.energy_component.current_energy
-	var passive_attempt := _player.try_cast_slot(SkillSlotIds.ACTIVE_1)
-	_expect(not passive_attempt.accepted and passive_attempt.reject_reason == CastAttemptResult.RejectReason.NOT_CASTABLE, "active-slot passive is not castable")
-	_expect(_player.energy_component.current_energy == energy_before, "passive input spends no energy")
-	_expect(_player.skill_executor.current_phase == SkillExecutor.Phase.IDLE, "passive input starts no cast or cooldown")
+	var before := _host.runtime_loadout.snapshot()
+	var illegal := _replace_formal_loadout(PASSIVE_VITALITY.skill_id, ELEMENT_BOLT.skill_id, &"", &"")
+	_expect(not illegal.accepted and illegal.detail == &"passive_skill_in_active_slot", "active slot rejects passive skill")
+	_expect(_host.runtime_loadout.snapshot().same_mapping(before), "rejected passive-in-active mapping is atomic")
+	var one_passive := _replace_formal_loadout(ELEMENT_BOLT.skill_id, &"", &"", PASSIVE_VITALITY.skill_id)
+	_expect(one_passive.accepted, "passive equips in PASSIVE_1")
+	_expect(_host.passive_adapter.registered_skill_ids() == [PASSIVE_VITALITY.skill_id], "passive slot registers once")
+	_expect(_host.runtime_loadout.registered_passive_slot_ids == [SkillSlotIds.PASSIVE_1], "passive registration keeps slot audit")
+	_expect(_player.damage_receiver.maximum_health == 120, "passive slot applies its effect")
 
 	var four := _replace_formal_loadout(
+		&"",
+		&"",
+		&"",
 		PASSIVE_VITALITY.skill_id,
 		PASSIVE_ENERGY.skill_id,
 		PASSIVE_FOCUS.skill_id,
@@ -284,7 +286,8 @@ func _test_legacy_migration_is_one_time() -> void:
 		&"a_bolt": ELEMENT_BOLT,
 		&"b_slash": BASIC_SLASH,
 		&"c_lance": WATER_LANCE,
-		&"d_overflow": PASSIVE_VITALITY,
+		&"d_overflow": _test_route_filler_skill(),
+		&"e_passive": PASSIVE_VITALITY,
 	}
 	var legacy: Array[SkillLoadout] = [legacy_water, LEGACY_FIRE]
 	var migration_rewards := _integration_reward_catalog()
@@ -309,12 +312,12 @@ func _test_legacy_migration_is_one_time() -> void:
 		legacy
 	), "formal host accepts legacy element loadouts")
 	_expect(host.persistence_adapter.migrated_legacy and host.persistence_adapter.restored, "formal host performs one-time migration")
-	_expect(host.saved_shared_loadout.entries.size() == 4, "formal migration saves only shared four-slot shape")
+	_expect(host.saved_shared_loadout.entries.size() == 7, "formal migration saves the shared seven-slot shape")
 	_expect(not host.persistence_adapter.legacy_state_retained, "formal migration retains no legacy state")
 	_expect(not _snapshot_contains(host.saved_shared_loadout, BASIC_SLASH.skill_id), "formal migration removes fixed basic attack from shared slots")
 	_expect(host.content_catalog.fixed_basic_attack_definition().skill_id == BASIC_SLASH.skill_id, "migrated run retains catalog basic attack outside shared slots")
 	_expect(_snapshot_contains(host.saved_shared_loadout, ELEMENT_BOLT.skill_id), "formal migration preserves legacy bolt ownership")
-	_expect(host.run_session.snapshot().skills.owns(PASSIVE_VITALITY.skill_id), "migration overflow remains owned but unequipped")
+	_expect(host.run_session.snapshot().skills.owns(&"task_10_route_filler"), "migration overflow remains owned but unequipped")
 	_expect(host.run_session.snapshot().route.phase == RunPhase.COMBAT, "migrated shared mapping enters combat")
 
 	# Traverse the real reward/route cycle to the first shop. The overflow
@@ -358,17 +361,17 @@ func _test_legacy_migration_is_one_time() -> void:
 		harness.free()
 		return
 	_expect(
-		opened.draft.try_assign_slot(SkillSlotIds.PASSIVE_1, PASSIVE_VITALITY.skill_id).accepted,
-		"migration overflow assigns to the shared passive slot"
+		opened.draft.try_assign_slot(SkillSlotIds.ACTIVE_2, &"task_10_route_filler").accepted,
+		"migration overflow assigns to the vacant shared active slot"
 	)
 	var confirmed := session.confirm_shop(opened.draft)
 	_expect(confirmed.accepted, "migration overflow shop confirmation succeeds")
 	_expect(
-		host.runtime_loadout.snapshot().get_skill_id(SkillSlotIds.PASSIVE_1) == PASSIVE_VITALITY.skill_id,
+		host.runtime_loadout.snapshot().get_skill_id(SkillSlotIds.ACTIVE_2) == &"task_10_route_filler",
 		"migration overflow is equipped after normal shop confirmation"
 	)
 	_expect(
-		host.saved_shared_loadout.get_skill_id(SkillSlotIds.PASSIVE_1) == PASSIVE_VITALITY.skill_id,
+		host.saved_shared_loadout.get_skill_id(SkillSlotIds.ACTIVE_2) == &"task_10_route_filler",
 		"confirmed overflow equipment is persisted by the host"
 	)
 	_expect(not host.persistence_adapter.restore(null, ElementIds.FIRE, [ElementIds.WATER, ElementIds.FIRE], legacy), "host migration adapter cannot restore twice")
@@ -398,11 +401,14 @@ func _test_persisted_four_passive_multi_enemy_room() -> void:
 		enemy.set_physics_process(false)
 		enemy.ai_enabled = false
 	var saved := _shared_snapshot(
+		&"",
+		&"",
+		&"",
 		PASSIVE_VITALITY.skill_id,
+		7,
 		PASSIVE_ENERGY.skill_id,
 		PASSIVE_FOCUS.skill_id,
-		PASSIVE_BALANCE.skill_id,
-		7
+		PASSIVE_BALANCE.skill_id
 	)
 	var enemies: Array[CombatEnemy] = [enemy_a, enemy_b]
 	var projected_kills: Array[EnemyKilledEvent] = []
@@ -451,11 +457,14 @@ func _test_zero_active_four_passive_shop() -> void:
 		PASSIVE_BALANCE,
 	]
 	var initial := _shared_snapshot(
+		&"",
+		&"",
+		&"",
 		PASSIVE_VITALITY.skill_id,
+		0,
 		PASSIVE_ENERGY.skill_id,
 		PASSIVE_FOCUS.skill_id,
-		PASSIVE_BALANCE.skill_id,
-		0
+		PASSIVE_BALANCE.skill_id
 	)
 	var runtime := RuntimeSkillLoadout.new(all_skills, initial, PassiveEffectPort.new())
 	var slash_reward := SkillRewardDefinition.new()
@@ -486,7 +495,7 @@ func _test_zero_active_four_passive_shop() -> void:
 			_expect(session.choose_route(RunDirector.SHOP_ROUTE_ID).accepted, "third room enters shared shop")
 	var opened := session.open_shop_draft()
 	_expect(opened.accepted, "shared shop draft opens for zero-active mapping")
-	_expect(opened.draft.preview_loadout().same_mapping(initial), "shop draft contains one shared four-slot mapping")
+	_expect(opened.draft.preview_loadout().same_mapping(initial), "shop draft contains one shared seven-slot mapping")
 	_expect(session.confirm_shop(opened.draft).accepted, "zero-active four-passive mapping confirms")
 	_expect(runtime.snapshot().same_mapping(initial), "confirmed mapping survives combat transition")
 	var persistence := SharedLoadoutPersistenceAdapter.new()
@@ -617,14 +626,20 @@ func _replace_formal_loadout(
 		active_1: StringName,
 		active_2: StringName,
 		active_3: StringName,
-		passive_1: StringName
+		passive_1: StringName,
+		passive_2: StringName = &"",
+		passive_3: StringName = &"",
+		passive_4: StringName = &""
 ) -> RuntimeLoadoutChangeResult:
 	return _host.runtime_loadout.try_replace_snapshot(_shared_snapshot(
 		active_1,
 		active_2,
 		active_3,
 		passive_1,
-		_host.runtime_loadout.snapshot().revision
+		_host.runtime_loadout.snapshot().revision,
+		passive_2,
+		passive_3,
+		passive_4
 	))
 
 
@@ -633,13 +648,19 @@ func _shared_snapshot(
 		active_2: StringName,
 		active_3: StringName,
 		passive_1: StringName,
-		revision: int
+		revision: int,
+		passive_2: StringName = &"",
+		passive_3: StringName = &"",
+		passive_4: StringName = &""
 ) -> RuntimeLoadoutSnapshot:
 	return RuntimeLoadoutSnapshot.new([
 		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_1, active_1),
 		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_2, active_2),
 		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.ACTIVE_3, active_3),
 		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_1, passive_1),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_2, passive_2),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_3, passive_3),
+		RuntimeLoadoutSlotSnapshot.new(SkillSlotIds.PASSIVE_4, passive_4),
 	], revision)
 
 

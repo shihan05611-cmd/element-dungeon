@@ -12,13 +12,16 @@ class RecordingEffectPort:
 		return true
 
 
-class SharedFourSlotPort:
+class SharedSevenSlotPort:
 	extends RuntimeLoadoutPort
 
 	const ACTIVE_1: StringName = &"active_1"
 	const ACTIVE_2: StringName = &"active_2"
 	const ACTIVE_3: StringName = &"active_3"
 	const PASSIVE_1: StringName = &"passive_1"
+	const PASSIVE_2: StringName = &"passive_2"
+	const PASSIVE_3: StringName = &"passive_3"
+	const PASSIVE_4: StringName = &"passive_4"
 
 	var current: RuntimeLoadoutSnapshot
 	var passive_skill_ids: Array[StringName] = []
@@ -39,9 +42,9 @@ class SharedFourSlotPort:
 			return RuntimeLoadoutChangeResult.rejected(&"invalid_snapshot_structure", current)
 		if candidate.revision != current.revision:
 			return RuntimeLoadoutChangeResult.rejected(&"stale_loadout_revision", current)
-		if candidate.entries.size() != 4:
-			return RuntimeLoadoutChangeResult.rejected(&"expected_four_shared_slots", current)
-		for slot_id in [ACTIVE_1, ACTIVE_2, ACTIVE_3, PASSIVE_1]:
+		if candidate.entries.size() != 7:
+			return RuntimeLoadoutChangeResult.rejected(&"expected_seven_shared_slots", current)
+		for slot_id in [ACTIVE_1, ACTIVE_2, ACTIVE_3, PASSIVE_1, PASSIVE_2, PASSIVE_3, PASSIVE_4]:
 			if not candidate.has_slot(slot_id):
 				return RuntimeLoadoutChangeResult.rejected(&"missing_shared_slot", current)
 		var seen_skills: Array[StringName] = []
@@ -51,11 +54,14 @@ class SharedFourSlotPort:
 			if seen_skills.has(entry.skill_id):
 				return RuntimeLoadoutChangeResult.rejected(&"duplicate_equipped_skill", current)
 			seen_skills.append(entry.skill_id)
-		if (
-			not candidate.get_skill_id(PASSIVE_1).is_empty()
-			and not passive_skill_ids.has(candidate.get_skill_id(PASSIVE_1))
-		):
-			return RuntimeLoadoutChangeResult.rejected(&"active_skill_in_passive_slot", current)
+		for slot_id in [ACTIVE_1, ACTIVE_2, ACTIVE_3]:
+			var active_skill_id := candidate.get_skill_id(slot_id)
+			if not active_skill_id.is_empty() and passive_skill_ids.has(active_skill_id):
+				return RuntimeLoadoutChangeResult.rejected(&"passive_skill_in_active_slot", current)
+		for slot_id in [PASSIVE_1, PASSIVE_2, PASSIVE_3, PASSIVE_4]:
+			var passive_skill_id := candidate.get_skill_id(slot_id)
+			if not passive_skill_id.is_empty() and not passive_skill_ids.has(passive_skill_id):
+				return RuntimeLoadoutChangeResult.rejected(&"active_skill_in_passive_slot", current)
 		return RuntimeLoadoutChangeResult.success(candidate)
 
 	func try_replace_snapshot(candidate: RuntimeLoadoutSnapshot) -> RuntimeLoadoutChangeResult:
@@ -106,13 +112,13 @@ func _run(test_name: String, callable: Callable) -> void:
 
 
 func _test_shared_snapshot_sort_copy_revision() -> void:
-	var snapshot := RuntimeLoadoutSnapshot.new(_four_entries(
+	var snapshot := RuntimeLoadoutSnapshot.new(_seven_entries(
 		&"skill_a",
 		&"skill_b",
 		&"skill_c",
 		&"skill_p"
 	), 17)
-	_expect(snapshot.is_valid(), "four-slot snapshot valid")
+	_expect(snapshot.is_valid(), "seven-slot snapshot valid")
 	_expect_eq(snapshot.revision, 17, "revision preserved")
 	var entries := snapshot.entries
 	_expect_eq(entries[0].slot_id, &"active_1", "entries sorted by slot id")
@@ -120,7 +126,7 @@ func _test_shared_snapshot_sort_copy_revision() -> void:
 	_expect_eq(entries[2].slot_id, &"active_3", "third entry sorted")
 	_expect_eq(entries[3].slot_id, &"passive_1", "passive entry sorted")
 	entries.clear()
-	_expect_eq(snapshot.entries.size(), 4, "entries getter returns copy")
+	_expect_eq(snapshot.entries.size(), 7, "entries getter returns copy")
 	_expect_eq(snapshot.get_skill_id(&"active_2"), &"skill_b", "slot lookup uses no element id")
 
 
@@ -141,7 +147,7 @@ func _test_shared_snapshot_rejects_invalid_entries() -> void:
 
 
 func _test_shop_draft_shared_assign_reset_and_stale() -> void:
-	var baseline := RuntimeLoadoutSnapshot.new(_four_entries(&"old", &"", &"", &""), 4)
+	var baseline := RuntimeLoadoutSnapshot.new(_seven_entries(&"old", &"", &"", &""), 4)
 	var progression := ProgressionSnapshot.new()
 	var draft := ShopDraft.new(8, progression, baseline)
 	_expect(draft.try_assign_slot(&"active_1", &"new").accepted, "shared slot assignment accepted")
@@ -154,7 +160,7 @@ func _test_shop_draft_shared_assign_reset_and_stale() -> void:
 
 
 func _test_run_session_rejects_unowned_shared_skill() -> void:
-	var port := SharedFourSlotPort.new(RuntimeLoadoutSnapshot.new(_four_entries(), 1))
+	var port := SharedSevenSlotPort.new(RuntimeLoadoutSnapshot.new(_seven_entries(), 1))
 	var session := _make_session(port)
 	_reach_shop(session)
 	var draft := session.open_shop_draft().draft
@@ -172,19 +178,19 @@ func _test_run_session_rejects_unowned_shared_skill() -> void:
 
 func _test_four_passives_are_accepted_by_b_port() -> void:
 	var passives: Array[StringName] = [&"passive_a", &"passive_b", &"passive_c", &"passive_d"]
-	var port := SharedFourSlotPort.new(RuntimeLoadoutSnapshot.new(_four_entries(), 1), passives)
+	var port := SharedSevenSlotPort.new(RuntimeLoadoutSnapshot.new(_seven_entries(), 1), passives)
 	var session := _make_session(port, passives)
 	_reach_shop(session)
 	var draft := session.open_shop_draft().draft
-	draft.try_assign_slot(&"active_1", passives[0])
-	draft.try_assign_slot(&"active_2", passives[1])
-	draft.try_assign_slot(&"active_3", passives[2])
-	draft.try_assign_slot(&"passive_1", passives[3])
+	draft.try_assign_slot(&"passive_1", passives[0])
+	draft.try_assign_slot(&"passive_2", passives[1])
+	draft.try_assign_slot(&"passive_3", passives[2])
+	draft.try_assign_slot(&"passive_4", passives[3])
 	var result := session.confirm_shop(draft)
 	_expect(result.accepted, "zero active plus four passives accepted")
-	_expect_eq(port.commit_count, 1, "four-slot snapshot replaced atomically")
+	_expect_eq(port.commit_count, 1, "seven-slot snapshot replaced atomically")
 	for index in 4:
-		var slot_id: StringName = [&"active_1", &"active_2", &"active_3", &"passive_1"][index]
+		var slot_id: StringName = [&"passive_1", &"passive_2", &"passive_3", &"passive_4"][index]
 		_expect_eq(result.run_snapshot.loadout.get_skill_id(slot_id), passives[index], "passive mapping committed")
 
 
@@ -260,14 +266,20 @@ func _test_sequence_state_isolated_between_sessions() -> void:
 	_expect_eq(first.snapshot().revision, second.snapshot().revision, "session sequence states remain isolated")
 
 
-func _four_entries(
+func _seven_entries(
 		active_1_skill: StringName = &"",
 		active_2_skill: StringName = &"",
 		active_3_skill: StringName = &"",
-		passive_1_skill: StringName = &""
+		passive_1_skill: StringName = &"",
+		passive_2_skill: StringName = &"",
+		passive_3_skill: StringName = &"",
+		passive_4_skill: StringName = &""
 ) -> Array[RuntimeLoadoutSlotSnapshot]:
 	return [
 		RuntimeLoadoutSlotSnapshot.new(&"passive_1", passive_1_skill),
+		RuntimeLoadoutSlotSnapshot.new(&"passive_2", passive_2_skill),
+		RuntimeLoadoutSlotSnapshot.new(&"passive_3", passive_3_skill),
+		RuntimeLoadoutSlotSnapshot.new(&"passive_4", passive_4_skill),
 		RuntimeLoadoutSlotSnapshot.new(&"active_3", active_3_skill),
 		RuntimeLoadoutSlotSnapshot.new(&"active_1", active_1_skill),
 		RuntimeLoadoutSlotSnapshot.new(&"active_2", active_2_skill),

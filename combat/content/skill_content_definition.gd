@@ -79,10 +79,9 @@ func validation_error() -> StringName:
 			return &"unknown_default_slot"
 		if not initially_owned:
 			return &"default_equipment_must_be_initially_owned"
-		if (
-			default_slot_id == SkillSlotIds.PASSIVE_1
-			and not gameplay_definition.is_passive_skill()
-		):
+		if SkillSlotIds.is_active(default_slot_id) and not gameplay_definition.is_active_skill():
+			return &"passive_skill_in_active_default_slot"
+		if SkillSlotIds.is_passive(default_slot_id) and not gameplay_definition.is_passive_skill():
 			return &"active_skill_in_passive_default_slot"
 	if gameplay_definition.is_passive_skill():
 		if active_progression != null:

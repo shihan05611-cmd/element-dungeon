@@ -1,0 +1,15 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+PASS: catalog_and_frozen_rules
+PASS: disabled_observe_enabled_modes
+PASS: active_and_passive_purchase
+PASS: active_upgrade_curve_and_max
+PASS: reset_floor_and_purchase_not_refunded
+PASS: economy_rejections_are_atomic
+PASS: command_replay_and_id_reuse
+PASS: dream_dust_rewards_and_terminal_zero
+PASS: loadout_and_room_preserve_level
+PASS: final_loadout_port_rejection_is_atomic
+PASS: snapshot_collections_are_copies
+TASK 27 RUN ECONOMY PROGRESSION TESTS PASSED: 11 tests, 291 assertions
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
