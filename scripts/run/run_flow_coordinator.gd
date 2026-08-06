@@ -7,6 +7,7 @@ signal room_activated(
 	room_instance_id: int
 )
 signal flow_error(detail: StringName)
+signal ui_command_result(command: StringName, result: RunCommandResult)
 
 @export var flow_definition: RunFlowDefinition
 @export var content_catalog: RunContentCatalog
@@ -35,7 +36,10 @@ var last_error: StringName:
 @onready var player: PlayerCharacter = $Player
 @onready var feedback: CombatFeedback = $CombatFeedback
 @onready var vfx: SkillVfxCoordinator = $SkillVfxCoordinator
-@onready var smoke_panel: RunFlowSmokePanel = $RunFlowSmokePanel
+@onready var combat_hud: CombatHUD = $CombatHUD
+# Read-only compatibility alias retained for the accepted Task29 persistence
+# runner. The formal scene no longer instantiates or depends on the smoke UI.
+@onready var smoke_panel: CombatHUD = $CombatHUD
 @onready var room_staging: Node2D = $RoomStaging
 @onready var room_container: Node2D = $RoomContainer
 
@@ -53,18 +57,89 @@ func _ready() -> void:
 	call_deferred("_bootstrap_run")
 
 
-func choose_route(option_id: StringName) -> RunCommandResult:
+func current_snapshot() -> RunSnapshot:
+	return host.run_session.snapshot() if host != null and host.run_session != null else null
+
+
+func choose_route(option_id: StringName, expected_revision: int = -1) -> RunCommandResult:
 	if host.run_session == null:
 		return RunCommandResult.rejected(
 			RunCommandResult.RejectReason.INVALID_STATE,
 			&"run_session_not_ready"
 		)
 	var snapshot := host.run_session.snapshot()
-	return host.run_session.choose_formal_route(
+	var result := host.run_session.choose_formal_route(
 		_next_command_id(&"route"),
-		snapshot.revision,
+		snapshot.revision if expected_revision < 0 else expected_revision,
 		option_id
 	)
+	ui_command_result.emit(&"choose_route", result)
+	return result
+
+
+func purchase_shop_skill(
+	offer_id: StringName,
+	expected_revision: int = -1,
+	shop_session_id: StringName = &""
+) -> RunCommandResult:
+	var snapshot := current_snapshot()
+	if snapshot == null or snapshot.shop == null:
+		return RunCommandResult.rejected(RunCommandResult.RejectReason.INVALID_STATE, &"shop_session_missing")
+	var result := host.run_session.purchase_skill(
+		_next_command_id(&"purchase"),
+		snapshot.revision if expected_revision < 0 else expected_revision,
+		snapshot.shop.session_id if shop_session_id.is_empty() else shop_session_id,
+		offer_id
+	)
+	ui_command_result.emit(&"purchase_skill", result)
+	return result
+
+
+func upgrade_shop_skill(
+	skill_id: StringName,
+	expected_revision: int = -1,
+	shop_session_id: StringName = &""
+) -> RunCommandResult:
+	var snapshot := current_snapshot()
+	if snapshot == null or snapshot.shop == null:
+		return RunCommandResult.rejected(RunCommandResult.RejectReason.INVALID_STATE, &"shop_session_missing")
+	var result := host.run_session.upgrade_active_skill(
+		_next_command_id(&"upgrade"),
+		snapshot.revision if expected_revision < 0 else expected_revision,
+		snapshot.shop.session_id if shop_session_id.is_empty() else shop_session_id,
+		skill_id
+	)
+	ui_command_result.emit(&"upgrade_skill", result)
+	return result
+
+
+func reset_shop_skill(
+	skill_id: StringName,
+	expected_revision: int = -1,
+	shop_session_id: StringName = &""
+) -> RunCommandResult:
+	var snapshot := current_snapshot()
+	if snapshot == null or snapshot.shop == null:
+		return RunCommandResult.rejected(RunCommandResult.RejectReason.INVALID_STATE, &"shop_session_missing")
+	var result := host.run_session.reset_active_skill_upgrades(
+		_next_command_id(&"reset"),
+		snapshot.revision if expected_revision < 0 else expected_revision,
+		snapshot.shop.session_id if shop_session_id.is_empty() else shop_session_id,
+		skill_id
+	)
+	ui_command_result.emit(&"reset_skill", result)
+	return result
+
+
+func apply_shop_loadout(
+	draft: ShopDraft,
+	candidate: RuntimeLoadoutSnapshot
+) -> RunCommandResult:
+	if host.run_session == null:
+		return RunCommandResult.rejected(RunCommandResult.RejectReason.INVALID_STATE, &"run_session_not_ready")
+	var result := host.run_session.apply_shop_loadout_immediately(draft, candidate)
+	ui_command_result.emit(&"apply_shop_loadout", result)
+	return result
 
 
 func purchase_first_affordable_skill() -> RunCommandResult:
@@ -81,12 +156,7 @@ func purchase_first_affordable_skill() -> RunCommandResult:
 		)
 	for offer: ShopOfferSnapshot in snapshot.shop.offers:
 		if offer.purchase_price <= snapshot.economy.balance:
-			return host.run_session.purchase_skill(
-				_next_command_id(&"purchase"),
-				snapshot.revision,
-				snapshot.shop.session_id,
-				offer.offer_id
-			)
+			return purchase_shop_skill(offer.offer_id, snapshot.revision, snapshot.shop.session_id)
 	return RunCommandResult.rejected(
 		RunCommandResult.RejectReason.INSUFFICIENT_DREAM_DUST,
 		&"no_affordable_shop_offer",
@@ -94,7 +164,10 @@ func purchase_first_affordable_skill() -> RunCommandResult:
 	)
 
 
-func leave_shop() -> RunCommandResult:
+func leave_shop(
+	expected_revision: int = -1,
+	shop_session_id: StringName = &""
+) -> RunCommandResult:
 	if host.run_session == null:
 		return RunCommandResult.rejected(
 			RunCommandResult.RejectReason.INVALID_STATE,
@@ -106,11 +179,13 @@ func leave_shop() -> RunCommandResult:
 			RunCommandResult.RejectReason.INVALID_STATE,
 			&"shop_session_missing"
 		)
-	return host.run_session.leave_formal_shop(
+	var result := host.run_session.leave_formal_shop(
 		_next_command_id(&"leave_shop"),
-		snapshot.revision,
-		snapshot.shop.session_id
+		snapshot.revision if expected_revision < 0 else expected_revision,
+		snapshot.shop.session_id if shop_session_id.is_empty() else shop_session_id
 	)
+	ui_command_result.emit(&"leave_shop", result)
+	return result
 
 
 func request_new_run() -> void:
@@ -149,7 +224,7 @@ func _bootstrap_run() -> void:
 		_fail(&"skill_vfx_coordinator_configuration_failed")
 		return
 	_bind_persistent_feedback(_staged_room.enemies)
-	smoke_panel.configure(self, host, player)
+	combat_hud.configure(player, _staged_room.enemies[0], feedback, host, self)
 	host.session_snapshot_changed.connect(_on_session_snapshot_changed)
 	host.integration_error.connect(_fail)
 	var started := host.run_session.start_formal_run(
@@ -215,6 +290,7 @@ func _activate_staged_room(authority_snapshot: RunSnapshot) -> bool:
 		_transition_in_progress = false
 		return _fail(&"skill_vfx_enemy_rebind_failed")
 	_bind_persistent_feedback(_active_room.enemies)
+	combat_hud.rebind_target(_active_room.enemies[0])
 	_activated_scene_paths.append(_active_room.scene_path)
 	_activated_room_instance_ids.append(_active_room.get_instance_id())
 	_transition_in_progress = false

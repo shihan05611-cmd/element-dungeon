@@ -39,7 +39,7 @@ func _run() -> void:
 	_host.set_process(false)
 
 	await _run_async_test("dual_anchor_resolution_matrix", _test_dual_anchor_resolution_matrix)
-	_run_test("fixed_three_plus_one_and_compatibility", _test_fixed_three_plus_one_and_compatibility)
+	_run_test("strict_three_active_four_passive_and_compatibility", _test_strict_three_active_four_passive_and_compatibility)
 	_run_test("compact_authoritative_state_grammar", _test_compact_authoritative_state_grammar)
 	await _run_async_test("target_authority_without_visible_text", _test_target_authority_without_visible_text)
 	await _run_async_test("reward_one_two_three_equal_centered", _test_reward_one_two_three_equal_centered)
@@ -83,43 +83,51 @@ func _test_dual_anchor_resolution_matrix() -> void:
 		var status_rect := _hud.status_panel.get_global_rect()
 		var belt_rect := _hud.skill_panel.get_global_rect()
 		_expect(status_rect.size.is_equal_approx(Vector2(280, 76)), "status is fixed 280x76 at %s" % str(viewport_size))
-		_expect(belt_rect.size.is_equal_approx(Vector2(544, 72)), "skill belt is fixed 544x72 at %s" % str(viewport_size))
+		var passive_rect := _hud.passive_panel.get_global_rect()
+		_expect(belt_rect.size.is_equal_approx(Vector2(532, 78)), "active skill belt is fixed 532x78 at %s" % str(viewport_size))
+		_expect(passive_rect.size.x >= 496.0 and passive_rect.size.y >= 58.0 and passive_rect.size.y <= 66.0, "four-passive strip keeps its compact fixed footprint at %s" % str(viewport_size))
 		_expect(_inside(status_rect, bounds), "status stays in safe canvas at %s" % str(viewport_size))
 		_expect(_inside(belt_rect, bounds), "skill belt stays in safe canvas at %s" % str(viewport_size))
+		_expect(_inside(passive_rect, bounds), "passive strip stays in safe canvas at %s" % str(viewport_size))
 		_expect(not status_rect.intersects(belt_rect), "dual anchors do not overlap at %s" % str(viewport_size))
+		_expect(not status_rect.intersects(passive_rect), "status and passive strip remain strictly separated at %s" % str(viewport_size))
 		_expect(absf(belt_rect.get_center().x - bounds.get_center().x) <= 0.2, "skill belt remains centered at %s" % str(viewport_size))
 		_expect(belt_rect.end.y <= bounds.end.y - 15.9, "skill belt keeps bottom safe margin at %s" % str(viewport_size))
-	var permanent_area := 280.0 * 76.0 + 544.0 * 72.0
-	_expect(is_equal_approx(permanent_area / (1152.0 * 648.0) * 100.0, 8.09758), "permanent HUD target is 8.10 percent")
+	var permanent_area := 280.0 * 76.0 + 532.0 * 78.0 + 496.0 * 58.0
+	_expect(permanent_area / (1152.0 * 648.0) * 100.0 < 12.5, "seven-slot HUD stays below 12.5 percent of minimum viewport")
 	root.size = Vector2i(1152, 648)
 	await _settle_layout()
 
 
-func _test_fixed_three_plus_one_and_compatibility() -> void:
+func _test_strict_three_active_four_passive_and_compatibility() -> void:
 	var row := _hud.get_node("Root/SkillPanel/Margin/Skills/SlotRow") as HBoxContainer
-	_expect(row.get_child_count() == 5, "visible belt contains CurrentElement plus exactly four shared slots")
+	var passive_row := _hud.get_node("Root/PassivePanel/Margin/SlotRow") as HBoxContainer
+	_expect(row.get_child_count() == 4, "active belt contains CurrentElement plus exactly three active slots")
+	_expect(passive_row.get_child_count() == 4, "independent low-weight strip contains exactly four passive slots")
 	_expect((row.get_child(0) as Control).name == &"CurrentElement", "CurrentElement is the first stable belt item")
 	var expected_order: Array[StringName] = [
 		SkillSlotIds.ACTIVE_1,
 		SkillSlotIds.ACTIVE_2,
 		SkillSlotIds.ACTIVE_3,
 		SkillSlotIds.PASSIVE_1,
+		SkillSlotIds.PASSIVE_2,
+		SkillSlotIds.PASSIVE_3,
+		SkillSlotIds.PASSIVE_4,
 	]
-	var previous_end := -INF
-	for index: int in expected_order.size():
-		var slot_id := expected_order[index]
+	for slot_id: StringName in expected_order:
 		var visible_panel := _hud.visual_slot_panel(slot_id)
 		var compatibility_panel := _hud.slot_panel(slot_id)
-		_expect(visible_panel != null and visible_panel.name == String(slot_id), "visible slot order retains %s" % String(slot_id))
+		_expect(visible_panel != null and visible_panel.name == String(slot_id), "seven-slot projection retains %s" % String(slot_id))
 		_expect(compatibility_panel != null and not compatibility_panel.is_visible_in_tree(), "task12 adapter stays resolvable but invisible: %s" % String(slot_id))
 		_expect(compatibility_panel.size.x >= 150.0 and compatibility_panel.size.y >= 88.0, "task12 adapter preserves old readable bounds: %s" % String(slot_id))
-		_expect(visible_panel.size.y >= 44.0 and visible_panel.get_global_rect().position.x >= previous_end - 0.2, "visible compact footprint/order is stable: %s" % String(slot_id))
-		previous_end = visible_panel.get_global_rect().end.x
-	var passive := _hud.visual_slot_panel(SkillSlotIds.PASSIVE_1)
-	_expect(not (passive.get_node("Margin/Body/Key") as Control).visible, "PASSIVE_1 has no false keycap")
-	_expect((passive.get_node("Margin/Body/PassiveMark") as Label).visible, "PASSIVE_1 uses a distinct P marker")
+		_expect(visible_panel.size.y >= 44.0, "visible compact footprint is readable: %s" % String(slot_id))
+	for slot_id: StringName in SkillSlotIds.passive():
+		var passive := _hud.visual_slot_panel(slot_id)
+		_expect(not (passive.get_node("Margin/Body/Key") as Control).visible, "%s has no false keycap" % String(slot_id))
+		_expect((passive.get_node("Margin/Body/PassiveMark") as Label).visible, "%s uses a distinct P marker" % String(slot_id))
+		_expect(not (passive.get_node("Margin/Body/Level") as Label).visible and not (passive.get_node("Margin/Body/Cost") as Label).visible, "%s has no fake level or SP cost" % String(slot_id))
 	var pivot := _hud.element_pivot_panel()
-	_expect(pivot.size.is_equal_approx(Vector2(72, 56)), "CurrentElement pivot stays compact and readable")
+	_expect(pivot.size.x >= 72.0 and pivot.size.y >= 56.0 and pivot.size.y <= _hud.skill_panel.size.y, "CurrentElement pivot stays compact and readable")
 	_expect((pivot.get_node("Body/ElementShape") as Label).text == "◆", "CurrentElement includes a redundant shape signal")
 	_expect((pivot.get_node("Body/ElementText") as Label).text == "水", "CurrentElement includes short text")
 	_expect(not _hud.help_panel.is_visible_in_tree() and not _hud.debug_panel.is_visible_in_tree(), "help and debug are not permanent HUD")

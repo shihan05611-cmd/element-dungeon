@@ -7,7 +7,7 @@
 [ext_resource type="Script" path="res://scripts/run_session_host.gd" id="5_host"]
 [ext_resource type="Script" path="res://scripts/combat_feedback.gd" id="6_feedback"]
 [ext_resource type="PackedScene" path="res://scenes/vfx/skill_vfx_coordinator.tscn" id="7_vfx"]
-[ext_resource type="PackedScene" path="res://scenes/run/run_flow_smoke_panel.tscn" id="8_panel"]
+[ext_resource type="PackedScene" path="res://scenes/combat_hud.tscn" id="8_hud"]
 
 [node name="RunGame" type="Node2D"]
 script = ExtResource("1_coordinator")
@@ -38,4 +38,4 @@ script = ExtResource("5_host")
 room_id = &"combat_01_entry"
 room_completion_experience = 0
 
-[node name="RunFlowSmokePanel" parent="." instance=ExtResource("8_panel")]
+[node name="CombatHUD" parent="." instance=ExtResource("8_hud")]

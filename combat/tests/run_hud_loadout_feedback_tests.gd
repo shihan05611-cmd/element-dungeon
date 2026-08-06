@@ -135,7 +135,7 @@ func _test_three_policy_and_future_element_preview() -> void:
 	_expect(neutral_text.contains("无属性") and neutral_text.contains("中性空心"), "NEUTRAL policy is explicit")
 	_expect(String(_overlay.call("_element_text", &"earth")).contains("EARTH"), "third element uses generic shape text")
 	_expect(String(_overlay.call("_element_text", &"wind")).contains("WIND"), "fourth element uses generic shape text")
-	_expect((_overlay.get("_slot_row") as HBoxContainer).get_child_count() == 4, "future element previews do not add skill bars")
+	_expect((_overlay.get("_slot_row") as HBoxContainer).get_child_count() == 7, "future element previews preserve the strict three-active/four-passive zones")
 	_overlay.hide_overlay()
 
 
@@ -210,7 +210,7 @@ func _test_zero_active_four_passive_warning() -> void:
 	_expect(_overlay.zero_active_warning_visible(), "zero-active warning is visible")
 	_expect((_overlay.get("_warning") as Label).text.contains("战斗将依赖普通攻击与被动"), "zero-active warning states fallback play")
 	_expect(not (_overlay.get("_confirm") as Button).disabled or (_overlay.get("_confirm") as Button).text.contains("仅商店"), "warning itself does not block confirmation semantics")
-	for slot_id: StringName in [SkillSlotIds.ACTIVE_1, SkillSlotIds.ACTIVE_2, SkillSlotIds.ACTIVE_3, SkillSlotIds.PASSIVE_1]:
+	for slot_id: StringName in SkillSlotIds.all():
 		var slot_key := "按键 %s" % ("1" if slot_id == SkillSlotIds.ACTIVE_1 else "2" if slot_id == SkillSlotIds.ACTIVE_2 else "3" if slot_id == SkillSlotIds.ACTIVE_3 else "—")
 		_expect(not _all_text(_overlay.slot_card(slot_id)).contains(slot_key), "four-passive preview has no cast key: %s" % String(slot_id))
 	_expect(_overlay.current_preview().entries.size() == 7, "legacy HUD preview retains the full seven-slot authority")

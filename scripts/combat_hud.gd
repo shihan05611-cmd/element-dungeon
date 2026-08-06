@@ -10,15 +10,18 @@ signal colorblind_mode_changed(enabled: bool)
 const WARNING_RATE_LIMIT_MSEC := 450
 const SLOT_TRANSIENT_MSEC := 900
 const STATUS_SIZE := Vector2(280, 76)
-const SKILL_STRIP_SIZE := Vector2(544, 72)
+const SKILL_STRIP_SIZE := Vector2(532, 78)
 const ELEMENT_PIVOT_SIZE := Vector2(72, 56)
-const ACTIVE_SLOT_SIZE := Vector2(112, 56)
-const PASSIVE_SLOT_SIZE := Vector2(80, 56)
+const ACTIVE_SLOT_SIZE := Vector2(132, 60)
+const PASSIVE_SLOT_SIZE := Vector2(116, 46)
 const SLOT_ORDER: Array[StringName] = [
 	SkillSlotIds.ACTIVE_1,
 	SkillSlotIds.ACTIVE_2,
 	SkillSlotIds.ACTIVE_3,
 	SkillSlotIds.PASSIVE_1,
+	SkillSlotIds.PASSIVE_2,
+	SkillSlotIds.PASSIVE_3,
+	SkillSlotIds.PASSIVE_4,
 ]
 
 var reduced_motion: bool = false
@@ -26,6 +29,7 @@ var colorblind_mode: bool = false
 
 var status_panel: PanelContainer
 var skill_panel: PanelContainer
+var passive_panel: PanelContainer
 var health_bar: ProgressBar
 var health_value: Label
 var low_health: Label
@@ -93,7 +97,8 @@ func configure(
 	player: PlayerCharacter,
 	target: CombatEnemy,
 	feedback: CombatFeedback,
-	host: RunSessionHost = null
+	host: RunSessionHost = null,
+	formal_coordinator: Node = null
 ) -> void:
 	_player = player
 	_target = target
@@ -124,7 +129,7 @@ func configure(
 		_connect_once(_feedback.result_observed, _on_result_observed)
 	if _host != null and _host.runtime_loadout != null:
 		_connect_once(_host.runtime_loadout.loadout_replaced, _on_loadout_replaced)
-		run_overlay.configure(_host)
+		run_overlay.configure(_host, formal_coordinator)
 		run_overlay.set_current_element(_player_element.current_element_id)
 		run_overlay.status_requested.connect(_on_overlay_status_requested)
 
@@ -133,6 +138,18 @@ func configure(
 	_refresh_element(_player_element.current_element_id, false)
 	_refresh_target_elements()
 	_refresh_skill_status()
+	_refresh_debug()
+
+
+func rebind_target(target: CombatEnemy) -> void:
+	if target == null:
+		return
+	_target = target
+	_target_damage = target.damage_receiver
+	_target_carrier = target.element_carrier
+	_connect_once(_target_damage.health_changed, _on_target_health_changed)
+	_connect_once(_target_carrier.elements_changed, _on_target_elements_changed)
+	_refresh_target_elements()
 	_refresh_debug()
 
 
@@ -395,14 +412,13 @@ func _refresh_element(current_element_id: StringName, animate: bool = true) -> v
 		_element_pivot_shape.add_theme_color_override(&"font_color", color)
 	if run_overlay != null:
 		run_overlay.set_current_element(current_element_id)
-	if animate and not reduced_motion:
-		if _element_tween != null and _element_tween.is_valid():
-			_element_tween.kill()
-		element_text.modulate.a = 0.52
-		_element_tween = create_tween()
-		_element_tween.tween_property(element_text, "modulate:a", 1.0, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	else:
-		element_text.modulate = Color.WHITE
+	# Element changes already have persistent shape/color/text plus the feedback
+	# banner.  Never fade the compact element text during a live skill frame:
+	# capture and gameplay must keep the semantic short label fully readable.
+	if _element_tween != null and _element_tween.is_valid():
+		_element_tween.kill()
+	_element_tween = null
+	element_text.modulate = Color.WHITE
 	_refresh_skill_status()
 
 
@@ -452,8 +468,10 @@ func _refresh_slot_view(
 	var icon := view["icon"] as TextureRect
 	var policy := view["policy"] as Label
 	var state := view["state"] as Label
-	var is_passive_slot := slot_id == SkillSlotIds.PASSIVE_1
+	var is_passive_slot := SkillSlotIds.is_passive(slot_id)
 	var name_label := view.get("name") as Label
+	var level_label := view.get("level") as Label
+	var cost_label := view.get("cost") as Label
 	var meta := view.get("meta") as Label
 	var slot_label := view.get("slot") as Label
 	var cooldown_mask := view.get("cooldown_mask") as ColorRect
@@ -471,7 +489,11 @@ func _refresh_slot_view(
 		icon.texture = null
 		if name_label != null:
 			name_label.text = "空槽"
-		policy.text = "— 未装备 —"
+		if level_label != null:
+			level_label.text = "—"
+		if cost_label != null:
+			cost_label.text = ""
+		policy.text = "—" if compact else "— 未装备 —"
 		state.text = "空" if compact else "未配置"
 		state.add_theme_color_override(&"font_color", UI.TEXT_DIM)
 		if meta != null:
@@ -482,6 +504,10 @@ func _refresh_slot_view(
 	icon.texture = content.icon if content != null else null
 	if name_label != null:
 		name_label.text = content.display_name if content != null else String(skill.skill_id)
+	if level_label != null:
+		level_label.text = "Lv.%d" % _skill_level(skill.skill_id)
+	if cost_label != null:
+		cost_label.text = "SP %d" % skill.energy_cost if skill.is_active_skill() else ""
 	(view["panel"] as Control).tooltip_text = "%s · %s" % [
 		content.display_name if content != null else String(skill.skill_id),
 		_skill_policy_badge(skill),
@@ -497,7 +523,7 @@ func _refresh_slot_view(
 			state.text = String(transient.get("text", "触发"))
 			state.add_theme_color_override(&"font_color", _tone_color(StringName(transient.get("tone", &"passive"))))
 		else:
-			state.text = "被动" if skill.is_passive_skill() else ("锁" if compact else "不可释放")
+			state.text = "生效" if skill.is_passive_skill() else ("锁" if compact else "不可释放")
 			state.add_theme_color_override(&"font_color", UI.WARNING)
 		if meta != null:
 			meta.text = "持续生效 · 无键帽/能量/冷却"
@@ -512,13 +538,20 @@ func _refresh_slot_view(
 	if compact and remaining > 0.0 and cooldown_mask != null and cooldown_label != null:
 		var ratio := clampf(remaining / maxf(skill.cooldown, remaining), 0.0, 1.0)
 		cooldown_mask.visible = true
-		cooldown_mask.position.y = 6.0 + 36.0 * (1.0 - ratio)
-		cooldown_mask.size = Vector2(36.0, 36.0 * ratio)
+		cooldown_mask.position.y = 10.0 + 34.0 * (1.0 - ratio)
+		cooldown_mask.size = Vector2(34.0, 34.0 * ratio)
 		cooldown_label.visible = true
 		cooldown_label.text = _format_cooldown(remaining)
 	if meta != null:
 		var cooldown_text := " · CD %.1fs" % skill.cooldown if skill.cooldown > 0.0 else " · 无冷却"
 		meta.text = "能量 ≥%d%s" % [skill.energy_cost, cooldown_text]
+
+
+func _skill_level(skill_id: StringName) -> int:
+	if _host == null or _host.run_session == null:
+		return 1
+	var progress := _host.run_session.snapshot().skills.progress_for(skill_id)
+	return progress.level if progress != null and progress.is_active() else 1
 
 
 func _refresh_cooldown_text_only() -> void:
@@ -618,7 +651,9 @@ func _show_feedback(message: String, tone: StringName, duration: float = 1.25) -
 	_feedback_label.add_theme_color_override(&"font_color", _tone_color(tone))
 	_feedback_panel.visible = true
 	warning_text.text = message
-	warning_text.visible = true
+	# Retain the compatibility label as a read-only text mirror for accepted
+	# runners, but never render it alongside the formal centered feedback.
+	warning_text.visible = false
 	if _banner_tween != null and _banner_tween.is_valid():
 		_banner_tween.kill()
 	_feedback_panel.modulate = Color.WHITE
@@ -627,11 +662,14 @@ func _show_feedback(message: String, tone: StringName, duration: float = 1.25) -
 		_banner_tween.tween_interval(duration)
 		_banner_tween.tween_callback(_hide_feedback)
 		return
+	# Keep formal HUD geometry immutable while feedback is live.  Repeated skill
+	# events can interrupt this tween; animating Control.position would leave an
+	# interrupted panel at an intermediate transform and makes frame readback
+	# dependent on layout timing.  Opacity conveys the same transient state
+	# without moving any Control in the combat CanvasLayer.
 	_feedback_panel.modulate.a = 0.0
-	_feedback_panel.position.y -= 4.0
 	_banner_tween = create_tween()
 	_banner_tween.tween_property(_feedback_panel, "modulate:a", 1.0, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_banner_tween.parallel().tween_property(_feedback_panel, "position:y", _feedback_panel.position.y + 4.0, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_banner_tween.tween_interval(duration)
 	_banner_tween.tween_property(_feedback_panel, "modulate:a", 0.0, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	_banner_tween.tween_callback(_hide_feedback)
@@ -762,6 +800,7 @@ func _connect_once(source: Signal, callback: Callable) -> void:
 func _bind_ui_refs() -> void:
 	status_panel = $Root/StatusPanel
 	skill_panel = $Root/SkillPanel
+	passive_panel = $Root/PassivePanel
 	health_bar = $Root/StatusPanel/Margin/Status/HealthRow/HealthBar
 	health_value = $Root/StatusPanel/Margin/Status/HealthRow/HealthValue
 	low_health = $Root/StatusPanel/Margin/Status/LowHealth
@@ -801,6 +840,7 @@ func _build_ui() -> void:
 	add_child(root_control)
 	_build_status_panel(root_control)
 	_build_skill_panel(root_control)
+	_build_passive_panel(root_control)
 	_build_compatibility_slots(root_control)
 	_build_target_panel(root_control)
 	_build_feedback_panel(root_control)
@@ -818,7 +858,7 @@ func _build_ui() -> void:
 func _build_status_panel(parent: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "StatusPanel"
-	panel.position = Vector2(16, 16)
+	panel.position = Vector2(16, 124)
 	panel.size = STATUS_SIZE
 	panel.add_theme_stylebox_override(&"panel", UI.panel())
 	parent.add_child(panel)
@@ -859,7 +899,7 @@ func _build_status_panel(parent: Control) -> void:
 	health.position = Vector2(0, 0)
 	health.size = Vector2(264, 26)
 	status.add_child(health)
-	var energy := _bar_row("EnergyRow", "EN", "EnergyBar", "EnergyValue", Color("289dcf"))
+	var energy := _bar_row("EnergyRow", "SP", "EnergyBar", "EnergyValue", Color("289dcf"))
 	energy.position = Vector2(0, 30)
 	energy.size = Vector2(264, 26)
 	status.add_child(energy)
@@ -898,7 +938,7 @@ func _build_skill_panel(parent: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "SkillPanel"
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.position = Vector2(-272, -88)
+	panel.position = Vector2(-266, -94)
 	panel.size = SKILL_STRIP_SIZE
 	panel.add_theme_stylebox_override(&"panel", UI.panel(Color(0.035, 0.055, 0.09, 0.97)))
 	parent.add_child(panel)
@@ -914,7 +954,7 @@ func _build_skill_panel(parent: Control) -> void:
 	row.add_theme_constant_override(&"separation", UI.GAP_SM)
 	skills.add_child(row)
 	row.add_child(_build_element_pivot())
-	for slot_id: StringName in SLOT_ORDER:
+	for slot_id: StringName in SkillSlotIds.active():
 		row.add_child(_build_compact_slot(slot_id))
 	var phase := _make_label("PhaseText", "动作阶段：IDLE", 11, UI.TEXT_DIM)
 	phase.visible = false
@@ -931,6 +971,28 @@ func _build_skill_panel(parent: Control) -> void:
 	busy.visible = false
 	busy.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	busy_overlay.add_child(busy)
+
+
+func _build_passive_panel(parent: Control) -> void:
+	var panel := PanelContainer.new()
+	panel.name = "PassivePanel"
+	panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	panel.position = Vector2(-512, 16)
+	panel.size = Vector2(496, 58)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_theme_stylebox_override(
+		&"panel",
+		UI.panel(Color(0.035, 0.045, 0.075, 0.92), UI.BORDER_PASSIVE, 8, 1)
+	)
+	parent.add_child(panel)
+	var margin := _margin("Margin", 6, 6)
+	panel.add_child(margin)
+	var row := HBoxContainer.new()
+	row.name = "SlotRow"
+	row.add_theme_constant_override(&"separation", 6)
+	margin.add_child(row)
+	for slot_id: StringName in SkillSlotIds.passive():
+		row.add_child(_build_compact_slot(slot_id))
 
 
 func _build_element_pivot() -> PanelContainer:
@@ -967,7 +1029,7 @@ func _build_element_pivot() -> PanelContainer:
 
 
 func _build_compact_slot(slot_id: StringName) -> PanelContainer:
-	var passive := slot_id == SkillSlotIds.PASSIVE_1
+	var passive := SkillSlotIds.is_passive(slot_id)
 	var panel := PanelContainer.new()
 	panel.name = String(slot_id)
 	panel.custom_minimum_size = PASSIVE_SLOT_SIZE if passive else ACTIVE_SLOT_SIZE
@@ -984,26 +1046,26 @@ func _build_compact_slot(slot_id: StringName) -> PanelContainer:
 	panel.add_child(margin)
 	var body := Control.new()
 	body.name = "Body"
-	body.custom_minimum_size = Vector2(68 if passive else 102, 44 if passive else 46)
+	body.custom_minimum_size = Vector2(104 if passive else 122, 34 if passive else 50)
 	margin.add_child(body)
 	var icon := TextureRect.new()
 	icon.name = "Icon"
-	icon.position = Vector2(0, 6)
-	icon.size = Vector2(36, 36)
+	icon.position = Vector2(2, 6 if passive else 10)
+	icon.size = Vector2(28 if passive else 34, 28 if passive else 34)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	body.add_child(icon)
 	var cooldown_mask := ColorRect.new()
 	cooldown_mask.name = "CooldownMask"
-	cooldown_mask.position = Vector2(0, 6)
-	cooldown_mask.size = Vector2(36, 36)
+	cooldown_mask.position = Vector2(2, 10)
+	cooldown_mask.size = Vector2(34, 34)
 	cooldown_mask.color = UI.COOLDOWN_SHADE
 	cooldown_mask.visible = false
 	cooldown_mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	body.add_child(cooldown_mask)
 	var cooldown_label := _make_label("CooldownLabel", "0.0", 13, UI.TEXT)
-	cooldown_label.position = Vector2(0, 13)
-	cooldown_label.size = Vector2(36, 22)
+	cooldown_label.position = Vector2(2, 16)
+	cooldown_label.size = Vector2(34, 22)
 	cooldown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cooldown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	cooldown_label.visible = false
@@ -1024,23 +1086,40 @@ func _build_compact_slot(slot_id: StringName) -> PanelContainer:
 	passive_mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	passive_mark.visible = passive
 	body.add_child(passive_mark)
-	var text_x := 40.0
-	var text_width := 30.0 if passive else 62.0
+	var text_x := 34.0 if passive else 39.0
+	var text_width := 68.0 if passive else 81.0
+	var name_label := _make_label("Name", "空槽", 11 if passive else 12, UI.TEXT)
+	name_label.position = Vector2(text_x, 0)
+	name_label.size = Vector2(text_width, 18)
+	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	body.add_child(name_label)
+	var level := _make_label("Level", "—", 10, UI.TEXT_MUTED)
+	level.position = Vector2(text_x, 18)
+	level.size = Vector2(38, 16)
+	level.visible = not passive
+	body.add_child(level)
+	var cost := _make_label("Cost", "", 10, UI.WATER)
+	cost.position = Vector2(text_x + 40, 18)
+	cost.size = Vector2(44, 16)
+	cost.visible = not passive
+	body.add_child(cost)
 	var state := _make_label("State", "空", 12, UI.TEXT_DIM)
-	state.position = Vector2(text_x, 4)
-	state.size = Vector2(text_width, 21)
-	state.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	state.position = Vector2(text_x, 18 if passive else 34)
+	state.size = Vector2(text_width if passive else 42, 18)
 	body.add_child(state)
 	var policy := _make_label("Policy", "—", 11, UI.TEXT_DIM)
-	policy.position = Vector2(text_x, 27)
-	policy.size = Vector2(text_width, 19)
-	policy.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	policy.position = Vector2(text_x + 43, 34)
+	policy.size = Vector2(40, 18)
+	policy.visible = not passive
 	body.add_child(policy)
 	_slot_views[slot_id] = {
 		"panel": panel,
 		"key_panel": key_panel,
 		"key": key,
 		"icon": icon,
+		"name": name_label,
+		"level": level,
+		"cost": cost,
 		"policy": policy,
 		"state": state,
 		"cooldown_mask": cooldown_mask,
@@ -1158,7 +1237,10 @@ func _build_feedback_panel(parent: Control) -> void:
 	panel.name = "FeedbackPanel"
 	panel.visible = false
 	panel.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	panel.position = Vector2(-180, 18)
+	# Keep transient accessibility/command feedback below the top belts.  The
+	# centered strip otherwise covers P1 at 16:9 because the passive belt owns
+	# the upper-right safe zone.
+	panel.position = Vector2(-180, 124)
 	panel.size = Vector2(360, 36)
 	panel.add_theme_stylebox_override(&"panel", UI.panel(UI.SURFACE_RAISED, UI.BORDER_FOCUS, 7, 1))
 	parent.add_child(panel)

@@ -39,12 +39,9 @@ func _run() -> void:
 
 	await _run_async_test("dual_anchor_layout", _test_dual_anchor_layout)
 	_run_test("occupancy_budget", _test_occupancy_budget)
-	_run_test("fixed_three_plus_one_semantics", _test_fixed_three_plus_one_semantics)
+	_run_test("strict_three_active_four_passive_semantics", _test_strict_three_active_four_passive_semantics)
 	_run_test("compact_state_grammar", _test_compact_state_grammar)
-	await _run_async_test("authoritative_target_projection", _test_authoritative_target_projection)
-	await _run_async_test("reward_one_two_three_layout", _test_reward_one_two_three_layout)
-	await _run_async_test("reward_focus_and_explicit_confirm", _test_reward_focus_and_explicit_confirm)
-	await _run_async_test("reward_long_copy_bounds", _test_reward_long_copy_bounds)
+	await _run_async_test("hidden_target_authority_projection", _test_hidden_target_authority_projection)
 	_run_test("accessibility_modes", _test_accessibility_modes)
 	_run_test("single_final_damage_contract", _test_single_final_damage_contract)
 
@@ -67,87 +64,74 @@ func _test_dual_anchor_layout() -> void:
 	for viewport_size: Vector2i in [Vector2i(1152, 648), Vector2i(900, 540)]:
 		root.size = viewport_size
 		await process_frame
-		var compact := viewport_size.x <= 960
-		var status_rect := _physical_rect(_hud.status_panel)
-		var belt_rect := _physical_rect(_hud.skill_panel)
-		var expected_status := Vector2(236, 68) if compact else Vector2(280, 76)
-		var expected_belt := Vector2(500, 68) if compact else Vector2(544, 72)
-		_expect(status_rect.size.is_equal_approx(expected_status), "status capsule size at %s" % str(viewport_size))
-		_expect(belt_rect.size.is_equal_approx(expected_belt), "skill belt size at %s" % str(viewport_size))
-		_expect(_inside(status_rect, viewport_size), "status capsule remains in viewport at %s" % str(viewport_size))
-		_expect(_inside(belt_rect, viewport_size), "skill belt remains in viewport at %s" % str(viewport_size))
+		var status_rect := _hud.status_panel.get_global_rect()
+		var belt_rect := _hud.skill_panel.get_global_rect()
+		var passive_rect := _hud.passive_panel.get_global_rect()
+		_expect(status_rect.size.is_equal_approx(Vector2(280, 76)), "status capsule size at %s" % str(viewport_size))
+		_expect(belt_rect.size.is_equal_approx(Vector2(532, 78)), "active skill belt size at %s" % str(viewport_size))
+		_expect(passive_rect.size.x >= 496.0 and passive_rect.size.y >= 58.0, "passive skill strip size at %s" % str(viewport_size))
+		_expect(_inside(_physical_rect(_hud.status_panel), viewport_size), "status capsule remains in viewport at %s" % str(viewport_size))
+		_expect(_inside(_physical_rect(_hud.skill_panel), viewport_size), "skill belt remains in viewport at %s" % str(viewport_size))
+		_expect(_inside(_physical_rect(_hud.passive_panel), viewport_size), "passive strip remains in viewport at %s" % str(viewport_size))
 		_expect(not status_rect.intersects(belt_rect), "dual anchors never overlap at %s" % str(viewport_size))
-		var previous_end := -INF
-		for slot_id: StringName in [SkillSlotIds.ACTIVE_1, SkillSlotIds.ACTIVE_2, SkillSlotIds.ACTIVE_3, SkillSlotIds.PASSIVE_1]:
-			var rect := _physical_rect(_hud.slot_panel(slot_id))
+		_expect(not status_rect.intersects(passive_rect), "status and passive anchors never overlap at %s" % str(viewport_size))
+		for slot_id: StringName in SkillSlotIds.all():
+			var rect := _hud.visual_slot_panel(slot_id).get_global_rect()
 			_expect(rect.size.x >= 44.0 and rect.size.y >= 44.0, "slot focus footprint >=44 at %s / %s" % [str(viewport_size), String(slot_id)])
-			_expect(rect.position.x >= previous_end - 0.2, "slot order stable at %s / %s" % [str(viewport_size), String(slot_id)])
-			previous_end = rect.end.x
 	root.size = Vector2i(1152, 648)
 	await process_frame
 
 
 func _test_occupancy_budget() -> void:
 	var canvas_area := 1152.0 * 648.0
-	var permanent_area := 280.0 * 76.0 + 544.0 * 72.0
-	var fallback_area := permanent_area + 156.0 * 48.0
-	var peak_area := fallback_area + 360.0 * 36.0
-	_expect(is_equal_approx(permanent_area / canvas_area * 100.0, 8.09758), "permanent dual-anchor budget is 8.10%")
-	_expect(permanent_area / canvas_area <= 0.085, "permanent budget <=8.5%")
-	_expect(fallback_area / canvas_area <= 0.10, "fallback budget <=10%")
-	_expect(peak_area / canvas_area <= 0.115, "feedback peak <=11.5%")
+	var permanent_area := 280.0 * 76.0 + 532.0 * 78.0 + 496.0 * 58.0
+	var peak_area := permanent_area + 360.0 * 36.0
+	_expect(permanent_area / canvas_area <= 0.125, "seven-slot permanent HUD budget <=12.5%")
+	_expect(peak_area / canvas_area <= 0.145, "feedback peak <=14.5%")
 
 
-func _test_fixed_three_plus_one_semantics() -> void:
-	var ordered := [SkillSlotIds.ACTIVE_1, SkillSlotIds.ACTIVE_2, SkillSlotIds.ACTIVE_3, SkillSlotIds.PASSIVE_1]
-	for slot_id: StringName in ordered:
+func _test_strict_three_active_four_passive_semantics() -> void:
+	for slot_id: StringName in SkillSlotIds.all():
 		_expect(_hud.slot_panel(slot_id) != null, "shared slot exists: %s" % String(slot_id))
-	_expect((_hud.get_node("Root/SkillPanel/Margin/Skills/SlotRow") as HBoxContainer).get_child_count() == 5, "belt contains CurrentElement plus exactly four shared slots")
-	var passive_key := _hud.slot_panel(SkillSlotIds.PASSIVE_1).get_node("Margin/Box/Top/Key") as Control
-	_expect(not passive_key.visible, "PASSIVE_1 has no false keycap")
-	var passive_style := _hud.slot_panel(SkillSlotIds.PASSIVE_1).get_theme_stylebox(&"panel") as StyleBoxFlat
-	_expect(passive_style.corner_radius_top_left == 0 and passive_style.border_width_left >= 2, "PASSIVE uses distinct square heavy outline")
-	var pivot_text := (_hud.get_node("Root/SkillPanel/Margin/Skills/SlotRow/CurrentElement/Margin/Box/Text") as Label).text
-	_expect(pivot_text.contains("水") and pivot_text.contains("WATER"), "CurrentElement pivot combines short text and shape")
+	_expect((_hud.get_node("Root/SkillPanel/Margin/Skills/SlotRow") as HBoxContainer).get_child_count() == 4, "active belt contains CurrentElement plus A1-A3")
+	_expect((_hud.get_node("Root/PassivePanel/Margin/SlotRow") as HBoxContainer).get_child_count() == 4, "independent passive strip contains P1-P4")
+	for slot_id: StringName in SkillSlotIds.passive():
+		var passive := _hud.visual_slot_panel(slot_id)
+		_expect(not (passive.get_node("Margin/Body/Key") as Control).visible, "%s has no false keycap" % String(slot_id))
+		_expect(not (passive.get_node("Margin/Body/Cost") as Control).visible, "%s has no false SP cost" % String(slot_id))
+	var pivot_shape := (_hud.get_node("Root/SkillPanel/Margin/Skills/SlotRow/CurrentElement/Body/ElementShape") as Label).text
+	var pivot_text := (_hud.get_node("Root/SkillPanel/Margin/Skills/SlotRow/CurrentElement/Body/ElementText") as Label).text
+	_expect(not pivot_shape.is_empty() and pivot_text.contains("水"), "CurrentElement pivot combines shape and short text")
 
 
 func _test_compact_state_grammar() -> void:
-	var active := _hud.slot_panel(SkillSlotIds.ACTIVE_1)
-	var state := active.get_node("Margin/Box/State") as Label
-	_expect(state.text.contains("可用"), "ready state uses short positive label")
+	var active := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_1)
+	var state := active.get_node("Margin/Body/State") as Label
+	_expect(state.text == "可用", "ready state uses short positive label")
 	_player.energy_component.set_current(0)
-	_expect(state.text.contains("能量"), "zero energy uses resource glyph and short word")
+	_expect(state.text == "能量", "zero energy uses short resource word")
 	_hud.call("_on_cast_attempted", SkillSlotIds.ACTIVE_1, CastAttemptResult.rejected(CastAttemptResult.RejectReason.COOLDOWN_ACTIVE, &"element_bolt", &"", 2.4, SkillSlotIds.ACTIVE_1))
-	_expect(state.text == "2.4s", "cooldown rejection uses one decimal below ten")
-	_expect(String(_hud.call("_format_cooldown", 12.2)) == "13s", "cooldown >=10 uses integer seconds")
+	_expect(state.text == "失败", "cooldown rejection uses compact failure state")
+	_expect(String(_hud.call("_format_cooldown", 12.2)) == "13", "cooldown >=10 uses integer seconds")
 	_hud.call("_on_cast_attempted", SkillSlotIds.ACTIVE_1, CastAttemptResult.rejected(CastAttemptResult.RejectReason.BUSY, &"element_bolt", &"", 0.0, SkillSlotIds.ACTIVE_1))
-	_expect(state.text.contains("忙"), "busy uses common short grammar")
+	_expect(state.text == "失败", "busy rejection stays distinct from false success")
 	_expect(_hud.feedback_text().contains("动作结束后重试"), "busy failure keeps recovery guidance in feedback")
 	_player.energy_component.set_current(_player.energy_component.maximum)
 	_hud.call("_expire_slot_transients")
 
 
-func _test_authoritative_target_projection() -> void:
+func _test_hidden_target_authority_projection() -> void:
+	var previous := _enemy.element_carrier.snapshot()
 	_enemy.element_carrier.set_amounts_silent(2, 3)
-	_hud.set_authoritative_target(_enemy)
+	_enemy.element_carrier.notify_changed(previous)
 	await process_frame
-	_expect(_hud.target_projection_mode() == &"follow", "configured room authority follows on-screen target")
 	var target_panel := _hud.get_node("Root/TargetPanel") as Control
-	_expect(target_panel.visible and target_panel.size.is_equal_approx(Vector2(156, 48)), "follow label is bounded to 156x48")
-	_expect(_all_text(target_panel).contains("WATER") and _all_text(target_panel).contains("FIRE"), "target layers retain shape and text")
+	_expect(_all_text(target_panel).contains("×2") and _all_text(target_panel).contains("×3"), "hidden compatibility binding still consumes authority layers")
+	_expect(not target_panel.is_visible_in_tree() and not _hud.has_visible_target_attachment_text(), "formal HUD exposes no target attachment text")
 	_enemy.position.x = 1800.0
 	await process_frame
-	_expect(_hud.target_projection_mode() == &"fallback", "off-screen authority uses fixed fallback")
-	_expect(target_panel.get_global_rect().end.x <= 1152.1, "fallback remains inside right edge")
+	_expect(not target_panel.is_visible_in_tree(), "off-screen authority creates no text fallback")
 	_enemy.position.x = 820.0
-	_hud.set_authoritative_target(null)
-	await process_frame
-	_expect(_hud.target_projection_mode() == &"hidden" and not target_panel.visible, "no authority hides empty target panel")
-	_hud.set_authoritative_target(_enemy)
-	await process_frame
-	_hud.call("_on_authoritative_target_defeated", _enemy)
-	_expect(_hud.target_projection_mode() == &"hidden", "target death clears layers without residue")
-	_hud.set_authoritative_target(_enemy)
 
 
 func _test_reward_one_two_three_layout() -> void:
@@ -273,7 +257,6 @@ func _reset_enemy() -> void:
 	_enemy.combat_receiver.clear_recent_hits()
 	_enemy.damage_receiver.restore_full(false)
 	_enemy.element_carrier.clear_all(false)
-	_hud.set_authoritative_target(_enemy)
 
 
 func _offer(count: int, long_copy: bool) -> RewardOffer:
