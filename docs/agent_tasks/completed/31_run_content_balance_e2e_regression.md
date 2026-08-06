@@ -1,8 +1,8 @@
 # 任务 31：基础内容、数值与整轮端到端回归
 
-状态：BLOCKED
+状态：ACCEPTED
 负责人：Content/Balance & E2E Validation Agent（复用 Run Flow/Scene Integration Agent 2.0 职责对话，threadId `019fd63e-f9d7-7760-b68c-45b552c90881`，hostId `local`）
-依赖：任务 30 `ACCEPTED`；Task30 阶段检查点 `fa94956bbaa9be32cafa2a585d8bd2116da5882e`；恢复执行前新增依赖任务 32 `ACCEPTED`
+依赖：任务 30 `ACCEPTED`；Task30 阶段检查点 `fa94956bbaa9be32cafa2a585d8bd2116da5882e`；任务 32 `ACCEPTED`，阶段检查点 `8ae7f9083b7da3d9f01b32966fa207162a623fd0`
 回传中枢：Review 5.0，threadId `019fc6c7-85e3-77f0-a99b-9cc9ee6055a2`，hostId `local`
 
 ## 1. 目标与完成定义
@@ -139,9 +139,9 @@ Task31 evidence README 必须逐项列出任务 26 契约第 9 节的 14 场景�
 - `run_task31_content_balance_tests.gd`：覆盖 catalog、价格/等级连续性、效果白名单、预算/守恒/返还、八房引用、路线差异、Boss 零梦尘和 14 场景矩阵静态/领域部分。
 - `run_task31_full_run_e2e_tests.gd`：从正式新 main scene 完成安全路线与风险路线各一局，覆盖购买、升级、重置、即时七槽、四被动跨房、失败结算、开始新一局和“返回入口禁用且不改变权威”。
 - 两局都必须经六个真实战斗房实例推进，记录六个不同实例、至少四种真实模板、三商店、两路线和 Boss 直结算；不得直接调用完成/终局跳关。
-- 复跑 Task30 接受基线 `26/26 runners / 282 tests / 3127 assertions`；加上两个 Task31 runner 后正式 runner 数应为 `28/28`，tests/assertions 以新 runner 实际输出精确汇总。
-- Task12/16/18/24 迁移数字保持 `13/113、11/209、9/124、10/237`，除非 Task31 未获授权的旧 runner 被改动（这将直接构成越界失败）。
-- Task20 runner 单列运行并记录，继续历史 `BLOCKED`，不得计入 28 个门禁 runner。
+- 复跑 Task32 接受基线 `27/27 runners / 287 tests / 3338 assertions`；加上两个 Task31 runner 后正式 runner 数应为 `29/29`，tests/assertions 以新 runner 实际输出精确汇总。
+- Task12/16/18/24 迁移数字保持 `13/113、11/231、9/124、10/237`，Task27 economy 保持 `11/307`；除非 Task31 未获授权的旧 runner 被改动（这将直接构成越界失败）。
+- Task20 runner 单列运行并记录，继续历史 `BLOCKED`，不得计入 29 个门禁 runner。
 - 正式 `RunGame` 与 `TestRoom` 各 180 帧 smoke，全部正式日志五类标记为 0；capture 后再做一次 editor rescan。
 
 ## 8. 实际 Viewport 与人工检查
@@ -160,7 +160,7 @@ Task31 evidence README 必须逐项列出任务 26 契约第 9 节的 14 场景�
 - 最终价格、等级曲线、八房敌群/梦尘、两条路线差异与 Boss 数值表；
 - 安全/风险两局的总时长、逐房时长、梦尘 earned/spent/refunded/balance、购买/升级/重置、最终技能等级、七槽、四被动和技能使用占比；
 - 三条构筑预算与 14 场景矩阵逐项证据；
-- scan、28 个正式 runner、Task20 单列、双 smoke、capture、rescan 的精确 exit/tests/assertions/日志标记；
+- scan、29 个正式 runner、Task20 单列、双 smoke、capture、rescan 的精确 exit/tests/assertions/日志标记；
 - 至少 14 张实际 Viewport 的逐图信息和人工检查；
 - 冷副本/profile、复制核对、共享 `.godot`/sidecar 前后对账、保护项和 Git 写操作为 0。
 
@@ -194,3 +194,32 @@ Task31 evidence README 必须逐项列出任务 26 契约第 9 节的 14 场景�
 - 任务 32 不新增被动机制：分别沿用现有 `+20` 最大生命和 `+10` 最大 SP 的静态被动定义；`passive_focus`、`passive_balance` 继续保持旧资源、不得注册。
 - 任务 32 必须独立验收并由中枢标记 `ACCEPTED` 后，本任务才可恢复；届时中枢将补发新的检查点、接受 runner 数字和 allowlist 基线。
 - 本次 Task31 阻塞记录与 evidence 保留，不作为失败实现；任务31继续冻结，当前不运行任何部分门禁。
+
+## 13. Task32 前置解除与恢复执行（2026-08-06）
+
+中枢 Review 5.0 已在全新冷副本独立验收任务 32 并标记 `ACCEPTED`，阶段检查点为 `8ae7f9083b7da3d9f01b32966fa207162a623fd0`。正式 catalog 现为一个固定普通攻击与八个可购买内容（四主动、四被动）；P1–P4 的正式购买、即时装配和跨房重建链路已通过独立门禁。Task31 的原四被动阻塞前置因此解除，本任务从该检查点恢复为 `IN_PROGRESS`；原阻塞记录继续保留用于审计，不降低真实四被动、两条完整局或其余完成定义。
+
+## 14. Task32 解除后的最终执行记录（2026-08-06）
+
+Task31 已在此前不存在的 `C:\tmp\element-dungeon-task31-exec-20260806-01\project` 与独立 profile `C:\tmp\element-dungeon-task31-exec-20260806-01\profile` 完成全部门禁，当前冻结为 `REVIEW`，等待中枢独立验收：
+
+- 冷副本复制前源/目标逐文件核对为 `1533 files / 45,761,395 bytes / only-source 0 / only-cold 0 / mismatch 0`；冷副本首次 Godot 命令为 4.7.1 headless editor scan，exit `0`。
+- Task32 接受基线复跑 `27/27 runners / 287 tests / 3338 assertions`；Task31 两个专项为 `13 tests / 757 assertions`；正式总计 `29/29 runners / 300 tests / 4095 assertions`。Task20 单列 `7 tests / 68 assertions`，不计入门禁。
+- 正式 `RunGame` 与 `TestRoom` 各 `--quit-after 180` smoke，均 exit `0`；最终 capture 后 editor rescan exit `0`。全部 35 份正式日志的 `SCRIPT ERROR / Parse Error / ERROR: / WARNING: / CrashHandlerException` 均为 `0`。
+- E2E 从正式 `RunGame` 真实完成安全线与风险线各一局；每局均为六个不同活动房实例、三商店、两路线、四被动跨房、Boss 敌人/房间梦尘均 `0` 且同一事务直达结果。安全线 `595 earned / 300 purchases / 300 upgrades / 105 refunded / 100 balance`；风险线 `700 / 510 / 115 / 0 / 75`。
+- 非 headless capture 从同一正式流程生成 `19` 张新 Viewport，最终为 `1 test / 627 assertions / 19 screenshots`；安全线八张 `1920×1080`，风险线、新局和失败十一张 `2560×1440`。执行侧已逐张按原始分辨率打开检查通过。
+- 未调整 allowlist 内任何 `.tres`/`.tscn`；新增内容仅为三个 Task31 验证夹具及 Task31 evidence。未修改 Task27～30 权威/UI/runner/evidence、`project.godot` 或 `TestRoom`。
+- 共享 `.godot` 前后均为 `754 files / 37,416,266 bytes / latest 2026-08-06T12:52:36.9297954Z`；全部 sidecar 前后均为 `537 / 198,428 / latest 2026-08-06T12:46:32.2117630Z`，其中既有未跟踪 sidecar 均为 `66 / 28,555 / same latest`。共享编辑器只被动保持，未调用或控制。
+- 未使用子 Agent；Git 暂存、提交、切换、恢复、重置、清理和推送等写操作均为 `0`。完整数值、房间、两局、14 场景、日志、逐图 SHA 与保护对账见 `docs/agent_tasks/evidence/task31/README.md`。
+
+## 15. 中枢 Review 5.0 独立验收（2026-08-07）
+
+中枢在此前不存在的 `C:\tmp\element-dungeon-task31-review5-20260806-01\project` 与独立 profile 中完成全新冷副本复验，结论为 `PASS / ACCEPTED`：
+
+- 冷复制排除 `.git/.godot/.workbuddy/cache/__pycache__/*.pyc` 后，源与副本均为 `1583 files / 49,970,105 bytes`，逐文件 `only-source 0 / only-cold 0 / mismatch 0`；复制来的旧 19 张 Viewport 在首次 scan 前移出项目，后续证据全部由本轮重新生成。
+- 第一条 Godot 4.7.1 命令为 headless editor scan，exit `0`；29/29 正式 runner 为 `300 tests / 4095 assertions`，其中 Task31 两个专项为 `13 / 757`。Task20 单列 `7 / 68`、继续历史 `BLOCKED`；RunGame/TestRoom 各 180 帧 smoke 均 exit `0`。
+- 非 headless 正式 RunGame capture 为 `1 test / 627 assertions / 19 screenshots`，覆盖两条六战路线、三商店、两路线门牌、四种房模板、四被动、Boss、成功/失败与新局。19 图均按原始分辨率打开检查；2560×1440 狭廊战中 HP 面板压住房间标题最左侧一小段，属于不影响控制、角色、构筑或权威信息的非阻塞 UI 抛光项，交由后续任务处理。
+- capture 后最终 editor rescan exit `0`；35 份独立 Review 日志共 `102,935 bytes`，`SCRIPT ERROR / Parse Error / ERROR: / WARNING: / CrashHandlerException` 均为 `0`。
+- 回到共享区复核时 HEAD 仍为 Task32 检查点 `8ae7f9083b7da3d9f01b32966fa207162a623fd0`；Task31 五个核心对象哈希未变；共享 `.godot` 仍为 `754 / 37,416,266`，全部 sidecar 仍为 `537 / 198,428`，其中未跟踪 sidecar 仍为 `66 / 28,555`。无 allowlist 外 tracked 漂移，保护项未删除、修改或认领。
+
+任务31通过独立验收并归档；任务20仍保持历史 `BLOCKED`，不得据本任务结果追认。
