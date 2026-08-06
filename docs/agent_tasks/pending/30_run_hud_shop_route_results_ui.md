@@ -2,7 +2,7 @@
 
 状态：PENDING
 负责人：UI/HUD Implementation Agent 2.0（threadId `019fc67f-02a6-7540-9549-02513a23af09`，hostId `local`）
-依赖：任务 29 `ACCEPTED`；阶段检查点 `dc834ff27a500b5259b7be244ee3febf61704429`；任务 20 继续历史 `BLOCKED`
+依赖：任务 29 `ACCEPTED`，实现检查点 `dc834ff27a500b5259b7be244ee3febf61704429`；任务 20 继续历史 `BLOCKED`
 
 ## 1. 目标与完成定义
 
@@ -150,7 +150,7 @@ capture 在保存每张 PNG 前必须自动断言对应权威 phase/snapshot、�
 
 - 建立此前不存在的 `C:\tmp` 冷副本和独立 profile，排除 `.git/.godot/.workbuddy/cache`，逐文件比较数量、字节与 SHA-256；冷副本第一条 Godot 命令必须是 4.7.1 headless editor scan。
 - 开始前与完成后核对 HEAD、完整 `git status`、Task30 allowlist 内容/SHA、Task29权威/场景保护文件、Task20/24历史证据、共享 `.godot` 和未跟踪 sidecar。共享编辑器被动漂移单列，不删除、不认领。
-- 初始 Git 基线为 `dc834ff27a500b5259b7be244ee3febf61704429`。当前已知工作树保留项为 `.workbuddy/memory/2026-07-31.md`、`docs/架构评估与扩展性改进建议.md` 和 28 个未跟踪 `.gd.uid/.png.import` sidecar；均不属于 Task30。
+- Task29 实现检查点为 `dc834ff27a500b5259b7be244ee3febf61704429`。Task30 开工时 HEAD 必须包含本任务书且没有其他未声明的 tracked 差异；实际分发 HEAD 由中枢聊天消息给出并由执行者在开工审计中记录。当前已知工作树保留项为 `.workbuddy/memory/2026-07-31.md`、`docs/架构评估与扩展性改进建议.md` 和 28 个未跟踪 `.gd.uid/.png.import` sidecar；均不属于 Task30。
 - 执行者 Git 写操作必须为零。中枢只有在独立 Review PASS、回归和精确 allowlist 暂存审计后才可提交；不 push。
 
 ## 8. 完成、冻结与自动回传
