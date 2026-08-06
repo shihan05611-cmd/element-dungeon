@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
+[ext_resource type="Script" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
+[ext_resource type="PackedScene" path="res://scenes/run/rooms/room_arena_platforms.tscn" id="3_template"]
+[ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="4_enemy"]
+
+[sub_resource type="Resource" id="SpawnElite"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"layer_elite"
+local_position = Vector2(790, 494)
+maximum_health = 145
+defense_flat = 2.0
+dream_dust_reward = 35
+
+[resource]
+script = ExtResource("1_room")
+room_id = &"combat_03_layer_elite"
+display_name = "战 3 · 层主精英"
+template_label = "紫晶双层廊"
+encounter_label = "强化精英"
+environment_label = "错层平台"
+room_scene = ExtResource("3_template")
+enemy_spawns = Array[ExtResource("2_spawn")]([SubResource("SpawnElite")])
+completion_dream_dust = 90

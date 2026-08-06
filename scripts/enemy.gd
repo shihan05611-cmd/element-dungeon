@@ -15,6 +15,8 @@ const ATTACK_DURATION := 0.55
 @export var ai_enabled: bool = true
 @export var growth_enemy_id: StringName = &"orc_1"
 @export_range(0, 1000000, 1, "or_greater") var experience_reward: int = 50
+@export_range(0, 1000000, 1, "or_greater") var dream_dust_reward: int = 0
+@export var terminal_enemy: bool = false
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var prompt: Label = $Prompt
@@ -33,6 +35,25 @@ var defeated: bool = false
 var rng := RandomNumberGenerator.new()
 
 static var _last_enemy_cast_id: int = 1_000_000_000
+
+
+func configure_run_spawn(
+		definition: EnemySpawnDefinition,
+		is_terminal_enemy: bool = false
+) -> bool:
+	if definition == null or not definition.validation_error(is_terminal_enemy).is_empty():
+		return false
+	growth_enemy_id = definition.enemy_id
+	experience_reward = 0
+	dream_dust_reward = definition.dream_dust_reward
+	terminal_enemy = is_terminal_enemy
+	if damage_receiver == null:
+		return false
+	return damage_receiver.configure_runtime(
+		definition.maximum_health,
+		definition.maximum_health,
+		definition.defense_flat
+	)
 
 
 func _ready() -> void:

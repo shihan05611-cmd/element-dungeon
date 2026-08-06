@@ -9,6 +9,10 @@ enum {
 	ROUTE_CHOICE,
 	SHOP,
 	RUN_COMPLETE,
+	ENTRY,
+	ROOM_LOADING,
+	ROOM_RESOLUTION,
+	RUN_FAILED,
 }
 
 
@@ -28,5 +32,13 @@ static func name_of(value: int) -> StringName:
 			return &"shop"
 		RUN_COMPLETE:
 			return &"run_complete"
+		ENTRY:
+			return &"entry"
+		ROOM_LOADING:
+			return &"room_loading"
+		ROOM_RESOLUTION:
+			return &"room_resolution"
+		RUN_FAILED:
+			return &"run_failed"
 		_:
 			return &"unknown"

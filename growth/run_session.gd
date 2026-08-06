@@ -29,6 +29,8 @@ var _shop_session_sequence: int = 0
 var _command_records: Dictionary = {}
 var _observed_experience: int = 0
 var _observed_relic_events: int = 0
+var _run_result: RunResultSnapshot
+var _flow_definition: RunFlowDefinition
 
 
 func _init(
@@ -40,7 +42,9 @@ func _init(
 		effect_port: GrowthEffectPort = null,
 		rules: RunRulesSnapshot = null,
 		content_catalog: RunContentCatalog = null,
-		initial_dream_dust: int = 0
+		initial_dream_dust: int = 0,
+		flow_definition: RunFlowDefinition = null,
+		run_id: StringName = &""
 ) -> void:
 	_skill_catalog = skill_catalog.duplicate()
 	_relic_catalog = relic_catalog.duplicate()
@@ -55,6 +59,8 @@ func _init(
 	_unlocked_form_ids = unlocked_form_ids.duplicate()
 	_runtime_loadout_port = runtime_loadout_port
 	_relic_controller = RelicController.new(effect_port)
+	_flow_definition = flow_definition
+	_director = RunDirector.new(flow_definition, run_id) if flow_definition != null else RunDirector.new()
 
 
 func snapshot() -> RunSnapshot:
@@ -72,7 +78,9 @@ func snapshot() -> RunSnapshot:
 		_economy.snapshot(),
 		_shop_snapshot,
 		_observed_experience,
-		_observed_relic_events
+		_observed_relic_events,
+		_director.current_node_snapshot(),
+		_run_result
 	)
 
 
@@ -83,9 +91,145 @@ func begin_combat_room(room_id: StringName) -> RunCommandResult:
 	return _commit_and_publish(&"combat_room_began")
 
 
+func is_formal_flow() -> bool:
+	return _director.formal_flow
+
+
+func combat_room_definition(node_id: StringName) -> CombatRoomDefinition:
+	return _director.combat_room_for(node_id)
+
+
+func start_formal_run(
+		command_id: StringName,
+		expected_run_revision: int
+) -> RunCommandResult:
+	var fingerprint := StringName("start_formal|%d" % expected_run_revision)
+	var replay := _command_replay(command_id, fingerprint)
+	if replay != null:
+		return replay
+	var envelope := _validate_formal_revision(expected_run_revision)
+	if not envelope.accepted:
+		return _recorded_rejection(command_id, fingerprint, envelope.reject_reason, envelope.detail)
+	var result := _director.start_formal_run()
+	if not result.accepted:
+		return _recorded_rejection(command_id, fingerprint, result.reject_reason, result.detail)
+	return _commit_formal_command(command_id, fingerprint, &"formal_run_started")
+
+
+func accept_room_transition(
+		command_id: StringName,
+		expected_run_revision: int,
+		node_id: StringName,
+		room_instance_id: int,
+		scene_path: String
+) -> RunCommandResult:
+	var fingerprint := StringName("activate|%d|%s|%d|%s" % [
+		expected_run_revision,
+		String(node_id),
+		room_instance_id,
+		scene_path,
+	])
+	var replay := _command_replay(command_id, fingerprint)
+	if replay != null:
+		return replay
+	var envelope := _validate_formal_revision(expected_run_revision)
+	if not envelope.accepted:
+		return _recorded_rejection(command_id, fingerprint, envelope.reject_reason, envelope.detail)
+	var result := _director.accept_formal_room(node_id, room_instance_id, scene_path)
+	if not result.accepted:
+		return _recorded_rejection(command_id, fingerprint, result.reject_reason, result.detail)
+	return _commit_formal_command(command_id, fingerprint, &"formal_room_activated")
+
+
+func choose_formal_route(
+		command_id: StringName,
+		expected_run_revision: int,
+		option_id: StringName
+) -> RunCommandResult:
+	var fingerprint := StringName("formal_route|%d|%s" % [
+		expected_run_revision,
+		String(option_id),
+	])
+	var replay := _command_replay(command_id, fingerprint)
+	if replay != null:
+		return replay
+	var envelope := _validate_formal_revision(expected_run_revision)
+	if not envelope.accepted:
+		return _recorded_rejection(command_id, fingerprint, envelope.reject_reason, envelope.detail)
+	var result := _director.choose_route(option_id)
+	if not result.accepted:
+		return _recorded_rejection(command_id, fingerprint, result.reject_reason, result.detail)
+	return _commit_formal_command(command_id, fingerprint, &"formal_route_chosen")
+
+
+func leave_formal_shop(
+		command_id: StringName,
+		expected_run_revision: int,
+		shop_session_id: StringName
+) -> RunCommandResult:
+	var fingerprint := StringName("leave_shop|%d|%s" % [
+		expected_run_revision,
+		String(shop_session_id),
+	])
+	var replay := _command_replay(command_id, fingerprint)
+	if replay != null:
+		return replay
+	if not _director.formal_flow:
+		return _recorded_rejection(
+			command_id,
+			fingerprint,
+			RunCommandResult.RejectReason.INVALID_STATE,
+			&"legacy_shop_uses_confirm"
+		)
+	var envelope := _validate_shop_envelope(expected_run_revision, shop_session_id)
+	if not envelope.accepted:
+		return _recorded_rejection(command_id, fingerprint, envelope.reject_reason, envelope.detail)
+	var result := _director.commit_shop_exit(false)
+	if not result.accepted:
+		return _recorded_rejection(command_id, fingerprint, result.reject_reason, result.detail)
+	_active_shop_draft = null
+	_shop_snapshot = null
+	return _commit_formal_command(command_id, fingerprint, &"formal_shop_left")
+
+
+func fail_formal_run(
+		command_id: StringName,
+		expected_run_revision: int,
+		failure_reason: StringName
+) -> RunCommandResult:
+	var fingerprint := StringName("fail_formal|%d|%s" % [
+		expected_run_revision,
+		String(failure_reason),
+	])
+	var replay := _command_replay(command_id, fingerprint)
+	if replay != null:
+		return replay
+	var envelope := _validate_formal_revision(expected_run_revision)
+	if not envelope.accepted:
+		return _recorded_rejection(command_id, fingerprint, envelope.reject_reason, envelope.detail)
+	if failure_reason.is_empty():
+		return _recorded_rejection(
+			command_id,
+			fingerprint,
+			RunCommandResult.RejectReason.INVALID_ARGUMENT,
+			&"missing_run_failure_reason"
+		)
+	var result := _director.fail_formal_run()
+	if not result.accepted:
+		return _recorded_rejection(command_id, fingerprint, result.reject_reason, result.detail)
+	_freeze_result(RunResultSnapshot.Outcome.FAILED, failure_reason)
+	return _commit_formal_command(command_id, fingerprint, &"formal_run_failed")
+
+
 func handle_event(event: RunEvent) -> RunCommandResult:
 	if event == null or not event.is_valid():
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.INVALID_EVENT, &"invalid_run_event")
+	if _run_result != null:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.RUN_ALREADY_FINISHED,
+			&"run_already_finished",
+			snapshot()
+		)
 	var event_key := event.identity_key()
 	if _processed_event_keys.has(event_key):
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.DUPLICATE_EVENT, &"event_already_processed")
@@ -626,6 +770,18 @@ func _handle_enemy_killed(event: EnemyKilledEvent) -> RunCommandResult:
 	var kill_key := StringName("%s:%s" % [String(event.room_id), String(event.enemy_id)])
 	if _processed_kill_keys.has(kill_key):
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.DUPLICATE_EVENT, &"enemy_kill_already_processed")
+	if _director.formal_flow:
+		var formal_room := _director.combat_room_for(event.room_id)
+		if formal_room == null:
+			return RunCommandResult.rejected(
+				RunCommandResult.RejectReason.CONFIGURATION_ERROR,
+				&"formal_kill_room_missing"
+			)
+		if formal_room.final_boss and (not event.terminal_enemy or event.dream_dust_reward != 0):
+			return RunCommandResult.rejected(
+				RunCommandResult.RejectReason.CONFIGURATION_ERROR,
+				&"terminal_enemy_reward_mismatch"
+			)
 	if _rules.progression_mode == RunFeatureMode.Value.ENABLED:
 		var experience_result := _progression.try_add_experience(event.experience_reward)
 		if not experience_result.accepted:
@@ -646,6 +802,22 @@ func _handle_room_completed(event: RoomCompletedEvent) -> RunCommandResult:
 	var room_validation := _director.validate_room_completion(event.room_id)
 	if not room_validation.accepted:
 		return room_validation
+	var formal_room: CombatRoomDefinition
+	if _director.formal_flow:
+		formal_room = _director.combat_room_for(event.room_id)
+		if formal_room == null:
+			return RunCommandResult.rejected(
+				RunCommandResult.RejectReason.CONFIGURATION_ERROR,
+				&"formal_room_definition_missing"
+			)
+		if (
+			event.completion_dream_dust != formal_room.completion_dream_dust
+			or event.terminal_room != formal_room.final_boss
+		):
+			return RunCommandResult.rejected(
+				RunCommandResult.RejectReason.CONFIGURATION_ERROR,
+				&"formal_room_reward_mismatch"
+			)
 	if _rules.progression_mode == RunFeatureMode.Value.ENABLED:
 		var experience_plan := ExperienceService.plan_gain(
 			_progression.snapshot(),
@@ -671,6 +843,12 @@ func _handle_room_completed(event: RoomCompletedEvent) -> RunCommandResult:
 	elif _rules.relic_mode == RunFeatureMode.Value.OBSERVE_ONLY:
 		_observed_relic_events += 1
 	_processed_event_keys[event.identity_key()] = true
+	if _director.formal_flow:
+		var route_after := _director.snapshot()
+		if route_after.phase == RunPhase.SHOP:
+			_install_shop_session(_run_revision + 1)
+		elif route_after.phase == RunPhase.RUN_COMPLETE:
+			_freeze_result(RunResultSnapshot.Outcome.COMPLETE, &"")
 	return _commit_and_publish(&"room_completed")
 
 
@@ -932,6 +1110,69 @@ func _commit_shop_command(
 	}
 	snapshot_changed.emit(current, cause)
 	return result
+
+
+func _validate_formal_revision(expected_run_revision: int) -> RunCommandResult:
+	if not _director.formal_flow:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.INVALID_STATE,
+			&"formal_flow_not_configured"
+		)
+	if not _director.configuration_error.is_empty():
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.CONFIGURATION_ERROR,
+			_director.configuration_error
+		)
+	if _run_result != null:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.RUN_ALREADY_FINISHED,
+			&"run_already_finished"
+		)
+	if expected_run_revision != _run_revision:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.STALE_RUN_REVISION,
+			&"stale_run_revision"
+		)
+	return RunCommandResult.success()
+
+
+func _commit_formal_command(
+		command_id: StringName,
+		fingerprint: StringName,
+		cause: StringName
+) -> RunCommandResult:
+	_run_revision += 1
+	var current := snapshot()
+	var result := RunCommandResult.success(current)
+	_command_records[command_id] = {
+		&"fingerprint": fingerprint,
+		&"result": result,
+	}
+	snapshot_changed.emit(current, cause)
+	return result
+
+
+func _freeze_result(
+		outcome: RunResultSnapshot.Outcome,
+		failure_reason: StringName
+) -> void:
+	if _run_result != null:
+		return
+	var route := _director.snapshot()
+	_run_result = RunResultSnapshot.new(
+		outcome,
+		route.run_id,
+		route.completed_combat_rooms,
+		RunFlowDefinition.REQUIRED_COMBAT_ROOMS,
+		route.current_node_id,
+		failure_reason,
+		_economy.snapshot(),
+		_skill_inventory.snapshot(),
+		_current_loadout_snapshot(),
+		route.shop_visits,
+		route.route_choices,
+		_run_revision + 1
+	)
 
 
 func _current_loadout_snapshot() -> RuntimeLoadoutSnapshot:

@@ -1,0 +1,54 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS task20_occupancy_budget
+ERROR: Node not found: "Root/SkillPanel/Margin/Skills/SlotRow/CurrentElement/Margin/Box/Text" (relative to "/root/TestRoom/CombatHUD").
+   at: get_node (scene/main/node.cpp:1975)
+   GDScript backtrace (most recent call first):
+       [0] _test_fixed_three_plus_one_semantics (res://combat/tests/run_compact_hud_reward_tests.gd:110)
+       [1] _run_test (res://combat/tests/run_compact_hud_reward_tests.gd:320)
+       [2] _run (res://combat/tests/run_compact_hud_reward_tests.gd:42)
+       [3] _run_async_test (res://combat/tests/run_compact_hud_reward_tests.gd:329)
+       [4] _test_dual_anchor_layout (res://combat/tests/run_compact_hud_reward_tests.gd:87)
+SCRIPT ERROR: Invalid access to property or key 'text' on a base object of type 'null instance'.
+   at: _test_fixed_three_plus_one_semantics (res://combat/tests/run_compact_hud_reward_tests.gd:110)
+   GDScript backtrace (most recent call first):
+       [0] _test_fixed_three_plus_one_semantics (res://combat/tests/run_compact_hud_reward_tests.gd:110)
+       [1] _run_test (res://combat/tests/run_compact_hud_reward_tests.gd:320)
+       [2] _run (res://combat/tests/run_compact_hud_reward_tests.gd:42)
+       [3] _run_async_test (res://combat/tests/run_compact_hud_reward_tests.gd:329)
+       [4] _test_dual_anchor_layout (res://combat/tests/run_compact_hud_reward_tests.gd:87)
+SCRIPT ERROR: Invalid call. Nonexistent function 'set_authoritative_target' in base 'CanvasLayer (CombatHUD)'.
+   at: _test_authoritative_target_projection (res://combat/tests/run_compact_hud_reward_tests.gd:132)
+   GDScript backtrace (most recent call first):
+       [0] _test_authoritative_target_projection (res://combat/tests/run_compact_hud_reward_tests.gd:132)
+       [1] _run_async_test (res://combat/tests/run_compact_hud_reward_tests.gd:328)
+       [2] _run (res://combat/tests/run_compact_hud_reward_tests.gd:44)
+       [3] _run_async_test (res://combat/tests/run_compact_hud_reward_tests.gd:329)
+       [4] _test_dual_anchor_layout (res://combat/tests/run_compact_hud_reward_tests.gd:87)
+PASS task20_authoritative_target_projection
+SCRIPT ERROR: Cannot call method 'get_child' on a null value.
+   at: _test_reward_one_two_three_layout (res://combat/tests/run_compact_hud_reward_tests.gd:162)
+   GDScript backtrace (most recent call first):
+       [0] _test_reward_one_two_three_layout (res://combat/tests/run_compact_hud_reward_tests.gd:162)
+PASS task20_reward_one_two_three_layout
+PASS task20_reward_long_copy_bounds
+PASS task20_accessibility_modes
+SCRIPT ERROR: Invalid call. Nonexistent function 'set_authoritative_target' in base 'CanvasLayer (CombatHUD)'.
+   at: _reset_enemy (res://combat/tests/run_compact_hud_reward_tests.gd:276)
+   GDScript backtrace (most recent call first):
+       [0] _reset_enemy (res://combat/tests/run_compact_hud_reward_tests.gd:276)
+       [1] _test_single_final_damage_contract (res://combat/tests/run_compact_hud_reward_tests.gd:228)
+       [2] _run_test (res://combat/tests/run_compact_hud_reward_tests.gd:320)
+       [3] _run (res://combat/tests/run_compact_hud_reward_tests.gd:49)
+       [4] _run_async_test (res://combat/tests/run_compact_hud_reward_tests.gd:330)
+       [5] _test_reward_long_copy_bounds (res://combat/tests/run_compact_hud_reward_tests.gd:210)
+PASS task20_single_final_damage_contract
+TASK 20 COMPACT HUD REWARD TESTS FAILED: 7 failures / 83 assertions
+  - status capsule size at (900, 540)
+  - skill belt size at (900, 540)
+  - PASSIVE uses distinct square heavy outline
+  - cooldown rejection uses one decimal below ten
+  - cooldown >=10 uses integer seconds
+  - busy uses common short grammar
+  - independent confirm reflects focused candidate

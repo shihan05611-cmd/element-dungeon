@@ -1,0 +1,161 @@
+[gd_resource type="Resource" script_class="RunFlowDefinition" load_steps=32 format=3]
+
+[ext_resource type="Script" path="res://growth/flow/run_flow_definition.gd" id="1_flow"]
+[ext_resource type="Script" path="res://growth/flow/run_node_definition.gd" id="2_node"]
+[ext_resource type="Script" path="res://growth/flow/route_branch_definition.gd" id="3_branch"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_01_entry.tres" id="4_c1"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_02_swarm.tres" id="5_c2a"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_02_pressure.tres" id="6_c2b"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_03_layer_elite.tres" id="7_c3"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_04_validation.tres" id="8_c4"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_05_stable.tres" id="9_c5a"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_05_risk.tres" id="10_c5b"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_06_final_boss.tres" id="11_c6"]
+
+[sub_resource type="Resource" id="Route1Swarm"]
+script = ExtResource("3_branch")
+option_id = &"route_01_swarm"
+target_node_id = &"combat_02_swarm"
+title = "潮汐围攻"
+encounter_label = "双近战群怪"
+environment_label = "开阔平地"
+risk_label = "标准风险"
+risk_tier = 1
+expected_dream_dust_label = "标准梦尘"
+
+[sub_resource type="Resource" id="Route1Pressure"]
+script = ExtResource("3_branch")
+option_id = &"route_01_pressure"
+target_node_id = &"combat_02_pressure"
+title = "紫晶压制"
+encounter_label = "高台重装敌人"
+environment_label = "双层平台"
+risk_label = "较高风险"
+risk_tier = 2
+expected_dream_dust_label = "较高梦尘"
+
+[sub_resource type="Resource" id="Route2Stable"]
+script = ExtResource("3_branch")
+option_id = &"route_02_stable"
+target_node_id = &"combat_05_stable"
+title = "稳妥收束"
+encounter_label = "标准精英"
+environment_label = "开阔平地"
+risk_label = "低风险"
+risk_tier = 1
+expected_dream_dust_label = "标准梦尘"
+
+[sub_resource type="Resource" id="Route2Risk"]
+script = ExtResource("3_branch")
+option_id = &"route_02_risk"
+target_node_id = &"combat_05_risk"
+title = "熔火险路"
+encounter_label = "双强化敌人"
+environment_label = "狭长夹击"
+risk_label = "高风险"
+risk_tier = 3
+expected_dream_dust_label = "额外梦尘"
+
+[sub_resource type="Resource" id="Entry"]
+script = ExtResource("2_node")
+node_id = &"run_entry"
+kind = 0
+next_node_id = &"combat_01_entry"
+
+[sub_resource type="Resource" id="Combat1"]
+script = ExtResource("2_node")
+node_id = &"combat_01_entry"
+kind = 1
+next_node_id = &"shop_01_early"
+combat_room = ExtResource("4_c1")
+
+[sub_resource type="Resource" id="Shop1"]
+script = ExtResource("2_node")
+node_id = &"shop_01_early"
+kind = 2
+next_node_id = &"route_01_first_branch"
+
+[sub_resource type="Resource" id="Route1"]
+script = ExtResource("2_node")
+node_id = &"route_01_first_branch"
+kind = 3
+route_branches = Array[ExtResource("3_branch")]([SubResource("Route1Swarm"), SubResource("Route1Pressure")])
+
+[sub_resource type="Resource" id="Combat2A"]
+script = ExtResource("2_node")
+node_id = &"combat_02_swarm"
+kind = 1
+next_node_id = &"combat_03_layer_elite"
+combat_room = ExtResource("5_c2a")
+
+[sub_resource type="Resource" id="Combat2B"]
+script = ExtResource("2_node")
+node_id = &"combat_02_pressure"
+kind = 1
+next_node_id = &"combat_03_layer_elite"
+combat_room = ExtResource("6_c2b")
+
+[sub_resource type="Resource" id="Combat3"]
+script = ExtResource("2_node")
+node_id = &"combat_03_layer_elite"
+kind = 1
+next_node_id = &"shop_02_mid"
+combat_room = ExtResource("7_c3")
+
+[sub_resource type="Resource" id="Shop2"]
+script = ExtResource("2_node")
+node_id = &"shop_02_mid"
+kind = 2
+next_node_id = &"combat_04_validation"
+
+[sub_resource type="Resource" id="Combat4"]
+script = ExtResource("2_node")
+node_id = &"combat_04_validation"
+kind = 1
+next_node_id = &"route_02_second_branch"
+combat_room = ExtResource("8_c4")
+
+[sub_resource type="Resource" id="Route2"]
+script = ExtResource("2_node")
+node_id = &"route_02_second_branch"
+kind = 3
+route_branches = Array[ExtResource("3_branch")]([SubResource("Route2Stable"), SubResource("Route2Risk")])
+
+[sub_resource type="Resource" id="Combat5A"]
+script = ExtResource("2_node")
+node_id = &"combat_05_stable"
+kind = 1
+next_node_id = &"shop_03_preboss"
+combat_room = ExtResource("9_c5a")
+
+[sub_resource type="Resource" id="Combat5B"]
+script = ExtResource("2_node")
+node_id = &"combat_05_risk"
+kind = 1
+next_node_id = &"shop_03_preboss"
+combat_room = ExtResource("10_c5b")
+
+[sub_resource type="Resource" id="Shop3"]
+script = ExtResource("2_node")
+node_id = &"shop_03_preboss"
+kind = 2
+next_node_id = &"combat_06_final_boss"
+
+[sub_resource type="Resource" id="Boss"]
+script = ExtResource("2_node")
+node_id = &"combat_06_final_boss"
+kind = 4
+next_node_id = &"run_result"
+combat_room = ExtResource("11_c6")
+
+[sub_resource type="Resource" id="Result"]
+script = ExtResource("2_node")
+node_id = &"run_result"
+kind = 5
+
+[resource]
+script = ExtResource("1_flow")
+flow_id = &"prototype_two_layer_six_combat"
+entry_node_id = &"run_entry"
+result_node_id = &"run_result"
+nodes = Array[ExtResource("2_node")]([SubResource("Entry"), SubResource("Combat1"), SubResource("Shop1"), SubResource("Route1"), SubResource("Combat2A"), SubResource("Combat2B"), SubResource("Combat3"), SubResource("Shop2"), SubResource("Combat4"), SubResource("Route2"), SubResource("Combat5A"), SubResource("Combat5B"), SubResource("Shop3"), SubResource("Boss"), SubResource("Result")])

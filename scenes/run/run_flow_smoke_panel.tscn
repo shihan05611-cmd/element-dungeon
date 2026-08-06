@@ -1,0 +1,129 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/run/run_flow_smoke_panel.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.035, 0.047, 0.075, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.72, 0.55, 0.24, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 8
+
+[node name="RunFlowSmokePanel" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -510.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 332.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="Margin" type="MarginContainer" parent="Root/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="Root/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="Title" type="Label" parent="Root/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.83, 0.44, 1)
+theme_override_font_sizes/font_size = 20
+text = "RUN GAME · 六战原型"
+
+[node name="State" type="Label" parent="Root/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "正在建立权威 Session…"
+autowrap_mode = 2
+
+[node name="Economy" type="Label" parent="Root/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.64, 0.86, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "梦尘 0"
+
+[node name="Loadout" type="Label" parent="Root/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.73, 0.79, 0.9, 1)
+theme_override_font_sizes/font_size = 12
+text = "七槽"
+autowrap_mode = 2
+
+[node name="Hint" type="Label" parent="Root/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.72, 1)
+theme_override_font_sizes/font_size = 13
+text = "正在加载第一战"
+autowrap_mode = 2
+
+[node name="RouteButtons" type="HBoxContainer" parent="Root/Panel/Margin/VBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RouteA" type="Button" parent="Root/Panel/Margin/VBox/RouteButtons"]
+custom_minimum_size = Vector2(225, 82)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "路线 1"
+autowrap_mode = 2
+
+[node name="RouteB" type="Button" parent="Root/Panel/Margin/VBox/RouteButtons"]
+custom_minimum_size = Vector2(225, 82)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "路线 2"
+autowrap_mode = 2
+
+[node name="ShopButtons" type="HBoxContainer" parent="Root/Panel/Margin/VBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Purchase" type="Button" parent="Root/Panel/Margin/VBox/ShopButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "P · 购买可负担技能"
+
+[node name="Leave" type="Button" parent="Root/Panel/Margin/VBox/ShopButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ENTER · 离开商店"
+
+[node name="ResultButtons" type="HBoxContainer" parent="Root/Panel/Margin/VBox"]
+visible = false
+layout_mode = 2
+
+[node name="NewRun" type="Button" parent="Root/Panel/Margin/VBox/ResultButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "开始新一局"

@@ -1,0 +1,41 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/run/run_flow_coordinator.gd" id="1_coordinator"]
+[ext_resource type="Resource" path="res://resources/run/flows/prototype_two_layer_six_combat.tres" id="2_flow"]
+[ext_resource type="Resource" path="res://resources/content/run_content_catalog.tres" id="3_catalog"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="4_player"]
+[ext_resource type="Script" path="res://scripts/run_session_host.gd" id="5_host"]
+[ext_resource type="Script" path="res://scripts/combat_feedback.gd" id="6_feedback"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/skill_vfx_coordinator.tscn" id="7_vfx"]
+[ext_resource type="PackedScene" path="res://scenes/run/run_flow_smoke_panel.tscn" id="8_panel"]
+
+[node name="RunGame" type="Node2D"]
+script = ExtResource("1_coordinator")
+flow_definition = ExtResource("2_flow")
+content_catalog = ExtResource("3_catalog")
+
+[node name="RoomStaging" type="Node2D" parent="."]
+process_mode = 4
+visible = false
+
+[node name="RoomContainer" type="Node2D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("4_player")]
+position = Vector2(230, 494)
+z_index = 5
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(576, 324)
+
+[node name="CombatFeedback" type="Node2D" parent="."]
+z_index = 10
+script = ExtResource("6_feedback")
+
+[node name="SkillVfxCoordinator" parent="." instance=ExtResource("7_vfx")]
+
+[node name="RunSessionHost" type="Node" parent="."]
+script = ExtResource("5_host")
+room_id = &"combat_01_entry"
+room_completion_experience = 0
+
+[node name="RunFlowSmokePanel" parent="." instance=ExtResource("8_panel")]

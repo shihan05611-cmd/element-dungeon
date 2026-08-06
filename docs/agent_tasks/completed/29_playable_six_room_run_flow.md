@@ -1,6 +1,6 @@
 # 任务 29：正式主入口与六战可玩关卡流程
 
-状态：IN_PROGRESS  
+状态：ACCEPTED
 负责人：Run Flow/Scene Integration Agent 2.0（threadId `019fd63e-f9d7-7760-b68c-45b552c90881`，hostId `local`）  
 依赖：任务 28 `ACCEPTED`；任务 20 继续历史 `BLOCKED`
 
@@ -138,3 +138,15 @@ docs/agent_tasks/evidence/task29/**
 交付必须列出：修改/新增文件与SHA；节点图和场景资源映射；六战/路线/商店/Boss/结果权威摘要；Task29专项与23-runner基线精确数字；两个smoke；全部日志错误计数；冷副本/profile与复制核对；四张Viewport路径/尺寸/SHA和人工验图；共享 `.godot`/sidecar/allowlist保护对账；风险；Git写操作为零。
 
 完成或阻塞后必须由本职责对话直接调用 `send_message_to_thread` 回传当前中枢 Review 5.0：threadId `019fc6c7-85e3-77f0-a99b-9cc9ee6055a2`、hostId `local`。完成回传 `REVIEW`，阻塞回传 `BLOCKED`，不要等待用户转述；回传后保持冻结。
+
+## 9. 中枢独立验收记录（2026-08-06）
+
+中枢 Review 5.0 未直接采信执行侧结论，在此前不存在的 `C:\tmp\element-dungeon-task29-review5-20260806-02` 建立冷副本与独立 profile。复制排除 `.git/.godot/.workbuddy`，源与副本均为 `1381 files / 40,330,563 bytes`，逐文件 SHA-256 `0 mismatch`；第一条 Godot 命令为 4.7.1 headless editor scan，exit `0`，日志四类错误标记均为 `0`。
+
+独立门禁结果：Task29 两项专项为 `2/2 runners / 7 tests / 259 assertions`；任务28接受基线为 `23/23 runners / 266 tests / 2646 assertions`；合计 `25/25 runners / 273 tests / 2905 assertions`，全部 exit `0` 且日志干净。`run_game.tscn` 与 `test_room.tscn` 各 180 帧 smoke 均 exit `0`、日志干净。Task20 单列复跑仍为历史 `7 failures / 83 assertions`，不计入门禁且状态不变。
+
+中枢把冷副本内原有四张执行侧 PNG 先移入独立备份目录，再以非编辑器、非 headless 的 Godot 4.7.1 OpenGL/NVIDIA 进程重新完成一局；结果为 `1 test / 59 assertions / 4 screenshots`，exit `0`、日志干净。四张新图均为 1920×1080，SHA-256 分别为 `FB1B4E199A8863A456D3E3902DE660301086E77D6D53E2CF5AD3ED95730DE84B`、`9DB185CE6F5CA64A477FE2E7451B72A16DC4E8F362974EFA670780E89FE3A046`、`D12A4DB55752BEAFC820ABB514263B0D71201018ECD4DE8A6479B2FC23848AD6`、`6A3AB3F98F63CC8F48A43E8E0C788D997E52218AE6463C1E1E705F88F71AD72C`。人工原图检查确认：入口房、两张路线门牌、压力分支双层平台、占位 Boss 与结算可辨；最终面板显示六战 `6/6`、商店 `3/3`、路线 `2/2`、Boss 零梦尘同事务直达结算。最小 smoke panel 与占位内容按任务29边界接受，不冒充任务30正式 UI。
+
+静态复核确认冻结流程图每条路径严格为六战、三商店、两路线；四种完整 PackedScene 与八份房间资源真实分流；场景编排按隐藏 staging 实例化/校验、权威激活、RoomContainer 替换的顺序执行；Boss 敌人和房间完成梦尘均为零，完成事务直接冻结 `run_result`。40 项实现/场景/resource/harness 哈希相对证据表 `0 mismatch`，`project.godot` 仅修改 `run/main_scene`，`git diff --check` 通过。
+
+验收前后共享 `.godot` 均为 `705 files / 34,863,310 bytes / B1D1398FC97EDA2E06273944F023BE9EE4EF54220E0101120A889F8A6196314E`；28 个未跟踪 `.gd.uid/.png.import` sidecar 路径集合不变。TestRoom、Task20、Task24 与正式 HUD 三脚本保护 diff 为零；共享 Godot PID 5036 全程仅被动保持开启，中枢未调用、保存、reload、reimport、运行或控制。结论：`PASS / ACCEPTED`。

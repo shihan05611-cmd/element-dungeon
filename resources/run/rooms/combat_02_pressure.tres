@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
+[ext_resource type="Script" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
+[ext_resource type="PackedScene" path="res://scenes/run/rooms/room_arena_platforms.tscn" id="3_template"]
+[ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="4_enemy"]
+
+[sub_resource type="Resource" id="SpawnPressure"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"platform_pressure"
+local_position = Vector2(810, 290)
+maximum_health = 105
+defense_flat = 1.0
+dream_dust_reward = 40
+
+[resource]
+script = ExtResource("1_room")
+room_id = &"combat_02_pressure"
+display_name = "战 2B · 高台压制"
+template_label = "紫晶双层廊"
+encounter_label = "高台重装敌人"
+environment_label = "双层平台"
+room_scene = ExtResource("3_template")
+enemy_spawns = Array[ExtResource("2_spawn")]([SubResource("SpawnPressure")])
+completion_dream_dust = 80

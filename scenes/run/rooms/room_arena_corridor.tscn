@@ -1,0 +1,71 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/run/run_room_instance.gd" id="1_room"]
+
+[sub_resource type="RectangleShape2D" id="GroundShape"]
+size = Vector2(820, 88)
+[sub_resource type="RectangleShape2D" id="WallShape"]
+size = Vector2(52, 560)
+[sub_resource type="StyleBoxFlat" id="TitleStyle"]
+bg_color = Color(0.11, 0.055, 0.025, 0.84)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.52, 0.18, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="RoomArenaCorridor" type="Node2D"]
+script = ExtResource("1_room")
+template_id = &"arena_corridor"
+template_display_name = "熔火狭廊"
+[node name="Backdrop" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 1152, 0, 1152, 648, 0, 648)
+color = Color(0.08, 0.035, 0.02, 1)
+[node name="InnerWall" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(150, 52, 1002, 52, 1002, 540, 150, 540)
+color = Color(0.19, 0.075, 0.035, 1)
+[node name="CeilingTrim" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(150, 52, 1002, 52, 960, 112, 192, 112)
+color = Color(0.32, 0.12, 0.045, 1)
+[node name="Ground" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 3
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+position = Vector2(576, 584)
+shape = SubResource("GroundShape")
+[node name="Visual" type="Polygon2D" parent="Ground"]
+polygon = PackedVector2Array(166, 540, 986, 540, 986, 628, 166, 628)
+color = Color(0.31, 0.11, 0.045, 1)
+[node name="Trim" type="Polygon2D" parent="Ground"]
+polygon = PackedVector2Array(166, 540, 986, 540, 986, 554, 166, 554)
+color = Color(0.96, 0.38, 0.12, 1)
+[node name="LeftWall" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 3
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
+position = Vector2(150, 324)
+shape = SubResource("WallShape")
+[node name="RightWall" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 3
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
+position = Vector2(1002, 324)
+shape = SubResource("WallShape")
+[node name="PlayerSpawn" type="Marker2D" parent="."]
+position = Vector2(250, 494)
+[node name="EnemyContainer" type="Node2D" parent="."]
+[node name="RoomTitle" type="Label" parent="."]
+offset_left = 172.0
+offset_top = 120.0
+offset_right = 520.0
+offset_bottom = 160.0
+theme_override_colors/font_color = Color(1, 0.82, 0.64, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("TitleStyle")
+text = "熔火狭廊"
+horizontal_alignment = 1
+vertical_alignment = 1

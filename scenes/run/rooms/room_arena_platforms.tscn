@@ -1,0 +1,103 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/run/run_room_instance.gd" id="1_room"]
+
+[sub_resource type="RectangleShape2D" id="GroundShape"]
+size = Vector2(1072, 88)
+
+[sub_resource type="RectangleShape2D" id="WallShape"]
+size = Vector2(40, 560)
+
+[sub_resource type="RectangleShape2D" id="PlatformLong"]
+size = Vector2(300, 24)
+
+[sub_resource type="RectangleShape2D" id="PlatformShort"]
+size = Vector2(220, 24)
+
+[sub_resource type="StyleBoxFlat" id="TitleStyle"]
+bg_color = Color(0.08, 0.055, 0.13, 0.82)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7, 0.45, 0.92, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="RoomArenaPlatforms" type="Node2D"]
+script = ExtResource("1_room")
+template_id = &"arena_platforms"
+template_display_name = "紫晶双层廊"
+
+[node name="Backdrop" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 1152, 0, 1152, 648, 0, 648)
+color = Color(0.055, 0.035, 0.09, 1)
+
+[node name="InnerWall" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(38, 60, 1114, 60, 1114, 540, 38, 540)
+color = Color(0.14, 0.08, 0.2, 1)
+
+[node name="Ground" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+position = Vector2(576, 584)
+shape = SubResource("GroundShape")
+
+[node name="Visual" type="Polygon2D" parent="Ground"]
+polygon = PackedVector2Array(40, 540, 1112, 540, 1112, 628, 40, 628)
+color = Color(0.22, 0.12, 0.29, 1)
+
+[node name="LeftWall" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 3
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
+position = Vector2(40, 324)
+shape = SubResource("WallShape")
+
+[node name="RightWall" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 3
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
+position = Vector2(1112, 324)
+shape = SubResource("WallShape")
+
+[node name="LowerPlatform" type="StaticBody2D" parent="."]
+position = Vector2(430, 428)
+collision_layer = 4
+collision_mask = 3
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LowerPlatform"]
+shape = SubResource("PlatformLong")
+one_way_collision = true
+[node name="Visual" type="Polygon2D" parent="LowerPlatform"]
+polygon = PackedVector2Array(-150, -12, 150, -12, 142, 12, -142, 12)
+color = Color(0.48, 0.28, 0.62, 1)
+
+[node name="UpperPlatform" type="StaticBody2D" parent="."]
+position = Vector2(810, 330)
+collision_layer = 4
+collision_mask = 3
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UpperPlatform"]
+shape = SubResource("PlatformShort")
+one_way_collision = true
+[node name="Visual" type="Polygon2D" parent="UpperPlatform"]
+polygon = PackedVector2Array(-110, -12, 110, -12, 102, 12, -102, 12)
+color = Color(0.62, 0.35, 0.78, 1)
+
+[node name="PlayerSpawn" type="Marker2D" parent="."]
+position = Vector2(210, 494)
+[node name="EnemyContainer" type="Node2D" parent="."]
+[node name="RoomTitle" type="Label" parent="."]
+offset_left = 36.0
+offset_top = 72.0
+offset_right = 420.0
+offset_bottom = 112.0
+theme_override_colors/font_color = Color(0.9, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("TitleStyle")
+text = "紫晶双层廊"
+horizontal_alignment = 1
+vertical_alignment = 1

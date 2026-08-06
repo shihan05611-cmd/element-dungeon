@@ -31,6 +31,10 @@ var content_catalog: RunContentCatalog:
 	get:
 		return _content_catalog
 
+var active_room_instance_id: int:
+	get:
+		return _room_instance_id
+
 
 var persistence_adapter: SharedLoadoutPersistenceAdapter:
 	get:
@@ -56,6 +60,9 @@ var _loadout_persistence: SharedLoadoutPersistenceAdapter
 var _player_damage_taken: int = 0
 var _configured: bool = false
 var _last_error: StringName = &""
+var _formal_flow: RunFlowDefinition
+var _room_definition: CombatRoomDefinition
+var _room_instance_id: int = 0
 
 
 func configure(
@@ -63,7 +70,11 @@ func configure(
 		enemies: Array[CombatEnemy],
 		content_catalog_value: RunContentCatalog,
 		restored_shared_snapshot: RuntimeLoadoutSnapshot = null,
-		legacy_loadouts: Array[SkillLoadout] = []
+		legacy_loadouts: Array[SkillLoadout] = [],
+		flow_definition: RunFlowDefinition = null,
+		initial_room_definition: CombatRoomDefinition = null,
+		initial_room_instance_id: int = 0,
+		run_id: StringName = &""
 ) -> bool:
 	if _configured:
 		return _fail(&"run_session_host_already_configured")
@@ -80,6 +91,19 @@ func configure(
 	_player = player
 	_enemies = enemies.duplicate()
 	_content_catalog = content_catalog_value
+	_formal_flow = flow_definition
+	_room_definition = initial_room_definition
+	_room_instance_id = initial_room_instance_id
+	if _formal_flow != null:
+		if (
+			not _formal_flow.is_valid()
+			or _room_definition == null
+			or not _room_definition.validation_error().is_empty()
+			or _room_definition.room_id != room_id
+			or _room_instance_id <= 0
+			or run_id.is_empty()
+		):
+			return _fail(&"invalid_formal_run_host_configuration")
 
 	_growth_adapter = PlayerGrowthAdapter.new()
 	if not _growth_adapter.configure(_player):
@@ -129,21 +153,98 @@ func configure(
 		owned_skill_ids,
 		_player.current_element_controller.ordered_available_elements,
 		_runtime_loadout,
-		_growth_adapter
+		_growth_adapter,
+		RunRulesSnapshot.formal_disabled() if _formal_flow != null else null,
+		_content_catalog if _formal_flow != null else null,
+		0,
+		_formal_flow,
+		run_id
 	)
 	_run_session.snapshot_changed.connect(_on_session_snapshot_changed)
-	var begin_result := _run_session.begin_combat_room(room_id)
-	if not begin_result.accepted:
-		return _fail(begin_result.detail)
+	if _formal_flow == null:
+		var begin_result := _run_session.begin_combat_room(room_id)
+		if not begin_result.accepted:
+			return _fail(begin_result.detail)
+	elif not _player.configure_run_skill_level_effects(_run_session):
+		return _fail(&"formal_skill_level_effect_configuration_failed")
 
 	var element_callback := Callable(self, "_on_element_changed")
 	if not _player.current_element_controller.element_changed.is_connected(element_callback):
 		_player.current_element_controller.element_changed.connect(element_callback)
+	var defeated_callback := Callable(self, "_on_player_defeated")
+	if _formal_flow != null and not _player.player_defeated.is_connected(defeated_callback):
+		_player.player_defeated.connect(defeated_callback)
 	_bind_combat_events()
 	_configured = true
 	_growth_adapter.apply_progression(_run_session.snapshot().progression)
 	session_ready.emit(_run_session.snapshot())
 	return true
+
+
+func activate_formal_room(
+		definition: CombatRoomDefinition,
+		enemies: Array[CombatEnemy],
+		room_instance_id: int,
+		scene_path: String,
+		transition_id: StringName,
+		expected_run_revision: int
+) -> RunCommandResult:
+	if not _configured or _formal_flow == null or definition == null:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.INVALID_STATE,
+			&"formal_host_not_configured"
+		)
+	if not definition.validation_error().is_empty() or enemies.is_empty():
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.SCENE_TRANSITION_FAILED,
+			&"invalid_formal_room_configuration"
+		)
+	var enemy_error := _enemy_configuration_error(enemies)
+	if not enemy_error.is_empty():
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.SCENE_TRANSITION_FAILED,
+			enemy_error
+		)
+	var accepted := _run_session.accept_room_transition(
+		transition_id,
+		expected_run_revision,
+		definition.room_id,
+		room_instance_id,
+		scene_path
+	)
+	if not accepted.accepted:
+		return accepted
+	var first_activation := _room_instance_id == room_instance_id
+	room_id = definition.room_id
+	_room_definition = definition
+	_room_instance_id = room_instance_id
+	_enemies = enemies.duplicate()
+	_passive_adapter.set_enemies(_enemies)
+	_player_damage_taken = 0
+	if not first_activation:
+		_player.prepare_floor_transition()
+	var room_sync_succeeded := _player.current_element_controller.set_event_room_id(room_id)
+	assert(room_sync_succeeded, "validated formal room ID must synchronize")
+	if not room_sync_succeeded:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.SCENE_TRANSITION_FAILED,
+			&"current_element_room_sync_failed"
+		)
+	_bind_combat_events()
+	return accepted
+
+
+func fail_scene_transition(detail: StringName) -> RunCommandResult:
+	if not _configured or _formal_flow == null:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.INVALID_STATE,
+			&"formal_host_not_configured"
+		)
+	return _run_session.fail_formal_run(
+		StringName("scene_failure:%d:%s" % [_run_session.snapshot().revision, String(detail)]),
+		_run_session.snapshot().revision,
+		detail if not detail.is_empty() else &"scene_transition_failed"
+	)
 
 
 func begin_next_room(next_room_id: StringName, enemies: Array[CombatEnemy]) -> RunCommandResult:
@@ -252,7 +353,9 @@ func _on_enemy_defeated(enemy: CombatEnemy) -> void:
 		StringName("enemy_killed:%s:%s" % [String(room_id), String(enemy_id)]),
 		room_id,
 		enemy_id,
-		enemy.experience_reward
+		enemy.experience_reward,
+		enemy.dream_dust_reward,
+		enemy.terminal_enemy
 	)
 	var result := _project_event(event)
 	if not result.accepted:
@@ -262,16 +365,29 @@ func _on_enemy_defeated(enemy: CombatEnemy) -> void:
 
 
 func _complete_room() -> void:
+	var completion_dream_dust := (
+		_room_definition.completion_dream_dust
+		if _formal_flow != null and _room_definition != null
+		else 0
+	)
+	var terminal_room := (
+		_room_definition.final_boss
+		if _formal_flow != null and _room_definition != null
+		else false
+	)
 	var event := RoomCompletedEvent.new(
-		StringName("room_completed:%s" % String(room_id)),
+		StringName("room_completed:%s:%d" % [String(room_id), _room_instance_id]),
 		room_id,
-		room_completion_experience,
-		_player_damage_taken
+		0 if _formal_flow != null else room_completion_experience,
+		_player_damage_taken,
+		completion_dream_dust,
+		terminal_room
 	)
 	var result := _project_event(event)
 	if not result.accepted:
 		return
-	_generate_room_reward()
+	if _formal_flow == null:
+		_generate_room_reward()
 
 
 func _generate_room_reward() -> void:
@@ -315,6 +431,19 @@ func _on_element_changed(change: ElementChangeResult) -> void:
 func _on_session_snapshot_changed(snapshot: RunSnapshot, cause: StringName) -> void:
 	_growth_adapter.apply_progression(snapshot.progression)
 	session_snapshot_changed.emit(snapshot, cause)
+
+
+func _on_player_defeated() -> void:
+	if not _configured or _formal_flow == null or _run_session.snapshot().result != null:
+		return
+	var revision := _run_session.snapshot().revision
+	var result := _run_session.fail_formal_run(
+		StringName("player_defeated:%s:%d" % [String(room_id), _room_instance_id]),
+		revision,
+		&"player_defeated"
+	)
+	if not result.accepted:
+		_fail(result.detail)
 
 
 func _on_runtime_loadout_replaced(

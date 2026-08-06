@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="元素地牢-4.7"
-run/main_scene="res://scenes/test_room.tscn"
+run/main_scene="res://scenes/run/run_game.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

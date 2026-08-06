@@ -64,6 +64,14 @@ var observed_relic_events: int:
 	get:
 		return _observed_relic_events
 
+var node: RunNodeSnapshot:
+	get:
+		return _node
+
+var result: RunResultSnapshot:
+	get:
+		return _result
+
 var _progression: ProgressionSnapshot
 var _skills: SkillInventorySnapshot
 var _relics: RelicInventorySnapshot
@@ -78,6 +86,8 @@ var _economy: DreamDustSnapshot
 var _shop: ShopSnapshot
 var _observed_experience: int
 var _observed_relic_events: int
+var _node: RunNodeSnapshot
+var _result: RunResultSnapshot
 
 
 func _init(
@@ -94,7 +104,9 @@ func _init(
 		p_economy: DreamDustSnapshot = null,
 		p_shop: ShopSnapshot = null,
 		p_observed_experience: int = 0,
-		p_observed_relic_events: int = 0
+		p_observed_relic_events: int = 0,
+		p_node: RunNodeSnapshot = null,
+		p_result: RunResultSnapshot = null
 ) -> void:
 	_progression = p_progression
 	_skills = p_skills
@@ -110,3 +122,5 @@ func _init(
 	_shop = p_shop
 	_observed_experience = maxi(0, p_observed_experience)
 	_observed_relic_events = maxi(0, p_observed_relic_events)
+	_node = p_node
+	_result = p_result
