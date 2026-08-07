@@ -1,0 +1,14 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS fake_enemy_commits_once_at_locked_impact
+PASS fake_wall_miss_invalid_and_query_failure_are_atomic
+PASS delivery_prepare_and_parent_failures_are_atomic
+PASS nested_cast_is_busy_during_commit
+PASS execution_services_narrow_updates_preserve_ports
+PASS production_callers_use_public_try_cast
+PASS formal_profile_is_shared_and_exact
+PASS real_physics_wall_tie_and_stable_enemy_order
+PASS ordinary_projectile_friend_signal_and_cleanup_semantics
+PASS real_fury_hits_once_without_flight_node
+TASK 34 PROJECTILE CAST TRANSACTION TESTS PASSED: 10 tests, 159 assertions

@@ -1,0 +1,23 @@
+{
+  "fixture": "projectile_step_reuse",
+  "seed": 4107,
+  "warmup_pairs": 5,
+  "measured_pairs": 30,
+  "runner_sha256": "83445FECF32241FA916C2B09E8C0E9F7EF968D942F1428FC0D5BFD643B3CC5D7",
+  "before_median_usec": 135703.5,
+  "after_median_usec": 121600.0,
+  "median_improvement_percent": 10.3928785919302,
+  "before_p95_usec": 144445.0,
+  "after_p95_usec": 131987.0,
+  "p95_change_percent": -8.624736058707466,
+  "trace_values": [
+    "67ec8c0d02b36bc5d3de4a7d5383b3d71b42d788ae5313f444487d4252b1b798"
+  ],
+  "before_counter_vectors": [
+    "12000,24200,24000,200,200,200,0,24200,0"
+  ],
+  "after_counter_vectors": [
+    "12000,24200,24000,200,200,200,0,800,800"
+  ],
+  "valid_rows": true
+}

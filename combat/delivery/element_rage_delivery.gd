@@ -93,28 +93,40 @@ func trigger_burst() -> bool:
 	return true
 
 
+func trigger_prepared_delivery() -> bool:
+	return trigger_burst()
+
+
+func preparation_validation_error() -> StringName:
+	if _burst_snapshot == null or not _burst_snapshot.is_valid():
+		return &"invalid_burst_snapshot"
+	if not is_initialized or not validation_error.is_empty():
+		return &"invalid_burst_initialization"
+	if not is_finite(base_radius) or base_radius <= 0.0:
+		return &"invalid_base_radius"
+	if hurtbox_collision_mask <= 0 or max_query_results <= 0:
+		return &"invalid_burst_query_configuration"
+	if walls_block_targets and blocking_collision_mask <= 0:
+		return &"invalid_burst_blocking_mask"
+	var prepared_radius := base_radius * _burst_snapshot.radius_scale
+	if not is_finite(prepared_radius) or prepared_radius <= 0.0:
+		return &"invalid_effective_radius"
+	if not _start_world_transform.origin.is_equal_approx(_burst_snapshot.impact_position):
+		return &"burst_impact_position_mismatch"
+	return &""
+
+
 func close_hit_window() -> void:
 	if not is_finished:
 		finish(FINISH_CANCELLED)
 
 
 func _on_delivery_ready() -> void:
-	if _burst_snapshot == null or not _burst_snapshot.is_valid():
-		_fail_configuration(&"invalid_burst_snapshot")
-		return
-	if not is_finite(base_radius) or base_radius <= 0.0:
-		_fail_configuration(&"invalid_base_radius")
-		return
-	if hurtbox_collision_mask <= 0 or max_query_results <= 0:
-		_fail_configuration(&"invalid_burst_query_configuration")
-		return
-	if walls_block_targets and blocking_collision_mask <= 0:
-		_fail_configuration(&"invalid_burst_blocking_mask")
+	var prepared_error := preparation_validation_error()
+	if not prepared_error.is_empty():
+		_fail_configuration(prepared_error)
 		return
 	_effective_radius = base_radius * _burst_snapshot.radius_scale
-	if not is_finite(_effective_radius) or _effective_radius <= 0.0:
-		_fail_configuration(&"invalid_effective_radius")
-		return
 	if trigger_on_ready:
 		call_deferred(&"_trigger_ready_burst", reuse_generation)
 

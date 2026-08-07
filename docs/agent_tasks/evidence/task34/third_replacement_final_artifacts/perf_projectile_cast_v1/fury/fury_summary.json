@@ -1,0 +1,23 @@
+{
+  "fixture": "fury_atomic_batch",
+  "seed": 4107,
+  "warmup_pairs": 5,
+  "measured_pairs": 30,
+  "runner_sha256": "83445FECF32241FA916C2B09E8C0E9F7EF968D942F1428FC0D5BFD643B3CC5D7",
+  "before_supported": [
+    false
+  ],
+  "after_median_usec": 603391.0,
+  "after_p95_usec": 739314.0,
+  "after_trace_values": [
+    "79ba36dedffc52034d931ed433d51c99d7037c20211df3466029da7027ebb649"
+  ],
+  "after_counter_vectors": [
+    "4000,12000,8000,4000,4000,5000,1000,4,4"
+  ],
+  "after_status_vectors": [
+    "2000,1000,1000,0,0,2000,0,2000,2000,2000"
+  ],
+  "valid_rows": true,
+  "after_tie_stable": true
+}

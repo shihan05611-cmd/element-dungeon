@@ -1,0 +1,11 @@
+{
+  "before_head": "102720086c53a84901b788726ad609d15263d64a",
+  "before_head_files": 1518,
+  "before_head_mismatch": 0,
+  "before_injected_runner_sha256": "83445FECF32241FA916C2B09E8C0E9F7EF968D942F1428FC0D5BFD643B3CC5D7",
+  "after_source_files": 1812,
+  "after_cold_files": 1881,
+  "after_missing": 0,
+  "after_hash_mismatch": 0,
+  "after_extra": 69
+}

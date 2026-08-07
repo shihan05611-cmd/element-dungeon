@@ -70,9 +70,7 @@ func configure(
 		RangeElementReclaimPort.new(player, player.energy_component, 160.0, 8, 256),
 		Callable(self, "_on_reclaim_vfx_committed")
 	)
-	if not player.skill_executor.set_execution_services(
-		SkillExecutionServices.new(reclaim_port)
-	):
+	if not player.skill_executor.set_execution_reclaim_port(reclaim_port):
 		_disconnect_all()
 		return false
 	if not set_enemies(enemies):
@@ -509,4 +507,3 @@ static func _is_live_node(node: Node) -> bool:
 
 func _exit_tree() -> void:
 	_disconnect_all()
-

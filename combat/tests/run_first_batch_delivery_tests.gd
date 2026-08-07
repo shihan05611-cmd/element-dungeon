@@ -202,21 +202,29 @@ func _burst_snapshot(
 		energy: int,
 		maximum: int = 100,
 		element_id: StringName = ElementIds.WATER,
-		attack_multiplier: float = 1.0
+		attack_multiplier: float = 1.0,
+		impact_position: Vector2 = Vector2.ZERO
 ) -> AllEnergyBurstExecutionSnapshot:
-	var definition := AllEnergyBurstExecution.new()
-	var skill := SkillDefinition.new()
-	skill.skill_id = &"task_15_rage"
-	skill.execution_definition = definition
-	var context := SkillExecutionContext.new(
-		skill,
-		_cast(element_id, attack_multiplier),
-		DeliverySpawnSnapshot.new(),
-		energy,
-		maximum
+	var cast_snapshot := _cast(element_id, attack_multiplier)
+	var multiplier := float(energy) * 0.08
+	var amount := mini(10, floori(float(energy) / 20.0))
+	var radius_steps := floori(float(energy) / float(maximum) * 10.0)
+	var payload := RuntimeAttackPayload.from_locked_stats(
+		cast_snapshot.stat_snapshot,
+		multiplier,
+		element_id,
+		amount,
+		PackedStringArray(["elemental_fury", "burst"])
 	)
-	var prepared := definition.prepare(context, null)
-	return prepared.snapshot as AllEnergyBurstExecutionSnapshot if prepared.accepted else null
+	return AllEnergyBurstExecutionSnapshot.new(
+		cast_snapshot,
+		energy,
+		maximum,
+		SkillExecutionSnapshot.MovementPolicy.LOCK_MOVEMENT,
+		payload,
+		1.0 + float(radius_steps) * 0.10,
+		impact_position
+	)
 
 
 func _submit_rage(
@@ -309,8 +317,18 @@ func _test_rage_wall_rule_is_explicit() -> void:
 	_make_wall(Vector2(20.0, -30.0), Vector2(2.0, 30.0))
 	_make_wall(Vector2(20.0, 30.0), Vector2(2.0, 30.0))
 	await physics_frame
-	await _submit_rage(_burst_snapshot(20), 50.0, true, Vector2(0.0, -30.0))
-	await _submit_rage(_burst_snapshot(20), 50.0, false, Vector2(0.0, 30.0))
+	await _submit_rage(
+		_burst_snapshot(20, 100, ElementIds.WATER, 1.0, Vector2(0.0, -30.0)),
+		50.0,
+		true,
+		Vector2(0.0, -30.0)
+	)
+	await _submit_rage(
+		_burst_snapshot(20, 100, ElementIds.WATER, 1.0, Vector2(0.0, 30.0)),
+		50.0,
+		false,
+		Vector2(0.0, 30.0)
+	)
 	_expect_eq(blocked.damage.current_health, 1000, "enabled wall blocking suppresses target")
 	_expect_eq(unblocked.damage.current_health, 984, "disabled wall blocking intentionally passes target")
 

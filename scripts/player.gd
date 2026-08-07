@@ -12,9 +12,6 @@ const FRICTION := 1750.0
 const GRAVITY := 1150.0
 const JUMP_VELOCITY := -520.0
 const HURT_DURATION := 0.34
-const ELEMENT_RAGE_DELIVERY_SCRIPT := preload(
-	"res://combat/delivery/element_rage_delivery.gd"
-)
 const ELEMENT_BEAM_DELIVERY_SCRIPT := preload(
 	"res://combat/delivery/element_beam_delivery.gd"
 )
@@ -159,7 +156,7 @@ func try_basic_attack() -> CastAttemptResult:
 			&"",
 			&"missing_basic_attack_catalog_entry"
 		)
-	var attempt := skill_executor._try_cast_configured(_basic_attack_definition)
+	var attempt := skill_executor.try_cast(_basic_attack_definition)
 	if attempt.accepted:
 		sprite.play(_element_animation_name(
 			&"attack",
@@ -190,9 +187,11 @@ func configure_run_runtime(
 		8,
 		256
 	)
-	if not skill_executor.set_execution_services(SkillExecutionServices.new(
-		reclaim_port
-	)):
+	var services := SkillExecutionServices.new(reclaim_port)
+	services.set_projectile_sweep_query_port(PhysicsProjectileSweepQuery2D.new())
+	services.set_skill_delivery_prepare_port(CombatSkillDeliveryAdapter.new(self, content_catalog))
+	services.set_projectile_source(self)
+	if not skill_executor.set_execution_services(services):
 		return false
 	return skill_controller.configure_runtime(current_element_controller, skill_executor, loadout)
 
@@ -379,52 +378,30 @@ func _on_delivery_spawned(_cast_id: int, _delivery_id: int, delivery: Node) -> v
 
 
 func _on_execution_activated(snapshot: SkillExecutionSnapshot) -> void:
-	if snapshot == null or _content_catalog == null:
+	if not snapshot is ChannelExecutionSnapshot or _content_catalog == null:
 		return
 	var delivery_scene := _content_catalog.runtime_delivery_scene_for(snapshot.skill_id)
 	if delivery_scene == null:
 		return
 	var node := delivery_scene.instantiate()
 	var spawn_snapshot := _capture_spawn_snapshot(_content_catalog.gameplay_for(snapshot.skill_id))
-	if snapshot is AllEnergyBurstExecutionSnapshot:
-		var rage := node as ELEMENT_RAGE_DELIVERY_SCRIPT
-		if (
-			rage == null
-			or not rage.initialize_burst(
-				snapshot as AllEnergyBurstExecutionSnapshot,
-				1,
-				spawn_snapshot.initial_transform,
-				spawn_snapshot.direction
-			)
-		):
-			if node != null:
-				node.free()
-			return
-		var delivery_parent: Node = get_tree().current_scene
-		if delivery_parent == null:
-			delivery_parent = get_parent()
-		delivery_parent.add_child(rage)
-		delivery_created.emit(rage)
-	elif snapshot is ChannelExecutionSnapshot:
-		var beam := node as ELEMENT_BEAM_DELIVERY_SCRIPT
-		if (
-			beam == null
-			or not beam.initialize_channel(
-				snapshot as ChannelExecutionSnapshot,
-				1,
-				spawn_snapshot.initial_transform,
-				spawn_snapshot.direction
-			)
-		):
-			if node != null:
-				node.free()
-			return
-		add_child(beam)
-		_active_beam_ref = weakref(beam)
-		_active_beam_snapshot = snapshot as ChannelExecutionSnapshot
-		delivery_created.emit(beam)
-	elif node != null:
-		node.free()
+	var beam := node as ELEMENT_BEAM_DELIVERY_SCRIPT
+	if (
+		beam == null
+		or not beam.initialize_channel(
+			snapshot as ChannelExecutionSnapshot,
+			1,
+			spawn_snapshot.initial_transform,
+			spawn_snapshot.direction
+		)
+	):
+		if node != null:
+			node.free()
+		return
+	add_child(beam)
+	_active_beam_ref = weakref(beam)
+	_active_beam_snapshot = snapshot as ChannelExecutionSnapshot
+	delivery_created.emit(beam)
 
 
 func _on_execution_tick_generated(snapshot: ChannelTickSnapshot) -> void:

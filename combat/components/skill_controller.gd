@@ -104,7 +104,7 @@ func try_cast_slot(slot_id: StringName) -> CastAttemptResult:
 				canonical_slot
 			)
 		)
-	return _publish_attempt(canonical_slot, _executor._try_cast_configured(skill, canonical_slot))
+	return _publish_attempt(canonical_slot, _executor.try_cast(skill, canonical_slot))
 
 
 func request_element(

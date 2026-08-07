@@ -162,6 +162,13 @@ func set_execution_services(services: SkillExecutionServices) -> bool:
 	return true
 
 
+func set_execution_reclaim_port(port: ElementReclaimPort) -> bool:
+	if _execution_services == null:
+		_execution_services = SkillExecutionServices.new()
+	_execution_services.set_reclaim_port(port)
+	return true
+
+
 ## Callable contract: gate.call(skill: SkillDefinition) -> bool.
 func set_external_action_gate(gate: Callable) -> void:
 	_external_action_gate = gate
@@ -195,7 +202,15 @@ func set_delivery_parent(delivery_parent: Node) -> bool:
 	return true
 
 
-## Internal path for skills supplied by a validated RuntimeSkillLoadout catalog.
+## Public cast transaction for validated runtime skill definitions.
+func try_cast(
+		skill: SkillDefinition,
+		slot_id: StringName = &""
+) -> CastAttemptResult:
+	return _try_cast_configured(skill, slot_id)
+
+
+## Compatibility implementation boundary. Production callers use try_cast.
 func _try_cast_configured(
 		skill: SkillDefinition,
 		slot_id: StringName = &""
@@ -442,7 +457,15 @@ func _try_cast_locked(skill: SkillDefinition, slot_id: StringName) -> CastAttemp
 	_energy._emit_committed_delta(-prepared.snapshot.energy_spent)
 	if prepared.commit_transaction != null:
 		prepared.commit_transaction.publish_committed()
-		_prepared_commit_transaction = null
+		if not prepared.commit_transaction.owns_prepared_delivery():
+			_prepared_commit_transaction = null
+	if (
+		_prepared_commit_transaction != null
+		and _prepared_commit_transaction.requires_immediate_activation()
+		and _phase == Phase.STARTUP
+		and is_zero_approx(_current_startup_time)
+	):
+		_enter_phase(Phase.ACTIVE)
 	return result
 
 
@@ -605,6 +628,16 @@ func _enter_phase(next_phase: Phase) -> void:
 			_spawn_current_delivery()
 		if current_cast_id == cast_id:
 			execution_activated.emit(_current_execution_snapshot)
+		if (
+			current_cast_id == cast_id
+			and _prepared_commit_transaction != null
+			and _prepared_commit_transaction.owns_prepared_delivery()
+		):
+			var activated := _prepared_commit_transaction.activate_prepared_delivery()
+			assert(activated, "validated prepared delivery activation is infallible")
+			if not activated:
+				_queue_cancel(&"prepared_delivery_activation_failed", cast_id)
+			_prepared_commit_transaction = null
 	_transition_in_progress = false
 	_apply_pending_cancel()
 
@@ -633,11 +666,19 @@ func _spawn_current_delivery() -> bool:
 	if delivery == null or not is_instance_valid(delivery):
 		_queue_cancel(&"delivery_instance_unavailable", current_cast_id)
 		return false
-	if not _delivery_parent_is_available():
-		delivery.free()
-		_queue_cancel(&"delivery_parent_unavailable", current_cast_id)
-		return false
-	_delivery_parent.add_child(delivery)
+	if delivery.is_inside_tree():
+		if (
+			_prepared_commit_transaction == null
+			or not _prepared_commit_transaction.owns_prepared_delivery()
+		):
+			_queue_cancel(&"unexpected_pre_attached_delivery", current_cast_id)
+			return false
+	else:
+		if not _delivery_parent_is_available():
+			delivery.free()
+			_queue_cancel(&"delivery_parent_unavailable", current_cast_id)
+			return false
+		_delivery_parent.add_child(delivery)
 	_delivery_spawned_successfully = true
 	_current_deliveries.append(weakref(delivery))
 	delivery_spawned.emit(current_cast_id, delivery.delivery_id, delivery)
@@ -804,7 +845,7 @@ func _execution_services_for_accepted_cast(
 		or _execution_services.reclaim_port is ElementReclaimExecution.LevelScaledReclaimPort
 	):
 		return _execution_services
-	return SkillExecutionServices.new(
+	return _execution_services.copy_with_reclaim_port(
 		ElementReclaimExecution.LevelScaledReclaimPort.new(
 			_execution_services.reclaim_port,
 			_energy

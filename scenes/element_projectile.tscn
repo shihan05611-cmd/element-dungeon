@@ -2,20 +2,12 @@
 
 [ext_resource type="Script" path="res://scripts/element_projectile.gd" id="1_projectile"]
 [ext_resource type="SpriteFrames" path="res://resources/animations/element_projectile_frames.tres" id="2_frames"]
-
-[sub_resource type="CircleShape2D" id="ProjectileShape"]
-radius = 6.0
+[ext_resource type="Resource" path="res://resources/combat/element_projectile_sweep_profile.tres" id="3_sweep"]
 
 [node name="ElementProjectile" type="Node2D"]
 z_index = 4
 script = ExtResource("1_projectile")
-projectile_shape = SubResource("ProjectileShape")
-speed = 720.0
-max_distance = 850.0
-hurtbox_collision_mask = 8
-blocking_collision_mask = 4
-query_margin = 0.01
-wall_tie_distance = 0.02
+sweep_profile = ExtResource("3_sweep")
 
 [node name="ProjectileSprite" type="AnimatedSprite2D" parent="."]
 texture_filter = 1

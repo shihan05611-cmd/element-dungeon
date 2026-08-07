@@ -15,3 +15,15 @@ func commit_silent() -> void:
 
 func publish_committed() -> void:
 	pass
+
+
+func owns_prepared_delivery() -> bool:
+	return false
+
+
+func requires_immediate_activation() -> bool:
+	return false
+
+
+func activate_prepared_delivery() -> bool:
+	return true

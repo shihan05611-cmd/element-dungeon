@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ProjectileSweepProfile2D" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://combat/definitions/projectile_sweep_profile_2d.gd" id="1_profile"]
+
+[sub_resource type="CircleShape2D" id="ProjectileShape"]
+radius = 6.0
+
+[resource]
+script = ExtResource("1_profile")
+shape = SubResource("ProjectileShape")
+speed = 720.0
+max_distance = 850.0
+hurtbox_collision_mask = 8
+blocking_collision_mask = 4
+query_margin = 0.01
+wall_tie_distance = 0.02
+max_contact_results = 64

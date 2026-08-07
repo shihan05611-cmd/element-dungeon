@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="SkillDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="SkillDefinition" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
 [ext_resource type="Script" path="res://combat/execution/all_energy_burst_execution.gd" id="2_execution"]
+[ext_resource type="Resource" path="res://resources/combat/element_projectile_sweep_profile.tres" id="3_sweep"]
 
 [sub_resource type="Resource" id="FuryExecution"]
 script = ExtResource("2_execution")
@@ -11,6 +12,7 @@ energy_per_element_amount = 20
 radius_step_count = 10
 radius_step_scale = 0.1
 presentation_tags = PackedStringArray("elemental_fury", "burst")
+projectile_sweep_profile = ExtResource("3_sweep")
 
 [resource]
 script = ExtResource("1_skill")

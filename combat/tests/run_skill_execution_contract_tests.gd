@@ -1,6 +1,9 @@
 extends SceneTree
 
 const RECORDING_DELIVERY: PackedScene = preload("res://combat/tests/recording_skill_delivery.tscn")
+const SWEEP_PROFILE: ProjectileSweepProfile2D = preload(
+	"res://resources/combat/element_projectile_sweep_profile.tres"
+)
 
 
 class RecordingReclaimTransaction:
@@ -31,6 +34,45 @@ class RecordingReclaimPort:
 				&"no_matching_element"
 			)
 		return ElementReclaimPrepareResult.success(3, 15, transaction)
+
+
+class FixedEnemySweepPort:
+	extends ProjectileSweepQueryPort2D
+
+	func query_first_contact(request: ProjectileSweepRequest2D) -> ProjectileSweepResult2D:
+		return ProjectileSweepResult2D.enemy_contact(
+			request.start_transform.origin + request.direction * 40.0,
+			40.0 / request.distance,
+			40.0,
+			null,
+			null,
+			1
+		)
+
+
+class TestBurstDeliveryPreparePort:
+	extends SkillDeliveryPreparePort
+
+	var parent: Node
+
+	func _init(p_parent: Node) -> void:
+		parent = p_parent
+
+	func prepare(
+			snapshot: SkillExecutionSnapshot,
+			spawn_snapshot: DeliverySpawnSnapshot
+	) -> PreparedSkillDeliveryTransaction:
+		var rage := ElementRageDelivery.new()
+		rage.trigger_on_ready = false
+		if not rage.initialize_burst(
+			snapshot as AllEnergyBurstExecutionSnapshot,
+			1,
+			spawn_snapshot.initial_transform,
+			spawn_snapshot.direction
+		):
+			rage.free()
+			return null
+		return PreparedSkillDeliveryTransaction.new(rage, parent)
 
 
 class Rig:
@@ -389,10 +431,17 @@ func _make_rig(
 	rig.executor = SkillExecutor.new()
 	rig.executor.configure_dependencies(rig.energy, rig.element, rig.delivery_parent)
 	rig.executor.configure_cast_identity(1001, 1002, &"player")
-	if services != null:
-		rig.executor.set_execution_services(services)
 	rig.host.add_child(rig.executor)
 	root.add_child(rig.host)
+	var configured_services := services if services != null else SkillExecutionServices.new()
+	if configured_services.projectile_sweep_query_port == null:
+		configured_services.set_projectile_sweep_query_port(FixedEnemySweepPort.new())
+	if configured_services.skill_delivery_prepare_port == null:
+		configured_services.set_skill_delivery_prepare_port(
+			TestBurstDeliveryPreparePort.new(rig.delivery_parent)
+		)
+	configured_services.set_projectile_source(rig.host)
+	rig.executor.set_execution_services(configured_services)
 	rig.executor.set_process(false)
 	rig.energy.set_process(false)
 	return rig
@@ -401,7 +450,9 @@ func _make_rig(
 func _burst_skill() -> SkillDefinition:
 	var skill := SkillDefinition.new()
 	skill.skill_id = &"test_burst"
-	skill.execution_definition = AllEnergyBurstExecution.new()
+	var execution := AllEnergyBurstExecution.new()
+	execution.projectile_sweep_profile = SWEEP_PROFILE
+	skill.execution_definition = execution
 	return skill
 
 

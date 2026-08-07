@@ -1,0 +1,14 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+PASS: shared_snapshot_sort_copy_revision
+PASS: shared_snapshot_rejects_invalid_entries
+PASS: shop_draft_shared_assign_reset_and_stale
+PASS: run_session_rejects_unowned_shared_skill
+PASS: four_passives_are_accepted_by_b_port
+PASS: same_element_event_is_invalid
+PASS: manual_and_auto_relic_filters
+PASS: event_id_and_sequence_are_both_deduplicated
+PASS: event_fields_are_immutable_and_complete
+PASS: sequence_state_isolated_between_sessions
+GROWTH 06 CONTRACT TESTS PASSED: 10 tests, 84 assertions
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)

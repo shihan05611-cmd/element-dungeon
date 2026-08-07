@@ -1,0 +1,9 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS: burning_exact_tick_and_fire_layers
+PASS: burning_large_delta
+PASS: unending_typed_basic_attack_event
+PASS: passive_runtime_lifecycle
+PASS: formal_stat_passive_resources
+TASK 14 PASSIVE TESTS PASSED: 5 tests, 55 assertions
