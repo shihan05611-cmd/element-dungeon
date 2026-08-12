@@ -1,0 +1,7 @@
+"Process","RunId","ChestDust","ChestSkills","Earned","Purchases","Upgrades","Refunded","Balance","ElementBoltLevel","ElementReclaimLevel","ElementalLaserLevel","Active1","Active2","Active3","Passive1","Passive2","Passive3","Passive4"
+"01_task31","task31_safe","300","elemental_laser|elemental_fury|element_reclaim","895","300","300","105","400","3","1","1","element_bolt","","","burning","unending","passive_vitality","passive_energy"
+"01_task31","task31_risk","450","elemental_laser|elemental_fury","1150","390","115","0","645","1","2","2","element_bolt","elemental_laser","element_reclaim","burning","unending","passive_vitality","passive_energy"
+"02_task31","task31_safe","300","elemental_laser|elemental_fury|element_reclaim","895","300","300","105","400","3","1","1","element_bolt","","","burning","unending","passive_vitality","passive_energy"
+"02_task31","task31_risk","450","elemental_laser|elemental_fury","1150","390","115","0","645","1","2","2","element_bolt","elemental_laser","element_reclaim","burning","unending","passive_vitality","passive_energy"
+"03_task31","task31_safe","300","elemental_laser|elemental_fury|element_reclaim","895","300","300","105","400","3","1","1","element_bolt","","","burning","unending","passive_vitality","passive_energy"
+"03_task31","task31_risk","450","elemental_laser|elemental_fury","1150","390","115","0","645","1","2","2","element_bolt","elemental_laser","element_reclaim","burning","unending","passive_vitality","passive_energy"

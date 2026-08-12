@@ -211,11 +211,15 @@ func _test_formal_drag_click_and_authority_recovery() -> void:
 
 
 func _test_formal_slot_swap_single_commit() -> void:
-	var purchase_reclaim := _button(&"purchase:element_reclaim")
-	_expect(purchase_reclaim != null and not purchase_reclaim.disabled, "middle shop can buy reclaim")
-	purchase_reclaim.pressed.emit()
+	var chest_owned := _coordinator.current_snapshot()
+	_expect(chest_owned.skills.owns(&"element_reclaim"), "task40_drag_flow deterministically owns reclaim from a pre-shop chest")
+	_expect(_button(&"purchase:element_reclaim") == null, "chest-owned reclaim has no redundant purchase control")
 	await process_frame
-	_expect(_coordinator.current_snapshot().skills.owns(&"element_reclaim"), "reclaim ownership is authoritative")
+	var no_purchase := _coordinator.current_snapshot()
+	_expect_eq(no_purchase.economy.balance, chest_owned.economy.balance, "chest-owned reclaim causes no shop wallet charge")
+	_expect_eq(no_purchase.economy.total_spent_on_purchases, chest_owned.economy.total_spent_on_purchases, "chest-owned reclaim causes no purchase ledger change")
+	_expect_eq(no_purchase.revision, chest_owned.revision, "chest-owned reclaim causes no purchase revision")
+	_expect(no_purchase.skills.owns(&"element_reclaim"), "reclaim chest ownership remains authoritative")
 
 	var equip_before := _coordinator.current_snapshot()
 	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_reclaim", &""), SkillSlotIds.ACTIVE_1)

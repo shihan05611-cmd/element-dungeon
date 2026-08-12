@@ -1,0 +1,13 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS task42_empty_pool_and_transaction_guards
+PASS task42_frozen_reward_and_room_economy
+TASK42_COHORT_DISTRIBUTION: {"cohort_size":512,"dust_count":256,"dust_percent":50.0,"four_candidate_skill_counts":{"element_reclaim":129,"elemental_fury":0,"elemental_laser":127,"unending":0},"skill_count":256,"skill_percent":50.0}
+TASK 42 REWARD ECONOMY TUNING TESTS FAILED: 6 failures / 2210 assertions
+  - element_reclaim occupies 20-30 percent of four-candidate skill claims
+  - elemental_fury is reachable on the skill branch
+  - elemental_fury occupies 20-30 percent of four-candidate skill claims
+  - elemental_laser occupies 20-30 percent of four-candidate skill claims
+  - unending is reachable on the skill branch
+  - unending occupies 20-30 percent of four-candidate skill claims

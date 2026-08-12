@@ -83,8 +83,7 @@ func _test_safe_run() -> void:
 	await _record_and_defeat_current_room(_safe_metrics)
 	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "safe settlement chest reaches result")
 	var final := _coordinator.current_snapshot()
-	var safe_purchase_spend := _expected_purchase_spend(300, _safe_metrics, PASSIVE_IDS)
-	_assert_completed_run(final, [&"route_01_swarm", &"route_02_stable"], 595 + int(_safe_metrics["chest_dust"]), safe_purchase_spend, 300, 105, boss_balance, boss_balance, "safe")
+	_assert_completed_run(final, [&"route_01_swarm", &"route_02_stable"], 895, 300, 300, 105, 400, boss_balance, "safe")
 	_expect_eq(final.skills.progress_for(&"element_bolt").level, 3, "safe specialist finishes at bolt Lv3")
 	_assert_final_loadout(final, &"element_bolt", &"", &"")
 	_assert_persistent_ids(persistent, "safe")
@@ -93,11 +92,12 @@ func _test_safe_run() -> void:
 	_safe_scene_paths = final.route.activated_scene_paths
 	_finalize_metrics(_safe_metrics, final)
 	_expect_eq(_safe_metrics["chest_dust"], 300, "safe run deterministically receives two 150-dust chests")
-	_expect_eq(_safe_metrics["chest_skills"], [&"element_reclaim", &"burning", &"elemental_fury"], "safe run deterministically receives the same three chest skills in order")
+	_expect_eq(_safe_metrics["chest_skills"], [&"elemental_laser", &"elemental_fury", &"element_reclaim"], "safe run deterministically receives the same three chest skills in order")
 	_expect_eq(final.economy.total_earned, 895, "safe earned ledger includes exact base and chest dust")
-	_expect_eq(final.economy.total_spent_on_purchases, 225, "safe purchase ledger omits only chest-granted burning")
+	_expect_eq(final.economy.total_spent_on_purchases, 300, "safe purchase ledger charges all four shop-only passives")
 	_expect_eq(final.economy.total_spent_on_upgrades, 300, "safe upgrade ledger retains both bolt upgrade sequences")
-	_expect_eq(final.economy.balance, 475, "safe final balance is exact after deterministic rewards and spending")
+	_expect_eq(final.economy.total_refunded, 105, "safe reset ledger freezes the exact 70 percent refund")
+	_expect_eq(final.economy.balance, 400, "safe final balance is exact after deterministic rewards and spending")
 	print("TASK31_SAFE_METRICS: " + JSON.stringify(_safe_metrics))
 
 
@@ -199,10 +199,7 @@ func _test_risk_run() -> void:
 	await _record_and_defeat_current_room(_risk_metrics)
 	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "risk settlement chest reaches result")
 	var final := _coordinator.current_snapshot()
-	var risk_purchase_ids: Array[StringName] = [&"element_reclaim", &"elemental_laser"]
-	risk_purchase_ids.append_array(PASSIVE_IDS)
-	var risk_purchase_spend := _expected_purchase_spend(510, _risk_metrics, risk_purchase_ids)
-	_assert_completed_run(final, [&"route_01_pressure", &"route_02_risk"], 700 + int(_risk_metrics["chest_dust"]), risk_purchase_spend, 115, 0, boss_balance, boss_balance, "risk")
+	_assert_completed_run(final, [&"route_01_pressure", &"route_02_risk"], 1150, 390, 115, 0, 645, boss_balance, "risk")
 	_expect_eq(final.skills.progress_for(&"element_bolt").level, 1, "risk bolt remains Lv1")
 	_expect_eq(final.skills.progress_for(&"elemental_laser").level, 2, "risk laser finishes Lv2")
 	_expect_eq(final.skills.progress_for(&"element_reclaim").level, 2, "risk reclaim finishes Lv2")
@@ -216,11 +213,12 @@ func _test_risk_run() -> void:
 	_expect(final.economy.total_earned > int(_safe_metrics["economy"]["earned"]), "risk route earns strictly more than safe route")
 	_finalize_metrics(_risk_metrics, final)
 	_expect_eq(_risk_metrics["chest_dust"], 450, "risk run deterministically receives three 150-dust chests")
-	_expect_eq(_risk_metrics["chest_skills"], [&"element_reclaim", &"elemental_fury"], "risk run deterministically receives the same two chest skills")
+	_expect_eq(_risk_metrics["chest_skills"], [&"elemental_laser", &"elemental_fury"], "risk run deterministically receives the same two chest skills")
 	_expect_eq(final.economy.total_earned, 1150, "risk earned ledger includes exact 700 base plus 450 chest dust")
-	_expect_eq(final.economy.total_spent_on_purchases, 420, "risk purchase ledger omits only chest-granted reclaim")
+	_expect_eq(final.economy.total_spent_on_purchases, 390, "risk purchase ledger omits only chest-granted laser")
 	_expect_eq(final.economy.total_spent_on_upgrades, 115, "risk upgrade ledger retains reclaim and laser upgrades")
-	_expect_eq(final.economy.balance, 615, "risk final balance is exact after deterministic rewards and spending")
+	_expect_eq(final.economy.total_refunded, 0, "risk refund ledger remains exactly zero")
+	_expect_eq(final.economy.balance, 645, "risk final balance is exact after deterministic rewards and spending")
 	print("TASK31_RISK_METRICS: " + JSON.stringify(_risk_metrics))
 
 
@@ -568,18 +566,6 @@ func _new_metrics(label: String, route_ids: Array[StringName]) -> Dictionary:
 		"chest_dust": 0,
 		"chest_skills": [],
 	}
-
-
-func _expected_purchase_spend(base_spend: int, metrics: Dictionary, intended_ids: Array[StringName]) -> int:
-	var result := base_spend
-	var chest_skills: Array = metrics["chest_skills"]
-	for value: Variant in chest_skills:
-		var skill_id := StringName(value)
-		if intended_ids.has(skill_id):
-			var content := CATALOG.content_for(skill_id)
-			if content != null:
-				result -= content.purchase_price
-	return result
 
 
 func _finalize_metrics(metrics: Dictionary, final: RunSnapshot) -> void:

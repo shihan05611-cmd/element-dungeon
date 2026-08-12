@@ -237,7 +237,7 @@ func claim_formal_room_chest(
 	var stable_hash: int = absi(String("%s|%s" % [String(route.run_id), String(room_id)]).hash())
 	var reward: RunChestRewardSnapshot
 	if not candidates.is_empty() and stable_hash % 2 == 0:
-		var content: SkillContentDefinition = candidates[stable_hash % candidates.size()]
+		var content: SkillContentDefinition = candidates[(stable_hash / 2) % candidates.size()]
 		var add_validation := _skill_inventory.validate_add_content(content)
 		if not add_validation.accepted:
 			return _recorded_rejection(

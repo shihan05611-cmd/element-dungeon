@@ -1,0 +1,4 @@
+"Run","Baseline","Expected","Exit","CohortSize","SkillCount","DustCount","SkillPercent","DustPercent","ElementReclaim","ElementalFury","ElementalLaser","Unending"
+"new_candidate_01","Task42 candidate","pass","0","512","256","256","50","50","65","65","64","62"
+"new_candidate_02","Task42 candidate","pass","0","512","256","256","50","50","65","65","64","62"
+"old_head_expected_failure","041928642bda41bdc1adc4b6ed16fa05db2ac17c","expected_failure","1","512","256","256","50","50","129","0","127","0"
