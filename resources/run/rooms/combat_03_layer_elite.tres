@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
 [ext_resource type="Script" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
@@ -14,6 +14,40 @@ maximum_health = 145
 defense_flat = 2.0
 dream_dust_reward = 35
 
+[sub_resource type="Resource" id="SpawnEliteB"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"layer_elite_b"
+local_position = Vector2(660, 494)
+maximum_health = 145
+defense_flat = 2.0
+dream_dust_reward = 0
+
+[sub_resource type="Resource" id="SpawnEliteC"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"layer_elite_c"
+local_position = Vector2(940, 494)
+maximum_health = 145
+defense_flat = 2.0
+dream_dust_reward = 0
+
+[sub_resource type="Resource" id="ReinforcementEliteA"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"layer_reinforcement_a"
+local_position = Vector2(620, 290)
+maximum_health = 110
+dream_dust_reward = 0
+
+[sub_resource type="Resource" id="ReinforcementEliteB"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"layer_reinforcement_b"
+local_position = Vector2(980, 290)
+maximum_health = 110
+dream_dust_reward = 0
+
 [resource]
 script = ExtResource("1_room")
 room_id = &"combat_03_layer_elite"
@@ -22,5 +56,7 @@ template_label = "紫晶双层廊"
 encounter_label = "强化精英"
 environment_label = "错层平台"
 room_scene = ExtResource("3_template")
-enemy_spawns = Array[ExtResource("2_spawn")]([SubResource("SpawnElite")])
+enemy_spawns = Array[ExtResource("2_spawn")]([SubResource("SpawnElite"), SubResource("SpawnEliteB"), SubResource("SpawnEliteC")])
+reinforcement_spawns = Array[ExtResource("2_spawn")]([SubResource("ReinforcementEliteA"), SubResource("ReinforcementEliteB")])
+reinforcement_delay_seconds = 12.0
 completion_dream_dust = 90

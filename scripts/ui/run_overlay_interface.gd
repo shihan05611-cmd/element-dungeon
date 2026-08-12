@@ -106,7 +106,10 @@ func configure(host: RunSessionHost, formal_coordinator: Node = null) -> void:
 func toggle_loadout() -> void:
 	if _formal_mode:
 		if _snapshot != null and _snapshot.route.phase == RunPhase.SHOP:
-			_render_formal_phase(_snapshot, &"toggle_shop")
+			if visible:
+				hide_overlay()
+			else:
+				_render_formal_phase(_snapshot, &"toggle_shop")
 		return
 	if visible:
 		if _reward_offer != null:
@@ -1382,6 +1385,10 @@ func formal_selected_route_id() -> StringName:
 	return _formal_selected_route_id
 
 
+func formal_shop_draft_instance_id() -> int:
+	return _formal_shop_draft.get_instance_id() if _formal_shop_draft != null else 0
+
+
 func formal_route_submit_count() -> int:
 	return _formal_route_submit_count
 
@@ -1413,6 +1420,12 @@ func _formal_begin(kind: StringName, heading: String, subtitle: String) -> void:
 	_formal_area.visible = true
 	_clear_children(_formal_area)
 	_formal_buttons.clear()
+	_close.text = "关闭商店界面 / 返回世界  L" if kind == &"shop" else "关闭  L"
+	_close.visible = kind == &"shop"
+	_close.focus_mode = Control.FOCUS_ALL
+	if kind == &"shop":
+		_close.disabled = false
+		_formal_buttons[&"close_shop_panel"] = _close
 	_title.text = heading
 	_subtitle.text = subtitle
 	_formal_status = null
@@ -1439,7 +1452,7 @@ func _show_formal_shop(cause: StringName = &"") -> void:
 	_formal_begin(
 		&"shop",
 		"梦尘商店",
-		"购买 / 升级 / 重置均独立提交 · 七槽装配即时生效"
+		"购买 / 升级 / 重置均独立提交 · 完成后前往世界出口按 F"
 	)
 
 	var wallet := HBoxContainer.new()
@@ -1550,12 +1563,14 @@ func _show_formal_shop(cause: StringName = &"") -> void:
 	_formal_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	footer.add_child(_formal_status)
 	var leave := _formal_action_button(
-		"离开商店",
+		"前往出口传送门 · 按 F",
 		"leave_shop",
-		Callable(self, "_formal_leave_shop"),
+		Callable(),
 		Vector2(176, 48),
 		true
 	)
+	leave.disabled = true
+	leave.tooltip_text = "正式流程只能通过商店房右侧世界传送门离开。"
 	footer.add_child(leave)
 	_restore_formal_focus()
 
@@ -2132,7 +2147,7 @@ func _show_formal_result() -> void:
 	columns.add_child(summary)
 	var summary_box := summary.get_node("Margin/Box") as VBoxContainer
 	summary_box.add_child(_label("战斗进度  %d / %d" % [result.completed_combat_rooms, result.total_combat_rooms], 20, UI.TEXT))
-	summary_box.add_child(_label("商店访问 %d / 3  ·  路线确认 %d / 2" % [result.shop_visits, result.route_choices], 14, UI.TEXT_MUTED))
+	summary_box.add_child(_label("商店访问 %d / 1  ·  路线确认 %d / 2" % [result.shop_visits, result.route_choices], 14, UI.TEXT_MUTED))
 	summary_box.add_child(_separator())
 	summary_box.add_child(_label("梦尘收入  +%d" % result.economy.total_earned, 14, UI.SUCCESS))
 	summary_box.add_child(_label("购买支出  -%d" % result.economy.total_spent_on_purchases, 14, UI.TEXT))

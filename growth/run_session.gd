@@ -31,6 +31,7 @@ var _observed_experience: int = 0
 var _observed_relic_events: int = 0
 var _run_result: RunResultSnapshot
 var _flow_definition: RunFlowDefinition
+var _claimed_chest_rooms: Dictionary = {}
 
 
 func _init(
@@ -190,6 +191,73 @@ func leave_formal_shop(
 	_active_shop_draft = null
 	_shop_snapshot = null
 	return _commit_formal_command(command_id, fingerprint, &"formal_shop_left")
+
+
+func claim_formal_room_chest(
+		command_id: StringName,
+		expected_run_revision: int,
+		room_id: StringName
+) -> RunCommandResult:
+	var fingerprint := StringName("claim_chest|%d|%s" % [
+		expected_run_revision,
+		String(room_id),
+	])
+	var replay := _command_replay(command_id, fingerprint)
+	if replay != null:
+		return replay
+	var envelope := _validate_formal_revision(expected_run_revision)
+	if not envelope.accepted:
+		return _recorded_rejection(command_id, fingerprint, envelope.reject_reason, envelope.detail)
+	var route := _director.snapshot()
+	if route.phase != RunPhase.COMBAT:
+		return _recorded_rejection(
+			command_id, fingerprint, RunCommandResult.RejectReason.INVALID_STATE, &"chest_outside_combat"
+		)
+	if room_id.is_empty() or room_id != route.current_room_id:
+		return _recorded_rejection(
+			command_id, fingerprint, RunCommandResult.RejectReason.INVALID_ARGUMENT, &"chest_room_mismatch"
+		)
+	var room := _director.combat_room_for(room_id)
+	if room == null or room.final_boss:
+		return _recorded_rejection(
+			command_id, fingerprint, RunCommandResult.RejectReason.INVALID_STATE, &"room_has_no_normal_chest"
+		)
+	if _claimed_chest_rooms.has(room_id):
+		return _recorded_rejection(
+			command_id, fingerprint, RunCommandResult.RejectReason.ALREADY_CLAIMED, &"room_chest_already_claimed"
+		)
+	var candidates: Array[SkillContentDefinition] = []
+	if _content_catalog != null:
+		for content: SkillContentDefinition in _content_catalog.skill_contents:
+			if content != null and content.reward_pool and not _skill_inventory.owns(content.skill_id):
+				candidates.append(content)
+	candidates.sort_custom(func(a: SkillContentDefinition, b: SkillContentDefinition) -> bool:
+		return String(a.skill_id) < String(b.skill_id)
+	)
+	var stable_hash: int = absi(String("%s|%s" % [String(route.run_id), String(room_id)]).hash())
+	var reward: RunChestRewardSnapshot
+	if not candidates.is_empty() and stable_hash % 2 == 0:
+		var content: SkillContentDefinition = candidates[stable_hash % candidates.size()]
+		var add_validation := _skill_inventory.validate_add_content(content)
+		if not add_validation.accepted:
+			return _recorded_rejection(
+				command_id, fingerprint, add_validation.reject_reason, add_validation.detail
+			)
+		_skill_inventory.commit_add_content(content, SkillProgressSnapshot.AcquisitionKind.SCRIPTED)
+		reward = RunChestRewardSnapshot.skill(room_id, content.skill_id)
+	else:
+		_economy.commit_earned(RunChestRewardSnapshot.DREAM_DUST_AMOUNT)
+		reward = RunChestRewardSnapshot.dust(room_id)
+	_claimed_chest_rooms[room_id] = true
+	_run_revision += 1
+	var current := snapshot()
+	var result := RunCommandResult.success(current, null, null, null, reward)
+	_command_records[command_id] = {
+		&"fingerprint": fingerprint,
+		&"result": result,
+	}
+	snapshot_changed.emit(current, &"formal_room_chest_claimed")
+	return result
 
 
 func fail_formal_run(

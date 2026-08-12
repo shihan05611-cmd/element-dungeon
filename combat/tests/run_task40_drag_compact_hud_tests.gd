@@ -19,6 +19,7 @@ func _initialize() -> void:
 func _run() -> void:
 	root.size = Vector2i(2560, 1440)
 	_coordinator = RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
+	_coordinator.run_id_override = &"task40_drag_flow"
 	_expect(_coordinator != null, "RunGame instantiates for Task40")
 	if _coordinator == null:
 		_finish()
@@ -120,8 +121,15 @@ func _test_expanded_resolution_programmatic_matrix() -> void:
 
 
 func _test_formal_drag_click_and_authority_recovery() -> void:
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "combat one opens the formal shop")
+	await _finish_current_room()
+	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "combat one chest and portal reach route one")
+	var route_id := _coordinator.current_snapshot().route.next_options[0].option_id
+	_expect(_coordinator.choose_route(route_id).accepted, "route one remains authoritative")
+	_expect(await _wait_for_combat(route_id), "confirmed first route enters its real room")
+	await _finish_current_room()
+	_expect(await _wait_for_combat(&"combat_03_layer_elite"), "route room advances into combat three")
+	await _finish_current_room()
+	_expect(await _wait_for_phase(RunPhase.SHOP), "combat three opens the single physical shop")
 	_expect(_overlay.formal_kind() == &"shop" and _overlay.visible, "formal shop is visible")
 
 	var purchase_burning := _button(&"purchase:burning")
@@ -181,7 +189,7 @@ func _test_formal_drag_click_and_authority_recovery() -> void:
 	_expect(_visible_text(_overlay).contains("主动技能不能放入 PASSIVE"), "active-to-passive authority reason is visible")
 
 	var unowned_before := active_illegal_after
-	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"elemental_fury", &""), SkillSlotIds.ACTIVE_1)
+	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"passive_vitality", &""), SkillSlotIds.ACTIVE_1)
 	await process_frame
 	var unowned_after := _coordinator.current_snapshot()
 	_expect_eq(unowned_after.revision, unowned_before.revision, "unowned drag rejection changes no revision")
@@ -198,19 +206,8 @@ func _test_formal_drag_click_and_authority_recovery() -> void:
 	_expect_eq(click_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_3), &"element_bolt", "original click-to-slot path remains effective")
 	_expect_eq(click_after.revision, click_before.revision + 1, "click path still advances authority once")
 
-	_button(&"leave_shop").pressed.emit()
-	await process_frame
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "leaving first shop reaches route choice")
-	var route_id := _coordinator.current_snapshot().route.next_options[0].option_id
-	_overlay.formal_route_cards()[0].pressed.emit()
-	await process_frame
-	_overlay.formal_route_confirm_button().pressed.emit()
-	await process_frame
-	_expect(await _wait_for_combat(route_id), "confirmed first route enters its real room")
-	await _defeat_current_room()
-	_expect(await _wait_for_combat(&"combat_03_layer_elite"), "route room advances into combat three")
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "combat three opens the middle shop")
+	var leave := _button(&"leave_shop")
+	_expect(leave != null and leave.disabled, "formal shop cannot bypass the world exit portal")
 
 
 func _test_formal_slot_swap_single_commit() -> void:
@@ -250,27 +247,41 @@ func _button(control_id: StringName) -> Button:
 	return _overlay.formal_control(control_id) as Button
 
 
-func _defeat_current_room() -> void:
+func _finish_current_room() -> void:
 	var room := _coordinator.active_room
 	_expect(room != null and room.configured, "active room is configured")
 	if room == null:
 		return
-	for enemy: CombatEnemy in room.enemies:
-		_hit_sequence += 1
-		var cast := CastSnapshot.new(
-			_hit_sequence,
-			&"task40_finisher",
-			_coordinator.player.get_instance_id(),
-			_coordinator.player.get_instance_id(),
-			&"player",
-			ElementIds.NONE,
-			CombatStatSnapshot.new()
-		)
-		var payload := RuntimeAttackPayload.new(99999.0, 99999.0, ElementIds.NONE, 0)
-		var request := HitRequest.new(cast, payload, _hit_sequence, 0, enemy.global_position, Vector2.RIGHT)
-		var result := enemy.combat_receiver.receive_hit(request)
-		_expect(result.accepted and enemy.defeated, "room enemy is defeated through CombatReceiver")
+	for enemy: CombatEnemy in room.initial_enemies:
+		_defeat_enemy(enemy)
 	await process_frame
+	for enemy: CombatEnemy in room.reinforcement_enemies:
+		_defeat_enemy(enemy)
+	await process_frame
+	_expect(room.room_is_cleared, "both waves clear before Task40 proceeds")
+	_coordinator.player.global_position = room.chest.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _defeat_enemy(enemy: CombatEnemy) -> void:
+	_hit_sequence += 1
+	var cast := CastSnapshot.new(
+		_hit_sequence,
+		&"task40_finisher",
+		_coordinator.player.get_instance_id(),
+		_coordinator.player.get_instance_id(),
+		&"player",
+		ElementIds.NONE,
+		CombatStatSnapshot.new()
+	)
+	var payload := RuntimeAttackPayload.new(99999.0, 99999.0, ElementIds.NONE, 0)
+	var request := HitRequest.new(cast, payload, _hit_sequence, 0, enemy.global_position, Vector2.RIGHT)
+	var result := enemy.combat_receiver.receive_hit(request)
+	_expect(result.accepted and enemy.defeated, "room enemy is defeated through CombatReceiver")
 
 
 func _wait_for_combat(node_or_option_id: StringName) -> bool:

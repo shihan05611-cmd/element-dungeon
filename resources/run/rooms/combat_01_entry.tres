@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
 [ext_resource type="Script" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
@@ -13,6 +13,38 @@ local_position = Vector2(820, 494)
 maximum_health = 70
 dream_dust_reward = 20
 
+[sub_resource type="Resource" id="SpawnEntryB"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"entry_guard_b"
+local_position = Vector2(720, 494)
+maximum_health = 70
+dream_dust_reward = 0
+
+[sub_resource type="Resource" id="SpawnEntryC"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"entry_guard_c"
+local_position = Vector2(920, 494)
+maximum_health = 70
+dream_dust_reward = 0
+
+[sub_resource type="Resource" id="ReinforcementEntryA"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"entry_reinforcement_a"
+local_position = Vector2(650, 494)
+maximum_health = 70
+dream_dust_reward = 0
+
+[sub_resource type="Resource" id="ReinforcementEntryB"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"entry_reinforcement_b"
+local_position = Vector2(980, 494)
+maximum_health = 70
+dream_dust_reward = 0
+
 [resource]
 script = ExtResource("1_room")
 room_id = &"combat_01_entry"
@@ -21,5 +53,7 @@ template_label = "潮汐平庭"
 encounter_label = "单体近战"
 environment_label = "开阔平地"
 room_scene = ExtResource("3_template")
-enemy_spawns = Array[ExtResource("2_spawn")]([SubResource("SpawnEntry")])
+enemy_spawns = Array[ExtResource("2_spawn")]([SubResource("SpawnEntry"), SubResource("SpawnEntryB"), SubResource("SpawnEntryC")])
+reinforcement_spawns = Array[ExtResource("2_spawn")]([SubResource("ReinforcementEntryA"), SubResource("ReinforcementEntryB")])
+reinforcement_delay_seconds = 12.0
 completion_dream_dust = 100

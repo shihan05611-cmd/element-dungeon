@@ -170,14 +170,14 @@ func _test_route_differences() -> void:
 	var swarm := FLOW.combat_room_for(&"combat_02_swarm")
 	var pressure := FLOW.combat_room_for(&"combat_02_pressure")
 	_expect(swarm.room_scene.resource_path != pressure.room_scene.resource_path, "route one changes the room template")
-	_expect(swarm.enemy_spawns.size() != pressure.enemy_spawns.size(), "route one changes enemy-group shape")
+	_expect(swarm.encounter_label != pressure.encounter_label, "route one changes disclosed encounter shape")
 	_expect(_maximum_enemy_health(pressure) > _maximum_enemy_health(swarm), "route one risk branch has higher single-target durability")
 	_expect(_room_dream_dust(pressure) > _room_dream_dust(swarm), "route one risk branch pays more dream dust")
 	_expect(route_one.route_branches[1].risk_tier > route_one.route_branches[0].risk_tier, "route one disclosure has a higher risk tier")
 	var stable := FLOW.combat_room_for(&"combat_05_stable")
 	var risk := FLOW.combat_room_for(&"combat_05_risk")
 	_expect(stable.room_scene.resource_path != risk.room_scene.resource_path, "route two changes the room template")
-	_expect(risk.enemy_spawns.size() > stable.enemy_spawns.size(), "route two risk branch adds an enemy")
+	_expect(risk.enemy_spawns.size() == stable.enemy_spawns.size() and risk.reinforcement_spawns.size() == stable.reinforcement_spawns.size(), "route two branches both preserve the Task41 two-wave count")
 	_expect(_total_enemy_health(risk) > _total_enemy_health(stable), "route two risk branch has higher total durability")
 	_expect(_room_dream_dust(risk) > _room_dream_dust(stable), "route two risk branch pays more dream dust")
 	_expect(route_two.route_branches[1].risk_tier > route_two.route_branches[0].risk_tier, "route two disclosure has a higher risk tier")
@@ -262,12 +262,16 @@ func _room_dream_dust(room: CombatRoomDefinition) -> int:
 	var total := room.completion_dream_dust
 	for spawn: EnemySpawnDefinition in room.enemy_spawns:
 		total += spawn.dream_dust_reward
+	for spawn: EnemySpawnDefinition in room.reinforcement_spawns:
+		total += spawn.dream_dust_reward
 	return total
 
 
 func _total_enemy_health(room: CombatRoomDefinition) -> int:
 	var total := 0
 	for spawn: EnemySpawnDefinition in room.enemy_spawns:
+		total += spawn.maximum_health
+	for spawn: EnemySpawnDefinition in room.reinforcement_spawns:
 		total += spawn.maximum_health
 	return total
 
@@ -276,12 +280,16 @@ func _maximum_enemy_health(room: CombatRoomDefinition) -> int:
 	var maximum := 0
 	for spawn: EnemySpawnDefinition in room.enemy_spawns:
 		maximum = maxi(maximum, spawn.maximum_health)
+	for spawn: EnemySpawnDefinition in room.reinforcement_spawns:
+		maximum = maxi(maximum, spawn.maximum_health)
 	return maximum
 
 
 func _maximum_enemy_defense(room: CombatRoomDefinition) -> float:
 	var maximum := 0.0
 	for spawn: EnemySpawnDefinition in room.enemy_spawns:
+		maximum = maxf(maximum, spawn.defense_flat)
+	for spawn: EnemySpawnDefinition in room.reinforcement_spawns:
 		maximum = maxf(maximum, spawn.defense_flat)
 	return maximum
 

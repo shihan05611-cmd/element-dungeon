@@ -247,6 +247,44 @@ func fail_scene_transition(detail: StringName) -> RunCommandResult:
 	)
 
 
+func claim_formal_room_chest(
+		command_id: StringName,
+		expected_run_revision: int,
+		requested_room_id: StringName,
+		room_instance_id: int
+) -> RunCommandResult:
+	if (
+		not _configured
+		or _formal_flow == null
+		or requested_room_id != room_id
+		or room_instance_id != _room_instance_id
+	):
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.INVALID_STATE,
+			&"inactive_room_chest",
+			_run_session.snapshot() if _run_session != null else null
+		)
+	return _run_session.claim_formal_room_chest(command_id, expected_run_revision, requested_room_id)
+
+
+func complete_formal_room(
+		requested_room_id: StringName,
+		room_instance_id: int
+) -> RunCommandResult:
+	if (
+		not _configured
+		or _formal_flow == null
+		or requested_room_id != room_id
+		or room_instance_id != _room_instance_id
+	):
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.INVALID_STATE,
+			&"inactive_room_completion",
+			_run_session.snapshot() if _run_session != null else null
+		)
+	return _complete_room()
+
+
 func begin_next_room(next_room_id: StringName, enemies: Array[CombatEnemy]) -> RunCommandResult:
 	if not _configured or next_room_id.is_empty() or enemies.is_empty():
 		return RunCommandResult.rejected(
@@ -366,11 +404,11 @@ func _on_enemy_defeated(enemy: CombatEnemy) -> void:
 	var result := _project_event(event)
 	if not result.accepted:
 		return
-	if _all_enemies_defeated():
+	if _formal_flow == null and _all_enemies_defeated():
 		_complete_room()
 
 
-func _complete_room() -> void:
+func _complete_room() -> RunCommandResult:
 	var completion_dream_dust := (
 		_room_definition.completion_dream_dust
 		if _formal_flow != null and _room_definition != null
@@ -391,9 +429,10 @@ func _complete_room() -> void:
 	)
 	var result := _project_event(event)
 	if not result.accepted:
-		return
+		return result
 	if _formal_flow == null:
 		_generate_room_reward()
+	return result
 
 
 func _generate_room_reward() -> void:

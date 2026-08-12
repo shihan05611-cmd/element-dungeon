@@ -70,6 +70,10 @@ var shop_commit: ShopCommitSummary:
 	get:
 		return _shop_commit
 
+var chest_reward: RunChestRewardSnapshot:
+	get:
+		return _chest_reward
+
 var _accepted: bool
 var _reject_reason: RejectReason
 var _detail: StringName
@@ -77,6 +81,7 @@ var _run_snapshot: RunSnapshot
 var _reward_offer: RewardOffer
 var _reward_option: RewardOption
 var _shop_commit: ShopCommitSummary
+var _chest_reward: RunChestRewardSnapshot
 
 
 func _init(
@@ -86,7 +91,8 @@ func _init(
 		p_run_snapshot: RunSnapshot = null,
 		p_reward_offer: RewardOffer = null,
 		p_reward_option: RewardOption = null,
-		p_shop_commit: ShopCommitSummary = null
+		p_shop_commit: ShopCommitSummary = null,
+		p_chest_reward: RunChestRewardSnapshot = null
 ) -> void:
 	_accepted = p_accepted
 	_reject_reason = p_reject_reason
@@ -95,13 +101,15 @@ func _init(
 	_reward_offer = p_reward_offer
 	_reward_option = p_reward_option
 	_shop_commit = p_shop_commit
+	_chest_reward = p_chest_reward
 
 
 static func success(
 		p_run_snapshot: RunSnapshot = null,
 		p_reward_offer: RewardOffer = null,
 		p_reward_option: RewardOption = null,
-		p_shop_commit: ShopCommitSummary = null
+		p_shop_commit: ShopCommitSummary = null,
+		p_chest_reward: RunChestRewardSnapshot = null
 ) -> RunCommandResult:
 	return RunCommandResult.new(
 		true,
@@ -110,7 +118,8 @@ static func success(
 		p_run_snapshot,
 		p_reward_offer,
 		p_reward_option,
-		p_shop_commit
+		p_shop_commit,
+		p_chest_reward
 	)
 
 

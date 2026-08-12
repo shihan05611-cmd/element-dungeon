@@ -1,6 +1,8 @@
 class_name RunFlowCoordinator
 extends Node2D
 
+const SHOP_ROOM_SCENE: PackedScene = preload("res://scenes/run/rooms/room_shop_formal.tscn")
+
 signal room_activated(
 	room_id: StringName,
 	scene_path: String,
@@ -11,10 +13,15 @@ signal ui_command_result(command: StringName, result: RunCommandResult)
 
 @export var flow_definition: RunFlowDefinition
 @export var content_catalog: RunContentCatalog
+@export var run_id_override: StringName = &""
 
 var active_room: RunRoomInstance:
 	get:
 		return _active_room
+
+var active_shop_room: RunShopRoomInstance:
+	get:
+		return _active_shop_room
 
 var active_enemies: Array[CombatEnemy]:
 	get:
@@ -44,6 +51,7 @@ var last_error: StringName:
 @onready var room_container: Node2D = $RoomContainer
 
 var _active_room: RunRoomInstance
+var _active_shop_room: RunShopRoomInstance
 var _staged_room: RunRoomInstance
 var _activated_scene_paths: Array[String] = []
 var _activated_room_instance_ids: Array[int] = []
@@ -51,9 +59,11 @@ var _command_sequence: int = 0
 var _transition_scheduled: bool = false
 var _transition_in_progress: bool = false
 var _last_error: StringName = &""
+var _interaction_busy: bool = false
 
 
 func _ready() -> void:
+	player.interact_requested.connect(_on_interact_requested)
 	call_deferred("_bootstrap_run")
 
 
@@ -206,7 +216,11 @@ func _bootstrap_run() -> void:
 		return
 	var definition := flow_definition.combat_room_for(first_node_id)
 	host.room_id = first_node_id
-	var run_id := StringName("formal_run_%d_%d" % [get_instance_id(), Time.get_ticks_usec()])
+	var run_id := (
+		run_id_override
+		if not run_id_override.is_empty()
+		else StringName("formal_run_%d_%d" % [get_instance_id(), Time.get_ticks_usec()])
+	)
 	if not host.configure(
 		player,
 		_staged_room.enemies,
@@ -282,6 +296,9 @@ func _activate_staged_room(authority_snapshot: RunSnapshot) -> bool:
 	_staged_room.activate()
 	_active_room = _staged_room
 	_staged_room = null
+	if _active_shop_room != null:
+		_active_shop_room.queue_free()
+		_active_shop_room = null
 	if previous != null and previous != _active_room:
 		previous.queue_free()
 	player.global_position = _active_room.player_spawn_global_position()
@@ -308,6 +325,73 @@ func _on_session_snapshot_changed(snapshot: RunSnapshot, _cause: StringName) -> 
 	if snapshot.route.phase == RunPhase.ROOM_LOADING and not _transition_scheduled:
 		_transition_scheduled = true
 		call_deferred("_load_pending_room")
+	elif snapshot.route.phase == RunPhase.SHOP and _active_shop_room == null:
+		call_deferred("_enter_shop_room")
+
+
+func _enter_shop_room() -> void:
+	if _active_shop_room != null or host.run_session == null:
+		return
+	var snapshot := current_snapshot()
+	if snapshot == null or snapshot.route.phase != RunPhase.SHOP:
+		return
+	var shop := SHOP_ROOM_SCENE.instantiate() as RunShopRoomInstance
+	if shop == null:
+		_fail(&"shop_room_protocol_mismatch")
+		return
+	shop.deactivate()
+	room_container.add_child(shop)
+	shop.activate()
+	if _active_room != null:
+		_active_room.queue_free()
+		_active_room = null
+	_active_shop_room = shop
+	_clear_transient_deliveries()
+	vfx.clear_presentations()
+	player.global_position = shop.player_spawn_global_position()
+	player.velocity = Vector2.ZERO
+
+
+func _on_interact_requested() -> void:
+	if _interaction_busy or host.run_session == null:
+		return
+	_interaction_busy = true
+	if _active_shop_room != null:
+		var shop_target := _active_shop_room.interaction_target_at(player.global_position)
+		if shop_target != null:
+			var shop_result := leave_shop()
+			if shop_result.accepted:
+				shop_target.mark_consumed("正在传送")
+		_interaction_busy = false
+		return
+	if _active_room == null or not _active_room.room_is_cleared:
+		_interaction_busy = false
+		return
+	var target := _active_room.interaction_target_at(player.global_position)
+	if target == null:
+		_interaction_busy = false
+		return
+	var snapshot := current_snapshot()
+	if target.kind == RunWorldInteractable.Kind.CHEST:
+		if _active_room.room_definition.final_boss:
+			var completion := host.complete_formal_room(_active_room.room_id, _active_room.get_instance_id())
+			if completion.accepted:
+				_active_room.open_settlement_chest()
+		else:
+			var claim := host.claim_formal_room_chest(
+				_next_command_id(&"chest"), snapshot.revision, _active_room.room_id, _active_room.get_instance_id()
+			)
+			if claim.accepted and claim.chest_reward != null:
+				var copy := "+150 梦尘"
+				if claim.chest_reward.kind == RunChestRewardSnapshot.Kind.SKILL:
+					var content := content_catalog.content_for(claim.chest_reward.skill_id)
+					copy = "获得技能 · %s" % (content.display_name if content != null else String(claim.chest_reward.skill_id))
+				_active_room.apply_chest_reward(copy)
+	elif target.kind == RunWorldInteractable.Kind.PORTAL:
+		var completion := host.complete_formal_room(_active_room.room_id, _active_room.get_instance_id())
+		if completion.accepted:
+			target.mark_consumed("正在传送")
+	_interaction_busy = false
 
 
 func _load_pending_room() -> void:

@@ -18,6 +18,7 @@ func _initialize() -> void:
 func _run() -> void:
 	root.size = Vector2i(1366, 768)
 	_coordinator = RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
+	_coordinator.run_id_override = &"task30_ui_flow"
 	_expect(_coordinator != null, "RunGame instantiates as RunFlowCoordinator")
 	if _coordinator == null:
 		_finish()
@@ -30,8 +31,8 @@ func _run() -> void:
 
 	_run_test("formal_scene_and_seven_slot_hud", _test_formal_scene_and_seven_slot_hud)
 	_run_test("combat_semantics_and_accessibility", _test_combat_semantics_and_accessibility)
-	await _run_async_test("early_shop_authority_and_recovery", _test_early_shop_authority_and_recovery)
 	await _run_async_test("route_focus_stale_recovery_and_confirm", _test_route_focus_stale_recovery_and_confirm)
+	await _run_async_test("single_shop_authority_and_recovery", _test_early_shop_authority_and_recovery)
 	await _run_async_test("middle_shop_levels_max_and_second_passive", _test_middle_shop_levels_max_and_second_passive)
 	await _run_async_test("second_route_visible_confirm", _test_second_route_visible_confirm)
 	await _run_async_test("preboss_shop_and_complete_result", _test_preboss_shop_and_complete_result)
@@ -100,12 +101,14 @@ func _test_combat_semantics_and_accessibility() -> void:
 
 
 func _test_early_shop_authority_and_recovery() -> void:
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "combat one opens early shop")
+	await _finish_current_room()
+	_expect(await _wait_for_combat(&"combat_03_layer_elite"), "route room flows to layer elite")
+	await _finish_current_room()
+	_expect(await _wait_for_phase(RunPhase.SHOP), "combat three opens the single shop")
 	_expect(_overlay.visible and _overlay.formal_kind() == &"shop", "formal shop opens automatically")
 	_expect(_inside(_overlay.get("_panel").get_global_rect(), Rect2(Vector2.ZERO, Vector2(root.size))), "shop panel stays inside 1366x768")
 	var before := _coordinator.current_snapshot()
-	_expect(before.economy.balance >= 120, "early shop projects authoritative guaranteed balance")
+	_expect(before.economy.balance >= 365, "single shop projects three-room authoritative base balance")
 	_expect(_visible_text(_overlay).contains("梦尘余额"), "shop shows dream-dust balance")
 	_expect(_visible_text(_overlay).contains("购买价"), "shop shows fixed purchase prices")
 	_expect(_visible_text(_overlay).contains("权威即时配装"), "shop exposes strict seven-slot zone")
@@ -118,53 +121,53 @@ func _test_early_shop_authority_and_recovery() -> void:
 	_expect_eq(upgraded.skills.progress_for(&"element_bolt").level, 2, "visible upgrade commits authoritative Lv2")
 	_expect_eq(upgraded.economy.balance, before.economy.balance - 55, "visible upgrade charges authoritative price")
 
-	var insufficient_revision := upgraded.revision
+	var second_upgrade_revision := upgraded.revision
 	_button(&"upgrade:element_bolt").pressed.emit()
 	await process_frame
-	var insufficient := _coordinator.current_snapshot()
-	_expect_eq(insufficient.revision, insufficient_revision, "insufficient upgrade rejection keeps revision")
-	_expect_eq(insufficient.skills.progress_for(&"element_bolt").level, 2, "insufficient upgrade keeps level")
-	_expect(_visible_text(_overlay).contains("梦尘不足"), "insufficient rejection gives recovery feedback")
+	var maximum := _coordinator.current_snapshot()
+	_expect_eq(maximum.revision, second_upgrade_revision + 1, "second exact upgrade advances revision once")
+	_expect_eq(maximum.skills.progress_for(&"element_bolt").level, 3, "single-shop budget reaches frozen maximum level")
+	var max_reject := _coordinator.upgrade_shop_skill(&"element_bolt", maximum.revision, maximum.shop.session_id)
+	_expect(not max_reject.accepted and max_reject.reject_reason == RunCommandResult.RejectReason.MAX_LEVEL_REACHED, "authority rejects a false fourth level")
 
 	var reset_request := _button(&"reset:element_bolt")
-	var reset_focus_revision := insufficient.revision
-	var reset_focus_balance := insufficient.economy.balance
+	var reset_focus_revision := maximum.revision
+	var reset_focus_balance := maximum.economy.balance
 	reset_request.pressed.emit()
 	await process_frame
 	_expect_eq(_coordinator.current_snapshot().revision, reset_focus_revision, "reset focus does not submit")
 	_expect_eq(_coordinator.current_snapshot().economy.balance, reset_focus_balance, "reset focus does not refund")
 	_expect(_button(&"reset_confirm:element_bolt") != null and _button(&"reset_cancel:element_bolt") != null, "reset exposes independent confirm and cancel")
-	_expect(_visible_text(_overlay).contains("预计返还 ✦ 38"), "reset estimate projects 70 percent floor from authority fields")
+	_expect(_visible_text(_overlay).contains("预计返还 ✦ 105"), "reset estimate projects 70 percent floor from both authority upgrades")
 	_button(&"reset_confirm:element_bolt").pressed.emit()
 	await process_frame
 	var reset := _coordinator.current_snapshot()
 	_expect_eq(reset.skills.progress_for(&"element_bolt").level, 1, "confirmed reset returns active to Lv1")
-	_expect_eq(reset.economy.balance, reset_focus_balance + 38, "confirmed reset refunds exact authoritative floor")
+	_expect_eq(reset.economy.balance, reset_focus_balance + 105, "confirmed reset refunds exact authoritative floor")
 
-	var purchase := _button(&"purchase:burning")
+	var purchase := _button(&"purchase:passive_vitality")
 	_expect(purchase != null and not purchase.disabled, "fixed passive offer has visible purchase control")
 	purchase.pressed.emit()
 	await process_frame
 	var purchased := _coordinator.current_snapshot()
-	_expect(purchased.skills.owns(&"burning"), "visible purchase commits ownership")
+	_expect(purchased.skills.owns(&"passive_vitality"), "visible purchase commits ownership")
 	_expect_eq(purchased.economy.balance, reset.economy.balance - 75, "visible purchase charges exact price")
 
-	_button(&"select:burning").pressed.emit()
+	_button(&"select:passive_vitality").pressed.emit()
 	await process_frame
 	var loadout_revision := _coordinator.current_snapshot().revision
 	_button(&"slot:passive_1").pressed.emit()
 	await process_frame
 	var equipped := _coordinator.current_snapshot()
-	_expect_eq(equipped.loadout.get_skill_id(SkillSlotIds.PASSIVE_1), &"burning", "visible P1 action commits RuntimeLoadout immediately")
+	_expect_eq(equipped.loadout.get_skill_id(SkillSlotIds.PASSIVE_1), &"passive_vitality", "visible P1 action commits RuntimeLoadout immediately")
 	_expect(equipped.revision == loadout_revision + 1, "immediate equip advances authority once")
 	_expect(_coordinator.host.runtime_loadout.snapshot().same_mapping(equipped.loadout), "runtime and RunSnapshot mappings align immediately")
-	_expect(_button(&"leave_shop").text == "离开商店", "leave copy does not imply loadout confirmation")
-	_button(&"leave_shop").pressed.emit()
-	await process_frame
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "visible leave advances to first route")
+	_expect(_button(&"leave_shop").disabled and _button(&"leave_shop").text.contains("按 F"), "shop UI directs the player to the physical F exit")
 
 
 func _test_route_focus_stale_recovery_and_confirm() -> void:
+	await _finish_current_room()
+	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "combat one chest and portal open first route")
 	_expect(_overlay.formal_kind() == &"route" and _overlay.visible, "formal route panel opens automatically")
 	_expect_eq(_overlay.formal_route_cards().size(), 2, "route shows exactly two frozen cards")
 	var route_text := _visible_text(_overlay)
@@ -193,10 +196,7 @@ func _test_route_focus_stale_recovery_and_confirm() -> void:
 
 
 func _test_middle_shop_levels_max_and_second_passive() -> void:
-	await _defeat_current_room()
-	_expect(await _wait_for_combat(&"combat_03_layer_elite"), "route room flows to layer elite")
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "combat three opens middle shop")
+	_expect(await _wait_for_phase(RunPhase.SHOP), "single shop remains open for level and passive controls")
 	_button(&"upgrade:element_bolt").pressed.emit()
 	await process_frame
 	_button(&"upgrade:element_bolt").pressed.emit()
@@ -218,13 +218,14 @@ func _test_middle_shop_levels_max_and_second_passive() -> void:
 	await process_frame
 	_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.PASSIVE_2), &"unending", "P2 immediate equip is authoritative")
 	_expect_eq(_coordinator.current_snapshot().loadout.entries.size(), 7, "shop preserves exact seven-slot mapping")
-	_button(&"leave_shop").pressed.emit()
-	await process_frame
-	_expect(await _wait_for_combat(&"combat_04_validation"), "middle shop visible leave loads combat four")
+	_expect(await _wait_until(func() -> bool: return _coordinator.active_shop_room != null, 360), "physical shop room is active")
+	_coordinator.player.global_position = _coordinator.active_shop_room.exit_portal.global_position
+	_coordinator.player.interact_requested.emit()
+	_expect(await _wait_for_combat(&"combat_04_validation"), "physical shop exit loads combat four")
 
 
 func _test_second_route_visible_confirm() -> void:
-	await _defeat_current_room()
+	await _finish_current_room()
 	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "combat four opens second route")
 	var snapshot := _coordinator.current_snapshot()
 	var desired_index := 0
@@ -241,33 +242,20 @@ func _test_second_route_visible_confirm() -> void:
 
 
 func _test_preboss_shop_and_complete_result() -> void:
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "combat five opens preboss shop")
-	var fury := _button(&"purchase:elemental_fury")
-	if fury != null and not fury.disabled:
-		fury.pressed.emit()
-		await process_frame
-		if _coordinator.current_snapshot().skills.owns(&"elemental_fury"):
-			_button(&"select:elemental_fury").pressed.emit()
-			await process_frame
-			_button(&"slot:active_2").pressed.emit()
-			await process_frame
-			_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_2), &"elemental_fury", "preboss active equips immediately through visible controls")
-	_button(&"leave_shop").pressed.emit()
-	await process_frame
-	_expect(await _wait_for_combat(&"combat_06_final_boss"), "preboss leave loads final boss")
+	await _finish_current_room()
+	_expect(await _wait_for_combat(&"combat_06_final_boss"), "combat five portal loads final boss directly")
 	var host_id := _coordinator.host.get_instance_id()
 	var session_id := _coordinator.host.run_session.get_instance_id()
 	var player_id := _coordinator.player.get_instance_id()
 	var hud_id := _hud.get_instance_id()
 	var runtime_id := _coordinator.host.runtime_loadout.get_instance_id()
 	var boss_balance := _coordinator.current_snapshot().economy.balance
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "boss death opens complete result")
+	await _finish_current_room()
+	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "boss settlement chest opens complete result")
 	var final := _coordinator.current_snapshot()
 	_expect(final.result != null and final.result.is_complete(), "result is frozen complete")
 	_expect_eq(final.result.completed_combat_rooms, 6, "result shows six of six combats")
-	_expect_eq(final.result.shop_visits, 3, "result freezes three shop visits")
+	_expect_eq(final.result.shop_visits, 1, "result freezes one shop visit")
 	_expect_eq(final.result.route_choices, 2, "result freezes two route confirmations")
 	_expect_eq(final.economy.balance, boss_balance, "boss awards zero dream dust")
 	_expect(final.shop == null and final.pending_reward == null, "boss result has no fourth shop or free reward")
@@ -337,27 +325,43 @@ func _button(control_id: StringName) -> Button:
 	return _overlay.formal_control(control_id) as Button
 
 
-func _defeat_current_room() -> void:
+func _finish_current_room() -> void:
 	var room := _coordinator.active_room
 	_expect(room != null and room.configured, "visible run has configured active room")
 	if room == null:
 		return
-	for enemy: CombatEnemy in room.enemies:
-		_hit_sequence += 1
-		var cast := CastSnapshot.new(
-			_hit_sequence,
-			&"task30_ui_finisher",
-			_coordinator.player.get_instance_id(),
-			_coordinator.player.get_instance_id(),
-			&"player",
-			ElementIds.NONE,
-			CombatStatSnapshot.new()
-		)
-		var payload := RuntimeAttackPayload.new(99999.0, 99999.0, ElementIds.NONE, 0)
-		var request := HitRequest.new(cast, payload, _hit_sequence, 0, enemy.global_position, Vector2.RIGHT)
-		var result := enemy.combat_receiver.receive_hit(request)
-		_expect(result.accepted and enemy.defeated, "room enemy defeated through real CombatReceiver")
+	for enemy: CombatEnemy in room.initial_enemies:
+		_defeat_enemy(enemy)
 	await process_frame
+	for enemy: CombatEnemy in room.reinforcement_enemies:
+		_defeat_enemy(enemy)
+	await process_frame
+	_expect(room.room_is_cleared, "both waves clear before world interaction")
+	_coordinator.player.global_position = room.chest.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+	if room.room_definition.final_boss:
+		return
+	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _defeat_enemy(enemy: CombatEnemy) -> void:
+	_hit_sequence += 1
+	var cast := CastSnapshot.new(
+		_hit_sequence,
+		&"task30_ui_finisher",
+		_coordinator.player.get_instance_id(),
+		_coordinator.player.get_instance_id(),
+		&"player",
+		ElementIds.NONE,
+		CombatStatSnapshot.new()
+	)
+	var payload := RuntimeAttackPayload.new(99999.0, 99999.0, ElementIds.NONE, 0)
+	var request := HitRequest.new(cast, payload, _hit_sequence, 0, enemy.global_position, Vector2.RIGHT)
+	var result := enemy.combat_receiver.receive_hit(request)
+	_expect(result.accepted and enemy.defeated, "room enemy defeated through real CombatReceiver")
 
 
 func _wait_for_combat(node_or_option_id: StringName) -> bool:

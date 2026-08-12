@@ -30,6 +30,7 @@ func _run() -> void:
 	_run_test("new_stat_passives_are_purchase_only_static_content", _test_new_content_contract)
 
 	_coordinator = RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
+	_coordinator.run_id_override = &"task32_passive_flow"
 	_expect(_coordinator != null, "real RunGame instantiates for Task32")
 	if _coordinator == null:
 		_finish()
@@ -118,12 +119,24 @@ func _test_new_content_contract() -> void:
 
 
 func _test_first_shop() -> void:
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "combat one opens the formal shop")
+	await _finish_current_room()
+	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "combat one chest and portal reach route one")
+	var pressure_index := _route_index(&"route_01_pressure")
+	_expect(pressure_index >= 0, "formal route exposes the pressure option")
+	if pressure_index < 0:
+		return
+	_overlay.formal_route_cards()[pressure_index].pressed.emit()
+	await process_frame
+	_overlay.formal_route_confirm_button().pressed.emit()
+	_expect(await _wait_for_room(&"combat_02_pressure"), "visible route confirmation reaches combat two")
+	await _finish_current_room()
+	_expect(await _wait_for_room(&"combat_03_layer_elite"), "combat two flows to the layer elite")
+	await _finish_current_room()
+	_expect(await _wait_for_phase(RunPhase.SHOP), "combat three opens the single formal shop")
 	_expect(_overlay.visible and _overlay.formal_kind() == &"shop", "formal shop UI is live")
 	var before := _coordinator.current_snapshot()
-	_expect_eq(before.economy.balance, 120, "first formal shop has exactly 120 dream dust")
-	_expect_eq(before.shop.offers.size(), 8, "first shop offers eight unowned purchasable contents")
+	_expect(before.economy.balance >= 365 and before.economy.balance == before.economy.total_earned, "single shop balance exactly reflects three rooms plus typed chest dust")
+	_expect_eq(before.shop.offers.size(), _unowned_shop_offer_count(before), "single shop offers every and only unowned purchasable content")
 	var burning_offer := _offer_for_skill(before.shop, &"burning")
 	_expect(burning_offer != null, "first shop has formal burning offer")
 	if burning_offer == null:
@@ -142,7 +155,7 @@ func _test_first_shop() -> void:
 	await process_frame
 	var purchased := _coordinator.current_snapshot()
 	_expect(purchased.skills.owns(&"burning"), "burning ownership commits")
-	_expect_eq(purchased.economy.balance, 45, "burning charges exactly 75 dream dust")
+	_expect_eq(purchased.economy.balance, before.economy.balance - 75, "burning charges exactly 75 dream dust")
 	_expect_eq(purchased.economy.total_spent_on_purchases, 75, "purchase ledger charges once")
 	_expect_eq(purchased.revision, before.revision + 1, "successful purchase advances authority once")
 	var duplicate_signature := _signature(purchased)
@@ -156,14 +169,7 @@ func _test_first_shop() -> void:
 
 	var unending_offer := _offer_for_skill(purchased.shop, &"unending")
 	_expect(unending_offer != null, "unending remains an unowned formal offer")
-	if unending_offer != null:
-		var insufficient := _coordinator.purchase_shop_skill(
-			unending_offer.offer_id,
-			purchased.revision,
-			purchased.shop.session_id
-		)
-		_expect(not insufficient.accepted and insufficient.reject_reason == RunCommandResult.RejectReason.INSUFFICIENT_DREAM_DUST, "insufficient purchase rejects with typed reason")
-		_expect_eq(_signature(_coordinator.current_snapshot()), duplicate_signature, "insufficient purchase changes no authority state")
+	_expect(purchased.economy.balance >= 225, "single-shop budget preserves three remaining exact passive purchases")
 
 	var passive_upgrade := _coordinator.upgrade_shop_skill(
 		&"burning",
@@ -184,28 +190,14 @@ func _test_first_shop() -> void:
 	_expect(_coordinator.host.runtime_loadout.snapshot().same_mapping(equipped.loadout), "P1 RuntimeLoadout matches RunSnapshot immediately")
 	_expect_eq(_coordinator.host.runtime_loadout.registered_passive_skill_ids, [&"burning"], "burning Runtime registers exactly once")
 
-	_expect(_emit_button(&"leave_shop"), "visible control leaves first shop")
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "first shop advances to route choice")
-	var route := _coordinator.current_snapshot()
-	_expect_eq(route.route.next_options.size(), 2, "formal route has two frozen options")
-	var pressure_index := _route_index(&"route_01_pressure")
-	_expect(pressure_index >= 0, "formal route exposes the pressure option")
-	if pressure_index < 0:
-		return
-	_overlay.formal_route_cards()[pressure_index].pressed.emit()
-	await process_frame
-	_overlay.formal_route_confirm_button().pressed.emit()
-	_expect(await _wait_for_phase(RunPhase.COMBAT), "visible route confirmation reaches combat two")
+	_expect(_button(&"leave_shop").disabled, "formal UI cannot bypass the physical shop exit")
 
 
 func _test_second_shop() -> void:
-	await _defeat_current_room()
-	_expect(await _wait_for_room(&"combat_03_layer_elite"), "combat two flows to the layer elite")
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "combat three opens the second formal shop")
+	_expect(await _wait_for_phase(RunPhase.SHOP), "all four passives are handled in the one formal shop")
 	var second_shop := _coordinator.current_snapshot()
-	_expect_eq(second_shop.economy.total_earned, 365, "first three combats earn the formal 365 dream dust")
-	_expect_eq(second_shop.economy.balance, 290, "second shop balance reflects the first passive purchase")
+	_expect(second_shop.economy.total_earned >= 365, "first three combats plus typed chests fund the single shop")
+	_expect_eq(second_shop.economy.balance, second_shop.economy.total_earned - 75, "single shop balance reflects the first passive purchase")
 
 	var purchases := [
 		[&"unending", SkillSlotIds.PASSIVE_2],
@@ -236,7 +228,7 @@ func _test_second_shop() -> void:
 
 	var final_shop := _coordinator.current_snapshot()
 	_expect_eq(final_shop.economy.total_spent_on_purchases, 300, "four formal passive purchases spend exactly 300")
-	_expect_eq(final_shop.economy.balance, 65, "wallet conserves to 65 after four purchases")
+	_expect_eq(final_shop.economy.balance, final_shop.economy.total_earned - 300, "wallet exactly conserves typed rewards minus four purchases")
 	_expect(final_shop.economy.is_valid() and final_shop.economy.balance == final_shop.economy.conserved_balance(), "final shop wallet is conserved")
 	_expect_eq(final_shop.loadout.entries.size(), 7, "authority loadout remains exactly seven slots")
 	for index: int in PASSIVE_IDS.size():
@@ -259,7 +251,9 @@ func _test_second_shop() -> void:
 
 
 func _test_room_rebuild() -> void:
-	_expect(_emit_button(&"leave_shop"), "visible control leaves the second shop")
+	_expect(await _wait_until(func() -> bool: return _coordinator.active_shop_room != null, 360), "physical shop room is active")
+	_coordinator.player.global_position = _coordinator.active_shop_room.exit_portal.global_position
+	_coordinator.player.interact_requested.emit()
 	_expect(await _wait_for_room(&"combat_04_validation"), "formal RunGame activates combat four")
 	var runtime := _coordinator.host.runtime_loadout
 	var combat_snapshot := _coordinator.current_snapshot()
@@ -318,27 +312,51 @@ func _emit_button(control_id: StringName) -> bool:
 	return true
 
 
-func _defeat_current_room() -> void:
+func _finish_current_room() -> void:
 	var room := _coordinator.active_room
 	_expect(room != null and room.configured, "Task32 uses a configured real combat room")
 	if room == null:
 		return
-	for enemy: CombatEnemy in room.enemies:
-		_hit_sequence += 1
-		var cast := CastSnapshot.new(
-			_hit_sequence,
-			&"task32_formal_finisher",
-			_coordinator.player.get_instance_id(),
-			_coordinator.player.get_instance_id(),
-			&"player",
-			ElementIds.NONE,
-			CombatStatSnapshot.new()
-		)
-		var payload := RuntimeAttackPayload.new(99999.0, 99999.0, ElementIds.NONE, 0)
-		var request := HitRequest.new(cast, payload, _hit_sequence, 0, enemy.global_position, Vector2.RIGHT)
-		var hit := enemy.combat_receiver.receive_hit(request)
-		_expect(hit.accepted and enemy.defeated, "Task32 room enemy is defeated through real CombatReceiver")
+	for enemy: CombatEnemy in room.initial_enemies:
+		_defeat_enemy(enemy)
 	await process_frame
+	for enemy: CombatEnemy in room.reinforcement_enemies:
+		_defeat_enemy(enemy)
+	await process_frame
+	_expect(room.room_is_cleared, "Task32 clears both waves before world interaction")
+	_coordinator.player.global_position = room.chest.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+	if room.room_definition.final_boss:
+		return
+	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _defeat_enemy(enemy: CombatEnemy) -> void:
+	_hit_sequence += 1
+	var cast := CastSnapshot.new(
+		_hit_sequence,
+		&"task32_formal_finisher",
+		_coordinator.player.get_instance_id(),
+		_coordinator.player.get_instance_id(),
+		&"player",
+		ElementIds.NONE,
+		CombatStatSnapshot.new()
+	)
+	var payload := RuntimeAttackPayload.new(99999.0, 99999.0, ElementIds.NONE, 0)
+	var request := HitRequest.new(cast, payload, _hit_sequence, 0, enemy.global_position, Vector2.RIGHT)
+	var hit := enemy.combat_receiver.receive_hit(request)
+	_expect(hit.accepted and enemy.defeated, "Task32 room enemy is defeated through real CombatReceiver")
+
+
+func _unowned_shop_offer_count(snapshot: RunSnapshot) -> int:
+	var count := 0
+	for content: SkillContentDefinition in CATALOG.shop_contents():
+		if not snapshot.skills.owns(content.skill_id):
+			count += 1
+	return count
 
 
 func _wait_for_room(room_id: StringName) -> bool:

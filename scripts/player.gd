@@ -4,6 +4,7 @@ extends CharacterBody2D
 signal delivery_created(delivery: Node)
 signal player_defeated
 signal basic_attack_committed(event: BasicAttackCommittedEvent)
+signal interact_requested
 
 const SPEED := 235.0
 const GROUND_ACCELERATION := 1450.0
@@ -84,6 +85,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed(&"jump"):
 		jump_requested = true
+	elif event.is_action_pressed(&"interact"):
+		interact_requested.emit()
 	elif event.is_action_pressed(&"attack_melee"):
 		try_basic_attack()
 	elif event.is_action_pressed(&"cast_active_1"):

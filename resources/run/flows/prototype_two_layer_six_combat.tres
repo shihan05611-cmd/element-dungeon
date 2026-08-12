@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RunFlowDefinition" load_steps=32 format=3]
+[gd_resource type="Resource" script_class="RunFlowDefinition" load_steps=28 format=3]
 
 [ext_resource type="Script" path="res://growth/flow/run_flow_definition.gd" id="1_flow"]
 [ext_resource type="Script" path="res://growth/flow/run_node_definition.gd" id="2_node"]
@@ -66,14 +66,8 @@ next_node_id = &"combat_01_entry"
 script = ExtResource("2_node")
 node_id = &"combat_01_entry"
 kind = 1
-next_node_id = &"shop_01_early"
-combat_room = ExtResource("4_c1")
-
-[sub_resource type="Resource" id="Shop1"]
-script = ExtResource("2_node")
-node_id = &"shop_01_early"
-kind = 2
 next_node_id = &"route_01_first_branch"
+combat_room = ExtResource("4_c1")
 
 [sub_resource type="Resource" id="Route1"]
 script = ExtResource("2_node")
@@ -99,12 +93,12 @@ combat_room = ExtResource("6_c2b")
 script = ExtResource("2_node")
 node_id = &"combat_03_layer_elite"
 kind = 1
-next_node_id = &"shop_02_mid"
+next_node_id = &"shop_01_mid"
 combat_room = ExtResource("7_c3")
 
 [sub_resource type="Resource" id="Shop2"]
 script = ExtResource("2_node")
-node_id = &"shop_02_mid"
+node_id = &"shop_01_mid"
 kind = 2
 next_node_id = &"combat_04_validation"
 
@@ -125,21 +119,15 @@ route_branches = Array[ExtResource("3_branch")]([SubResource("Route2Stable"), Su
 script = ExtResource("2_node")
 node_id = &"combat_05_stable"
 kind = 1
-next_node_id = &"shop_03_preboss"
+next_node_id = &"combat_06_final_boss"
 combat_room = ExtResource("9_c5a")
 
 [sub_resource type="Resource" id="Combat5B"]
 script = ExtResource("2_node")
 node_id = &"combat_05_risk"
 kind = 1
-next_node_id = &"shop_03_preboss"
-combat_room = ExtResource("10_c5b")
-
-[sub_resource type="Resource" id="Shop3"]
-script = ExtResource("2_node")
-node_id = &"shop_03_preboss"
-kind = 2
 next_node_id = &"combat_06_final_boss"
+combat_room = ExtResource("10_c5b")
 
 [sub_resource type="Resource" id="Boss"]
 script = ExtResource("2_node")
@@ -158,4 +146,4 @@ script = ExtResource("1_flow")
 flow_id = &"prototype_two_layer_six_combat"
 entry_node_id = &"run_entry"
 result_node_id = &"run_result"
-nodes = Array[ExtResource("2_node")]([SubResource("Entry"), SubResource("Combat1"), SubResource("Shop1"), SubResource("Route1"), SubResource("Combat2A"), SubResource("Combat2B"), SubResource("Combat3"), SubResource("Shop2"), SubResource("Combat4"), SubResource("Route2"), SubResource("Combat5A"), SubResource("Combat5B"), SubResource("Shop3"), SubResource("Boss"), SubResource("Result")])
+nodes = Array[ExtResource("2_node")]([SubResource("Entry"), SubResource("Combat1"), SubResource("Route1"), SubResource("Combat2A"), SubResource("Combat2B"), SubResource("Combat3"), SubResource("Shop2"), SubResource("Combat4"), SubResource("Route2"), SubResource("Combat5A"), SubResource("Combat5B"), SubResource("Boss"), SubResource("Result")])

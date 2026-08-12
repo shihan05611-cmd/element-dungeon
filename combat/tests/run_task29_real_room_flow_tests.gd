@@ -14,6 +14,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var coordinator := RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
+	coordinator.run_id_override = &"task29_real_flow"
 	_expect(coordinator != null, "run_game root is RunFlowCoordinator")
 	if coordinator == null:
 		_finish()
@@ -50,15 +51,7 @@ func _run() -> void:
 	_expect(coordinator.host.get_parent() == coordinator, "host is persistent sibling of RoomContainer")
 	_expect(coordinator.smoke_panel.get_parent() == coordinator, "smoke HUD is persistent sibling of RoomContainer")
 
-	await _defeat_current_room(coordinator)
-	_expect(await _wait_for_phase(coordinator, RunPhase.SHOP), "combat one reaches early shop")
-	_assert_persistent_ids(coordinator, host_id, session_id, player_id, panel_id, loadout_id, passive_adapter_id)
-	var early_shop := coordinator.host.run_session.snapshot()
-	_expect(early_shop.economy.balance >= 110, "combat one guarantee can buy an active skill")
-	shop_sessions.append(early_shop.shop.session_id)
-	var purchase_one := coordinator.purchase_first_affordable_skill()
-	_expect(purchase_one.accepted, "early shop completes an authoritative purchase")
-	_expect(coordinator.leave_shop().accepted, "early shop leaves without stat confirmation")
+	await _finish_current_room(coordinator)
 	_expect(await _wait_for_phase(coordinator, RunPhase.ROUTE_CHOICE), "first route choice becomes visible")
 	var route_one := coordinator.host.run_session.snapshot()
 	_expect_eq(route_one.route.next_options.size(), 2, "first route freezes two options")
@@ -67,21 +60,23 @@ func _run() -> void:
 	_record_room(coordinator, scene_paths, room_instances)
 	_expect_eq(coordinator.active_room.template_id, &"arena_platforms", "first route changes to platform template")
 
-	await _defeat_current_room(coordinator)
+	await _finish_current_room(coordinator)
 	_expect(await _wait_for_room(coordinator, &"combat_03_layer_elite"), "combat two auto-loads combat three")
 	_record_room(coordinator, scene_paths, room_instances)
-	await _defeat_current_room(coordinator)
-	_expect(await _wait_for_phase(coordinator, RunPhase.SHOP), "combat three reaches middle shop")
+	await _finish_current_room(coordinator)
+	_expect(await _wait_for_phase(coordinator, RunPhase.SHOP), "combat three reaches the single physical shop")
 	_assert_persistent_ids(coordinator, host_id, session_id, player_id, panel_id, loadout_id, passive_adapter_id)
 	var middle_shop := coordinator.host.run_session.snapshot()
 	shop_sessions.append(middle_shop.shop.session_id)
 	var purchase_two := coordinator.purchase_first_affordable_skill()
-	_expect(purchase_two.accepted, "middle shop completes an authoritative purchase")
-	_expect(coordinator.leave_shop().accepted, "middle shop leaves")
+	_expect(purchase_two.accepted, "single shop completes an authoritative purchase")
+	_expect(await _wait_until(func() -> bool: return coordinator.active_shop_room != null, 360), "single physical shop room becomes active")
+	coordinator.player.global_position = coordinator.active_shop_room.exit_portal.global_position
+	coordinator.player.interact_requested.emit()
 	_expect(await _wait_for_room(coordinator, &"combat_04_validation"), "middle shop loads combat four")
 	_record_room(coordinator, scene_paths, room_instances)
 
-	await _defeat_current_room(coordinator)
+	await _finish_current_room(coordinator)
 	_expect(await _wait_for_phase(coordinator, RunPhase.ROUTE_CHOICE), "combat four reaches second route")
 	var route_two := coordinator.host.run_session.snapshot()
 	_expect_eq(route_two.route.next_options.size(), 2, "second route freezes two options")
@@ -90,31 +85,24 @@ func _run() -> void:
 	_record_room(coordinator, scene_paths, room_instances)
 	_expect_eq(coordinator.active_room.template_id, &"arena_corridor", "second route changes to corridor template")
 
-	await _defeat_current_room(coordinator)
-	_expect(await _wait_for_phase(coordinator, RunPhase.SHOP), "combat five reaches preboss shop")
-	_assert_persistent_ids(coordinator, host_id, session_id, player_id, panel_id, loadout_id, passive_adapter_id)
-	var preboss_shop := coordinator.host.run_session.snapshot()
-	shop_sessions.append(preboss_shop.shop.session_id)
-	var purchase_three := coordinator.purchase_first_affordable_skill()
-	_expect(purchase_three.accepted, "preboss shop completes an authoritative purchase")
-	_expect(coordinator.leave_shop().accepted, "preboss shop leaves")
+	await _finish_current_room(coordinator)
 	_expect(await _wait_for_room(coordinator, &"combat_06_final_boss"), "preboss shop loads boss arena")
 	_record_room(coordinator, scene_paths, room_instances)
 	_expect_eq(coordinator.active_room.template_id, &"arena_boss", "boss uses dedicated PackedScene")
 	var before_boss := coordinator.host.run_session.snapshot()
 	var boss_balance := before_boss.economy.balance
-	await _defeat_current_room(coordinator)
-	_expect(await _wait_for_phase(coordinator, RunPhase.RUN_COMPLETE), "boss death reaches result in same transaction")
+	await _finish_current_room(coordinator)
+	_expect(await _wait_for_phase(coordinator, RunPhase.RUN_COMPLETE), "boss settlement chest reaches result")
 
 	var final := coordinator.host.run_session.snapshot()
 	_assert_persistent_ids(coordinator, host_id, session_id, player_id, panel_id, loadout_id, passive_adapter_id)
 	_expect(final.result != null and final.result.is_complete(), "complete result snapshot exists")
 	_expect_eq(final.route.completed_combat_rooms, 6, "real scene run completes exactly six combat rooms")
-	_expect_eq(final.route.shop_visits, 3, "real scene run visits exactly three shops")
+	_expect_eq(final.route.shop_visits, 1, "real scene run visits exactly one shop")
 	_expect_eq(final.route.route_choices, 2, "real scene run chooses exactly two routes")
 	_expect_eq(final.route.selected_route_option_ids, [&"route_01_pressure", &"route_02_risk"], "real route choices freeze exact option ids")
-	_expect_eq(shop_sessions.size(), 3, "three shop sessions observed")
-	_expect_eq(_unique_string_name_count(shop_sessions), 3, "each shop session id is unique")
+	_expect_eq(shop_sessions.size(), 1, "one shop session observed")
+	_expect_eq(_unique_string_name_count(shop_sessions), 1, "single shop session id is unique")
 	_expect(final.economy.total_spent_on_purchases > 0, "real run consumes dream dust in shops")
 	_expect_eq(final.economy.balance, boss_balance, "boss kill and room completion award zero dream dust")
 	_expect(final.shop == null, "boss result has no terminal shop")
@@ -131,34 +119,51 @@ func _run() -> void:
 	_finish()
 
 
-func _defeat_current_room(coordinator: RunFlowCoordinator) -> void:
+func _finish_current_room(coordinator: RunFlowCoordinator) -> void:
 	var room := coordinator.active_room
 	_expect(room != null and room.configured, "active room is a configured RunRoomInstance")
 	if room == null:
 		return
-	for enemy: CombatEnemy in room.enemies:
-		_hit_sequence += 1
-		var cast := CastSnapshot.new(
-			_hit_sequence,
-			&"task29_real_room_finisher",
-			coordinator.player.get_instance_id(),
-			coordinator.player.get_instance_id(),
-			&"player",
-			ElementIds.NONE,
-			CombatStatSnapshot.new()
-		)
-		var payload := RuntimeAttackPayload.new(9999.0, 9999.0, ElementIds.NONE, 0)
-		var request := HitRequest.new(
-			cast,
-			payload,
-			_hit_sequence,
-			0,
-			enemy.global_position,
-			Vector2.RIGHT
-		)
-		var result := enemy.combat_receiver.receive_hit(request)
-		_expect(result.accepted and enemy.defeated, "enemy defeated through real CombatReceiver transaction")
+	for enemy: CombatEnemy in room.initial_enemies:
+		_defeat_enemy(coordinator, enemy)
 	await process_frame
+	for enemy: CombatEnemy in room.reinforcement_enemies:
+		_defeat_enemy(coordinator, enemy)
+	await process_frame
+	_expect(room.room_is_cleared, "both waves clear before a physical interaction")
+	coordinator.player.global_position = room.chest.global_position
+	coordinator.player.interact_requested.emit()
+	await process_frame
+	if room.room_definition.final_boss:
+		return
+	_expect(room.chest.consumed and not room.portal.locked, "typed chest result unlocks the physical portal")
+	coordinator.player.global_position = room.portal.global_position
+	coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _defeat_enemy(coordinator: RunFlowCoordinator, enemy: CombatEnemy) -> void:
+	_hit_sequence += 1
+	var cast := CastSnapshot.new(
+		_hit_sequence,
+		&"task29_real_room_finisher",
+		coordinator.player.get_instance_id(),
+		coordinator.player.get_instance_id(),
+		&"player",
+		ElementIds.NONE,
+		CombatStatSnapshot.new()
+	)
+	var payload := RuntimeAttackPayload.new(9999.0, 9999.0, ElementIds.NONE, 0)
+	var request := HitRequest.new(
+		cast,
+		payload,
+		_hit_sequence,
+		0,
+		enemy.global_position,
+		Vector2.RIGHT
+	)
+	var result := enemy.combat_receiver.receive_hit(request)
+	_expect(result.accepted and enemy.defeated, "enemy defeated through real CombatReceiver transaction")
 
 
 func _record_room(

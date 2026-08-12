@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
 [ext_resource type="Script" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
@@ -13,6 +13,31 @@ local_position = Vector2(700, 494)
 maximum_health = 105
 defense_flat = 1.0
 dream_dust_reward = 35
+
+[sub_resource type="Resource" id="SpawnC"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"risk_center"
+local_position = Vector2(790, 494)
+maximum_health = 105
+defense_flat = 1.0
+dream_dust_reward = 0
+
+[sub_resource type="Resource" id="ReinforcementA"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"risk_reinforcement_a"
+local_position = Vector2(620, 494)
+maximum_health = 150
+dream_dust_reward = 0
+
+[sub_resource type="Resource" id="ReinforcementB"]
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("4_enemy")
+enemy_id = &"risk_reinforcement_b"
+local_position = Vector2(1000, 494)
+maximum_health = 150
+dream_dust_reward = 0
 
 [sub_resource type="Resource" id="SpawnB"]
 script = ExtResource("2_spawn")
@@ -31,5 +56,7 @@ template_label = "熔火狭廊"
 encounter_label = "双强化敌人"
 environment_label = "狭长夹击"
 room_scene = ExtResource("3_template")
-enemy_spawns = Array[ExtResource("2_spawn")]([SubResource("SpawnA"), SubResource("SpawnB")])
+enemy_spawns = Array[ExtResource("2_spawn")]([SubResource("SpawnA"), SubResource("SpawnB"), SubResource("SpawnC")])
+reinforcement_spawns = Array[ExtResource("2_spawn")]([SubResource("ReinforcementA"), SubResource("ReinforcementB")])
+reinforcement_delay_seconds = 12.0
 completion_dream_dust = 140

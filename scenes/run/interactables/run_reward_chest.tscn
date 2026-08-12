@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/run/run_world_interactable.gd" id="1_interactable"]
+[ext_resource type="Texture2D" path="res://assets/generated/vfx/run_reward_chest/chest_closed.png" id="2_texture"]
+
+[sub_resource type="StyleBoxFlat" id="PromptStyle"]
+bg_color = Color(0.035, 0.045, 0.075, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.72, 0.22, 0.9)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="RunRewardChest" type="Node2D"]
+z_index = 4
+script = ExtResource("1_interactable")
+kind = 0
+interaction_distance = 104.0
+prompt_text = "开启宝箱"
+locked_text = "战斗尚未结束"
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_texture")
+scale = Vector2(0.46, 0.46)
+
+[node name="Prompt" type="Label" parent="."]
+offset_left = -112.0
+offset_top = -104.0
+offset_right = 112.0
+offset_bottom = -72.0
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("PromptStyle")
+text = "F · 开启宝箱"
+horizontal_alignment = 1
+vertical_alignment = 1
