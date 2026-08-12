@@ -34,6 +34,45 @@ static func query_circle(
 	)
 
 
+static func query_visible_world_rect(
+		source: Node2D,
+		collision_mask: int,
+		max_results: int,
+		source_team_id: StringName,
+		deduplicate_receivers: bool = false
+) -> Array[CombatTargetCandidate2D]:
+	if not _is_live_source(source):
+		return []
+	var viewport := source.get_viewport()
+	if viewport == null:
+		return []
+	var visible_rect := viewport.get_visible_rect()
+	if visible_rect.size.x <= 0.0 or visible_rect.size.y <= 0.0:
+		return []
+	var inverse_canvas := source.get_canvas_transform().affine_inverse()
+	var world_rect := Rect2(inverse_canvas * visible_rect.position, Vector2.ZERO)
+	world_rect = world_rect.expand(inverse_canvas * visible_rect.end)
+	world_rect = world_rect.expand(
+		inverse_canvas * Vector2(visible_rect.end.x, visible_rect.position.y)
+	)
+	world_rect = world_rect.expand(
+		inverse_canvas * Vector2(visible_rect.position.x, visible_rect.end.y)
+	)
+	if world_rect.size.x <= 0.0 or world_rect.size.y <= 0.0:
+		return []
+	var shape := RectangleShape2D.new()
+	shape.size = world_rect.size
+	return query_shape(
+		source.get_world_2d(),
+		shape,
+		Transform2D(0.0, world_rect.get_center()),
+		collision_mask,
+		max_results,
+		source_team_id,
+		deduplicate_receivers
+	)
+
+
 static func query_beam(
 		source: Node2D,
 		length: float,

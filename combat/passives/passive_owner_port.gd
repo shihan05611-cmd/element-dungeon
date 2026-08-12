@@ -11,3 +11,11 @@ func restore_health(
 		_event_id: StringName
 ) -> bool:
 	return false
+
+
+func restore_energy(
+		_amount: int,
+		_source_skill_id: StringName,
+		_event_id: StringName
+) -> bool:
+	return false

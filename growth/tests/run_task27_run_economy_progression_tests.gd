@@ -58,7 +58,7 @@ func _initialize() -> void:
 
 func _test_catalog_and_frozen_rules() -> void:
 	_expect(CATALOG != null and CATALOG.is_valid(), "production catalog remains loadable")
-	_expect_eq(CATALOG.shop_contents().size(), 8, "all eight non-basic skills have shop definitions")
+	_expect_eq(CATALOG.shop_contents().size(), 9, "all nine non-basic skills have shop definitions")
 	for content: SkillContentDefinition in CATALOG.shop_contents():
 		_expect(content.purchase_price > 0, "shop content has positive purchase price: %s" % String(content.skill_id))
 		if content.gameplay_definition.is_active_skill():
@@ -66,7 +66,7 @@ func _test_catalog_and_frozen_rules() -> void:
 			_expect_eq(content.active_progression.definition_for_level(1).upgrade_price, 0, "Lv1 has no upgrade price")
 		else:
 			_expect(content.active_progression == null, "passive has no level definition")
-	for skill_id: StringName in [&"passive_vitality", &"passive_energy"]:
+	for skill_id: StringName in [&"passive_vitality", &"passive_energy", &"passive_reaction_energy"]:
 		var content := CATALOG.content_for(skill_id)
 		_expect(content != null and content.is_shop_purchasable(), "new formal passive is shop-purchasable: %s" % String(skill_id))
 		_expect(content.gameplay_definition.is_passive_skill() and content.active_progression == null, "new formal passive remains level-free: %s" % String(skill_id))

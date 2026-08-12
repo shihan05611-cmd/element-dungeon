@@ -1,0 +1,30 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS: rage_minimum_radius_and_payload
+PASS: rage_midpoint_radius
+PASS: rage_maximum_multi_target_and_reaction
+PASS: rage_wall_rule_is_explicit
+PASS: rage_duplicate_hurtboxes_hit_once
+PASS: rage_snapshot_remains_locked
+PASS: beam_channel_thresholds_049_050_100
+PASS: beam_large_delta_penetrates_all_targets
+PASS: beam_target_enter_and_exit
+PASS: beam_per_tick_dedup_and_cross_tick_rehit
+PASS: beam_rejects_out_of_order_ticks
+PASS: beam_release_cleans_runtime_state
+PASS: beam_insufficient_energy_cleans_runtime_state
+PASS: beam_death_cancel_cleans_runtime_state
+PASS: beam_tree_exit_cleans_runtime_state
+PASS: beam_reuse_resets_tick_and_targets
+PASS: reclaim_no_explicit_target
+PASS: reclaim_no_matching_element
+PASS: reclaim_full_energy_is_atomic
+PASS: reclaim_single_target_locked_element_and_deltas
+PASS: reclaim_multi_target_commits_before_notifications
+PASS: reclaim_mixed_elements_only_consume_matches
+PASS: reclaim_near_full_reports_clamped_restore
+PASS: reclaim_invalid_target_rejects_whole_transaction
+PASS: reclaim_snapshot_mismatch_rejects_whole_transaction
+PASS: reclaim_energy_mismatch_rejects_whole_transaction
+TASK 15 FIRST BATCH TESTS PASSED: 26 tests, 163 assertions

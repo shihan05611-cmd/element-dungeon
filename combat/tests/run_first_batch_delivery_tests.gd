@@ -396,7 +396,7 @@ func _make_execution_rig(
 	executor.set_process(false)
 	var port: RangeElementReclaimPort = null
 	if reclaim:
-		port = RangeElementReclaimPort.new(host, energy, 100.0, HURTBOX_LAYER, 256)
+		port = RangeElementReclaimPort.new(host, energy, HURTBOX_LAYER, 256)
 		executor.set_execution_services(SkillExecutionServices.new(port))
 	host.add_child(executor)
 	_world.add_child(host)

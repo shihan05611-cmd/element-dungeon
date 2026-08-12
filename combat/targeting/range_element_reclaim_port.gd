@@ -1,10 +1,9 @@
 class_name RangeElementReclaimPort
 extends ElementReclaimPort
 
-## Concrete Agent-C spatial port. Query configuration is instance-owned so no
-## live caster combat stats or current element are consulted during prepare.
+## Concrete spatial port. The current source Viewport and canvas transform are
+## the only range authority; no live combat stats or current element are read.
 
-var query_radius: float = 160.0
 var hurtbox_collision_mask: int = 8
 var max_query_results: int = 256
 
@@ -15,11 +14,9 @@ var _energy_ref: WeakRef
 func _init(
 		source: Node2D = null,
 		energy: EnergyComponent = null,
-		p_query_radius: float = 160.0,
 		p_hurtbox_collision_mask: int = 8,
 		p_max_query_results: int = 256
 ) -> void:
-	query_radius = p_query_radius
 	hurtbox_collision_mask = p_hurtbox_collision_mask
 	max_query_results = p_max_query_results
 	if source != null and energy != null:
@@ -35,15 +32,25 @@ func configure(source: Node2D, energy: EnergyComponent) -> bool:
 
 
 func prepare(request: ElementReclaimRequest) -> ElementReclaimPrepareResult:
-	if request == null or not request.is_valid():
+	if request == null:
+		return ElementReclaimPrepareResult.rejected(
+			CastAttemptResult.RejectReason.INVALID_CONFIGURATION,
+			&"invalid_reclaim_request"
+		)
+	var valid_full_request := (
+		request.cast_snapshot != null
+		and request.cast_snapshot.is_valid()
+		and ElementIds.is_combat_element(request.cast_snapshot.cast_element_id)
+		and request.maximum_energy > 0
+		and request.current_energy == request.maximum_energy
+	)
+	if not request.is_valid() and not valid_full_request:
 		return ElementReclaimPrepareResult.rejected(
 			CastAttemptResult.RejectReason.INVALID_CONFIGURATION,
 			&"invalid_reclaim_request"
 		)
 	if (
-		not is_finite(query_radius)
-		or query_radius <= 0.0
-		or hurtbox_collision_mask <= 0
+		hurtbox_collision_mask <= 0
 		or max_query_results <= 0
 	):
 		return ElementReclaimPrepareResult.rejected(
@@ -75,9 +82,8 @@ func prepare(request: ElementReclaimRequest) -> ElementReclaimPrepareResult:
 			&"energy_already_full"
 		)
 
-	var candidates := CombatTargetQuery2D.query_circle(
+	var candidates := CombatTargetQuery2D.query_visible_world_rect(
 		source,
-		query_radius,
 		hurtbox_collision_mask,
 		max_query_results,
 		request.cast_snapshot.team_id,

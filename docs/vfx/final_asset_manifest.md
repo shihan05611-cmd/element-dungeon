@@ -19,7 +19,7 @@ Each skill directory contains stable `prompt.md` and `manifest.md`.
 
 - Fury: base radius 96, maximum scale 2.0; one presentation animation, one logical hit window.
 - Laser: 320×24, piercing; a visual pulse may occur on every authoritative 0.5 s Tick.
-- Reclaim: query radius 160; particles originate at every successfully consumed enemy and arrive at the player; no success VFX for failed transactions.
+- Reclaim: authoritative query scope is the world-visible rectangle obtained from the current Viewport through the current canvas transform; targets inside that rectangle are not blocked by wall line-of-sight, while off-screen targets are excluded. Particles originate at every successfully consumed enemy and arrive at the player; no success VFX for failed transactions.
 - Burning: enemy-attached only when Burning is owned/equipped and the target has fire layers; no layer consumption implication.
 - Unending: enemy-attached only when Unending is owned/equipped and the target has water layers; no layer consumption implication.
 - Water/fire differ by both silhouette and color.
@@ -48,3 +48,15 @@ Task 17 did not modify Catalog, SkillDefinition, combat, growth, Player, Enemy, 
 | Passive Energy / 元素储备 | `assets/generated/vfx/passive_energy/icon.png` | None; permanent `+10` maximum-SP projection, `presentation_scene = null` |
 
 Both Task32 icons are 256×256 RGBA alpha assets generated with the built-in `image_gen` workflow, removed from a flat chroma-key background with the official imagegen helper, and checked at original size plus 64×64 and 32×32. Their exact prompts, source hashes, final hashes, alpha statistics and usage boundaries are recorded in each skill directory's `prompt.md` and `manifest.md`. Task32 adds no animation sheet, particle, presentation scene, runtime delivery, world trigger or VFX script.
+
+## Task 39 run-flow and boss asset additions
+
+| Asset | Stable PNG | Intended display |
+|---|---|---|
+| Reward chest, closed | `assets/generated/vfx/run_reward_chest/chest_closed.png` | World object, about 96–128 px |
+| Reward chest, open | `assets/generated/vfx/run_reward_chest/chest_open.png` | Same body/angle/palette; lid and contained inner light only change |
+| Route portal | `assets/generated/vfx/run_route_portal/portal.png` | World object, about 96–128 px; engine owns any breathing/rotation |
+| Elemental Reaction Energy / 元素回响 | `assets/generated/vfx/passive_reaction_energy/icon.png` | HUD 32×32 or 64×64; reaction burst and return channels, not a capacity reservoir |
+| Boss arc projectile | `assets/generated/vfx/boss_arc_projectile/projectile.png` | Left-facing low projectile, about 96×48; collision and movement remain Task41-owned |
+
+All five Task39 files are 256×256 RGBA alpha cutouts made with the built-in `image_gen` workflow, flat `#00ff00` chroma-key sources, and the official `remove_chroma_key.py` helper. Task39 adds no scripts, scenes, animation, collision, combat timing, flow logic, or shared `.godot` output. Exact prompts, source/final hashes, alpha statistics, import UIDs, and display boundaries are recorded in each asset directory and `docs/agent_tasks/evidence/task39/README.md`.

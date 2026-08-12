@@ -26,7 +26,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	root.size = Vector2i(1920, 1080)
-	_run_test("formal_catalog_has_four_active_and_four_passive_contents", _test_catalog_shape)
+	_run_test("formal_catalog_has_four_active_and_five_passive_contents", _test_catalog_shape)
 	_run_test("new_stat_passives_are_purchase_only_static_content", _test_new_content_contract)
 
 	_coordinator = RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
@@ -53,8 +53,8 @@ func _run() -> void:
 
 func _test_catalog_shape() -> void:
 	_expect(CATALOG != null and CATALOG.is_valid(), "formal catalog validates")
-	_expect_eq(CATALOG.gameplay_definitions().size(), 9, "catalog has fixed basic plus eight purchasable definitions")
-	_expect_eq(CATALOG.shop_contents().size(), 8, "catalog has eight purchasable contents")
+	_expect_eq(CATALOG.gameplay_definitions().size(), 10, "catalog has fixed basic plus nine purchasable definitions")
+	_expect_eq(CATALOG.shop_contents().size(), 9, "catalog has nine purchasable contents")
 	_expect_eq(CATALOG.reward_definitions().size(), 5, "historical reward projection remains five")
 	var active_count := 0
 	var passive_count := 0
@@ -64,7 +64,11 @@ func _test_catalog_shape() -> void:
 		else:
 			passive_count += 1
 	_expect_eq(active_count, 4, "shop catalog has four active contents")
-	_expect_eq(passive_count, 4, "shop catalog has four passive contents")
+	_expect_eq(passive_count, 5, "shop catalog has five passive contents")
+	var reaction_energy := CATALOG.content_for(&"passive_reaction_energy")
+	_expect(reaction_energy != null and reaction_energy.purchase_price == 75, "element echo joins the formal shop catalog")
+	_expect(reaction_energy.gameplay_definition.passive_effect_definition is ReactionEnergyPassiveEffectDefinition, "element echo uses the typed reaction-energy runtime")
+	_expect(not reaction_energy.reward_pool and reaction_energy.active_progression == null, "element echo adds neither free reward nor passive levels")
 	_expect_eq(CATALOG.initial_owned_skill_ids(), [&"element_bolt"], "new passives are not initially owned")
 	for legacy_id: StringName in [&"water_lance", &"fire_lance", &"passive_focus", &"passive_balance"]:
 		_expect(CATALOG.content_for(legacy_id) == null, "excluded legacy content remains unregistered: %s" % String(legacy_id))
@@ -119,7 +123,7 @@ func _test_first_shop() -> void:
 	_expect(_overlay.visible and _overlay.formal_kind() == &"shop", "formal shop UI is live")
 	var before := _coordinator.current_snapshot()
 	_expect_eq(before.economy.balance, 120, "first formal shop has exactly 120 dream dust")
-	_expect_eq(before.shop.offers.size(), 7, "first shop offers seven unowned purchasable contents")
+	_expect_eq(before.shop.offers.size(), 8, "first shop offers eight unowned purchasable contents")
 	var burning_offer := _offer_for_skill(before.shop, &"burning")
 	_expect(burning_offer != null, "first shop has formal burning offer")
 	if burning_offer == null:

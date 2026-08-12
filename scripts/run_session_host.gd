@@ -318,6 +318,12 @@ func _on_combat_result(
 ) -> void:
 	if not _configured or result == null or not result.accepted:
 		return
+	_passive_adapter.on_combat_result(
+		result,
+		target_id,
+		target_is_player,
+		_player.get_instance_id()
+	)
 	if target_is_player:
 		_player_damage_taken += maxi(0, -result.health_delta)
 	elif target_receiver != null and result.root_owner_id == _player.get_instance_id():

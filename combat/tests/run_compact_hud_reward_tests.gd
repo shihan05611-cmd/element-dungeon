@@ -67,9 +67,9 @@ func _test_dual_anchor_layout() -> void:
 		var status_rect := _hud.status_panel.get_global_rect()
 		var belt_rect := _hud.skill_panel.get_global_rect()
 		var passive_rect := _hud.passive_panel.get_global_rect()
-		_expect(status_rect.size.is_equal_approx(Vector2(280, 76)), "status capsule size at %s" % str(viewport_size))
-		_expect(belt_rect.size.is_equal_approx(Vector2(532, 78)), "active skill belt size at %s" % str(viewport_size))
-		_expect(passive_rect.size.x >= 496.0 and passive_rect.size.y >= 58.0, "passive skill strip size at %s" % str(viewport_size))
+		_expect(status_rect.size.is_equal_approx(Vector2(264, 76)), "status capsule size at %s" % str(viewport_size))
+		_expect(belt_rect.size.is_equal_approx(Vector2(532, 72)), "active skill belt size at %s" % str(viewport_size))
+		_expect(passive_rect.size.x >= 496.0 and passive_rect.size.y >= 54.0, "passive skill strip size at %s" % str(viewport_size))
 		_expect(_inside(_physical_rect(_hud.status_panel), viewport_size), "status capsule remains in viewport at %s" % str(viewport_size))
 		_expect(_inside(_physical_rect(_hud.skill_panel), viewport_size), "skill belt remains in viewport at %s" % str(viewport_size))
 		_expect(_inside(_physical_rect(_hud.passive_panel), viewport_size), "passive strip remains in viewport at %s" % str(viewport_size))
@@ -84,7 +84,7 @@ func _test_dual_anchor_layout() -> void:
 
 func _test_occupancy_budget() -> void:
 	var canvas_area := 1152.0 * 648.0
-	var permanent_area := 280.0 * 76.0 + 532.0 * 78.0 + 496.0 * 58.0
+	var permanent_area := 264.0 * 76.0 + 532.0 * 72.0 + 496.0 * 54.0
 	var peak_area := permanent_area + 360.0 * 36.0
 	_expect(permanent_area / canvas_area <= 0.125, "seven-slot permanent HUD budget <=12.5%")
 	_expect(peak_area / canvas_area <= 0.145, "feedback peak <=14.5%")
@@ -107,7 +107,7 @@ func _test_strict_three_active_four_passive_semantics() -> void:
 func _test_compact_state_grammar() -> void:
 	var active := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_1)
 	var state := active.get_node("Margin/Body/State") as Label
-	_expect(state.text == "可用", "ready state uses short positive label")
+	_expect(state.text.is_empty() and not state.visible, "ready state stays visually quiet")
 	_player.energy_component.set_current(0)
 	_expect(state.text == "能量", "zero energy uses short resource word")
 	_hud.call("_on_cast_attempted", SkillSlotIds.ACTIVE_1, CastAttemptResult.rejected(CastAttemptResult.RejectReason.COOLDOWN_ACTIVE, &"element_bolt", &"", 2.4, SkillSlotIds.ACTIVE_1))

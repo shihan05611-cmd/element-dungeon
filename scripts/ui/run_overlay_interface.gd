@@ -14,6 +14,7 @@ const SLOT_ORDER: Array[StringName] = [
 	SkillSlotIds.PASSIVE_3,
 	SkillSlotIds.PASSIVE_4,
 ]
+const FORMAL_LOADOUT_DRAG_KIND := &"formal_shop_loadout"
 
 var colorblind_mode: bool = false
 var _current_element_id: StringName = ElementIds.WATER
@@ -1133,6 +1134,30 @@ func _candidate_with_assignment(
 	return RuntimeLoadoutSnapshot.new(entries, base.revision)
 
 
+func _candidate_for_drag_drop(
+	base: RuntimeLoadoutSnapshot,
+	skill_id: StringName,
+	source_slot_id: StringName,
+	target_slot_id: StringName
+) -> RuntimeLoadoutSnapshot:
+	if (
+		source_slot_id.is_empty()
+		or source_slot_id == target_slot_id
+		or base.get_skill_id(source_slot_id) != skill_id
+	):
+		return _candidate_with_assignment(base, target_slot_id, skill_id)
+	var target_skill_id := base.get_skill_id(target_slot_id)
+	var entries: Array[RuntimeLoadoutSlotSnapshot] = []
+	for entry: RuntimeLoadoutSlotSnapshot in base.entries:
+		var candidate_skill := entry.skill_id
+		if entry.slot_id == source_slot_id:
+			candidate_skill = target_skill_id
+		elif entry.slot_id == target_slot_id:
+			candidate_skill = skill_id
+		entries.append(RuntimeLoadoutSlotSnapshot.new(entry.slot_id, candidate_skill))
+	return RuntimeLoadoutSnapshot.new(entries, base.revision)
+
+
 func _activation_text(skill: SkillDefinition) -> String:
 	return "ACTIVE 主动" if skill != null and skill.is_active_skill() else "PASSIVE 被动"
 
@@ -1484,6 +1509,11 @@ func _show_formal_shop(cause: StringName = &"") -> void:
 			Callable(self, "_formal_select_skill").bind(skill_id),
 			Vector2(124, 44)
 		)
+		select.set_drag_forwarding(
+			Callable(self, "_formal_skill_drag_data").bind(skill_id),
+			Callable(self, "_formal_inventory_can_drop"),
+			Callable(self, "_formal_inventory_drop")
+		)
 		inventory_row.add_child(select)
 	loadout_box.add_child(_formal_slot_zone("主动槽 · 有键帽 / SP / 状态", SkillSlotIds.active()))
 	loadout_box.add_child(_formal_slot_zone("被动槽 · 无键帽 / SP / 冷却", SkillSlotIds.passive()))
@@ -1678,8 +1708,138 @@ func _formal_slot_zone(title_text: String, slot_ids: Array[StringName]) -> VBoxC
 		)
 		if _formal_selected_slot_id == slot_id:
 			button.add_theme_stylebox_override(&"normal", UI.button_style(UI.SURFACE_SOFT, UI.BORDER_FOCUS))
+		button.set_drag_forwarding(
+			Callable(self, "_formal_slot_drag_data").bind(slot_id),
+			Callable(self, "_formal_slot_can_drop").bind(slot_id),
+			Callable(self, "_formal_slot_drop").bind(slot_id)
+		)
 		row.add_child(button)
 	return zone
+
+
+func _formal_skill_drag_data(_position: Vector2, skill_id: StringName) -> Variant:
+	if not _formal_drag_context_ready() or not _snapshot.skills.owned_skill_ids.has(skill_id):
+		return null
+	var content := _catalog.content_for(skill_id)
+	if content == null or not content.equippable:
+		return null
+	set_drag_preview(_formal_drag_preview(content))
+	return {
+		"kind": FORMAL_LOADOUT_DRAG_KIND,
+		"skill_id": skill_id,
+		"source_slot_id": &"",
+	}
+
+
+func _formal_slot_drag_data(_position: Vector2, slot_id: StringName) -> Variant:
+	if not _formal_drag_context_ready():
+		return null
+	var skill_id := _working_loadout.get_skill_id(slot_id)
+	if skill_id.is_empty():
+		return null
+	var content := _catalog.content_for(skill_id)
+	if content == null:
+		return null
+	set_drag_preview(_formal_drag_preview(content))
+	return {
+		"kind": FORMAL_LOADOUT_DRAG_KIND,
+		"skill_id": skill_id,
+		"source_slot_id": slot_id,
+	}
+
+
+func _formal_slot_can_drop(_position: Vector2, data: Variant, _slot_id: StringName) -> bool:
+	return (
+		_formal_drag_context_ready()
+		and data is Dictionary
+		and data.get("kind", &"") == FORMAL_LOADOUT_DRAG_KIND
+		and not StringName(data.get("skill_id", &"")).is_empty()
+	)
+
+
+func _formal_slot_drop(_position: Vector2, data: Variant, slot_id: StringName) -> void:
+	if not _formal_slot_can_drop(_position, data, slot_id):
+		return
+	_formal_apply_drag_drop(
+		StringName(data.get("skill_id", &"")),
+		StringName(data.get("source_slot_id", &"")),
+		slot_id
+	)
+
+
+func _formal_inventory_can_drop(_position: Vector2, _data: Variant) -> bool:
+	return false
+
+
+func _formal_inventory_drop(_position: Vector2, _data: Variant) -> void:
+	pass
+
+
+func _formal_drag_context_ready() -> bool:
+	return (
+		_formal_kind == &"shop"
+		and not _formal_command_busy
+		and _formal_shop_draft != null
+		and _working_loadout != null
+		and _snapshot != null
+		and _snapshot.shop != null
+	)
+
+
+func _formal_drag_preview(content: SkillContentDefinition) -> Control:
+	var preview := PanelContainer.new()
+	preview.custom_minimum_size = Vector2(164, 52)
+	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	preview.add_theme_stylebox_override(&"panel", UI.flat_panel(UI.SURFACE_RAISED, UI.BORDER_FOCUS, 7, 2))
+	var margin := _margin_container(8, 6)
+	preview.add_child(margin)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override(&"separation", UI.GAP_SM)
+	margin.add_child(row)
+	if content.icon != null:
+		var icon := TextureRect.new()
+		icon.custom_minimum_size = Vector2(36, 36)
+		icon.texture = content.icon
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(icon)
+	var copy := VBoxContainer.new()
+	copy.add_theme_constant_override(&"separation", 0)
+	row.add_child(copy)
+	copy.add_child(_label(content.display_name, 14, UI.TEXT))
+	copy.add_child(_label(
+		"ACTIVE 主动" if content.gameplay_definition.is_active_skill() else "PASSIVE 被动",
+		11,
+		UI.WATER if content.gameplay_definition.is_active_skill() else UI.BORDER_PASSIVE
+	))
+	return preview
+
+
+func _formal_apply_drag_drop(skill_id: StringName, source_slot_id: StringName, target_slot_id: StringName) -> void:
+	if not _formal_drag_context_ready():
+		return
+	_formal_focus_id = StringName("slot:%s" % String(target_slot_id))
+	if not source_slot_id.is_empty() and _working_loadout.get_skill_id(source_slot_id) != skill_id:
+		_recover_formal_shop(null, "拖拽来源已变化")
+		return
+	var candidate := _candidate_for_drag_drop(_working_loadout, skill_id, source_slot_id, target_slot_id)
+	var result := _formal_coordinator.call("apply_shop_loadout", _formal_shop_draft, candidate) as RunCommandResult
+	if result == null or not result.accepted:
+		_recover_formal_shop(result, "拖拽装配未生效")
+		return
+	var target_before := _working_loadout.get_skill_id(target_slot_id)
+	_snapshot = result.run_snapshot
+	_working_loadout = _formal_shop_draft.preview_loadout()
+	_formal_selected_skill_id = &""
+	_formal_selected_slot_id = target_slot_id
+	_show_formal_shop(&"loadout_applied")
+	_set_formal_status(
+		"槽位已互换并由权威即时生效。"
+		if not source_slot_id.is_empty() and not target_before.is_empty() and source_slot_id != target_slot_id
+		else "拖拽装配已由权威 RuntimeLoadout 即时生效。",
+		&"success"
+	)
 
 
 func _formal_select_skill(skill_id: StringName) -> void:

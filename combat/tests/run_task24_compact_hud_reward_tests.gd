@@ -82,10 +82,10 @@ func _test_dual_anchor_resolution_matrix() -> void:
 		var bounds := hud_root.get_global_rect()
 		var status_rect := _hud.status_panel.get_global_rect()
 		var belt_rect := _hud.skill_panel.get_global_rect()
-		_expect(status_rect.size.is_equal_approx(Vector2(280, 76)), "status is fixed 280x76 at %s" % str(viewport_size))
+		_expect(status_rect.size.is_equal_approx(Vector2(264, 76)), "status is fixed 264x76 at %s" % str(viewport_size))
 		var passive_rect := _hud.passive_panel.get_global_rect()
-		_expect(belt_rect.size.is_equal_approx(Vector2(532, 78)), "active skill belt is fixed 532x78 at %s" % str(viewport_size))
-		_expect(passive_rect.size.x >= 496.0 and passive_rect.size.y >= 58.0 and passive_rect.size.y <= 66.0, "four-passive strip keeps its compact fixed footprint at %s" % str(viewport_size))
+		_expect(belt_rect.size.is_equal_approx(Vector2(532, 72)), "active skill belt is fixed 532x72 at %s" % str(viewport_size))
+		_expect(passive_rect.size.x >= 496.0 and passive_rect.size.y >= 54.0 and passive_rect.size.y <= 62.0, "four-passive strip keeps its compact fixed footprint at %s" % str(viewport_size))
 		_expect(_inside(status_rect, bounds), "status stays in safe canvas at %s" % str(viewport_size))
 		_expect(_inside(belt_rect, bounds), "skill belt stays in safe canvas at %s" % str(viewport_size))
 		_expect(_inside(passive_rect, bounds), "passive strip stays in safe canvas at %s" % str(viewport_size))
@@ -93,7 +93,7 @@ func _test_dual_anchor_resolution_matrix() -> void:
 		_expect(not status_rect.intersects(passive_rect), "status and passive strip remain strictly separated at %s" % str(viewport_size))
 		_expect(absf(belt_rect.get_center().x - bounds.get_center().x) <= 0.2, "skill belt remains centered at %s" % str(viewport_size))
 		_expect(belt_rect.end.y <= bounds.end.y - 15.9, "skill belt keeps bottom safe margin at %s" % str(viewport_size))
-	var permanent_area := 280.0 * 76.0 + 532.0 * 78.0 + 496.0 * 58.0
+	var permanent_area := 264.0 * 76.0 + 532.0 * 72.0 + 496.0 * 54.0
 	_expect(permanent_area / (1152.0 * 648.0) * 100.0 < 12.5, "seven-slot HUD stays below 12.5 percent of minimum viewport")
 	root.size = Vector2i(1152, 648)
 	await _settle_layout()
@@ -138,7 +138,7 @@ func _test_compact_authoritative_state_grammar() -> void:
 	var active := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_1)
 	var state := active.get_node("Margin/Body/State") as Label
 	var cooldown_label := active.get_node("Margin/Body/CooldownLabel") as Label
-	_expect(state.text == "可用", "available state uses one short word")
+	_expect(state.text.is_empty() and not state.visible, "available state is empty and hidden")
 	_player.energy_component.set_current(0)
 	_expect(state.text == "能量", "zero energy uses short resource state")
 	_player.energy_component.set_current(_player.energy_component.maximum)

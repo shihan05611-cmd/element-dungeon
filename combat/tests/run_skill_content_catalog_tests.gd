@@ -109,8 +109,8 @@ func _run() -> void:
 
 func _test_formal_catalog_shape() -> void:
 	_expect(CATALOG != null and CATALOG.validation_error().is_empty(), "formal catalog validates")
-	_expect(CATALOG.gameplay_definitions().size() == 9, "catalog registers eight obtainable skills plus basic attack")
-	_expect(CATALOG.obtainable_contents().size() == 8, "catalog exposes eight obtainable contents")
+	_expect(CATALOG.gameplay_definitions().size() == 10, "catalog registers nine obtainable skills plus basic attack")
+	_expect(CATALOG.obtainable_contents().size() == 9, "catalog exposes nine obtainable contents")
 	_expect(CATALOG.reward_definitions().size() == 5, "catalog projects five chest rewards")
 	_expect(CATALOG.initial_owned_skill_ids() == [&"element_bolt"], "element bolt is the only initial owned skill")
 	var initial := CATALOG.default_loadout_snapshot()
@@ -163,7 +163,7 @@ func _test_formal_catalog_shape() -> void:
 			_expect(content.icon == null and content.presentation_scene == null, "fixed basic attack keeps presentation empty")
 		elif content.skill_id == &"element_bolt":
 			_expect(content.icon != null and content.presentation_scene == null, "element bolt uses its stable icon and existing projectile presentation")
-		elif content.skill_id in [&"passive_vitality", &"passive_energy"]:
+		elif content.skill_id in [&"passive_vitality", &"passive_energy", &"passive_reaction_energy"]:
 			_expect(content.icon != null and content.presentation_scene == null, "stat passive uses an icon without fake world presentation: %s" % String(content.skill_id))
 		else:
 			_expect(content.icon != null and content.presentation_scene != null, "approved task-17 presentation fields are connected: %s" % String(content.skill_id))
@@ -198,6 +198,12 @@ func _test_six_skill_values() -> void:
 	var unending := CATALOG.gameplay_for(&"unending")
 	var unending_effect := unending.passive_effect_definition as UnendingPassiveEffectDefinition
 	_expect(unending.required_element_id == ElementIds.WATER and unending_effect.health_per_layer == 1, "unending has fixed water healing semantics")
+	var reaction_energy := CATALOG.content_for(&"passive_reaction_energy")
+	var reaction_effect := reaction_energy.gameplay_definition.passive_effect_definition as ReactionEnergyPassiveEffectDefinition
+	_expect(reaction_energy.display_name == "元素回响" and reaction_energy.purchase_price == 75, "reaction energy has frozen product identity and price")
+	_expect(reaction_energy.gameplay_definition.is_passive_skill() and reaction_energy.active_progression == null, "reaction energy is level-free passive-only content")
+	_expect(not reaction_energy.reward_pool and not reaction_energy.initial_reward_pool, "reaction energy stays outside the disabled free reward flow")
+	_expect(reaction_effect != null and reaction_effect.energy_restore == 10, "reaction energy restores the frozen ten SP")
 
 
 func _test_reward_projection() -> void:

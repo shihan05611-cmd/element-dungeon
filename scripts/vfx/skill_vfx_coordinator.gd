@@ -67,7 +67,7 @@ func configure(
 	_bind_player(player)
 	_bind_runtime_loadout(host.runtime_loadout)
 	var reclaim_port := ReclaimVfxPort.new(
-		RangeElementReclaimPort.new(player, player.energy_component, 160.0, 8, 256),
+		RangeElementReclaimPort.new(player, player.energy_component, 8, 256),
 		Callable(self, "_on_reclaim_vfx_committed")
 	)
 	if not player.skill_executor.set_execution_reclaim_port(reclaim_port):

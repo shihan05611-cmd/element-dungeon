@@ -82,7 +82,9 @@ func _test_combat_semantics_and_accessibility() -> void:
 	_expect(not (active.get_node("Margin/Body/Name") as Label).text.is_empty(), "A1 name is readable")
 	_expect((active.get_node("Margin/Body/Level") as Label).text.begins_with("Lv."), "A1 has Lv grammar")
 	_expect((active.get_node("Margin/Body/Cost") as Label).text.begins_with("SP "), "A1 has SP grammar")
-	_expect((active.get_node("Margin/Body/State") as Label).text in ["可用", "能量", "冷却", "忙", "释放"], "A1 uses compact authority state grammar")
+	var active_state := active.get_node("Margin/Body/State") as Label
+	_expect(active_state.text in ["", "能量", "冷却", "忙", "释放"], "A1 uses compact authority state grammar without ready copy")
+	_expect(active_state.text != "" or not active_state.visible, "empty ready state remains hidden")
 	_hud.set_colorblind_mode(true)
 	_hud.set_reduced_motion(true)
 	_expect(_hud.colorblind_mode and _hud.reduced_motion, "colorblind and reduced-motion modes are independently enabled")

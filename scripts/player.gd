@@ -183,7 +183,6 @@ func configure_run_runtime(
 	var reclaim_port := RangeElementReclaimPort.new(
 		self,
 		energy_component,
-		160.0,
 		8,
 		256
 	)

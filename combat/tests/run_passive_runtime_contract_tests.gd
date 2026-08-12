@@ -9,6 +9,9 @@ class RecordingOwnerPort:
 	var heals: Array[int] = []
 	var heal_sources: Array[StringName] = []
 	var heal_events: Array[StringName] = []
+	var energy_restores: Array[int] = []
+	var energy_sources: Array[StringName] = []
+	var energy_events: Array[StringName] = []
 
 	func capture_attack_stats() -> CombatStatSnapshot:
 		capture_count += 1
@@ -18,6 +21,12 @@ class RecordingOwnerPort:
 		heals.append(amount)
 		heal_sources.append(source_skill_id)
 		heal_events.append(event_id)
+		return true
+
+	func restore_energy(amount: int, source_skill_id: StringName, event_id: StringName) -> bool:
+		energy_restores.append(amount)
+		energy_sources.append(source_skill_id)
+		energy_events.append(event_id)
 		return true
 
 
@@ -50,6 +59,7 @@ func _run_all() -> void:
 	_run("burning_exact_tick_and_fire_layers", _test_burning_exact_tick_and_fire_layers)
 	_run("burning_large_delta", _test_burning_large_delta)
 	_run("unending_typed_basic_attack_event", _test_unending_typed_basic_attack_event)
+	_run("reaction_energy_committed_result", _test_reaction_energy_committed_result)
 	_run("passive_runtime_lifecycle", _test_passive_runtime_lifecycle)
 	_run("formal_stat_passive_resources", _test_formal_stat_passive_resources)
 
@@ -142,6 +152,66 @@ func _test_unending_typed_basic_attack_event() -> void:
 	)
 	_expect(not runtime.on_basic_attack_committed(no_water), "zero water layers do not heal")
 	_expect_eq(owner.heals.size(), 1, "ignored events cannot duplicate healing")
+
+
+func _test_reaction_energy_committed_result() -> void:
+	var owner := RecordingOwnerPort.new()
+	var definition := ReactionEnergyPassiveEffectDefinition.new()
+	var runtime := definition.create_runtime(
+		&"passive_reaction_energy",
+		PassiveRuntimeContext.new(owner, null)
+	)
+	var reaction := _combat_result(71, 81, 0, 901, true)
+	_expect(runtime.on_combat_result(reaction, &"enemy-a", false, 901), "player reaction restores energy")
+	_expect_eq(owner.energy_restores, [10], "reaction restores the fixed ten energy once")
+	_expect_eq(owner.energy_sources, [&"passive_reaction_energy"], "energy restore preserves passive source")
+	_expect_eq(owner.energy_events, [&"reaction_energy:71:81:0:enemy-a"], "energy restore identity uses cast delivery hit and target")
+	_expect(not runtime.on_combat_result(reaction, &"enemy-a", false, 901), "same settlement cannot restore twice")
+	_expect_eq(owner.energy_restores.size(), 1, "duplicate result leaves one restore")
+	_expect(not runtime.on_combat_result(_combat_result(72, 82, 0, 901, false), &"enemy-a", false, 901), "non-reaction is ignored")
+	_expect(not runtime.on_combat_result(_combat_result(73, 83, 0, 902, true), &"player", true, 901), "enemy reaction against player is ignored")
+	_expect(not runtime.on_combat_result(CombatResult.rejected(null, CombatStatus.RejectReason.INVALID_REQUEST), &"enemy-a", false, 901), "rejected result is ignored")
+	_expect_eq(owner.energy_restores.size(), 1, "ignored results restore no energy")
+
+
+func _combat_result(
+		cast_id: int,
+		delivery_id: int,
+		hit_index: int,
+		root_owner_id: int,
+		reaction: bool
+) -> CombatResult:
+	var receiver := CombatReceiver.new()
+	receiver.target_team_id = &"enemy"
+	var carrier := ElementCarrier.new()
+	carrier.set_amounts_silent(1 if reaction else 0, 0)
+	receiver.configure_components(carrier, null)
+	var cast := CastSnapshot.new(
+		cast_id,
+		&"test_reaction_source",
+		root_owner_id,
+		root_owner_id,
+		&"player",
+		ElementIds.FIRE,
+		CombatStatSnapshot.new()
+	)
+	var payload := RuntimeAttackPayload.from_locked_stats(
+		cast.stat_snapshot,
+		1.0,
+		ElementIds.FIRE,
+		1
+	)
+	var result := receiver.receive_hit(HitRequest.new(
+		cast,
+		payload,
+		delivery_id,
+		hit_index,
+		Vector2.ZERO,
+		Vector2.RIGHT
+	))
+	receiver.free()
+	carrier.free()
+	return result
 
 
 func _test_passive_runtime_lifecycle() -> void:

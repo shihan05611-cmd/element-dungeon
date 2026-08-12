@@ -9,11 +9,12 @@ signal colorblind_mode_changed(enabled: bool)
 
 const WARNING_RATE_LIMIT_MSEC := 450
 const SLOT_TRANSIENT_MSEC := 900
-const STATUS_SIZE := Vector2(280, 76)
-const SKILL_STRIP_SIZE := Vector2(532, 78)
+const STATUS_SIZE := Vector2(264, 76)
+const SKILL_STRIP_SIZE := Vector2(532, 72)
+const PASSIVE_STRIP_SIZE := Vector2(496, 56)
 const ELEMENT_PIVOT_SIZE := Vector2(72, 56)
-const ACTIVE_SLOT_SIZE := Vector2(132, 60)
-const PASSIVE_SLOT_SIZE := Vector2(116, 46)
+const ACTIVE_SLOT_SIZE := Vector2(132, 54)
+const PASSIVE_SLOT_SIZE := Vector2(116, 42)
 const SLOT_ORDER: Array[StringName] = [
 	SkillSlotIds.ACTIVE_1,
 	SkillSlotIds.ACTIVE_2,
@@ -72,7 +73,6 @@ var _element_pivot: PanelContainer
 var _element_pivot_swatch: ColorRect
 var _element_pivot_text: Label
 var _element_pivot_shape: Label
-var _busy_strip: ColorRect
 var _legacy_element_swatch: ColorRect
 var _legacy_element_text: Label
 var _last_warning_msec: int = -WARNING_RATE_LIMIT_MSEC
@@ -441,8 +441,6 @@ func _refresh_skill_status() -> void:
 	if _player_executor == null or _player_skills == null or _player_energy == null:
 		return
 	phase_text.text = "动作阶段：%s" % String(_player_executor.get_phase_name()).to_upper()
-	if _busy_strip != null:
-		_busy_strip.visible = _player_executor.current_phase != SkillExecutor.Phase.IDLE
 	for slot_id: StringName in SLOT_ORDER:
 		_refresh_slot(slot_id)
 
@@ -477,6 +475,7 @@ func _refresh_slot_view(
 	var cooldown_mask := view.get("cooldown_mask") as ColorRect
 	var cooldown_label := view.get("cooldown_label") as Label
 	var passive_mark := view.get("passive_mark") as Label
+	state.visible = true
 	if slot_label != null:
 		slot_label.text = String(slot_id).to_upper()
 	if cooldown_mask != null:
@@ -534,12 +533,13 @@ func _refresh_slot_view(
 	else:
 		state.text = _compact_availability_text(skill) if compact else _availability_text(skill)
 		state.add_theme_color_override(&"font_color", _availability_color(state.text))
+	state.visible = not state.text.is_empty()
 	var remaining := _player_executor.get_cooldown_remaining(skill.skill_id)
 	if compact and remaining > 0.0 and cooldown_mask != null and cooldown_label != null:
 		var ratio := clampf(remaining / maxf(skill.cooldown, remaining), 0.0, 1.0)
 		cooldown_mask.visible = true
-		cooldown_mask.position.y = 10.0 + 34.0 * (1.0 - ratio)
-		cooldown_mask.size = Vector2(34.0, 34.0 * ratio)
+		cooldown_mask.position.y = 8.0 + 32.0 * (1.0 - ratio)
+		cooldown_mask.size = Vector2(32.0, 32.0 * ratio)
 		cooldown_label.visible = true
 		cooldown_label.text = _format_cooldown(remaining)
 	if meta != null:
@@ -571,7 +571,7 @@ func _availability_text(skill: SkillDefinition) -> String:
 		return "能量不足"
 	if _player_executor.is_skill_on_cooldown(skill.skill_id):
 		return "冷却 %.1fs" % _player_executor.get_cooldown_remaining(skill.skill_id)
-	return "可用"
+	return ""
 
 
 func _compact_availability_text(skill: SkillDefinition) -> String:
@@ -584,12 +584,10 @@ func _compact_availability_text(skill: SkillDefinition) -> String:
 		return "能量"
 	if _player_executor.is_skill_on_cooldown(skill.skill_id):
 		return "冷却"
-	return "可用"
+	return ""
 
 
 func _availability_color(text_value: String) -> Color:
-	if text_value == "可用":
-		return UI.SUCCESS
 	if text_value.begins_with("冷却") or text_value.ends_with("s"):
 		return UI.COOLDOWN
 	if text_value == "忙碌" or text_value == "施放中" or text_value == "忙" or text_value == "释放":
@@ -816,7 +814,6 @@ func _bind_ui_refs() -> void:
 	_legacy_element_swatch = $Root/StatusPanel/Margin/Status/TitleRow/ElementBadge/BadgeMargin/BadgeRow/ElementSwatch
 	_legacy_element_text = $Root/StatusPanel/Margin/Status/TitleRow/ElementBadge/BadgeMargin/BadgeRow/ElementText
 	phase_text = $Root/SkillPanel/Margin/Skills/PhaseText
-	_busy_strip = $Root/SkillPanel/BusyOverlay/BusyStrip
 	warning_text = $Root/WarningText
 	debug_panel = $Root/DebugPanel
 	debug_skill = $Root/DebugPanel/Margin/Debug/Skill
@@ -858,7 +855,8 @@ func _build_ui() -> void:
 func _build_status_panel(parent: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "StatusPanel"
-	panel.position = Vector2(16, 124)
+	# Keep the compact capsule below the authoritative room-title band.
+	panel.position = Vector2(16, 168)
 	panel.size = STATUS_SIZE
 	panel.add_theme_stylebox_override(&"panel", UI.panel())
 	parent.add_child(panel)
@@ -897,11 +895,11 @@ func _build_status_panel(parent: Control) -> void:
 	badge_row.add_child(element_label)
 	var health := _bar_row("HealthRow", "HP", "HealthBar", "HealthValue", Color("dc4658"))
 	health.position = Vector2(0, 0)
-	health.size = Vector2(264, 26)
+	health.size = Vector2(248, 26)
 	status.add_child(health)
 	var energy := _bar_row("EnergyRow", "SP", "EnergyBar", "EnergyValue", Color("289dcf"))
 	energy.position = Vector2(0, 30)
-	energy.size = Vector2(264, 26)
+	energy.size = Vector2(248, 26)
 	status.add_child(energy)
 	var low := _make_label("LowHealth", "! HP", 11, UI.ERROR)
 	low.visible = false
@@ -921,7 +919,7 @@ func _bar_row(row_name: String, caption: String, bar_name: String, value_name: S
 	row.add_child(label)
 	var bar := ProgressBar.new()
 	bar.name = bar_name
-	bar.custom_minimum_size = Vector2(148, 18)
+	bar.custom_minimum_size = Vector2(132, 18)
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.show_percentage = false
 	bar.add_theme_stylebox_override(&"background", UI.flat_panel(Color("070b13"), UI.BORDER, 3, 1))
@@ -938,7 +936,7 @@ func _build_skill_panel(parent: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "SkillPanel"
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.position = Vector2(-266, -94)
+	panel.position = Vector2(-266, -88)
 	panel.size = SKILL_STRIP_SIZE
 	panel.add_theme_stylebox_override(&"panel", UI.panel(Color(0.035, 0.055, 0.09, 0.97)))
 	parent.add_child(panel)
@@ -959,18 +957,6 @@ func _build_skill_panel(parent: Control) -> void:
 	var phase := _make_label("PhaseText", "动作阶段：IDLE", 11, UI.TEXT_DIM)
 	phase.visible = false
 	skills.add_child(phase)
-	var busy_overlay := Control.new()
-	busy_overlay.name = "BusyOverlay"
-	busy_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_child(busy_overlay)
-	var busy := ColorRect.new()
-	busy.name = "BusyStrip"
-	busy.position = Vector2(10, 0)
-	busy.size = Vector2(524, 3)
-	busy.color = UI.BUSY
-	busy.visible = false
-	busy.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	busy_overlay.add_child(busy)
 
 
 func _build_passive_panel(parent: Control) -> void:
@@ -978,14 +964,14 @@ func _build_passive_panel(parent: Control) -> void:
 	panel.name = "PassivePanel"
 	panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	panel.position = Vector2(-512, 16)
-	panel.size = Vector2(496, 58)
+	panel.size = PASSIVE_STRIP_SIZE
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_theme_stylebox_override(
 		&"panel",
 		UI.panel(Color(0.035, 0.045, 0.075, 0.92), UI.BORDER_PASSIVE, 8, 1)
 	)
 	parent.add_child(panel)
-	var margin := _margin("Margin", 6, 6)
+	var margin := _margin("Margin", 6, 4)
 	panel.add_child(margin)
 	var row := HBoxContainer.new()
 	row.name = "SlotRow"
@@ -1042,30 +1028,30 @@ func _build_compact_slot(slot_id: StringName) -> PanelContainer:
 			2 if passive else 1
 		)
 	)
-	var margin := _margin("Margin", 4, 4)
+	var margin := _margin("Margin", 4, 3)
 	panel.add_child(margin)
 	var body := Control.new()
 	body.name = "Body"
-	body.custom_minimum_size = Vector2(104 if passive else 122, 34 if passive else 50)
+	body.custom_minimum_size = Vector2(104 if passive else 122, 36 if passive else 48)
 	margin.add_child(body)
 	var icon := TextureRect.new()
 	icon.name = "Icon"
-	icon.position = Vector2(2, 6 if passive else 10)
-	icon.size = Vector2(28 if passive else 34, 28 if passive else 34)
+	icon.position = Vector2(2, 5 if passive else 8)
+	icon.size = Vector2(26 if passive else 32, 26 if passive else 32)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	body.add_child(icon)
 	var cooldown_mask := ColorRect.new()
 	cooldown_mask.name = "CooldownMask"
-	cooldown_mask.position = Vector2(2, 10)
-	cooldown_mask.size = Vector2(34, 34)
+	cooldown_mask.position = Vector2(2, 8)
+	cooldown_mask.size = Vector2(32, 32)
 	cooldown_mask.color = UI.COOLDOWN_SHADE
 	cooldown_mask.visible = false
 	cooldown_mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	body.add_child(cooldown_mask)
 	var cooldown_label := _make_label("CooldownLabel", "0.0", 13, UI.TEXT)
-	cooldown_label.position = Vector2(2, 16)
-	cooldown_label.size = Vector2(34, 22)
+	cooldown_label.position = Vector2(2, 13)
+	cooldown_label.size = Vector2(32, 22)
 	cooldown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cooldown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	cooldown_label.visible = false
@@ -1086,30 +1072,30 @@ func _build_compact_slot(slot_id: StringName) -> PanelContainer:
 	passive_mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	passive_mark.visible = passive
 	body.add_child(passive_mark)
-	var text_x := 34.0 if passive else 39.0
+	var text_x := 32.0 if passive else 37.0
 	var text_width := 68.0 if passive else 81.0
 	var name_label := _make_label("Name", "空槽", 11 if passive else 12, UI.TEXT)
 	name_label.position = Vector2(text_x, 0)
-	name_label.size = Vector2(text_width, 18)
+	name_label.size = Vector2(text_width, 17)
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	body.add_child(name_label)
 	var level := _make_label("Level", "—", 10, UI.TEXT_MUTED)
-	level.position = Vector2(text_x, 18)
-	level.size = Vector2(38, 16)
+	level.position = Vector2(text_x, 17)
+	level.size = Vector2(38, 14)
 	level.visible = not passive
 	body.add_child(level)
 	var cost := _make_label("Cost", "", 10, UI.WATER)
-	cost.position = Vector2(text_x + 40, 18)
-	cost.size = Vector2(44, 16)
+	cost.position = Vector2(text_x + 40, 17)
+	cost.size = Vector2(44, 14)
 	cost.visible = not passive
 	body.add_child(cost)
 	var state := _make_label("State", "空", 12, UI.TEXT_DIM)
-	state.position = Vector2(text_x, 18 if passive else 34)
-	state.size = Vector2(text_width if passive else 42, 18)
+	state.position = Vector2(text_x, 17 if passive else 31)
+	state.size = Vector2(text_width if passive else 42, 17)
 	body.add_child(state)
 	var policy := _make_label("Policy", "—", 11, UI.TEXT_DIM)
-	policy.position = Vector2(text_x + 43, 34)
-	policy.size = Vector2(40, 18)
+	policy.position = Vector2(text_x + 43, 31)
+	policy.size = Vector2(40, 17)
 	policy.visible = not passive
 	body.add_child(policy)
 	_slot_views[slot_id] = {

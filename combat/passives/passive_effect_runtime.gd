@@ -40,5 +40,14 @@ func on_basic_attack_committed(_event: BasicAttackCommittedEvent) -> bool:
 	return false
 
 
+func on_combat_result(
+		_result: CombatResult,
+		_target_id: StringName,
+		_target_is_player: bool,
+		_owner_root_id: int
+) -> bool:
+	return false
+
+
 func stat_modifier_snapshot() -> PassiveStatModifierSnapshot:
 	return PassiveStatModifierSnapshot.new()

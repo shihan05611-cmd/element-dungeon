@@ -30,6 +30,19 @@ class PlayerOwnerPort:
 			and _growth_adapter.restore_health(amount, source_skill_id, event_id)
 		)
 
+	func restore_energy(
+			amount: int,
+			source_skill_id: StringName,
+			event_id: StringName
+	) -> bool:
+		return (
+			_growth_adapter != null
+			and amount > 0
+			and not source_skill_id.is_empty()
+			and not event_id.is_empty()
+			and _growth_adapter.restore_energy(amount, source_skill_id, event_id)
+		)
+
 	static func _is_live_node(node: Node) -> bool:
 		return node != null and is_instance_valid(node) and not node.is_queued_for_deletion()
 
@@ -231,4 +244,23 @@ func on_basic_attack_committed(event: BasicAttackCommittedEvent) -> bool:
 	var triggered := false
 	for runtime: PassiveEffectRuntime in _registered_runtimes:
 		triggered = runtime.on_basic_attack_committed(event) or triggered
+	return triggered
+
+
+func on_combat_result(
+		result: CombatResult,
+		target_id: StringName,
+		target_is_player: bool,
+		owner_root_id: int
+) -> bool:
+	if result == null or target_id.is_empty() or owner_root_id <= 0:
+		return false
+	var triggered := false
+	for runtime: PassiveEffectRuntime in _registered_runtimes:
+		triggered = runtime.on_combat_result(
+			result,
+			target_id,
+			target_is_player,
+			owner_root_id
+		) or triggered
 	return triggered

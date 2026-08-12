@@ -49,8 +49,8 @@ func _run() -> void:
 
 func _test_catalog_and_modes() -> void:
 	_expect(CATALOG != null and CATALOG.is_valid(), "formal catalog validates")
-	_expect_eq(CATALOG.gameplay_definitions().size(), 9, "catalog contains fixed basic plus eight shop skills")
-	_expect_eq(CATALOG.shop_contents().size(), 8, "catalog exposes eight purchasable contents")
+	_expect_eq(CATALOG.gameplay_definitions().size(), 10, "catalog contains fixed basic plus nine shop skills")
+	_expect_eq(CATALOG.shop_contents().size(), 9, "catalog exposes nine purchasable contents")
 	_expect_eq(CATALOG.initial_owned_skill_ids(), [&"element_bolt"], "only element bolt starts owned")
 	_expect_eq(CATALOG.default_loadout_snapshot().entries.size(), 7, "default authority mapping has seven slots")
 	_expect_eq(CATALOG.default_loadout_snapshot().get_skill_id(SkillSlotIds.ACTIVE_1), &"element_bolt", "A1 starts with element bolt")
@@ -128,6 +128,9 @@ func _test_passives() -> void:
 	_expect_eq(SkillSlotIds.active().size(), 3, "authority exposes exactly three active slots")
 	_expect_eq(SkillSlotIds.passive().size(), 4, "authority exposes exactly four passive slots")
 	_expect_eq(_unique_count(PASSIVE_IDS), 4, "formal catalog supplies four different passive IDs")
+	var reaction_energy := CATALOG.content_for(&"passive_reaction_energy")
+	_expect(reaction_energy != null and reaction_energy.is_shop_purchasable() and reaction_energy.purchase_price == 75, "element echo is an additional level-free shop passive")
+	_expect(not reaction_energy.reward_pool and reaction_energy.active_progression == null, "element echo does not revive free rewards or passive levels")
 
 
 func _test_room_resources() -> void:
@@ -251,7 +254,7 @@ func _test_fourteen_scenarios() -> void:
 	_expect_eq(rules.progression_mode, RunFeatureMode.Value.DISABLED, "matrix 10: growth is disabled without deleting events")
 	_expect(PASSIVE_IDS.all(func(skill_id: StringName) -> bool: return CATALOG.content_for(skill_id).gameplay_definition.passive_effect_definition != null), "matrix 11: passive effects remain available while growth is disabled")
 	_expect(not CATALOG.relic_definitions.is_empty() and rules.relic_mode == RunFeatureMode.Value.DISABLED, "matrix 12: relic resources remain loadable but disabled")
-	_expect(CATALOG.shop_contents().size() == 8 and CATALOG.default_loadout_snapshot().entries.size() == 7, "matrix 13: shop projection and authority mapping share catalog truth")
+	_expect(CATALOG.shop_contents().size() == 9 and CATALOG.default_loadout_snapshot().entries.size() == 7, "matrix 13: shop projection and authority mapping share catalog truth")
 	_expect(_room_dream_dust(FLOW.combat_room_for(&"combat_06_final_boss")) == 0 and FLOW.node_for(&"combat_06_final_boss").next_node_id == FLOW.result_node_id, "matrix 14: boss awards zero and goes directly to result")
 
 
