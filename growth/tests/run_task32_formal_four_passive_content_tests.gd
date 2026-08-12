@@ -158,6 +158,7 @@ func _test_first_shop() -> void:
 	_expect_eq(purchased.economy.balance, before.economy.balance - 75, "burning charges exactly 75 dream dust")
 	_expect_eq(purchased.economy.total_spent_on_purchases, 75, "purchase ledger charges once")
 	_expect_eq(purchased.revision, before.revision + 1, "successful purchase advances authority once")
+	_expect_eq(purchased.loadout.revision, before.loadout.revision + 1, "burning automatic P1 loadout advances exactly once")
 	var duplicate_signature := _signature(purchased)
 	var duplicate := _coordinator.purchase_shop_skill(
 		burning_offer.offer_id,
@@ -179,15 +180,8 @@ func _test_first_shop() -> void:
 	_expect(not passive_upgrade.accepted and passive_upgrade.reject_reason == RunCommandResult.RejectReason.PASSIVE_HAS_NO_LEVELS, "formal passive rejects active progression")
 	_expect_eq(_signature(_coordinator.current_snapshot()), duplicate_signature, "passive upgrade rejection changes nothing")
 
-	_expect(_emit_button(&"select:burning"), "visible ownership control selects burning")
-	await process_frame
-	var equip_before := _coordinator.current_snapshot().revision
-	_expect(_emit_button(&"slot:passive_1"), "visible P1 control equips burning")
-	await process_frame
-	var equipped := _coordinator.current_snapshot()
-	_expect_eq(equipped.loadout.get_skill_id(SkillSlotIds.PASSIVE_1), &"burning", "P1 authority mapping is burning")
-	_expect_eq(equipped.revision, equip_before + 1, "P1 equip advances authority once")
-	_expect(_coordinator.host.runtime_loadout.snapshot().same_mapping(equipped.loadout), "P1 RuntimeLoadout matches RunSnapshot immediately")
+	_expect_eq(purchased.loadout.get_skill_id(SkillSlotIds.PASSIVE_1), &"burning", "purchase atomically maps burning to P1")
+	_expect(_coordinator.host.runtime_loadout.snapshot().same_mapping(purchased.loadout), "P1 RuntimeLoadout matches RunSnapshot immediately")
 	_expect_eq(_coordinator.host.runtime_loadout.registered_passive_skill_ids, [&"burning"], "burning Runtime registers exactly once")
 
 	_expect(_button(&"leave_shop").disabled, "formal UI cannot bypass the physical shop exit")
@@ -215,16 +209,10 @@ func _test_second_shop() -> void:
 		_expect(purchased.skills.owns(skill_id), "%s commits purchased ownership" % String(skill_id))
 		_expect_eq(purchased.economy.balance, before.economy.balance - 75, "%s charges exactly 75" % String(skill_id))
 		_expect_eq(purchased.revision, before.revision + 1, "%s purchase advances authority once" % String(skill_id))
+		_expect_eq(purchased.loadout.revision, before.loadout.revision + 1, "%s automatic loadout advances exactly once" % String(skill_id))
 		var progress := purchased.skills.progress_for(skill_id)
 		_expect(progress != null and progress.is_passive() and progress.level == 1 and progress.cumulative_upgrade_spend == 0, "%s is frozen level-free passive progress" % String(skill_id))
-		_expect(_emit_button(StringName("select:%s" % String(skill_id))), "%s selects through owned inventory" % String(skill_id))
-		await process_frame
-		var equip_revision := _coordinator.current_snapshot().revision
-		_expect(_emit_button(StringName("slot:%s" % String(slot_id))), "%s equips through its passive endpoint" % String(skill_id))
-		await process_frame
-		var equipped := _coordinator.current_snapshot()
-		_expect_eq(equipped.loadout.get_skill_id(slot_id), skill_id, "%s authority slot mapping commits" % String(skill_id))
-		_expect_eq(equipped.revision, equip_revision + 1, "%s equip advances authority once" % String(skill_id))
+		_expect_eq(purchased.loadout.get_skill_id(slot_id), skill_id, "%s purchase atomically maps to its literal passive endpoint" % String(skill_id))
 
 	var final_shop := _coordinator.current_snapshot()
 	_expect_eq(final_shop.economy.total_spent_on_purchases, 300, "four formal passive purchases spend exactly 300")

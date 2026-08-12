@@ -1,0 +1,19 @@
+Item,Initial,Final,Status,Notes
+shared_.godot_files,1111,1111,UNCHANGED,shared editor directory never used by Task43
+shared_.godot_bytes,45801258,45801258,UNCHANGED,read-only count
+external_untracked_import,36,36,UNCHANGED,exact paths in external_untracked_sidecars.csv
+external_untracked_translation,50,50,UNCHANGED,exact paths in external_untracked_sidecars.csv
+fixed_HEAD_tracked_import_uid,624,624,UNCHANGED,git tracked sidecar diff zero
+fixed_HEAD_all_tracked_import_uid_translation,764,764,UNCHANGED,git tracked sidecar diff zero
+protected_document_1_sha256,CB104DDA391DE0F3933AE97A55560AE182F7AEA45306E00E1CD6F4F768D69037,CB104DDA391DE0F3933AE97A55560AE182F7AEA45306E00E1CD6F4F768D69037,UNCHANGED,content not read
+protected_document_2_sha256,3745D2725AC0F484CFE447196D387F5D5E888A59BFC0F75A052DEBF6A8A55870,3745D2725AC0F484CFE447196D387F5D5E888A59BFC0F75A052DEBF6A8A55870,UNCHANGED,content not read
+external_Godot_PID,52240,52240,UNCHANGED,passive and not controlled
+external_godot_ai_PID,9908,9908,UNCHANGED,passive and not controlled
+cold_generated_sidecars,0,172_then_0,REMOVED_EXACT_LIST,only paths in cold_generated_sidecars_removed.csv
+cold_baseline_import_translation_hashes,389,389,UNCHANGED,all baseline ZIP files present with zero SHA256 mismatch
+cold_nonbaseline_import_translation_after_final_rescan,0,0,CLEAN,authorized empty evidence .gdignore prevented regeneration
+capture_rework_runs,0,2,PASS_BOTH,"each 1 test / 0 failures / 5 PNG / exit0 / five markers zero; repeat 2 owns final PNG"
+review_failed_capture_evidence,absent,absent,EXCLUDED,no failed Review logs or images entered current-final evidence
+cold_validation_fixture,absent,empty_0_byte_.gdignore,COLD_ONLY_EXCLUDED,never copied to shared or evidence and excluded from source hashes
+first_scan_blocker_log,preserved,preserved,KNOWN_BASELINE_IMPORT_BLOCKER,hash and markers in baseline_import_scan_history.csv
+git_write_operations,0,0,NONE,no add commit push reset restore checkout clean stash

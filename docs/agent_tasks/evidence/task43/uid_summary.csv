@@ -1,0 +1,3 @@
+Path,UID,SHA256,Generation,ReturnOrder
+growth/tests/run_task43_combat_loadout_world_cleanup_tests.gd.uid,uid://x7kutrkypynd,039AEB2BF7421AEAC4D4176C4DA3F010DB91DA7AA1081A24B546C406AAE2FB0E,cold_first_4.7.1_scan,uid_before_gd
+combat/tests/capture_task43_combat_loadout_world_cleanup_visuals.gd.uid,uid://vg1x71w112xs,4C7B4486CF8B55F5A106D77421A14DD5C6328DF98DB4CF0F8B27A412EFFDD83A,cold_first_4.7.1_scan,uid_before_gd

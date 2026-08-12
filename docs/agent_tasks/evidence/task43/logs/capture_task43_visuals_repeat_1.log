@@ -1,0 +1,10 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 591.74 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 2060
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+Task43 visual capture: 1 test, 5 images, 0 failures
+CAPTURED: res://docs/agent_tasks/evidence/task43/screenshots/task43_01_live_combat_loadout_readonly_1920x1080.png
+CAPTURED: res://docs/agent_tasks/evidence/task43/screenshots/task43_02_cleared_combat_loadout_auto_equipped_1920x1080.png
+CAPTURED: res://docs/agent_tasks/evidence/task43/screenshots/task43_03_world_no_corpses_grounded_chest_hud_1920x1080.png
+CAPTURED: res://docs/agent_tasks/evidence/task43/screenshots/task43_04_pressure_lower_platform_real_jump_2560x1440.png
+CAPTURED: res://docs/agent_tasks/evidence/task43/screenshots/task43_05_layer_elite_lower_platform_real_jump_2560x1440.png

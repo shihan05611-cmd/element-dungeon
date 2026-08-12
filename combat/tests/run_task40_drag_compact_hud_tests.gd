@@ -137,6 +137,8 @@ func _test_formal_drag_click_and_authority_recovery() -> void:
 	purchase_burning.pressed.emit()
 	await process_frame
 	_expect(_coordinator.current_snapshot().skills.owns(&"burning"), "burning ownership is authoritative")
+	_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.PASSIVE_1), &"unending", "pre-shop chest passive retains literal automatic P1")
+	_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.PASSIVE_2), &"burning", "new shop passive auto-equips into literal first empty P2")
 
 	var preview := _overlay.call("_formal_drag_preview", _coordinator.host.content_catalog.content_for(&"burning")) as Control
 	_expect(preview != null and _all_text(preview).contains("燃烧") and _all_text(preview).contains("PASSIVE 被动"), "drag preview contains short name and type")
@@ -158,14 +160,15 @@ func _test_formal_drag_click_and_authority_recovery() -> void:
 	_expect(_visible_text(_overlay).contains("拖拽来源已变化"), "stale slot source shows a recoverable short reason")
 
 	var passive_before := _coordinator.current_snapshot()
-	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"burning", &""), SkillSlotIds.PASSIVE_1)
+	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"burning", SkillSlotIds.PASSIVE_2), SkillSlotIds.PASSIVE_3)
 	await process_frame
 	var passive_after := _coordinator.current_snapshot()
-	_expect_eq(passive_after.loadout.get_skill_id(SkillSlotIds.PASSIVE_1), &"burning", "owned passive card drops into P1")
+	_expect_eq(passive_after.loadout.get_skill_id(SkillSlotIds.PASSIVE_3), &"burning", "auto-equipped passive slot drags from P2 into P3")
+	_expect(passive_after.loadout.get_skill_id(SkillSlotIds.PASSIVE_2).is_empty(), "passive drag clears its automatic source P2")
 	_expect_eq(passive_after.revision, passive_before.revision + 1, "one passive drop advances revision once")
 
 	var passive_illegal_before := passive_after
-	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"burning", SkillSlotIds.PASSIVE_1), SkillSlotIds.ACTIVE_2)
+	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"burning", SkillSlotIds.PASSIVE_3), SkillSlotIds.ACTIVE_3)
 	await process_frame
 	var passive_illegal_after := _coordinator.current_snapshot()
 	_expect_eq(passive_illegal_after.revision, passive_illegal_before.revision, "passive-to-active rejection changes no revision")
@@ -173,15 +176,15 @@ func _test_formal_drag_click_and_authority_recovery() -> void:
 	_expect(_visible_text(_overlay).contains("被动技能不能放入 ACTIVE"), "passive-to-active authority reason is visible")
 
 	var active_before := passive_illegal_after
-	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_bolt", &""), SkillSlotIds.ACTIVE_2)
+	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_bolt", SkillSlotIds.ACTIVE_1), SkillSlotIds.ACTIVE_3)
 	await process_frame
 	var active_after := _coordinator.current_snapshot()
-	_expect_eq(active_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_2), &"element_bolt", "owned active card drops into A2")
+	_expect_eq(active_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_3), &"element_bolt", "owned active slot drags into empty A3")
 	_expect(active_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_1).is_empty(), "active card move clears its previous slot")
 	_expect_eq(active_after.revision, active_before.revision + 1, "one active drop advances revision once")
 
 	var active_illegal_before := active_after
-	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_bolt", SkillSlotIds.ACTIVE_2), SkillSlotIds.PASSIVE_2)
+	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_bolt", SkillSlotIds.ACTIVE_3), SkillSlotIds.PASSIVE_2)
 	await process_frame
 	var active_illegal_after := _coordinator.current_snapshot()
 	_expect_eq(active_illegal_after.revision, active_illegal_before.revision, "active-to-passive rejection changes no revision")
@@ -200,10 +203,10 @@ func _test_formal_drag_click_and_authority_recovery() -> void:
 	var click_before := unowned_after
 	_button(&"select:element_bolt").pressed.emit()
 	await process_frame
-	_button(&"slot:active_3").pressed.emit()
+	_button(&"slot:active_1").pressed.emit()
 	await process_frame
 	var click_after := _coordinator.current_snapshot()
-	_expect_eq(click_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_3), &"element_bolt", "original click-to-slot path remains effective")
+	_expect_eq(click_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_1), &"element_bolt", "original click-to-slot path remains effective")
 	_expect_eq(click_after.revision, click_before.revision + 1, "click path still advances authority once")
 
 	var leave := _button(&"leave_shop")
@@ -213,6 +216,7 @@ func _test_formal_drag_click_and_authority_recovery() -> void:
 func _test_formal_slot_swap_single_commit() -> void:
 	var chest_owned := _coordinator.current_snapshot()
 	_expect(chest_owned.skills.owns(&"element_reclaim"), "task40_drag_flow deterministically owns reclaim from a pre-shop chest")
+	_expect_eq(chest_owned.loadout.get_skill_id(SkillSlotIds.ACTIVE_2), &"element_reclaim", "task40_drag_flow enters shop with chest reclaim auto-equipped in literal first empty A2")
 	_expect(_button(&"purchase:element_reclaim") == null, "chest-owned reclaim has no redundant purchase control")
 	await process_frame
 	var no_purchase := _coordinator.current_snapshot()
@@ -222,18 +226,19 @@ func _test_formal_slot_swap_single_commit() -> void:
 	_expect(no_purchase.skills.owns(&"element_reclaim"), "reclaim chest ownership remains authoritative")
 
 	var equip_before := _coordinator.current_snapshot()
-	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_reclaim", &""), SkillSlotIds.ACTIVE_1)
+	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_reclaim", &""), SkillSlotIds.ACTIVE_3)
 	await process_frame
 	var equip_after := _coordinator.current_snapshot()
-	_expect_eq(equip_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_1), &"element_reclaim", "owned reclaim card drops into A1")
+	_expect_eq(equip_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_3), &"element_reclaim", "owned auto-equipped reclaim card drops from A2 into A3")
+	_expect(equip_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_2).is_empty(), "reclaim card drag clears automatic A2")
 	_expect_eq(equip_after.revision, equip_before.revision + 1, "card drop commits exactly once")
 
 	var swap_before := equip_after
-	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_reclaim", SkillSlotIds.ACTIVE_1), SkillSlotIds.ACTIVE_3)
+	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_reclaim", SkillSlotIds.ACTIVE_3), SkillSlotIds.ACTIVE_1)
 	await process_frame
 	var swap_after := _coordinator.current_snapshot()
-	_expect_eq(swap_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_1), &"element_bolt", "slot swap moves the target skill back to the source")
-	_expect_eq(swap_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_3), &"element_reclaim", "slot swap moves the dragged skill into the target")
+	_expect_eq(swap_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_3), &"element_bolt", "slot swap moves the target skill back to the source")
+	_expect_eq(swap_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_1), &"element_reclaim", "slot swap moves the dragged skill into the target")
 	_expect_eq(swap_after.revision, swap_before.revision + 1, "one slot-to-slot drop creates one authority revision")
 	_expect(_coordinator.host.runtime_loadout.snapshot().same_mapping(swap_after.loadout), "RuntimeLoadout and RunSnapshot remain aligned after swap")
 	_expect(_visible_text(_overlay).contains("槽位已互换"), "slot swap has concise success feedback")

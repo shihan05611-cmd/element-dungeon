@@ -42,6 +42,7 @@ var _body_collision_layer: int = 0
 var _body_collision_mask: int = 0
 var _hurtbox_collision_layer: int = 0
 var _hurtbox_collision_mask: int = 0
+var _formal_run_spawn: bool = false
 
 static var _last_enemy_cast_id: int = 1_000_000_000
 
@@ -56,6 +57,7 @@ func configure_run_spawn(
 	experience_reward = 0
 	dream_dust_reward = definition.dream_dust_reward
 	terminal_enemy = is_terminal_enemy
+	_formal_run_spawn = true
 	if damage_receiver == null:
 		return false
 	var configured := damage_receiver.configure_runtime(
@@ -305,6 +307,8 @@ func _on_death_candidate(_result: CombatResult) -> void:
 	prompt.text = "已击败 · R 重置"
 	sprite.play(&"hurt")
 	enemy_defeated.emit()
+	if _formal_run_spawn:
+		call_deferred("queue_free")
 
 
 func _choose_patrol_target() -> void:

@@ -243,7 +243,9 @@ func claim_formal_room_chest(
 			return _recorded_rejection(
 				command_id, fingerprint, add_validation.reject_reason, add_validation.detail
 			)
+		var auto_equip_candidate := _validated_auto_equip_candidate(content)
 		_skill_inventory.commit_add_content(content, SkillProgressSnapshot.AcquisitionKind.SCRIPTED)
+		_commit_validated_auto_equip(auto_equip_candidate)
 		reward = RunChestRewardSnapshot.skill(room_id, content.skill_id)
 	else:
 		_economy.commit_earned(RunChestRewardSnapshot.DREAM_DUST_AMOUNT)
@@ -515,12 +517,14 @@ func purchase_skill(
 			RunCommandResult.RejectReason.INSUFFICIENT_DREAM_DUST,
 			&"insufficient_dream_dust_for_purchase"
 		)
+	var auto_equip_candidate := _validated_auto_equip_candidate(content)
 	var economy_before := _economy.snapshot()
 	_economy.commit_purchase(offer.purchase_price)
 	_skill_inventory.commit_add_content(
 		content,
 		SkillProgressSnapshot.AcquisitionKind.PURCHASED
 	)
+	_commit_validated_auto_equip(auto_equip_candidate)
 	var skill_after := _skill_inventory.snapshot().progress_for(content.skill_id)
 	var summary := ShopCommitSummary.economy_transaction(
 		ShopCommitSummary.TransactionKind.PURCHASE_SKILL,
@@ -766,6 +770,51 @@ func apply_shop_loadout_immediately(
 	draft.rebase_after_immediate_loadout(_run_revision, progression_current, loadout_after)
 	var current := snapshot()
 	snapshot_changed.emit(current, &"shop_loadout_applied")
+	return RunCommandResult.success(current)
+
+
+func apply_formal_combat_loadout(
+		expected_run_revision: int,
+		candidate: RuntimeLoadoutSnapshot
+) -> RunCommandResult:
+	var envelope := _validate_formal_revision(expected_run_revision)
+	if not envelope.accepted:
+		return envelope
+	if _director.snapshot().phase != RunPhase.COMBAT:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.INVALID_STATE,
+			&"combat_loadout_outside_combat",
+			snapshot()
+		)
+	if _runtime_loadout_port == null:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.LOADOUT_REJECTED,
+			&"runtime_loadout_port_not_configured",
+			snapshot()
+		)
+	var ownership_validation := _validate_loadout_ownership(candidate)
+	if not ownership_validation.accepted:
+		return ownership_validation
+	var current_loadout := _current_loadout_snapshot()
+	var loadout_validation := _runtime_loadout_port.validate_snapshot(candidate)
+	if not loadout_validation.accepted:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.LOADOUT_REJECTED,
+			loadout_validation.detail,
+			snapshot()
+		)
+	if current_loadout.same_mapping(candidate):
+		return RunCommandResult.success(snapshot())
+	var loadout_commit := _runtime_loadout_port.try_replace_snapshot(candidate)
+	if not loadout_commit.accepted:
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.LOADOUT_REJECTED,
+			loadout_commit.detail,
+			snapshot()
+		)
+	_run_revision += 1
+	var current := snapshot()
+	snapshot_changed.emit(current, &"combat_loadout_applied")
 	return RunCommandResult.success(current)
 
 
@@ -1248,6 +1297,46 @@ func _current_loadout_snapshot() -> RuntimeLoadoutSnapshot:
 		return RuntimeLoadoutSnapshot.new()
 	var current := _runtime_loadout_port.snapshot()
 	return current if current != null else RuntimeLoadoutSnapshot.new()
+
+
+func _validated_auto_equip_candidate(
+		content: SkillContentDefinition
+) -> RuntimeLoadoutSnapshot:
+	if (
+		content == null
+		or content.gameplay_definition == null
+		or _runtime_loadout_port == null
+	):
+		return null
+	var slots := (
+		SkillSlotIds.passive()
+		if content.gameplay_definition.is_passive_skill()
+		else SkillSlotIds.active()
+	)
+	var current := _current_loadout_snapshot()
+	var target_slot := StringName()
+	for slot_id: StringName in slots:
+		if current.get_skill_id(slot_id).is_empty():
+			target_slot = slot_id
+			break
+	if target_slot.is_empty():
+		return null
+	var entries: Array[RuntimeLoadoutSlotSnapshot] = []
+	for entry: RuntimeLoadoutSlotSnapshot in current.entries:
+		entries.append(RuntimeLoadoutSlotSnapshot.new(
+			entry.slot_id,
+			content.skill_id if entry.slot_id == target_slot else entry.skill_id
+		))
+	var candidate := RuntimeLoadoutSnapshot.new(entries, current.revision)
+	var validation := _runtime_loadout_port.validate_snapshot(candidate)
+	return candidate if validation.accepted else null
+
+
+func _commit_validated_auto_equip(candidate: RuntimeLoadoutSnapshot) -> void:
+	if candidate == null or _runtime_loadout_port == null:
+		return
+	var commit := _runtime_loadout_port.try_replace_snapshot(candidate)
+	assert(commit.accepted, "prevalidated auto-equip candidate must commit")
 
 
 func _commit_and_publish(cause: StringName) -> RunCommandResult:

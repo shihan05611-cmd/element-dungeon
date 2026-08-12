@@ -85,7 +85,7 @@ func _test_safe_run() -> void:
 	var final := _coordinator.current_snapshot()
 	_assert_completed_run(final, [&"route_01_swarm", &"route_02_stable"], 895, 300, 300, 105, 400, boss_balance, "safe")
 	_expect_eq(final.skills.progress_for(&"element_bolt").level, 3, "safe specialist finishes at bolt Lv3")
-	_assert_final_loadout(final, &"element_bolt", &"", &"")
+	_assert_final_loadout(final, &"element_bolt", &"elemental_laser", &"elemental_fury")
 	_assert_persistent_ids(persistent, "safe")
 	_expect_eq(_unique_int_count(final.route.activated_room_instance_ids), 6, "safe run uses six different RunRoomInstance IDs")
 	_expect_eq(_unique_string_count(final.route.activated_scene_paths), 3, "safe route truthfully uses flat/platform/boss templates")
@@ -244,6 +244,17 @@ func _purchase_and_equip(skill_id: StringName, slot_id: StringName) -> void:
 	_expect(progress != null and progress.level == 1 and progress.cumulative_upgrade_spend == 0, "%s starts at frozen Lv1/no spend" % String(skill_id))
 	if content.gameplay_definition.is_passive_skill():
 		_expect(progress.is_passive(), "%s has passive progress kind" % String(skill_id))
+	if purchased.loadout.get_skill_id(slot_id) == skill_id:
+		_expect_eq(
+			purchased.revision,
+			before.revision + (0 if before.skills.owns(skill_id) else 1),
+			"%s automatic first-empty equip is part of the acquisition revision" % String(skill_id)
+		)
+		_expect(
+			_coordinator.host.runtime_loadout.snapshot().same_mapping(purchased.loadout),
+			"%s automatic mapping is already authoritative without a second equip" % String(skill_id)
+		)
+		return
 	_expect(_press(StringName("select:%s" % String(skill_id))), "%s selects through formal inventory" % String(skill_id))
 	await process_frame
 	var equip_revision := _coordinator.current_snapshot().revision
@@ -343,6 +354,17 @@ func _record_and_defeat_current_room(metrics: Dictionary) -> void:
 			var chest_skills: Array = metrics["chest_skills"]
 			chest_skills.append(skill_id)
 			metrics["chest_skills"] = chest_skills
+			match skill_id:
+				&"elemental_laser":
+					_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_2), &"elemental_laser", "chest laser auto-equips into literal first empty A2")
+				&"elemental_fury":
+					_expect_eq(
+						_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_3),
+						&"elemental_fury" if String(metrics["label"]) == "safe" else &"element_reclaim",
+						"safe fury fills literal A3; risk full A1-A3 keeps literal reclaim without overwrite"
+					)
+				&"element_reclaim":
+					_expect(not _loadout_signature(_coordinator.current_snapshot().loadout).values().has(&"element_reclaim"), "safe full active slots keep chest reclaim owned-only without overwrite")
 	room_record["duration_ms"] = maxi(1, Time.get_ticks_msec() - started)
 	var rooms: Array = metrics["rooms"]
 	rooms.append(room_record)

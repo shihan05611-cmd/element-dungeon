@@ -207,7 +207,8 @@ func _activate_reinforcements() -> void:
 		return
 	_reinforcement_activated = true
 	for enemy: CombatEnemy in _reinforcement_enemies:
-		enemy.set_reinforcement_dormant(false)
+		if enemy != null and is_instance_valid(enemy):
+			enemy.set_reinforcement_dormant(false)
 
 
 func _create_interactables() -> void:
@@ -216,7 +217,7 @@ func _create_interactables() -> void:
 	add_child(container)
 	_chest = CHEST_SCENE.instantiate() as RunWorldInteractable
 	_chest.name = "SettlementChest" if _definition.final_boss else "RewardChest"
-	_chest.position = Vector2(760, 478)
+	_chest.position = Vector2(760, 501)
 	_chest.visible = false
 	_chest.set_enabled(false)
 	container.add_child(_chest)

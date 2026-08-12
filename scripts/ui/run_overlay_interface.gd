@@ -97,6 +97,10 @@ func configure(host: RunSessionHost, formal_coordinator: Node = null) -> void:
 		var reward_callback := Callable(self, "show_reward")
 		if not host.reward_ready.is_connected(reward_callback):
 			host.reward_ready.connect(reward_callback)
+	if _formal_mode and _formal_coordinator.has_signal("combat_loadout_availability_changed"):
+		var availability_callback := Callable(self, "_on_combat_loadout_availability_changed")
+		if not _formal_coordinator.is_connected("combat_loadout_availability_changed", availability_callback):
+			_formal_coordinator.connect("combat_loadout_availability_changed", availability_callback)
 	if _snapshot != null:
 		_working_loadout = _snapshot.loadout
 		if _formal_mode:
@@ -105,9 +109,11 @@ func configure(host: RunSessionHost, formal_coordinator: Node = null) -> void:
 
 func toggle_loadout() -> void:
 	if _formal_mode:
-		if _snapshot != null and _snapshot.route.phase == RunPhase.SHOP:
+		if _snapshot != null and _snapshot.route.phase in [RunPhase.SHOP, RunPhase.COMBAT]:
 			if visible:
 				hide_overlay()
+			elif _snapshot.route.phase == RunPhase.COMBAT:
+				_show_formal_combat_loadout(&"toggle_combat")
 			else:
 				_render_formal_phase(_snapshot, &"toggle_shop")
 		return
@@ -1061,6 +1067,11 @@ func _on_snapshot_changed(snapshot: RunSnapshot, _cause: StringName) -> void:
 		_refresh_loadout()
 
 
+func _on_combat_loadout_availability_changed(_available: bool) -> void:
+	if _formal_mode and visible and _formal_kind == &"combat_loadout":
+		_show_formal_combat_loadout(&"availability_changed")
+
+
 func _refresh_warning() -> void:
 	var active_count := 0
 	for slot_id: StringName in SkillSlotIds.active():
@@ -1405,10 +1416,13 @@ func _render_formal_phase(snapshot: RunSnapshot, cause: StringName) -> void:
 		RunPhase.RUN_COMPLETE, RunPhase.RUN_FAILED:
 			_show_formal_result()
 		_:
-			_formal_kind = &"combat"
-			_formal_command_busy = false
-			_formal_route_submitting = false
-			visible = false
+			if visible and _formal_kind == &"combat_loadout":
+				_show_formal_combat_loadout(cause)
+			else:
+				_formal_kind = &"combat"
+				_formal_command_busy = false
+				_formal_route_submitting = false
+				visible = false
 
 
 func _formal_begin(kind: StringName, heading: String, subtitle: String) -> void:
@@ -1421,16 +1435,79 @@ func _formal_begin(kind: StringName, heading: String, subtitle: String) -> void:
 	_clear_children(_formal_area)
 	_formal_buttons.clear()
 	_close.text = "关闭商店界面 / 返回世界  L" if kind == &"shop" else "关闭  L"
-	_close.visible = kind == &"shop"
+	_close.visible = kind in [&"shop", &"combat_loadout"]
 	_close.focus_mode = Control.FOCUS_ALL
-	if kind == &"shop":
+	if kind in [&"shop", &"combat_loadout"]:
 		_close.disabled = false
-		_formal_buttons[&"close_shop_panel"] = _close
+		_formal_buttons[&"close_shop_panel" if kind == &"shop" else &"close_combat_loadout"] = _close
 	_title.text = heading
 	_subtitle.text = subtitle
 	_formal_status = null
 	_formal_body = null
 	_show_overlay()
+
+
+func _show_formal_combat_loadout(cause: StringName = &"") -> void:
+	if _snapshot == null or _host == null or _catalog == null:
+		return
+	_formal_shop_draft = null
+	_working_loadout = _snapshot.loadout
+	var available := bool(_formal_coordinator.call("combat_loadout_available"))
+	_formal_begin(
+		&"combat_loadout",
+		"战斗配装 · ACTIVE 1–3 / PASSIVE 1–4",
+		"清场后可调整 · 直接提交权威 RuntimeLoadout，不创建商店草稿"
+	)
+	var gate := _label(
+		"✓ 当前房已清场，可点击或拖拽调整" if available else "战斗进行中 · 清场后可调整",
+		14,
+		UI.SUCCESS if available else UI.WARNING
+	)
+	gate.name = "CombatLoadoutGate"
+	_formal_area.add_child(gate)
+	var panel := _formal_section_panel("本局已拥有技能", 1.0)
+	_formal_area.add_child(panel)
+	var box := panel.get_node("Margin/Box") as VBoxContainer
+	var inventory := HFlowContainer.new()
+	inventory.name = "OwnedSkills"
+	inventory.add_theme_constant_override(&"h_separation", UI.GAP_XS)
+	inventory.add_theme_constant_override(&"v_separation", UI.GAP_XS)
+	box.add_child(inventory)
+	for skill_id: StringName in _snapshot.skills.owned_skill_ids:
+		var content := _catalog.content_for(skill_id)
+		if content == null or not content.equippable:
+			continue
+		var select := _formal_action_button(
+			"%s%s" % ["◆ " if _formal_selected_skill_id == skill_id else "", content.display_name],
+			"select:%s" % String(skill_id),
+			Callable(self, "_formal_select_skill").bind(skill_id),
+			Vector2(124, 44)
+		)
+		select.disabled = not available
+		select.set_drag_forwarding(
+			Callable(self, "_formal_skill_drag_data").bind(skill_id),
+			Callable(self, "_formal_inventory_can_drop"),
+			Callable(self, "_formal_inventory_drop")
+		)
+		inventory.add_child(select)
+	box.add_child(_formal_slot_zone("主动槽", SkillSlotIds.active()))
+	box.add_child(_formal_slot_zone("被动槽", SkillSlotIds.passive()))
+	var actions := HBoxContainer.new()
+	actions.add_theme_constant_override(&"separation", UI.GAP_SM)
+	box.add_child(actions)
+	var clear := _formal_action_button(
+		"卸下所选槽", "clear_slot", Callable(self, "_formal_clear_selected_slot"), Vector2(148, 44)
+	)
+	clear.disabled = not available or _formal_selected_slot_id.is_empty()
+	actions.add_child(clear)
+	_formal_status = _label(
+		"清场门禁已开放" if available else "战斗未清场：操作不会调用 authority",
+		13,
+		UI.TEXT_MUTED
+	)
+	_formal_status.name = "Status"
+	_formal_area.add_child(_formal_status)
+	_restore_formal_focus()
 
 
 func _show_formal_shop(cause: StringName = &"") -> void:
@@ -1721,6 +1798,8 @@ func _formal_slot_zone(title_text: String, slot_ids: Array[StringName]) -> VBoxC
 			Callable(self, "_formal_press_slot").bind(slot_id),
 			Vector2(112, 54)
 		)
+		if _formal_kind == &"combat_loadout":
+			button.disabled = not bool(_formal_coordinator.call("combat_loadout_available"))
 		if _formal_selected_slot_id == slot_id:
 			button.add_theme_stylebox_override(&"normal", UI.button_style(UI.SURFACE_SOFT, UI.BORDER_FOCUS))
 		button.set_drag_forwarding(
@@ -1791,13 +1870,13 @@ func _formal_inventory_drop(_position: Vector2, _data: Variant) -> void:
 
 
 func _formal_drag_context_ready() -> bool:
+	if _formal_command_busy or _working_loadout == null or _snapshot == null:
+		return false
+	if _formal_kind == &"shop":
+		return _formal_shop_draft != null and _snapshot.shop != null
 	return (
-		_formal_kind == &"shop"
-		and not _formal_command_busy
-		and _formal_shop_draft != null
-		and _working_loadout != null
-		and _snapshot != null
-		and _snapshot.shop != null
+		_formal_kind == &"combat_loadout"
+		and bool(_formal_coordinator.call("combat_loadout_available"))
 	)
 
 
@@ -1836,19 +1915,19 @@ func _formal_apply_drag_drop(skill_id: StringName, source_slot_id: StringName, t
 		return
 	_formal_focus_id = StringName("slot:%s" % String(target_slot_id))
 	if not source_slot_id.is_empty() and _working_loadout.get_skill_id(source_slot_id) != skill_id:
-		_recover_formal_shop(null, "拖拽来源已变化")
+		_recover_formal_loadout(null, "拖拽来源已变化")
 		return
 	var candidate := _candidate_for_drag_drop(_working_loadout, skill_id, source_slot_id, target_slot_id)
-	var result := _formal_coordinator.call("apply_shop_loadout", _formal_shop_draft, candidate) as RunCommandResult
+	var result := _apply_formal_loadout_candidate(candidate)
 	if result == null or not result.accepted:
-		_recover_formal_shop(result, "拖拽装配未生效")
+		_recover_formal_loadout(result, "拖拽装配未生效")
 		return
 	var target_before := _working_loadout.get_skill_id(target_slot_id)
 	_snapshot = result.run_snapshot
-	_working_loadout = _formal_shop_draft.preview_loadout()
+	_working_loadout = _formal_shop_draft.preview_loadout() if _formal_kind == &"shop" else _snapshot.loadout
 	_formal_selected_skill_id = &""
 	_formal_selected_slot_id = target_slot_id
-	_show_formal_shop(&"loadout_applied")
+	_show_current_formal_loadout(&"loadout_applied")
 	_set_formal_status(
 		"槽位已互换并由权威即时生效。"
 		if not source_slot_id.is_empty() and not target_before.is_empty() and source_slot_id != target_slot_id
@@ -1858,51 +1937,81 @@ func _formal_apply_drag_drop(skill_id: StringName, source_slot_id: StringName, t
 
 
 func _formal_select_skill(skill_id: StringName) -> void:
-	if _formal_command_busy:
+	if not _formal_drag_context_ready():
 		return
 	_formal_selected_skill_id = skill_id
 	_formal_selected_slot_id = &""
 	_formal_focus_id = StringName("select:%s" % String(skill_id))
-	_show_formal_shop(&"skill_selected")
+	_show_current_formal_loadout(&"skill_selected")
 
 
 func _formal_press_slot(slot_id: StringName) -> void:
-	if _formal_command_busy or _formal_shop_draft == null:
+	if not _formal_drag_context_ready():
 		return
 	if _formal_selected_skill_id.is_empty():
 		_formal_selected_slot_id = slot_id
 		_formal_focus_id = StringName("slot:%s" % String(slot_id))
-		_show_formal_shop(&"slot_selected")
+		_show_current_formal_loadout(&"slot_selected")
 		return
 	var candidate := _candidate_with_assignment(_working_loadout, slot_id, _formal_selected_skill_id)
 	_formal_focus_id = StringName("slot:%s" % String(slot_id))
-	var result := _formal_coordinator.call("apply_shop_loadout", _formal_shop_draft, candidate) as RunCommandResult
+	var result := _apply_formal_loadout_candidate(candidate)
 	if result == null or not result.accepted:
-		_recover_formal_shop(result, "装配未生效")
+		_recover_formal_loadout(result, "装配未生效")
 		return
 	_snapshot = result.run_snapshot
-	_working_loadout = _formal_shop_draft.preview_loadout()
+	_working_loadout = _formal_shop_draft.preview_loadout() if _formal_kind == &"shop" else _snapshot.loadout
 	_formal_selected_skill_id = &""
 	_formal_selected_slot_id = slot_id
-	_show_formal_shop(&"loadout_applied")
+	_show_current_formal_loadout(&"loadout_applied")
 	_set_formal_status("装配已由权威 RuntimeLoadout 即时生效。", &"success")
 
 
 func _formal_clear_selected_slot() -> void:
-	if _formal_selected_slot_id.is_empty() or _formal_shop_draft == null:
+	if _formal_selected_slot_id.is_empty() or not _formal_drag_context_ready():
 		return
 	var slot_id := _formal_selected_slot_id
 	var candidate := _candidate_with_assignment(_working_loadout, slot_id, &"")
 	_formal_focus_id = &"clear_slot"
-	var result := _formal_coordinator.call("apply_shop_loadout", _formal_shop_draft, candidate) as RunCommandResult
+	var result := _apply_formal_loadout_candidate(candidate)
 	if result == null or not result.accepted:
-		_recover_formal_shop(result, "卸下未生效")
+		_recover_formal_loadout(result, "卸下未生效")
 		return
 	_snapshot = result.run_snapshot
-	_working_loadout = _formal_shop_draft.preview_loadout()
+	_working_loadout = _formal_shop_draft.preview_loadout() if _formal_kind == &"shop" else _snapshot.loadout
 	_formal_selected_slot_id = &""
-	_show_formal_shop(&"loadout_applied")
+	_show_current_formal_loadout(&"loadout_applied")
 	_set_formal_status("槽位已卸下并即时生效。", &"success")
+
+
+func _apply_formal_loadout_candidate(candidate: RuntimeLoadoutSnapshot) -> RunCommandResult:
+	if _formal_kind == &"shop":
+		return _formal_coordinator.call("apply_shop_loadout", _formal_shop_draft, candidate) as RunCommandResult
+	return _formal_coordinator.call("apply_combat_loadout", candidate, _snapshot.revision) as RunCommandResult
+
+
+func _show_current_formal_loadout(cause: StringName) -> void:
+	if _formal_kind == &"shop":
+		_show_formal_shop(cause)
+	else:
+		_show_formal_combat_loadout(cause)
+
+
+func _recover_formal_loadout(result: RunCommandResult, prefix: String) -> void:
+	if _formal_kind == &"shop":
+		_recover_formal_shop(result, prefix)
+		return
+	_snapshot = (
+		result.run_snapshot
+		if result != null and result.run_snapshot != null
+		else _formal_coordinator.call("current_snapshot") as RunSnapshot
+	)
+	if _snapshot != null and _snapshot.route.phase == RunPhase.COMBAT:
+		_show_formal_combat_loadout(&"authority_rejected")
+		_set_formal_status(
+			"%s：%s" % [prefix, _detail_text(result.detail if result != null else &"missing_result")],
+			&"error"
+		)
 
 
 func _formal_purchase(offer_id: StringName) -> void:

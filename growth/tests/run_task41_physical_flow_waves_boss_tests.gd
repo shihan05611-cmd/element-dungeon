@@ -193,12 +193,17 @@ func _test_physical_safe_path_and_boss_settlement() -> void:
 	if projectile != null:
 		_expect(projectile.speed <= 260.0 and projectile.hurtbox_collision_mask == 16 and projectile.blocking_collision_mask == 4, "boss projectile is slow, targets player hurtbox, and is wall-blocked")
 		projectile.free()
+	var boss_reference: WeakRef = weakref(boss)
 	for enemy: CombatEnemy in coordinator.active_room.enemies:
 		_defeat(enemy)
-	await process_frame
 	var fired_at_death := boss.boss_projectiles_fired
-	boss.call("_spawn_boss_projectile")
-	_expect_eq(boss.boss_projectiles_fired, fired_at_death, "defeated boss stops firing")
+	var projectiles_at_death := _projectile_count(coordinator)
+	await process_frame
+	_expect(not is_instance_valid(boss_reference.get_ref()), "defeated formal boss node is released on the next frame")
+	await physics_frame
+	await physics_frame
+	_expect(_projectile_count(coordinator) <= projectiles_at_death, "released boss creates no new projectile after death")
+	_expect_eq(fired_at_death, fired_before + 1, "boss projectile counter freezes at the death boundary")
 	_expect(coordinator.active_room.room_is_cleared and coordinator.active_room.portal == null, "boss clear reveals settlement chest without portal")
 	var before_boss_chest := coordinator.current_snapshot()
 	coordinator.player.global_position = coordinator.active_room.chest.global_position
@@ -245,6 +250,13 @@ func _first_projectile(node: Node) -> ProjectileDelivery:
 		if child is ProjectileDelivery:
 			return child as ProjectileDelivery
 	return null
+
+
+func _projectile_count(node: Node) -> int:
+	var count := 1 if node is ProjectileDelivery else 0
+	for child: Node in node.get_children():
+		count += _projectile_count(child)
+	return count
 
 
 func _wait_combat(coordinator: RunFlowCoordinator, room_id: StringName) -> bool:

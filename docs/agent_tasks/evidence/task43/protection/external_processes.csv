@@ -1,0 +1,3 @@
+Timestamp,PID,Process,StartTime,Responding,Ownership
+2026-08-13 00:56:15.028 +08:00,52240,Godot_v4.7.1-stable_win64,2026-08-12 21:38:48,true,external_passive_not_controlled
+2026-08-13 00:56:15.028 +08:00,9908,godot-ai,2026-08-12 21:39:08,true,external_passive_not_controlled

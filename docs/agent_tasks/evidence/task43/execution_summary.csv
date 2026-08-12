@@ -1,0 +1,13 @@
+Gate,CommandSet,Tests,Assertions,FramesOrImages,Exit,Acceptance,Result
+specialty,Task43,4,125,,0,accepted,PASS
+direct,Task31,4,534,,0,accepted,PASS
+direct,Task32,5,181,,0,accepted,PASS
+direct,Task40,4,118,,0,accepted,PASS
+direct,Task41,4,112,,0,accepted,PASS
+formal,formal34,319,6889,,0,accepted_34_of_34,PASS
+non_gate,Task20,7,68,,0,historical_BLOCKED_not_accepted,PASS_non_gate
+smoke,RunGame,,,180,0,accepted,PASS
+smoke,TestRoom,,,180,0,accepted,PASS
+capture,Task43_visuals_repeat_1,1,,5,0,accepted,PASS
+capture,Task43_visuals_repeat_2,1,,5,0,accepted_final_png,PASS
+rescan,final_editor_rescan_rework,,,1,0,accepted,PASS

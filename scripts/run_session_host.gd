@@ -267,6 +267,39 @@ func claim_formal_room_chest(
 	return _run_session.claim_formal_room_chest(command_id, expected_run_revision, requested_room_id)
 
 
+func formal_combat_loadout_available(
+		requested_room_id: StringName,
+		room_instance_id: int,
+		room_cleared: bool
+) -> bool:
+	return (
+		_configured
+		and _formal_flow != null
+		and _run_session != null
+		and _run_session.snapshot().route.phase == RunPhase.COMBAT
+		and requested_room_id == room_id
+		and room_instance_id == _room_instance_id
+		and room_cleared
+		and _all_enemies_defeated()
+	)
+
+
+func apply_formal_combat_loadout(
+		expected_run_revision: int,
+		candidate: RuntimeLoadoutSnapshot,
+		requested_room_id: StringName,
+		room_instance_id: int,
+		room_cleared: bool
+) -> RunCommandResult:
+	if not formal_combat_loadout_available(requested_room_id, room_instance_id, room_cleared):
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.INVALID_STATE,
+			&"combat_loadout_requires_cleared_active_room",
+			_run_session.snapshot() if _run_session != null else null
+		)
+	return _run_session.apply_formal_combat_loadout(expected_run_revision, candidate)
+
+
 func complete_formal_room(
 		requested_room_id: StringName,
 		room_instance_id: int
@@ -501,7 +534,7 @@ func _on_runtime_loadout_replaced(
 
 func _all_enemies_defeated() -> bool:
 	for enemy: CombatEnemy in _enemies:
-		if enemy != null and not enemy.defeated:
+		if enemy != null and is_instance_valid(enemy) and not enemy.defeated:
 			return false
 	return true
 

@@ -10,6 +10,7 @@ signal room_activated(
 )
 signal flow_error(detail: StringName)
 signal ui_command_result(command: StringName, result: RunCommandResult)
+signal combat_loadout_availability_changed(available: bool)
 
 @export var flow_definition: RunFlowDefinition
 @export var content_catalog: RunContentCatalog
@@ -149,6 +150,40 @@ func apply_shop_loadout(
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.INVALID_STATE, &"run_session_not_ready")
 	var result := host.run_session.apply_shop_loadout_immediately(draft, candidate)
 	ui_command_result.emit(&"apply_shop_loadout", result)
+	return result
+
+
+func combat_loadout_available() -> bool:
+	return (
+		_active_room != null
+		and is_instance_valid(_active_room)
+		and host != null
+		and host.formal_combat_loadout_available(
+			_active_room.room_id,
+			_active_room.get_instance_id(),
+			_active_room.room_is_cleared
+		)
+	)
+
+
+func apply_combat_loadout(
+		candidate: RuntimeLoadoutSnapshot,
+		expected_revision: int = -1
+) -> RunCommandResult:
+	var snapshot := current_snapshot()
+	if snapshot == null or _active_room == null or not is_instance_valid(_active_room):
+		return RunCommandResult.rejected(
+			RunCommandResult.RejectReason.INVALID_STATE,
+			&"active_combat_room_missing"
+		)
+	var result := host.apply_formal_combat_loadout(
+		snapshot.revision if expected_revision < 0 else expected_revision,
+		candidate,
+		_active_room.room_id,
+		_active_room.get_instance_id(),
+		_active_room.room_is_cleared
+	)
+	ui_command_result.emit(&"apply_combat_loadout", result)
 	return result
 
 
@@ -296,6 +331,10 @@ func _activate_staged_room(authority_snapshot: RunSnapshot) -> bool:
 	_staged_room.activate()
 	_active_room = _staged_room
 	_staged_room = null
+	var cleared_callback := Callable(self, "_on_active_room_cleared")
+	if not _active_room.room_cleared.is_connected(cleared_callback):
+		_active_room.room_cleared.connect(cleared_callback)
+	combat_loadout_availability_changed.emit(false)
 	if _active_shop_room != null:
 		_active_shop_room.queue_free()
 		_active_shop_room = null
@@ -317,6 +356,17 @@ func _activate_staged_room(authority_snapshot: RunSnapshot) -> bool:
 		_active_room.get_instance_id()
 	)
 	return true
+
+
+func _on_active_room_cleared(cleared_room_id: StringName, room_instance_id: int) -> void:
+	if (
+		_active_room == null
+		or not is_instance_valid(_active_room)
+		or cleared_room_id != _active_room.room_id
+		or room_instance_id != _active_room.get_instance_id()
+	):
+		return
+	combat_loadout_availability_changed.emit(combat_loadout_available())
 
 
 func _on_session_snapshot_changed(snapshot: RunSnapshot, _cause: StringName) -> void:
@@ -345,6 +395,7 @@ func _enter_shop_room() -> void:
 	if _active_room != null:
 		_active_room.queue_free()
 		_active_room = null
+	combat_loadout_availability_changed.emit(false)
 	_active_shop_room = shop
 	_clear_transient_deliveries()
 	vfx.clear_presentations()

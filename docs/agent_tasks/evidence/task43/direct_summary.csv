@@ -1,0 +1,6 @@
+"Runner","Path","Tests","Assertions","Exit","Failures","Summary"
+"Task43 specialty","docs\agent_tasks\evidence\task43\logs\task43_specialty.log","4","125","0","0","PASS"
+"Task31 direct","docs\agent_tasks\evidence\task43\logs\direct4\task31.log","4","534","0","0","PASS"
+"Task32 direct","docs\agent_tasks\evidence\task43\logs\direct4\task32.log","5","181","0","0","PASS"
+"Task40 direct","docs\agent_tasks\evidence\task43\logs\direct4\task40.log","4","118","0","0","PASS"
+"Task41 direct","docs\agent_tasks\evidence\task43\logs\direct4\task41.log","4","112","0","0","PASS"
