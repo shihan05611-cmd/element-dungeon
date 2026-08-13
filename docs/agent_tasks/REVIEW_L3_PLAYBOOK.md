@@ -24,8 +24,9 @@ L3 开始前固定并记录：
 3. 候选不包含 `.git`、共享 `.godot`、任务外未跟踪文件或保护文档。
 4. profile 位于候选外的独立目录，并为 Review 进程设置独立 `APPDATA`、`LOCALAPPDATA` 等
    Godot 用户数据位置；不得连接、关闭或驱动共享 Godot/editor/godot-ai。
-5. 若归档 evidence 中的 CSV 会被 Godot 误识别为翻译表，可在第一条 Godot 命令前创建冷根专用
-   0-byte `docs/agent_tasks/evidence/.gdignore`。它不得进入共享项目、正式 evidence 或 Git。
+5. 正式候选应携带项目内永久 `docs/agent_tasks/evidence/.gdignore`，以阻止 Godot 递归扫描归档
+   evidence。只有固定的旧基线尚无该文件时，才可在冷根第一条 Godot 命令前创建冷根专用的
+   临时 0-byte 屏障；该临时文件不得回流共享项目、正式 evidence 或 Git。
 6. 第一条 Godot 命令必须是任务书指定版本的 headless editor scan；本项目当前基准为 Godot
    `4.7.1`。记录版本、退出码和完整日志。
 
