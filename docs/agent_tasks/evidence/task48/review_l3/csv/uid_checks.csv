@@ -1,0 +1,3 @@
+"Path","UID","OccurrencesInColdUidSidecars","Bytes","SHA256","Result"
+"combat\tests\run_task48_dodge_integration.gd.uid","uid://cmty4vmexgy5e","1","20","8EBF3BA0D0B418A02A1D5F61EA8265D918ECE081FD60E2982751C88CD9CC7AE5","PASS"
+"combat\tests\capture_task48_dodge_visuals.gd.uid","uid://42uiiv6aoel1","1","19","7D5A0A10FE3020671B898DA9B1A31312B167DA93F78EA286C303B30D49EE82F6","PASS"

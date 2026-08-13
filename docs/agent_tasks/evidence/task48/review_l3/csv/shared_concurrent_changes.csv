@@ -1,0 +1,4 @@
+"Path","ColdBaselineSHA256","SharedFinalSHA256","Ownership","EffectOnCandidate"
+"combat\tests\run_task40_drag_compact_hud_tests.gd","4416ACD892EFDCDBEA1FC1A262E260753D0F853129FF357428BB95924B0B9E13","FB2F9B4EAA5288082946E7411BB609B728352C328F8095539450D704BEEE8CEA","Task49/external concurrent; not claimed","none (cold archive isolated)"
+"scripts\run\run_flow_smoke_panel.gd","D9E02542173220C3FD1007C85E7181E16655BF727D0A3009DEC68B5A3A78EA86","6A979B5DA02409A0C589A8E0F30AF37F5F03C1EB625A6DC818F90300BA5B24D9","Task49/external concurrent; not claimed","none (cold archive isolated)"
+"scripts\ui\run_overlay_interface.gd","194D2B0133548E067E7C11D04835B352A45A76C68C022077E51DCD747A31F125","A6B30B4EB5C614E5584654BABC0431430D921F16D50855FCCBFB3B8A24385E3F","Task49/external concurrent; not claimed","none (cold archive isolated)"

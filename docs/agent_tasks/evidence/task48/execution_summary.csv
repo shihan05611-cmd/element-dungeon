@@ -1,0 +1,9 @@
+Command,Result,Exit,Tests,Assertions,FramesOrImages,Log
+initial_editor_scan,PASS,0,0,0,0,logs/01_editor_scan.log
+task48_dodge_integration,PASS,0,5,55,0,logs/02_task48_runner.log
+agent_d_integration,PASS,0,9,73,0,logs/03_agent_d_integration.log
+skill_content_catalog,PASS,0,11,236,0,logs/04_skill_content_catalog.log
+task31_full_run_e2e,PASS,0,4,534,0,logs/05_task31_full_run_e2e.log
+run_game_smoke_180,PASS,0,0,0,180,logs/06_main_smoke_180.log
+task48_visual_capture,PASS,0,1,0,3,logs/07_task48_capture.log
+final_editor_scan,PASS,0,0,0,0,logs/08_final_editor_scan.log

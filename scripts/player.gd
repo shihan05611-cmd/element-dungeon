@@ -13,6 +13,11 @@ const FRICTION := 1750.0
 const GRAVITY := 1150.0
 const JUMP_VELOCITY := -520.0
 const HURT_DURATION := 0.34
+const DODGE_DURATION := 0.18
+const DODGE_COOLDOWN := 0.55
+const DODGE_DISTANCE_IN_BODY_WIDTHS := 1.5
+const ENEMY_BODY_COLLISION_LAYER := 2
+const WORLD_BLOCKER_COLLISION_LAYER := 3
 const ELEMENT_BEAM_DELIVERY_SCRIPT := preload(
 	"res://combat/delivery/element_beam_delivery.gd"
 )
@@ -29,6 +34,7 @@ const ELEMENT_BEAM_DELIVERY_SCRIPT := preload(
 @onready var current_element_controller: CurrentElementController = $ElementFormController
 @onready var skill_executor: SkillExecutor = $SkillExecutor
 @onready var skill_controller: SkillController = $SkillController
+@onready var body_collision: CollisionShape2D = $BodyCollision
 
 var facing: float = 1.0
 var hurt_time: float = 0.0
@@ -38,12 +44,24 @@ var defeated: bool = false
 var _base_sprite_modulate := Color.WHITE
 var _element_tween: Tween
 var _flash_tween: Tween
+var _dodge_tween: Tween
 var _content_catalog: RunContentCatalog
 var _basic_attack_definition: SkillDefinition
 var _active_beam_ref: WeakRef
 var _active_beam_snapshot: ChannelExecutionSnapshot
 var _skill_level_effect_adapter: RunSkillLevelEffectAdapter
-
+var _dodging: bool = false
+var _dodge_elapsed: float = 0.0
+var _dodge_cooldown_remaining: float = 0.0
+var _dodge_direction: float = 1.0
+var _dodge_target_distance: float = 0.0
+var _dodge_distance_traveled: float = 0.0
+var _dodge_saved_collision_mask: int = 0
+var _dodge_has_saved_collision_mask: bool = false
+var _dodge_saved_sprite_modulate := Color.WHITE
+var _dodge_has_saved_visual: bool = false
+var _dodge_saved_velocity := Vector2.ZERO
+var _dodge_has_saved_velocity: bool = false
 
 func _ready() -> void:
 	add_to_group(&"player")
@@ -77,11 +95,18 @@ func _ready() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PAUSED or what == NOTIFICATION_UNPAUSED:
+		if what == NOTIFICATION_PAUSED:
+			_finish_dodge()
 		skill_controller.handle_pause_exit()
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if defeated:
+		return
+	if event.is_action_pressed(&"dodge"):
+		_try_start_dodge()
+		return
+	if _dodging:
 		return
 	if event.is_action_pressed(&"jump"):
 		jump_requested = true
@@ -96,7 +121,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed(&"cast_active_3"):
 		try_cast_slot(SkillSlotIds.ACTIVE_3)
 	elif event.is_action_pressed(&"switch_element"):
-		skill_controller.cycle_next()
+		cycle_next()
 	elif event.is_action_released(&"cast_active_1"):
 		release_channel_for_slot(SkillSlotIds.ACTIVE_1)
 	elif event.is_action_released(&"cast_active_2"):
@@ -106,6 +131,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if _dodge_cooldown_remaining > 0.0:
+		_dodge_cooldown_remaining = maxf(0.0, _dodge_cooldown_remaining - delta)
+
+	if _dodging:
+		_advance_dodge(delta)
+		return
+
 	if not is_on_floor():
 		velocity.y = minf(velocity.y + GRAVITY * delta, 760.0)
 
@@ -247,6 +279,8 @@ func publish_basic_attack_commit(
 
 
 func respawn() -> void:
+	_finish_dodge(false, false)
+	_dodge_cooldown_remaining = 0.0
 	defeated = false
 	hurt_time = 0.0
 	velocity = Vector2.ZERO
@@ -268,10 +302,22 @@ func reload_run_state() -> void:
 	skill_controller.on_run_reloaded()
 
 func request_element(element_id: StringName) -> ElementChangeResult:
+	if _dodging:
+		return ElementChangeResult.rejected(
+			&"dodging",
+			current_element_controller.current_element_id,
+			FormChangedEvent.Source.MANUAL
+		)
 	return skill_controller.request_element(element_id)
 
 
 func cycle_next() -> ElementChangeResult:
+	if _dodging:
+		return ElementChangeResult.rejected(
+			&"dodging",
+			current_element_controller.current_element_id,
+			FormChangedEvent.Source.MANUAL
+		)
 	return skill_controller.cycle_next()
 
 
@@ -284,11 +330,11 @@ func get_element_definition(element_id: StringName) -> ElementDefinition:
 
 
 func _can_start_skill(_skill: SkillDefinition) -> bool:
-	return not defeated and hurt_time <= 0.0
+	return not defeated and hurt_time <= 0.0 and not _dodging
 
 
 func _can_change_element() -> bool:
-	return not defeated and hurt_time <= 0.0
+	return not defeated and hurt_time <= 0.0 and not _dodging
 
 
 func _capture_attack_stats(_skill: SkillDefinition) -> CombatStatSnapshot:
@@ -308,6 +354,110 @@ func _skill_locks_movement() -> bool:
 		and skill_executor.current_movement_policy
 			== SkillExecutionSnapshot.MovementPolicy.LOCK_MOVEMENT
 	)
+
+
+func _try_start_dodge() -> bool:
+	if (
+		_dodging
+		or defeated
+		or hurt_time > 0.0
+		or _dodge_cooldown_remaining > 0.0
+		or not is_on_floor()
+		or skill_executor == null
+		or skill_executor.current_phase != SkillExecutor.Phase.IDLE
+	):
+		return false
+	var body_width := _dodge_body_world_width()
+	if body_width <= 0.0:
+		return false
+	var input_axis := Input.get_axis(&"move_left", &"move_right")
+	_dodge_direction = signf(input_axis) if absf(input_axis) > 0.01 else signf(facing)
+	if is_zero_approx(_dodge_direction):
+		_dodge_direction = 1.0
+	facing = _dodge_direction
+	sprite.flip_h = facing > 0.0
+	_dodge_elapsed = 0.0
+	_dodge_distance_traveled = 0.0
+	_dodge_target_distance = body_width * DODGE_DISTANCE_IN_BODY_WIDTHS
+	_dodge_saved_collision_mask = collision_mask
+	_dodge_has_saved_collision_mask = true
+	_dodge_saved_velocity = velocity
+	_dodge_has_saved_velocity = true
+	_dodge_saved_sprite_modulate = sprite.modulate
+	_dodge_has_saved_visual = true
+	jump_requested = false
+	velocity = Vector2.ZERO
+	_dodging = true
+	combat_receiver.dodging = true
+	set_collision_mask_value(ENEMY_BODY_COLLISION_LAYER, false)
+	set_collision_mask_value(WORLD_BLOCKER_COLLISION_LAYER, true)
+	_start_dodge_visual()
+	return true
+
+
+func _advance_dodge(delta: float) -> void:
+	if not _dodging:
+		return
+	jump_requested = false
+	var step_time := minf(maxf(delta, 0.0), DODGE_DURATION - _dodge_elapsed)
+	if step_time > 0.0:
+		var step_distance := _dodge_target_distance * step_time / DODGE_DURATION
+		var before := global_position
+		var collision := move_and_collide(Vector2(_dodge_direction * step_distance, 0.0))
+		_dodge_distance_traveled += absf(global_position.x - before.x)
+		_dodge_elapsed += step_time
+		if collision != null:
+			_finish_dodge()
+			return
+	if _dodge_elapsed >= DODGE_DURATION - 0.00001:
+		_finish_dodge()
+
+
+func _finish_dodge(start_cooldown: bool = true, resume_presentation: bool = true) -> void:
+	var was_dodging := _dodging
+	_dodging = false
+	if combat_receiver != null:
+		combat_receiver.dodging = false
+	if _dodge_has_saved_collision_mask:
+		collision_mask = _dodge_saved_collision_mask
+		_dodge_has_saved_collision_mask = false
+	if _dodge_tween != null and _dodge_tween.is_valid():
+		_dodge_tween.kill()
+	_dodge_tween = null
+	if _dodge_has_saved_visual and sprite != null:
+		sprite.modulate = _dodge_saved_sprite_modulate
+		_dodge_has_saved_visual = false
+	if _dodge_has_saved_velocity:
+		velocity = _dodge_saved_velocity
+		_dodge_has_saved_velocity = false
+	if was_dodging and start_cooldown:
+		_dodge_cooldown_remaining = DODGE_COOLDOWN
+	if was_dodging and resume_presentation and is_inside_tree():
+		_play_locomotion_animation()
+
+
+func _dodge_body_world_width() -> float:
+	if body_collision == null or body_collision.shape == null:
+		return 0.0
+	return body_collision.shape.get_rect().size.x * body_collision.global_transform.x.length()
+
+
+func _start_dodge_visual() -> void:
+	if _element_tween != null and _element_tween.is_valid():
+		_element_tween.kill()
+	_element_tween = null
+	if _dodge_tween != null and _dodge_tween.is_valid():
+		_dodge_tween.kill()
+	var low_alpha := _dodge_saved_sprite_modulate
+	low_alpha.a *= 0.36
+	var high_alpha := _dodge_saved_sprite_modulate
+	high_alpha.a *= 0.78
+	_dodge_tween = create_tween()
+	_dodge_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
+	_dodge_tween.tween_property(sprite, "modulate", low_alpha, 0.035)
+	_dodge_tween.tween_property(sprite, "modulate", high_alpha, 0.05)
+	_dodge_tween.tween_property(sprite, "modulate", low_alpha, 0.05)
+	_dodge_tween.tween_property(sprite, "modulate", _dodge_saved_sprite_modulate, 0.045)
 
 
 func _idle_animation_name() -> StringName:
@@ -347,7 +497,7 @@ func _refresh_idle_animation_if_active() -> void:
 
 
 func _play_locomotion_animation() -> void:
-	if _skill_locks_movement() or hurt_time > 0.0 or defeated:
+	if _dodging or _skill_locks_movement() or hurt_time > 0.0 or defeated:
 		return
 	if not is_on_floor():
 		var jump_animation := _element_animation_name(&"jump", &"water_jump", &"fire_jump")
@@ -462,6 +612,7 @@ func _on_health_state_changed(
 ) -> void:
 	if delta >= 0 or defeated:
 		return
+	_finish_dodge()
 	skill_controller.cancel_current_cast(&"hit", skill_executor.current_cast_id)
 	hurt_time = HURT_DURATION
 	_update_energy_regeneration_pause()
@@ -479,6 +630,7 @@ func _on_health_state_changed(
 func _on_death_candidate(_result: CombatResult) -> void:
 	if defeated:
 		return
+	_finish_dodge(true, false)
 	defeated = true
 	hurt_time = 0.0
 	combat_receiver.accepting_hits = false
@@ -510,6 +662,7 @@ func _flash() -> void:
 
 
 func _exit_tree() -> void:
+	_finish_dodge(false, false)
 	var beam := _active_beam_ref.get_ref() as ELEMENT_BEAM_DELIVERY_SCRIPT if _active_beam_ref != null else null
 	if beam != null and is_instance_valid(beam) and not beam.is_queued_for_deletion():
 		beam.close_hit_window()
@@ -519,5 +672,8 @@ func _exit_tree() -> void:
 		_element_tween.kill()
 	if _flash_tween != null and _flash_tween.is_valid():
 		_flash_tween.kill()
+	if _dodge_tween != null and _dodge_tween.is_valid():
+		_dodge_tween.kill()
 	_element_tween = null
 	_flash_tween = null
+	_dodge_tween = null

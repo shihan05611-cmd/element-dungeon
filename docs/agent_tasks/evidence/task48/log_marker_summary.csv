@@ -1,0 +1,9 @@
+Log,SCRIPT_ERROR,Parse_Error,ERROR,WARNING,CrashHandlerException
+01_editor_scan.log,0,0,0,0,0
+02_task48_runner.log,0,0,0,0,0
+03_agent_d_integration.log,0,0,0,0,0
+04_skill_content_catalog.log,0,0,0,0,0
+05_task31_full_run_e2e.log,0,0,0,0,0
+06_main_smoke_180.log,0,0,0,0,0
+07_task48_capture.log,0,0,0,0,0
+08_final_editor_scan.log,0,0,0,0,0

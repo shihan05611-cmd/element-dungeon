@@ -1,0 +1,7 @@
+Item,Initial,Final,Status,Notes
+shared_godot,"1154 files / 31899157 bytes / latest 2026-08-13T11:31:22.1201304Z","1154 files / 31899157 bytes / latest 2026-08-13T11:31:22.1201304Z",UNCHANGED,shared editor not controlled
+shared_processes,"Godot 17624; godot-ai 3964","Godot 17624; godot-ai 3964",UNCHANGED,isolated Task48 processes only
+shared_sidecars_excluding_external_tmp,"377 uid / 128 import / 329 translation","379 uid / 128 import / 329 translation",EXPECTED,exactly two authorized Task48 cold-first UID files
+external_untracked_tmp,"absent from initial counts","1891 uid / 1124 import / 889 translation",EXTERNAL_EXCLUDED,preserved timestamps; no Task48 ownership or mutation
+combat_receiver,baseline fc7b531,baseline fc7b531,UNCHANGED,no public combat interface change
+player_scene,baseline fc7b531,baseline fc7b531,UNCHANGED,no scene change required

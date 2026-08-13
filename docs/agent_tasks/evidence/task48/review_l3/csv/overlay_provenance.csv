@@ -1,0 +1,5 @@
+"Path","Baseline","Overlay","PurityCheck"
+"project.godot","git archive fc7b5318...","execution -03 file minus exact global_instakill action","only dodge/Shift diff; global_instakill absent"
+"scripts/player.gd","git archive fc7b5318...","execution -03 file minus constant/static id/input branch/release_global_instakill/helpers","global_instakill absent; pure dodge diff"
+"scenes/player.tscn","git archive fc7b5318...","none","SHA identical"
+"Task48 runner/capture + UIDs","absent","copied byte-for-byte from execution -03","hash parity; UID unique"
