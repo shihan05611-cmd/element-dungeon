@@ -1,0 +1,14 @@
+Command,Result,Exit,Tests,Assertions,Frames
+initial_editor_scan,PASS,0,,,
+task51_specialized,PASS,0,2,92,
+task41_regression,PASS,0,4,112,
+task43_regression,PASS,0,4,125,
+delivery_tests,PASS,0,16,56,
+delivery_reuse_tests,PASS,0,10,105,
+delivery_skill_integration,PASS,0,1,4,
+task34_projectile_transaction,PASS,0,11,211,
+main_scene_smoke,PASS,0,,,180
+boss_room_smoke,PASS,0,,,180
+final_editor_scan,PASS,0,,,
+task51_baseline_expected_failure,EXPECTED_FAIL,1,2,92,
+

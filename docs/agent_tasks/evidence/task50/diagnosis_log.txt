@@ -1,0 +1,75 @@
+Task50 readonly diagnosis log
+date=2026-08-13
+baseline_head=fc7b5318f3b32860ee10265c23aa1cff199e1b99
+runtime_started=false
+cold_copy_created=false
+shared_godot_controlled=false
+
+[authority geometry]
+boss_body_collision_local_y=14
+boss_capsule_radius=16
+boss_capsule_height=36
+boss_body_bottom_from_root=32
+boss_dais_center=(820,466)
+boss_dais_size=(260,28)
+boss_dais_bounds=x[690,950],y[452,480]
+main_ground_center=(576,584)
+main_ground_size=(1072,88)
+main_ground_bounds=x[40,1112],y[540,628]
+world_collision_layer=4
+
+[spawn and projectile]
+spawn_x=boss_x+(direction_x*58)
+spawn_y=boss_y+84
+projectile_shape=circle
+projectile_radius=13
+projectile_speed=255
+projectile_max_distance=980
+projectile_hurtbox_mask=16
+projectile_blocker_mask=4
+sprite_node_offset=(0,0)
+sprite_scale=(0.32,0.32)
+texture_size=(256,256)
+texture_alpha_bbox=x[18,237],y[80,175]
+scaled_alpha_relative=x[-35.20,34.88],y[-15.36,15.04]
+
+[state calculation]
+dais_boss_root_y=420
+dais_projectile_center_y=504
+dais_authority_y=[491,517]
+dais_visual_y=[488.64,519.04]
+dais_result=safe_between_dais_bottom_480_and_ground_top_540
+floor_boss_root_y=508
+floor_projectile_center_y=592
+floor_authority_y=[579,605]
+floor_visual_y=[576.64,607.04]
+floor_result=authority_and_visual_fully_inside_ground_y_540_628
+
+[first physics step on floor]
+initial_intersect_shape=blocker_hit
+contact_fraction=0.0
+authority_displacement=0
+distance_travelled_increment=0
+finish_reason=blocked
+queued_for_deletion=true
+
+[root cause]
+unique_root_cause=boss_specific_fixed_downward_spawn_offset_y_plus_84
+collision_masks_correct=true
+projectile_lifecycle_correct=true
+main_ground_geometry_malformed=false
+pure_visual_offset=false
+
+[minimal fix]
+production_file=scripts/enemy.gd
+suggested_spawn_y=global_position.y
+public_projectile_delivery_change=false
+projectile_scene_change=false
+room_geometry_change=false
+
+[sha256 read-only inputs]
+scripts/enemy.gd=C519978427A72886BD509D2DACCCAC20B951F6B1A8FB5AC03B1538FD46B6ECCF
+scenes/enemy.tscn=D69A601C3D68C4273830E1BDC586B0F5755CE99B37883E35F8C3ADFBBBBE696D
+scenes/run/boss_arc_projectile.tscn=AFED928D06008F12552C7F574C22F6152B4D075B2D9ECE94D09B5AECA4D59CA9
+resources/run/rooms/combat_06_final_boss.tres=F7D47ADABB930C4F320403DC454CEBCB9BAE8962F7D6704B66A9EE93ABFCF365
+screenshots/task50_01_task41_on_dais_safe_reference.png=8B11F52EFE4AE9C87CEF025337D2310AC629CE59441D34AFA7DE5CC75632D7FF

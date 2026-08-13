@@ -1,0 +1,14 @@
+Log,SCRIPT_ERROR,Parse_Error,ERROR,WARNING,CrashHandlerException
+01_editor_scan.log,0,0,0,0,0
+02_task51_specialized.log,0,0,0,0,0
+03_task41_regression.log,0,0,0,0,0
+04_task43_regression.log,0,0,0,0,0
+05_delivery_tests.log,0,0,0,0,0
+06_delivery_reuse_tests.log,0,0,0,0,0
+07_delivery_skill_integration.log,0,0,0,0,0
+08_task34_projectile_transaction.log,0,0,0,0,0
+09_main_scene_smoke_180.log,0,0,0,0,0
+10_boss_room_smoke_180.log,0,0,0,0,0
+11_final_editor_scan.log,0,0,0,0,0
+task51_baseline_failure_clean.log,0,0,0,0,0
+

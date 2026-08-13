@@ -253,7 +253,7 @@ func _spawn_boss_projectile() -> void:
 		direction_x = facing if not is_zero_approx(facing) else -1.0
 	facing = direction_x
 	var direction := Vector2.RIGHT if direction_x > 0.0 else Vector2.LEFT
-	var spawn_transform := Transform2D(0.0, Vector2(global_position.x + direction.x * 58.0, global_position.y + 84.0))
+	var spawn_transform := Transform2D(0.0, Vector2(global_position.x + direction.x * 58.0, global_position.y))
 	var cast_snapshot := CastSnapshot.new(
 		_allocate_enemy_cast_id(), &"boss_arc", get_instance_id(), get_instance_id(), &"enemy", ElementIds.NONE, CombatStatSnapshot.new()
 	)
