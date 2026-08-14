@@ -1,6 +1,6 @@
 # 任务 57：完整房间背景、远景相机与平台碰撞迁移
 
-状态：PENDING
+状态：IN_PROGRESS
 负责人：独立场景/玩法工程执行任务（中枢派发）
 依赖：任务 49、51、53（ACCEPTED）；用户已接受本任务五张美术母版
 Git 基线：`main` HEAD `b080de734d8a9dd321a62ec13a4152b00b8989f7`
@@ -142,5 +142,6 @@ Task58 会触及商店交互、敌人和正式 spawn 资源，与本任务房间
 
 - 路径对齐：用户已明确选择“完整背景 + 平台碰撞”，不再比较 TileSet/分层方案；本任务采用不改 `project.godot` 的统一 Camera zoom + 1536×832 authored world，为满足相同可观察目标的最低风险迁移。
 - 执行职责候选审计：Task54 为已取消 TileSet 可行性且对话历史目标冲突；Task53 为美术 Review；均不复用。Task57 为跨公共房间模板的 L3 场景工程，创建全新独立执行任务，压力等级 `GREEN`。
-- 执行对话 `threadId`/`hostId`、模型/推理与首个 `wait_threads` cursor：派发后由中枢回填。
+- 执行对话：`threadId=019fff06-10c0-7401-84fd-7a559dc8ab2f`，`hostId=local`；实际模型 `gpt-5.6-sol`，推理等级 `high`；隔离 worktree `C:\Users\heliashi\.codex\worktrees\ecd6\元素地牢-4.7`。
+- 首个 `wait_threads(timeoutMs: 0)` cursor：`1d971891-1353-4aca-9a02-1c9b4b534272:1`；快照为执行中。中枢只使用该实际 id/cursor 主动跟踪，不要求跨对话回传。
 - 独立 L3 Review 对话：执行冻结后另行创建、登记和主动跟踪。
