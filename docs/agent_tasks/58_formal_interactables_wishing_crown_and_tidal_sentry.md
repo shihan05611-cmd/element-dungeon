@@ -146,5 +146,6 @@ Review Thinking：`high`
 - 皇冠近距 `F` 是打开既有商店交互内容的唯一入口。商店权威 snapshot 只准备/刷新数据，不得主动显示；Coordinator 的皇冠交互必须调用明确的现有商店显示入口，而不是仅设置 `visible=true`。
 - 最低风险实现：仅在 `scripts/ui/run_overlay_interface.gd` 将 `toggle_loadout()` 的 SHOP 分支改为既有全局配装展示，并暴露一个仅供正式皇冠交互调用的显式商店显示方法；`scripts/run/run_flow_coordinator.gd` 在皇冠 F 时调用它。不得新增 scene/node、复制交易逻辑或修改 `scripts/combat_hud.gd`。
 - rework2 专项必须覆盖：入店同栈隐藏；隐藏态按物理 L 只出现全局配装且 shop draft/事务计数不变；关闭 L 页后皇冠 F 才出现商店内容；重复 F、购买/升级、关闭重开、出口事务保持。
-- Task41 既有“物理 L 重开商店”属于被本轮用户目标明确取代的旧入口断言，按 §4.2 允许精确迁移为“L 只开全局配装、皇冠 F 才开商店”；Task41 其余物理流程、波次、Boss、经济、配装和几何断言不得删除或放宽。相对固定基线的最终非 evidence overlay 预期为 `10 D / 18 M / 6 A`，共 34 项。
+- Task41 既有“物理 L 重开商店”属于被本轮用户目标明确取代的旧入口断言，按 §4.2 允许精确迁移为“L 只开全局配装、皇冠 F 才开商店”；Task41 其余物理流程、波次、Boss、经济、配装和几何断言不得删除或放宽。
+- Task31 两条正式流程均冻结了“SHOP 自动可见后直接取按钮”的旧入口，按 §4.2 允许只在原购买/升级/配装/离店步骤前加入真实世界皇冠近距 F；不得直接调用 Overlay 商店内部方法，原五阶段、`4/1/0`、奖励、经济、重开和失败流程断言不得删除或放宽，正式 `4/383` 必须至少保持。相对固定基线的最终非 evidence overlay 预期为 `10 D / 19 M / 6 A`，共 35 项。
 - rework2 使用全新执行冷根/profile：`C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-exec-rework2-20260814-03` / `C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-exec-rework2-profile-20260814-03`，完整重跑 L3 后冻结回审。
