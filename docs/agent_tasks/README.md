@@ -2,7 +2,7 @@
 
 本目录只管理已明确立项的 Agent 任务。
 
-中枢 Agent 的职责、对话复用、任务分发、自动回传、Git 与安全规则统一见 `docs/agent_tasks/CENTRAL_REVIEW_RULES.md`。Review Agent 按 `docs/agent_tasks/REVIEW_AGENT_RULES.md` 选择 L1/L2/L3；只有 L3 必读 `docs/agent_tasks/REVIEW_L3_PLAYBOOK.md`。本 README 主要保留任务文档格式、项目通用 UI 口径、当前依赖和历史基线。
+中枢 Agent 的职责、对话复用、任务分发、`wait_threads` 主动跟踪、Git 与安全规则统一见 `docs/agent_tasks/CENTRAL_REVIEW_RULES.md`。执行与 Review 对话只在各自任务内交付并冻结，不再跨对话直接回传中枢。Review Agent 按 `docs/agent_tasks/REVIEW_AGENT_RULES.md` 选择 L1/L2/L3；只有 L3 必读 `docs/agent_tasks/REVIEW_L3_PLAYBOOK.md`。本 README 主要保留任务文档格式、项目通用 UI 口径、当前依赖和历史基线。
 
 ## 协调优先级
 
