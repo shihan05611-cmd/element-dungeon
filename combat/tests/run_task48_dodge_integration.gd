@@ -47,7 +47,7 @@ func _test_open_ground_direction_duration_cooldown() -> void:
 	player.call(&"_advance_dodge", 0.03)
 	var distance := absf(player.global_position.x - start.x)
 	_expect(not bool(player.get("_dodging")) and not player.combat_receiver.dodging, "dodge ends exactly after 0.18 seconds")
-	_expect(absf(distance - expected_distance) <= expected_distance * 0.02, "open ground travels 1.5 body widths")
+	_expect(absf(distance - expected_distance) <= expected_distance * 0.02, "open ground travels 5.0 body widths")
 	_expect_eq(player.collision_mask, 7, "natural completion restores the exact original collision mask")
 	_expect(not bool(player.call(&"_try_start_dodge")), "cooldown blocks an immediate second dodge")
 	player.call(&"_physics_process", 0.54)
@@ -80,7 +80,7 @@ func _test_damage_enemy_and_wall_contract() -> void:
 	for _step: int in 6:
 		player.call(&"_advance_dodge", 0.03)
 	_expect(absf(player.global_position.x - start.x - expected_distance) <= expected_distance * 0.02, "enemy body layer does not truncate real dodge motion")
-	_expect(player.global_position.distance_to(enemy.global_position) < 32.0, "player occupies enemy body space without disabling world collision")
+	_expect(player.global_position.x > enemy.global_position.x, "completed five-body-width dodge ends beyond the enemy center")
 
 	player.global_position = Vector2(1035.0, start.y)
 	player.velocity = Vector2.ZERO
