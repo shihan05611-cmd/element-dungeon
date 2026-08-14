@@ -1,0 +1,7 @@
+"Path","Width","Height","Bytes","SHA256","LastWriteTimeUtc","VisualQA"
+"screenshots/task49_01_first_room_two_enemies_1920x1080.png","1920","1080","79270","abb73dbaae2298a249e2ce4919a8b6828bed961289c455cffeb2123cb956c758","2026-08-13T14:17:02.5848990Z","PASS: exactly two enemies visible"
+"screenshots/task49_02_first_room_immediate_clear_1920x1080.png","1920","1080","187115","bdf8cc6171aa2451fd00ebb71888dcad2c8742219065427d7a79e17f7d2194a6","2026-08-13T14:17:02.7247345Z","PASS: chest visible, portal locked, no reinforcements"
+"screenshots/task49_03_first_chest_active_guarantee_1920x1080.png","1920","1080","207210","cb8f58912ab80559efb6c875c819030efb9bda0b927a382f886a275c2bfa4dd8","2026-08-13T14:17:02.8648349Z","PASS: active Reclaim visible in A2 and portal unlocked"
+"screenshots/task49_04_mid_shop_after_two_combats_1920x1080.png","1920","1080","409210","97c7457bb3221ef1c3f3b10160287fd73e57d65db8efc023a5404507602a4c0d","2026-08-13T14:17:03.2060013Z","PASS: one mid shop readable and in bounds"
+"screenshots/task49_05_final_boss_fourth_combat_1920x1080.png","1920","1080","190101","efee18c613ca5e0f3b4b800e9b11e110fbd01bf52267d3c522f74c995f645a95","2026-08-13T14:17:03.4282814Z","FAIL: title says Battle 6 although Boss is combat 4; 99999 text clutters Boss"
+"screenshots/task49_06_result_four_one_zero_1920x1080.png","1920","1080","216670","f5029a840bb7dcb50e539045b2967ea0fbd857ca6acb29d07e41617010eb048d","2026-08-13T14:17:03.5986811Z","PASS: result visibly shows 4/4, 1/1, 0/0"

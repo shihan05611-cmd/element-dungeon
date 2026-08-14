@@ -227,16 +227,26 @@ func claim_formal_room_chest(
 			command_id, fingerprint, RunCommandResult.RejectReason.ALREADY_CLAIMED, &"room_chest_already_claimed"
 		)
 	var candidates: Array[SkillContentDefinition] = []
+	var guaranteed_active_skill := room.guaranteed_active_skill_reward
 	if _content_catalog != null:
 		for content: SkillContentDefinition in _content_catalog.skill_contents:
-			if content != null and content.reward_pool and not _skill_inventory.owns(content.skill_id):
-				candidates.append(content)
+			if content == null or not content.reward_pool or _skill_inventory.owns(content.skill_id):
+				continue
+			if (
+				guaranteed_active_skill
+				and (
+					content.gameplay_definition == null
+					or not content.gameplay_definition.is_active_skill()
+				)
+			):
+				continue
+			candidates.append(content)
 	candidates.sort_custom(func(a: SkillContentDefinition, b: SkillContentDefinition) -> bool:
 		return String(a.skill_id) < String(b.skill_id)
 	)
 	var stable_hash: int = absi(String("%s|%s" % [String(route.run_id), String(room_id)]).hash())
 	var reward: RunChestRewardSnapshot
-	if not candidates.is_empty() and stable_hash % 2 == 0:
+	if not candidates.is_empty() and (guaranteed_active_skill or stable_hash % 2 == 0):
 		var content: SkillContentDefinition = candidates[(stable_hash / 2) % candidates.size()]
 		var add_validation := _skill_inventory.validate_add_content(content)
 		if not add_validation.accepted:

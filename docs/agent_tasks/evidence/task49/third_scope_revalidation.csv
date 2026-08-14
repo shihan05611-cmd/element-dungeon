@@ -1,0 +1,8 @@
+order,entry,tests,assertions,images,result,log
+23,run_task49_five_stage_demo_flow_tests.gd,5,103,n/a,PASS,logs/formal02/23_third_scope_task49_specialist.log
+24,run_task30_run_ui_tests.gd,9,166,n/a,PASS,logs/formal02/24_third_scope_task30_ui.log
+25,run_flow_smoke_panel.tscn_scene_boot,n/a,n/a,n/a,PASS,logs/formal02/25_third_scope_smoke_panel_scene.log
+26,capture_task49_five_stage_demo_visuals.gd,1,n/a,6,PASS,logs/formal02/26_third_scope_capture_task49.log
+27,main_scene_boot,n/a,n/a,n/a,PASS,logs/formal02/27_third_scope_main_scene_boot.log
+28,final_import_scan,n/a,n/a,n/a,PASS,logs/formal02/28_third_scope_final_editor_scan.log
+

@@ -1,7 +1,7 @@
 extends SceneTree
 
 const FLOW: RunFlowDefinition = preload(
-	"res://resources/run/flows/prototype_two_layer_six_combat.tres"
+	"res://resources/run/flows/prototype_five_stage_demo.tres"
 )
 const CATALOG: RunContentCatalog = preload(
 	"res://resources/content/run_content_catalog.tres"
@@ -15,10 +15,10 @@ var _room_instance_sequence: int = 1000
 
 
 func _initialize() -> void:
-	_run("flow_graph_and_route_targets", _test_flow_graph_and_route_targets)
-	_run("safe_branch_six_combat_complete", _test_safe_branch_six_combat_complete)
-	_run("risk_branch_six_combat_complete", _test_risk_branch_six_combat_complete)
-	_run("duplicate_completion_and_stale_route_atomic", _test_duplicate_completion_and_stale_route_atomic)
+	_run("five_stage_linear_graph", _test_flow_graph_and_route_targets)
+	_run("linear_run_a_completes", _test_linear_run_a_completes)
+	_run("linear_run_b_completes", _test_linear_run_b_completes)
+	_run("duplicate_completion_and_stale_activation_atomic", _test_duplicate_completion_and_stale_activation_atomic)
 	_run("scene_transition_failure_atomic", _test_scene_transition_failure_atomic)
 	_run("death_and_repeated_result_are_terminal", _test_death_and_repeated_result_are_terminal)
 
@@ -51,7 +51,7 @@ func _run(test_name: String, callable: Callable) -> void:
 
 func _test_flow_graph_and_route_targets() -> void:
 	_expect(FLOW != null and FLOW.is_valid(), "formal flow resource validates")
-	_expect_eq(FLOW.nodes.size(), 13, "formal graph has thirteen unique static nodes")
+	_expect_eq(FLOW.nodes.size(), 7, "formal graph has entry, five playable stages, and result")
 	var ids: Array[StringName] = []
 	var combat_nodes := 0
 	var shop_nodes := 0
@@ -69,57 +69,48 @@ func _test_flow_graph_and_route_targets() -> void:
 			route_nodes += 1
 		if node.kind == RunNodeKind.BOSS:
 			boss_nodes += 1
-	_expect_eq(combat_nodes, 8, "graph exposes eight possible combat configs")
+	_expect_eq(combat_nodes, 4, "graph exposes four fixed combat configs including Boss")
 	_expect_eq(shop_nodes, 1, "graph fixes one shop node")
-	_expect_eq(route_nodes, 2, "graph fixes two route nodes")
+	_expect_eq(route_nodes, 0, "graph removes route nodes")
 	_expect_eq(boss_nodes, 1, "graph fixes one boss node")
-	var route_one := FLOW.node_for(&"route_01_first_branch")
-	var route_two := FLOW.node_for(&"route_02_second_branch")
-	_expect(route_one.route_branches[0].target_node_id != route_one.route_branches[1].target_node_id, "first route targets differ")
-	_expect(route_two.route_branches[0].target_node_id != route_two.route_branches[1].target_node_id, "second route targets differ")
-	var c2a := FLOW.combat_room_for(route_one.route_branches[0].target_node_id)
-	var c2b := FLOW.combat_room_for(route_one.route_branches[1].target_node_id)
-	var c5a := FLOW.combat_room_for(route_two.route_branches[0].target_node_id)
-	var c5b := FLOW.combat_room_for(route_two.route_branches[1].target_node_id)
-	_expect(c2a != c2b and c2a.resource_path != c2b.resource_path, "first route loads different room definitions")
-	_expect(c2a.room_scene.resource_path != c2b.room_scene.resource_path, "first route loads different PackedScenes")
-	_expect(c5a != c5b and c5a.resource_path != c5b.resource_path, "second route loads different room definitions")
-	_expect(c5a.room_scene.resource_path != c5b.room_scene.resource_path, "second route loads different PackedScenes")
+	_expect_eq(FLOW.node_for(&"combat_01_entry").next_node_id, &"combat_02_swarm", "combat one reaches combat two directly")
+	_expect_eq(FLOW.node_for(&"combat_02_swarm").next_node_id, &"shop_demo_mid", "combat two reaches the demo shop")
+	_expect_eq(FLOW.node_for(&"shop_demo_mid").next_node_id, &"combat_04_validation", "shop reaches combat three")
+	_expect_eq(FLOW.node_for(&"combat_04_validation").next_node_id, &"combat_06_final_boss", "combat three reaches Boss directly")
 	var boss := FLOW.combat_room_for(&"combat_06_final_boss")
 	_expect(boss.final_boss and boss.completion_dream_dust == 0, "boss room completion awards zero dream dust")
 	for spawn: EnemySpawnDefinition in boss.enemy_spawns:
 		_expect_eq(spawn.dream_dust_reward, 0, "boss enemy awards zero dream dust")
 
 
-func _test_safe_branch_six_combat_complete() -> void:
+func _test_linear_run_a_completes() -> void:
 	var session := _new_session(&"safe_run")
 	var replay := _start(session, &"safe_start")
 	_expect(replay.accepted, "formal run starts")
 	var repeated := session.start_formal_run(&"safe_start", 0)
 	_expect(repeated == replay, "identical start command replays original result")
 	_expect_eq(session.snapshot().revision, 1, "start replay adds no revision")
-	_finish_run(session, &"route_01_swarm", &"route_02_stable")
-	_assert_completed_run(session, [&"route_01_swarm", &"route_02_stable"])
-	_expect(session.snapshot().route.activated_scene_paths.has("res://scenes/run/rooms/room_arena_flat.tscn"), "safe route records flat PackedScene")
+	_finish_run(session)
+	_assert_completed_run(session)
+	_expect(session.snapshot().route.activated_scene_paths.has("res://scenes/run/rooms/room_arena_flat.tscn"), "linear run records flat PackedScene")
 
 
-func _test_risk_branch_six_combat_complete() -> void:
+func _test_linear_run_b_completes() -> void:
 	var session := _new_session(&"risk_run")
 	_expect(_start(session, &"risk_start").accepted, "risk run starts")
-	_finish_run(session, &"route_01_pressure", &"route_02_risk")
-	_assert_completed_run(session, [&"route_01_pressure", &"route_02_risk"])
+	_finish_run(session)
+	_assert_completed_run(session)
 	var scenes := session.snapshot().route.activated_scene_paths
-	_expect(scenes.has("res://scenes/run/rooms/room_arena_platforms.tscn"), "risk route records platform PackedScene")
-	_expect(scenes.has("res://scenes/run/rooms/room_arena_corridor.tscn"), "risk route records corridor PackedScene")
-	_expect(scenes.has("res://scenes/run/rooms/room_arena_boss.tscn"), "risk route records boss PackedScene")
+	_expect(scenes.has("res://scenes/run/rooms/room_arena_flat.tscn"), "linear run records the reused validation PackedScene")
+	_expect(scenes.has("res://scenes/run/rooms/room_arena_boss.tscn"), "linear run records boss PackedScene")
 
 
-func _test_duplicate_completion_and_stale_route_atomic() -> void:
+func _test_duplicate_completion_and_stale_activation_atomic() -> void:
 	var session := _new_session(&"atomic_run")
 	_start(session, &"atomic_start")
 	_expect(_activate_pending(session).accepted, "first room activates")
 	var completed := _complete_current_room(session)
-	_expect(completed.accepted and completed.run_snapshot.route.phase == RunPhase.ROUTE_CHOICE, "first room reaches first route")
+	_expect(completed.accepted and completed.run_snapshot.route.phase == RunPhase.ROOM_LOADING, "first room reaches combat two loading")
 	var before_duplicate := session.snapshot()
 	var duplicate := session.handle_event(RoomCompletedEvent.new(
 		&"duplicate_room_new_event",
@@ -131,28 +122,20 @@ func _test_duplicate_completion_and_stale_route_atomic() -> void:
 	))
 	_expect(not duplicate.accepted and duplicate.reject_reason == RunCommandResult.RejectReason.DUPLICATE_ROOM, "duplicate completion is structurally rejected")
 	_expect_same_authority(before_duplicate, session.snapshot(), "duplicate completion")
-	var route_before := session.snapshot()
-	var stale_revision := session.choose_formal_route(
-		&"stale_revision_route",
-		route_before.revision - 1,
-		&"route_01_swarm"
+	var activation_before := session.snapshot()
+	var pending_room := FLOW.combat_room_for(activation_before.route.pending_node_id)
+	var stale_revision := session.accept_room_transition(
+		&"stale_activation", activation_before.revision - 1,
+		pending_room.room_id, 2901, pending_room.room_scene.resource_path
 	)
-	_expect(not stale_revision.accepted and stale_revision.reject_reason == RunCommandResult.RejectReason.STALE_RUN_REVISION, "stale route revision rejected")
-	_expect_same_authority(route_before, session.snapshot(), "stale route revision")
-	var stale_option := session.choose_formal_route(
-		&"stale_option_route",
-		route_before.revision,
-		&"route_01_removed"
+	_expect(not stale_revision.accepted and stale_revision.reject_reason == RunCommandResult.RejectReason.STALE_RUN_REVISION, "stale direct activation revision rejected")
+	_expect_same_authority(activation_before, session.snapshot(), "stale direct activation")
+	var wrong_scene := session.accept_room_transition(
+		&"wrong_direct_scene", activation_before.revision,
+		pending_room.room_id, 2902, "res://scenes/run/rooms/not_the_configured_scene.tscn"
 	)
-	_expect(not stale_option.accepted and stale_option.reject_reason == RunCommandResult.RejectReason.STALE_ROUTE_OPTION, "stale route option rejected")
-	_expect_same_authority(route_before, session.snapshot(), "stale route option")
-	var reused := session.choose_formal_route(
-		&"stale_option_route",
-		route_before.revision,
-		&"route_01_swarm"
-	)
-	_expect(not reused.accepted and reused.reject_reason == RunCommandResult.RejectReason.COMMAND_ID_REUSED, "command id reuse with different target rejected")
-	_expect_same_authority(route_before, session.snapshot(), "route command id reuse")
+	_expect(not wrong_scene.accepted and wrong_scene.reject_reason == RunCommandResult.RejectReason.SCENE_TRANSITION_FAILED, "wrong direct successor scene rejected")
+	_expect_same_authority(activation_before, session.snapshot(), "wrong direct successor scene")
 
 
 func _test_scene_transition_failure_atomic() -> void:
@@ -266,46 +249,31 @@ func _leave_shop(session: RunSession) -> RunCommandResult:
 	)
 
 
-func _choose(session: RunSession, option_id: StringName) -> RunCommandResult:
-	var snapshot := session.snapshot()
-	return session.choose_formal_route(
-		_next_command(&"route"),
-		snapshot.revision,
-		option_id
-	)
-
-
-func _finish_run(session: RunSession, route_one: StringName, route_two: StringName) -> void:
+func _finish_run(session: RunSession) -> void:
 	_expect(_activate_pending(session).accepted, "combat one activates")
 	_expect(_complete_current_room(session).accepted, "combat one completes")
-	_expect(_choose(session, route_one).accepted, "route one selected")
 	_expect(_activate_pending(session).accepted, "combat two activates")
 	_expect(_complete_current_room(session).accepted, "combat two completes")
+	_expect(_leave_shop(session).accepted, "single shop leaves")
 	_expect(_activate_pending(session).accepted, "combat three activates")
 	_expect(_complete_current_room(session).accepted, "combat three completes")
-	_expect(_leave_shop(session).accepted, "single shop leaves")
-	_expect(_activate_pending(session).accepted, "combat four activates")
-	_expect(_complete_current_room(session).accepted, "combat four completes")
-	_expect(_choose(session, route_two).accepted, "route two selected")
-	_expect(_activate_pending(session).accepted, "combat five activates")
-	_expect(_complete_current_room(session).accepted, "combat five completes")
 	_expect(_activate_pending(session).accepted, "boss activates")
 	_expect(_complete_current_room(session).accepted, "boss completes")
 
 
-func _assert_completed_run(session: RunSession, route_ids: Array[StringName]) -> void:
+func _assert_completed_run(session: RunSession) -> void:
 	var snapshot := session.snapshot()
 	_expect_eq(snapshot.route.phase, RunPhase.RUN_COMPLETE, "full run reaches complete phase")
 	_expect(snapshot.result != null and snapshot.result.is_complete(), "complete result is frozen")
-	_expect_eq(snapshot.route.completed_combat_rooms, 6, "exactly six combat rooms complete")
+	_expect_eq(snapshot.route.completed_combat_rooms, 4, "exactly four combat rooms complete")
 	_expect_eq(snapshot.route.shop_visits, 1, "exactly one shop visited")
-	_expect_eq(snapshot.route.route_choices, 2, "exactly two routes chosen")
-	_expect_eq(snapshot.route.selected_route_option_ids, route_ids, "selected route identities frozen")
-	_expect_eq(snapshot.route.activated_room_instance_ids.size(), 6, "six different room instances activated")
-	_expect_eq(_unique_int_count(snapshot.route.activated_room_instance_ids), 6, "room instance ids never reused")
+	_expect_eq(snapshot.route.route_choices, 0, "exactly zero routes chosen")
+	_expect_eq(snapshot.route.selected_route_option_ids, [], "no route identities are frozen")
+	_expect_eq(snapshot.route.activated_room_instance_ids.size(), 4, "four different room instances activated")
+	_expect_eq(_unique_int_count(snapshot.route.activated_room_instance_ids), 4, "room instance ids never reused")
 	_expect_eq(snapshot.result.final_node_id, &"run_result", "boss transaction lands directly at result")
 	_expect_eq(snapshot.result.shop_visits, 1, "result freezes shop count")
-	_expect_eq(snapshot.result.route_choices, 2, "result freezes route count")
+	_expect_eq(snapshot.result.route_choices, 0, "result freezes route count")
 	var terminal_before := session.snapshot()
 	var repeated := session.handle_event(RoomCompletedEvent.new(
 		_next_command(&"duplicate_boss"),

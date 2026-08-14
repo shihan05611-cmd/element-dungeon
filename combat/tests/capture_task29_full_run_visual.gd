@@ -34,30 +34,15 @@ func _run() -> void:
 	_images["01_combat_01_entry_1920x1080.png"] = await _capture_current()
 
 	await _defeat_current_room(coordinator)
-	_expect(await _wait_for_phase(coordinator, RunPhase.SHOP), "capture reaches early shop")
-	_expect(coordinator.purchase_first_affordable_skill().accepted, "capture purchases at early shop")
-	_expect(coordinator.leave_shop().accepted, "capture leaves early shop")
-	_expect(await _wait_for_phase(coordinator, RunPhase.ROUTE_CHOICE), "capture reaches first route")
-	_images["02_route_01_choice_1920x1080.png"] = await _capture_current()
-
-	_expect(coordinator.choose_route(&"route_01_pressure").accepted, "capture selects pressure branch")
-	_expect(await _wait_for_room(coordinator, &"combat_02_pressure"), "capture loads platform branch")
-	_images["03_platform_room_1920x1080.png"] = await _capture_current()
+	_expect(await _wait_for_room(coordinator, &"combat_02_swarm"), "capture reaches fixed combat two")
+	_images["02_combat_02_swarm_1920x1080.png"] = await _capture_current()
 	await _defeat_current_room(coordinator)
-	_expect(await _wait_for_room(coordinator, &"combat_03_layer_elite"), "capture reaches combat three")
-	await _defeat_current_room(coordinator)
-	_expect(await _wait_for_phase(coordinator, RunPhase.SHOP), "capture reaches middle shop")
-	_expect(coordinator.purchase_first_affordable_skill().accepted, "capture purchases at middle shop")
-	_expect(coordinator.leave_shop().accepted, "capture leaves middle shop")
+	_expect(await _wait_for_phase(coordinator, RunPhase.SHOP), "capture reaches the single shop after two combats")
+	_images["03_single_shop_1920x1080.png"] = await _capture_current()
+	_expect(coordinator.purchase_first_affordable_skill().accepted, "capture purchases at the single shop")
+	_expect(coordinator.leave_shop().accepted, "capture leaves the single shop")
 	_expect(await _wait_for_room(coordinator, &"combat_04_validation"), "capture reaches combat four")
 	await _defeat_current_room(coordinator)
-	_expect(await _wait_for_phase(coordinator, RunPhase.ROUTE_CHOICE), "capture reaches second route")
-	_expect(coordinator.choose_route(&"route_02_risk").accepted, "capture selects risk branch")
-	_expect(await _wait_for_room(coordinator, &"combat_05_risk"), "capture loads corridor branch")
-	await _defeat_current_room(coordinator)
-	_expect(await _wait_for_phase(coordinator, RunPhase.SHOP), "capture reaches preboss shop")
-	_expect(coordinator.purchase_first_affordable_skill().accepted, "capture purchases at preboss shop")
-	_expect(coordinator.leave_shop().accepted, "capture leaves preboss shop")
 	_expect(await _wait_for_room(coordinator, &"combat_06_final_boss"), "capture loads boss room")
 	var boss_balance := coordinator.host.run_session.snapshot().economy.balance
 	await _defeat_current_room(coordinator)
@@ -65,15 +50,15 @@ func _run() -> void:
 	_images["04_boss_result_1920x1080.png"] = await _capture_current()
 
 	var final := coordinator.host.run_session.snapshot()
-	_expect_eq(final.route.completed_combat_rooms, 6, "capture final assertion: six combat rooms")
-	_expect_eq(final.route.shop_visits, 3, "capture final assertion: three shops")
-	_expect_eq(final.route.route_choices, 2, "capture final assertion: two routes")
+	_expect_eq(final.route.completed_combat_rooms, 4, "capture final assertion: four combat rooms")
+	_expect_eq(final.route.shop_visits, 1, "capture final assertion: one shop")
+	_expect_eq(final.route.route_choices, 0, "capture final assertion: zero routes")
 	_expect(final.result != null and final.result.is_complete(), "capture final assertion: complete result")
 	_expect_eq(final.economy.balance, boss_balance, "capture final assertion: boss awards zero dust")
-	_expect_eq(final.route.activated_room_instance_ids.size(), 6, "capture final assertion: six room activations")
-	_expect_eq(_unique_int_count(final.route.activated_room_instance_ids), 6, "capture final assertion: room instances differ")
-	_expect(_unique_string_count(final.route.activated_scene_paths) >= 4, "capture final assertion: PackedScene templates differ")
-	_expect_eq(final.route.selected_route_option_ids, [&"route_01_pressure", &"route_02_risk"], "capture final assertion: route identities")
+	_expect_eq(final.route.activated_room_instance_ids.size(), 4, "capture final assertion: four room activations")
+	_expect_eq(_unique_int_count(final.route.activated_room_instance_ids), 4, "capture final assertion: room instances differ")
+	_expect_eq(_unique_string_count(final.route.activated_scene_paths), 2, "capture final assertion: flat and boss templates differ")
+	_expect_eq(final.route.selected_route_option_ids, [], "capture final assertion: no route identities")
 	_expect_eq(coordinator.host.get_instance_id(), persistent_ids[0], "capture final assertion: Host persists")
 	_expect_eq(coordinator.host.run_session.get_instance_id(), persistent_ids[1], "capture final assertion: Session persists")
 	_expect_eq(coordinator.player.get_instance_id(), persistent_ids[2], "capture final assertion: Player persists")
@@ -113,7 +98,7 @@ func _defeat_current_room(coordinator: RunFlowCoordinator) -> void:
 	_expect(room != null and room.configured, "capture room is configured")
 	if room == null:
 		return
-	for enemy: CombatEnemy in room.enemies:
+	for enemy: CombatEnemy in room.initial_enemies:
 		_hit_sequence += 1
 		var cast := CastSnapshot.new(
 			_hit_sequence,
@@ -134,6 +119,22 @@ func _defeat_current_room(coordinator: RunFlowCoordinator) -> void:
 		)
 		var result := enemy.combat_receiver.receive_hit(request)
 		_expect(result.accepted and enemy.defeated, "capture defeats enemy through CombatReceiver")
+	await process_frame
+	for enemy: CombatEnemy in room.reinforcement_enemies:
+		_hit_sequence += 1
+		var cast := CastSnapshot.new(_hit_sequence, &"task29_capture_finisher", coordinator.player.get_instance_id(), coordinator.player.get_instance_id(), &"player", ElementIds.NONE, CombatStatSnapshot.new())
+		var request := HitRequest.new(cast, RuntimeAttackPayload.new(9999.0, 9999.0, ElementIds.NONE, 0), _hit_sequence, 0, enemy.global_position, Vector2.RIGHT)
+		var result := enemy.combat_receiver.receive_hit(request)
+		_expect(result.accepted and enemy.defeated, "capture defeats reinforcement through CombatReceiver")
+	await process_frame
+	_expect(room.room_is_cleared, "capture clears the configured room")
+	coordinator.player.global_position = room.chest.global_position
+	coordinator.player.interact_requested.emit()
+	await process_frame
+	if room.room_definition.final_boss:
+		return
+	coordinator.player.global_position = room.portal.global_position
+	coordinator.player.interact_requested.emit()
 	await process_frame
 
 

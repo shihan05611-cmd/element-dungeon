@@ -1,0 +1,6 @@
+order,entry,tests,assertions,images,result,log
+29,run_task49_five_stage_demo_flow_tests.gd,5,103,n/a,PASS,logs/formal02/29_fourth_scope_task49_specialist.log
+30,capture_task49_five_stage_demo_visuals.gd,1,n/a,6,PASS,logs/formal02/30_fourth_scope_capture_task49.log
+31,main_scene_smoke,n/a,n/a,n/a,PASS,logs/formal02/31_fourth_scope_main_scene_smoke.log
+32,final_import_scan,n/a,n/a,n/a,PASS,logs/formal02/32_fourth_scope_final_editor_scan.log
+

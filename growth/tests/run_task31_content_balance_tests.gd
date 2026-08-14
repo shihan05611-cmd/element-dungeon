@@ -1,15 +1,11 @@
 extends SceneTree
 
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
-const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_two_layer_six_combat.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const ROOM_IDS: Array[StringName] = [
 	&"combat_01_entry",
 	&"combat_02_swarm",
-	&"combat_02_pressure",
-	&"combat_03_layer_elite",
 	&"combat_04_validation",
-	&"combat_05_stable",
-	&"combat_05_risk",
 	&"combat_06_final_boss",
 ]
 const ACTIVE_IDS: Array[StringName] = [
@@ -38,8 +34,8 @@ func _run() -> void:
 	_run_test("formal_catalog_and_feature_modes", _test_catalog_and_modes)
 	_run_test("active_prices_levels_and_effect_whitelist", _test_active_progression)
 	_run_test("four_passives_are_level_free_purchase_content", _test_passives)
-	_run_test("eight_rooms_have_reachable_scenes_and_spawns", _test_room_resources)
-	_run_test("safe_and_risk_routes_have_real_differences", _test_route_differences)
+	_run_test("demo_rooms_have_reachable_scenes_and_spawns", _test_room_resources)
+	_run_test("five_stage_demo_has_fixed_sequence", _test_route_differences)
 	_run_test("boss_is_stronger_and_awards_zero_dream_dust", _test_boss)
 	_run_test("three_build_budgets_are_feasible", _test_build_budgets)
 	_run_test("seventy_percent_refund_has_no_arbitrage", _test_refund_no_arbitrage)
@@ -134,8 +130,8 @@ func _test_passives() -> void:
 
 
 func _test_room_resources() -> void:
-	_expect(FLOW != null and FLOW.is_valid(), "formal six-room flow validates")
-	_expect_eq(ROOM_IDS.size(), 8, "flow owns eight branch-aware combat room resources")
+	_expect(FLOW != null and FLOW.is_valid(), "formal five-stage demo flow validates")
+	_expect_eq(ROOM_IDS.size(), 4, "flow owns four fixed combat room resources including Boss")
 	var scene_paths: Array[String] = []
 	for room_id: StringName in ROOM_IDS:
 		var room := FLOW.combat_room_for(room_id)
@@ -159,31 +155,17 @@ func _test_room_resources() -> void:
 			if player_spawn != null:
 				_expect(spawn.local_position.distance_to(player_spawn.position) >= 120.0, "%s/%s does not overlap player spawn" % [String(room_id), String(spawn.enemy_id)])
 		instance.free()
-	_expect_eq(scene_paths.size(), 4, "branch-aware room set references all four real templates")
+	_expect_eq(scene_paths.size(), 2, "demo combat set references flat and boss templates")
 
 
 func _test_route_differences() -> void:
-	var route_one := FLOW.node_for(&"route_01_first_branch")
-	var route_two := FLOW.node_for(&"route_02_second_branch")
-	_expect(route_one != null and route_one.route_branches.size() == 2, "route one exposes two frozen branches")
-	_expect(route_two != null and route_two.route_branches.size() == 2, "route two exposes two frozen branches")
-	var swarm := FLOW.combat_room_for(&"combat_02_swarm")
-	var pressure := FLOW.combat_room_for(&"combat_02_pressure")
-	_expect(swarm.room_scene.resource_path != pressure.room_scene.resource_path, "route one changes the room template")
-	_expect(swarm.encounter_label != pressure.encounter_label, "route one changes disclosed encounter shape")
-	_expect(_maximum_enemy_health(pressure) > _maximum_enemy_health(swarm), "route one risk branch has higher single-target durability")
-	_expect(_room_dream_dust(pressure) > _room_dream_dust(swarm), "route one risk branch pays more dream dust")
-	_expect(route_one.route_branches[1].risk_tier > route_one.route_branches[0].risk_tier, "route one disclosure has a higher risk tier")
-	var stable := FLOW.combat_room_for(&"combat_05_stable")
-	var risk := FLOW.combat_room_for(&"combat_05_risk")
-	_expect(stable.room_scene.resource_path != risk.room_scene.resource_path, "route two changes the room template")
-	_expect(risk.enemy_spawns.size() == stable.enemy_spawns.size() and risk.reinforcement_spawns.size() == stable.reinforcement_spawns.size(), "route two branches both preserve the Task41 two-wave count")
-	_expect(_total_enemy_health(risk) > _total_enemy_health(stable), "route two risk branch has higher total durability")
-	_expect(_room_dream_dust(risk) > _room_dream_dust(stable), "route two risk branch pays more dream dust")
-	_expect(route_two.route_branches[1].risk_tier > route_two.route_branches[0].risk_tier, "route two disclosure has a higher risk tier")
-	_expect_eq(_safe_run_earnings(), 595, "safe route earns the frozen 595 dream dust")
-	_expect_eq(_risk_run_earnings(), 700, "risk route earns the frozen 700 dream dust")
-	_expect(_risk_run_earnings() > _safe_run_earnings(), "risk route has strictly higher total expected dream dust")
+	_expect(FLOW.node_for(&"route_01_first_branch") == null and FLOW.node_for(&"route_02_second_branch") == null, "demo flow exposes no route nodes")
+	_expect_eq(FLOW.node_for(&"combat_01_entry").next_node_id, &"combat_02_swarm", "combat one reaches combat two")
+	_expect_eq(FLOW.node_for(&"combat_02_swarm").next_node_id, &"shop_demo_mid", "combat two reaches the only shop")
+	_expect_eq(FLOW.node_for(&"shop_demo_mid").next_node_id, &"combat_04_validation", "shop reaches combat three")
+	_expect_eq(FLOW.node_for(&"combat_04_validation").next_node_id, &"combat_06_final_boss", "combat three reaches Boss")
+	_expect_eq(_safe_run_earnings(), 345, "fixed demo combat rooms retain 345 base dream dust")
+	_expect_eq(_risk_run_earnings(), 345, "the route-free demo has one fixed base-income path")
 
 
 func _test_boss() -> void:
@@ -208,7 +190,7 @@ func _test_build_budgets() -> void:
 	var bolt := CATALOG.content_for(&"element_bolt")
 	var specialist_upgrade_spend := bolt.active_progression.levels[1].upgrade_price + bolt.active_progression.levels[2].upgrade_price
 	_expect_eq(specialist_upgrade_spend, 150, "main-active specialization reaches Lv3 for 150")
-	_expect(specialist_upgrade_spend <= 345, "specialization is affordable by the second shop on the safe path")
+	_expect(specialist_upgrade_spend <= 220, "specialization is affordable from the two pre-shop combat rooms")
 	var multi_active_spend := (
 		CATALOG.content_for(&"element_reclaim").purchase_price
 		+ CATALOG.content_for(&"elemental_laser").purchase_price
@@ -216,13 +198,13 @@ func _test_build_budgets() -> void:
 		+ CATALOG.content_for(&"elemental_laser").active_progression.levels[1].upgrade_price
 	)
 	_expect_eq(multi_active_spend, 325, "multi-active purchase plus two Lv2 upgrades costs 325")
-	_expect(multi_active_spend <= _risk_run_earnings(), "multi-active build is affordable on the risk path")
+	_expect(multi_active_spend <= _risk_run_earnings(), "multi-active build remains affordable across the fixed demo run")
 	var four_passive_spend := 0
 	for skill_id: StringName in PASSIVE_IDS:
 		four_passive_spend += CATALOG.content_for(skill_id).purchase_price
 	_expect_eq(four_passive_spend, 300, "four formal passives cost 300 total")
-	_expect(four_passive_spend <= 345, "initial bolt plus four passives is affordable by the second safe shop")
-	_expect(four_passive_spend + specialist_upgrade_spend <= _safe_run_earnings(), "four passives and Lv3 specialization fit the full safe budget")
+	_expect(four_passive_spend <= 220 + RunChestRewardSnapshot.DREAM_DUST_AMOUNT, "four passives remain affordable before the shop when combat two yields the existing dust branch")
+	_expect(four_passive_spend + specialist_upgrade_spend <= _safe_run_earnings() + RunChestRewardSnapshot.DREAM_DUST_AMOUNT, "four passives and Lv3 specialization fit fixed base plus one typed dust reward")
 
 
 func _test_refund_no_arbitrage() -> void:
@@ -298,20 +280,12 @@ func _safe_run_earnings() -> int:
 	return (
 		_room_dream_dust(FLOW.combat_room_for(&"combat_01_entry"))
 		+ _room_dream_dust(FLOW.combat_room_for(&"combat_02_swarm"))
-		+ _room_dream_dust(FLOW.combat_room_for(&"combat_03_layer_elite"))
 		+ _room_dream_dust(FLOW.combat_room_for(&"combat_04_validation"))
-		+ _room_dream_dust(FLOW.combat_room_for(&"combat_05_stable"))
 	)
 
 
 func _risk_run_earnings() -> int:
-	return (
-		_room_dream_dust(FLOW.combat_room_for(&"combat_01_entry"))
-		+ _room_dream_dust(FLOW.combat_room_for(&"combat_02_pressure"))
-		+ _room_dream_dust(FLOW.combat_room_for(&"combat_03_layer_elite"))
-		+ _room_dream_dust(FLOW.combat_room_for(&"combat_04_validation"))
-		+ _room_dream_dust(FLOW.combat_room_for(&"combat_05_risk"))
-	)
+	return _safe_run_earnings()
 
 
 func _unique_count(values: Array[StringName]) -> int:

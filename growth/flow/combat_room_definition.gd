@@ -11,6 +11,8 @@ extends Resource
 @export var reinforcement_spawns: Array[EnemySpawnDefinition] = []
 @export_range(0.1, 60.0, 0.1, "or_greater") var reinforcement_delay_seconds: float = 12.0
 @export_range(0, 1000000, 1, "or_greater") var completion_dream_dust: int = 0
+@export var single_wave: bool = false
+@export var guaranteed_active_skill_reward: bool = false
 @export var final_boss: bool = false
 
 
@@ -28,10 +30,17 @@ func validation_error() -> StringName:
 	if final_boss:
 		if enemy_spawns.size() != 1 or not reinforcement_spawns.is_empty():
 			return &"boss_room_requires_one_enemy_and_no_reinforcements"
+		if single_wave or guaranteed_active_skill_reward:
+			return &"boss_room_rejects_normal_reward_policy"
+	elif single_wave:
+		if enemy_spawns.size() != 2 or not reinforcement_spawns.is_empty():
+			return &"single_wave_room_requires_two_enemies_and_no_reinforcements"
 	elif enemy_spawns.size() < 3 or enemy_spawns.size() > 5:
 		return &"normal_room_initial_wave_out_of_range"
 	elif reinforcement_spawns.size() < 2 or reinforcement_spawns.size() > 3:
 		return &"normal_room_reinforcement_wave_out_of_range"
+	if guaranteed_active_skill_reward and not single_wave:
+		return &"guaranteed_active_skill_reward_requires_single_wave"
 	if not is_finite(reinforcement_delay_seconds) or reinforcement_delay_seconds <= 0.0:
 		return &"invalid_reinforcement_delay"
 	if completion_dream_dust < 0:

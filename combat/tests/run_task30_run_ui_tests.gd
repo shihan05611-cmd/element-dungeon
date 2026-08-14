@@ -1,6 +1,8 @@
 extends SceneTree
 
 const RUN_GAME_SCENE: PackedScene = preload("res://scenes/run/run_game.tscn")
+const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 
 var _tests: int = 0
 var _assertions: int = 0
@@ -18,7 +20,7 @@ func _initialize() -> void:
 func _run() -> void:
 	root.size = Vector2i(1366, 768)
 	_coordinator = RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
-	_coordinator.run_id_override = &"task30_ui_flow"
+	_coordinator.run_id_override = _pre_shop_dust_run_id()
 	_expect(_coordinator != null, "RunGame instantiates as RunFlowCoordinator")
 	if _coordinator == null:
 		_finish()
@@ -31,10 +33,10 @@ func _run() -> void:
 
 	_run_test("formal_scene_and_seven_slot_hud", _test_formal_scene_and_seven_slot_hud)
 	_run_test("combat_semantics_and_accessibility", _test_combat_semantics_and_accessibility)
-	await _run_async_test("route_focus_stale_recovery_and_confirm", _test_route_focus_stale_recovery_and_confirm)
+	await _run_async_test("combat_one_advances_without_route_ui", _test_route_focus_stale_recovery_and_confirm)
 	await _run_async_test("single_shop_authority_and_recovery", _test_early_shop_authority_and_recovery)
 	await _run_async_test("middle_shop_levels_max_and_second_passive", _test_middle_shop_levels_max_and_second_passive)
-	await _run_async_test("second_route_visible_confirm", _test_second_route_visible_confirm)
+	await _run_async_test("combat_three_advances_directly_to_boss", _test_second_route_visible_confirm)
 	await _run_async_test("preboss_shop_and_complete_result", _test_preboss_shop_and_complete_result)
 	await _run_async_test("new_run_creates_new_authority", _test_new_run_creates_new_authority)
 	await _run_async_test("failed_result_is_distinct", _test_failed_result_is_distinct)
@@ -102,13 +104,11 @@ func _test_combat_semantics_and_accessibility() -> void:
 
 func _test_early_shop_authority_and_recovery() -> void:
 	await _finish_current_room()
-	_expect(await _wait_for_combat(&"combat_03_layer_elite"), "route room flows to layer elite")
-	await _finish_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "combat three opens the single shop")
+	_expect(await _wait_for_phase(RunPhase.SHOP), "combat two opens the single shop")
 	_expect(_overlay.visible and _overlay.formal_kind() == &"shop", "formal shop opens automatically")
 	_expect(_inside(_overlay.get("_panel").get_global_rect(), Rect2(Vector2.ZERO, Vector2(root.size))), "shop panel stays inside 1366x768")
 	var before := _coordinator.current_snapshot()
-	_expect(before.economy.balance >= 365, "single shop projects three-room authoritative base balance")
+	_expect(before.economy.balance >= 220, "single shop projects two-room authoritative base balance")
 	_expect(_visible_text(_overlay).contains("梦尘余额"), "shop shows dream-dust balance")
 	_expect(_visible_text(_overlay).contains("购买价"), "shop shows fixed purchase prices")
 	_expect(_visible_text(_overlay).contains("权威即时配装"), "shop exposes strict seven-slot zone")
@@ -156,43 +156,23 @@ func _test_early_shop_authority_and_recovery() -> void:
 	_button(&"select:passive_vitality").pressed.emit()
 	await process_frame
 	var loadout_revision := _coordinator.current_snapshot().revision
+	_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.PASSIVE_1), &"passive_vitality", "purchase already auto-equips the first passive into P1")
 	_button(&"slot:passive_1").pressed.emit()
 	await process_frame
 	var equipped := _coordinator.current_snapshot()
 	_expect_eq(equipped.loadout.get_skill_id(SkillSlotIds.PASSIVE_1), &"passive_vitality", "visible P1 action commits RuntimeLoadout immediately")
-	_expect(equipped.revision == loadout_revision + 1, "immediate equip advances authority once")
+	_expect_eq(equipped.revision, loadout_revision, "reselecting the already auto-equipped P1 mapping is idempotent")
 	_expect(_coordinator.host.runtime_loadout.snapshot().same_mapping(equipped.loadout), "runtime and RunSnapshot mappings align immediately")
 	_expect(_button(&"leave_shop").disabled and _button(&"leave_shop").text.contains("按 F"), "shop UI directs the player to the physical F exit")
 
 
 func _test_route_focus_stale_recovery_and_confirm() -> void:
 	await _finish_current_room()
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "combat one chest and portal open first route")
-	_expect(_overlay.formal_kind() == &"route" and _overlay.visible, "formal route panel opens automatically")
-	_expect_eq(_overlay.formal_route_cards().size(), 2, "route shows exactly two frozen cards")
-	var route_text := _visible_text(_overlay)
-	for field_copy: String in ["资源 / 梦尘", "遭遇", "环境", "风险"]:
-		_expect(route_text.contains(field_copy), "route cards expose %s" % field_copy)
-	var before := _coordinator.current_snapshot()
-	_expect(_overlay.formal_route_confirm_button().disabled, "route confirm starts disabled before focus")
-	_overlay.formal_route_cards()[1].pressed.emit()
-	await process_frame
-	_expect_eq(_coordinator.current_snapshot().revision, before.revision, "route focus changes no authority revision")
-	_expect(_overlay.formal_selected_route_id() == before.route.next_options[1].option_id, "route focus stores only frozen option identity")
-	_expect(not _overlay.formal_route_confirm_button().disabled, "focused route enables independent confirm")
-	_overlay.set("_formal_route_revision", before.revision - 1)
-	var stale_count := _overlay.formal_route_submit_count()
-	_overlay.formal_route_confirm_button().pressed.emit()
-	await process_frame
-	_expect_eq(_overlay.formal_route_submit_count(), stale_count + 1, "stale confirm sends exactly one command")
-	_expect_eq(_coordinator.current_snapshot().revision, before.revision, "stale route rejection keeps authority")
-	_expect_eq(_coordinator.current_snapshot().route.phase, RunPhase.ROUTE_CHOICE, "stale route rejection does not locally advance")
-	_expect(_visible_text(_overlay).contains("恢复"), "stale route rejection exposes recovery state")
-	var selected := _overlay.formal_selected_route_id()
-	_overlay.formal_route_confirm_button().pressed.emit()
-	await process_frame
-	_expect(await _wait_for_combat(selected), "second explicit confirm loads selected authoritative target")
-	_expect_eq(_overlay.formal_route_submit_count(), stale_count + 2, "successful route sends one additional command only")
+	_expect(await _wait_for_combat(&"combat_02_swarm"), "combat one portal loads the fixed second combat")
+	var snapshot := _coordinator.current_snapshot()
+	_expect_eq(snapshot.route.route_choices, 0, "direct transition records no route choice")
+	_expect_eq(snapshot.route.next_options.size(), 0, "direct transition exposes no route options")
+	_expect(_overlay.formal_kind() != &"route", "route panel never opens in the demo flow")
 
 
 func _test_middle_shop_levels_max_and_second_passive() -> void:
@@ -226,24 +206,13 @@ func _test_middle_shop_levels_max_and_second_passive() -> void:
 
 func _test_second_route_visible_confirm() -> void:
 	await _finish_current_room()
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "combat four opens second route")
-	var snapshot := _coordinator.current_snapshot()
-	var desired_index := 0
-	for index: int in snapshot.route.next_options.size():
-		if snapshot.route.next_options[index].option_id == &"route_02_risk":
-			desired_index = index
-	var revision := snapshot.revision
-	_overlay.formal_route_cards()[desired_index].pressed.emit()
-	await process_frame
-	_expect_eq(_coordinator.current_snapshot().revision, revision, "second route focus is also non-committing")
-	_overlay.formal_route_confirm_button().pressed.emit()
-	await process_frame
-	_expect(await _wait_for_combat(&"route_02_risk"), "second visible confirm loads risk target")
+	_expect(await _wait_for_combat(&"combat_06_final_boss"), "combat three loads Boss directly")
+	_expect_eq(_coordinator.current_snapshot().route.route_choices, 0, "pre-Boss transition records no route choice")
+	_expect(_overlay.formal_kind() != &"route", "no second route UI appears")
 
 
 func _test_preboss_shop_and_complete_result() -> void:
-	await _finish_current_room()
-	_expect(await _wait_for_combat(&"combat_06_final_boss"), "combat five portal loads final boss directly")
+	_expect(await _wait_for_combat(&"combat_06_final_boss"), "Boss remains active for settlement verification")
 	var host_id := _coordinator.host.get_instance_id()
 	var session_id := _coordinator.host.run_session.get_instance_id()
 	var player_id := _coordinator.player.get_instance_id()
@@ -254,9 +223,9 @@ func _test_preboss_shop_and_complete_result() -> void:
 	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "boss settlement chest opens complete result")
 	var final := _coordinator.current_snapshot()
 	_expect(final.result != null and final.result.is_complete(), "result is frozen complete")
-	_expect_eq(final.result.completed_combat_rooms, 6, "result shows six of six combats")
+	_expect_eq(final.result.completed_combat_rooms, 4, "result shows four of four combats")
 	_expect_eq(final.result.shop_visits, 1, "result freezes one shop visit")
-	_expect_eq(final.result.route_choices, 2, "result freezes two route confirmations")
+	_expect_eq(final.result.route_choices, 0, "result freezes zero route confirmations")
 	_expect_eq(final.economy.balance, boss_balance, "boss awards zero dream dust")
 	_expect(final.shop == null and final.pending_reward == null, "boss result has no fourth shop or free reward")
 	_expect(_overlay.formal_kind() == &"result" and _overlay.visible, "formal result replaces shop/route UI")
@@ -316,13 +285,40 @@ func _test_failed_result_is_distinct() -> void:
 	_expect_eq(failed.economy.total_earned, before.economy.total_earned, "failure grants no dream dust")
 	var copy := _visible_text(_overlay)
 	_expect(copy.contains("DEFEAT") and copy.contains("失败"), "failure presentation is unmistakable")
-	_expect(copy.contains("0 / 6"), "failure result shows actual combat progress")
+	_expect(copy.contains("0 / 4"), "failure result shows actual combat progress")
 	_expect(not copy.contains("确认领取") and not copy.contains("购买价"), "failure result shows neither reward nor shop")
 	_expect(_button(&"new_run") != null and not _button(&"new_run").disabled, "failure result retains keyboard-focusable recovery")
 
 
 func _button(control_id: StringName) -> Button:
 	return _overlay.formal_control(control_id) as Button
+
+
+func _pre_shop_dust_run_id() -> StringName:
+	for index: int in 256:
+		var run_id := StringName("task30_ui_flow_%03d" % index)
+		var session := RunSession.new(
+			CATALOG.reward_definitions(), CATALOG.relic_definitions,
+			CATALOG.initial_owned_skill_ids(), [ElementIds.WATER, ElementIds.FIRE],
+			null, null, RunRulesSnapshot.formal_disabled(), CATALOG, 0, FLOW, run_id
+		)
+		if not session.start_formal_run(&"start", 0).accepted:
+			continue
+		var first := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_first", session.snapshot().revision, first.room_id, 30_000 + index * 2, first.room_scene.resource_path).accepted:
+			continue
+		if not session.claim_formal_room_chest(&"claim_first", session.snapshot().revision, first.room_id).accepted:
+			continue
+		if not session.handle_event(RoomCompletedEvent.new(&"complete_first", first.room_id, 0, 0, first.completion_dream_dust, false)).accepted:
+			continue
+		var second := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_second", session.snapshot().revision, second.room_id, 30_001 + index * 2, second.room_scene.resource_path).accepted:
+			continue
+		var claim := session.claim_formal_room_chest(&"claim_second", session.snapshot().revision, second.room_id)
+		if claim.accepted and claim.chest_reward.kind == RunChestRewardSnapshot.Kind.DREAM_DUST:
+			return run_id
+	_expect(false, "a deterministic second-room dust cohort exists for the UI economy path")
+	return &"task30_ui_flow_fallback"
 
 
 func _finish_current_room() -> void:
@@ -336,7 +332,7 @@ func _finish_current_room() -> void:
 	for enemy: CombatEnemy in room.reinforcement_enemies:
 		_defeat_enemy(enemy)
 	await process_frame
-	_expect(room.room_is_cleared, "both waves clear before world interaction")
+	_expect(room.room_is_cleared, "all configured enemies clear before world interaction")
 	_coordinator.player.global_position = room.chest.global_position
 	_coordinator.player.interact_requested.emit()
 	await process_frame

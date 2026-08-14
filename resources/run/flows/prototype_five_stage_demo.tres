@@ -1,0 +1,60 @@
+[gd_resource type="Resource" script_class="RunFlowDefinition" load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://growth/flow/run_flow_definition.gd" id="1_flow"]
+[ext_resource type="Script" path="res://growth/flow/run_node_definition.gd" id="2_node"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_01_entry.tres" id="3_c1"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_02_swarm.tres" id="4_c2"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_04_validation.tres" id="5_c3"]
+[ext_resource type="Resource" path="res://resources/run/rooms/combat_06_final_boss.tres" id="6_boss"]
+
+[sub_resource type="Resource" id="Entry"]
+script = ExtResource("2_node")
+node_id = &"run_entry"
+kind = 0
+next_node_id = &"combat_01_entry"
+
+[sub_resource type="Resource" id="Combat1"]
+script = ExtResource("2_node")
+node_id = &"combat_01_entry"
+kind = 1
+next_node_id = &"combat_02_swarm"
+combat_room = ExtResource("3_c1")
+
+[sub_resource type="Resource" id="Combat2"]
+script = ExtResource("2_node")
+node_id = &"combat_02_swarm"
+kind = 1
+next_node_id = &"shop_demo_mid"
+combat_room = ExtResource("4_c2")
+
+[sub_resource type="Resource" id="Shop"]
+script = ExtResource("2_node")
+node_id = &"shop_demo_mid"
+kind = 2
+next_node_id = &"combat_04_validation"
+
+[sub_resource type="Resource" id="Combat3"]
+script = ExtResource("2_node")
+node_id = &"combat_04_validation"
+kind = 1
+next_node_id = &"combat_06_final_boss"
+combat_room = ExtResource("5_c3")
+
+[sub_resource type="Resource" id="Boss"]
+script = ExtResource("2_node")
+node_id = &"combat_06_final_boss"
+kind = 4
+next_node_id = &"run_result"
+combat_room = ExtResource("6_boss")
+
+[sub_resource type="Resource" id="Result"]
+script = ExtResource("2_node")
+node_id = &"run_result"
+kind = 5
+
+[resource]
+script = ExtResource("1_flow")
+flow_id = &"prototype_five_stage_demo"
+entry_node_id = &"run_entry"
+result_node_id = &"run_result"
+nodes = Array[ExtResource("2_node")]([SubResource("Entry"), SubResource("Combat1"), SubResource("Combat2"), SubResource("Shop"), SubResource("Combat3"), SubResource("Boss"), SubResource("Result")])

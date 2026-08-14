@@ -2,6 +2,7 @@ extends SceneTree
 
 const RUN_GAME_SCENE: PackedScene = preload("res://scenes/run/run_game.tscn")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const PASSIVE_IDS: Array[StringName] = [
 	&"burning",
 	&"unending",
@@ -32,10 +33,10 @@ func _run() -> void:
 	if _coordinator == null:
 		_finish()
 		return
-	await _run_async_test("safe_route_four_passives_and_main_specialization", _test_safe_run)
+	await _run_async_test("linear_run_four_passives_and_main_specialization", _test_safe_run)
 	await _run_async_test("complete_result_return_boundary_and_new_authority", _test_complete_result_and_new_run)
 	await _run_async_test("failure_result_and_second_new_authority", _test_failure_and_new_run)
-	await _run_async_test("risk_route_multi_active_four_passive_run", _test_risk_run)
+	await _run_async_test("second_linear_run_multi_active_four_passive", _test_risk_run)
 	for tween: Tween in get_processed_tweens():
 		tween.kill()
 	if is_instance_valid(_coordinator):
@@ -45,25 +46,17 @@ func _run() -> void:
 
 
 func _test_safe_run() -> void:
-	_safe_metrics = _new_metrics("safe", [&"route_01_swarm", &"route_02_stable"])
+	_safe_metrics = _new_metrics("safe", [])
 	var persistent := _persistent_ids()
 	await _cast_accepted_slot(SkillSlotIds.ACTIVE_1, &"element_bolt", _safe_metrics)
 	await _record_and_defeat_current_room(_safe_metrics)
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "safe run reaches route one")
-	await _choose_route(&"route_01_swarm", &"combat_02_swarm")
+	_expect(await _wait_for_room(&"combat_02_swarm"), "safe combat one reaches fixed combat two")
 	await _record_and_defeat_current_room(_safe_metrics)
-	_expect(await _wait_for_room(&"combat_03_layer_elite"), "safe combat two flows to combat three")
-	await _record_and_defeat_current_room(_safe_metrics)
-	_expect(await _wait_for_phase(RunPhase.SHOP), "safe combat three reaches the single shop")
+	_expect(await _wait_for_phase(RunPhase.SHOP), "safe combat two reaches the single shop")
 	await _purchase_and_equip(&"burning", SkillSlotIds.PASSIVE_1)
 	await _purchase_and_equip(&"unending", SkillSlotIds.PASSIVE_2)
 	await _purchase_and_equip(&"passive_vitality", SkillSlotIds.PASSIVE_3)
 	await _purchase_and_equip(&"passive_energy", SkillSlotIds.PASSIVE_4)
-	await _upgrade_skill(&"element_bolt", 2, 55)
-	await _upgrade_skill(&"element_bolt", 3, 95)
-	await _reset_skill(&"element_bolt", 105)
-	await _upgrade_skill(&"element_bolt", 2, 55)
-	await _upgrade_skill(&"element_bolt", 3, 95)
 	_assert_four_passive_authority("safe middle shop")
 	var runtime_before := _runtime_instances()
 	var registrations_before := _coordinator.host.runtime_loadout.passive_registration_commit_count
@@ -75,29 +68,26 @@ func _test_safe_run() -> void:
 	_expect_eq(_coordinator.host.runtime_loadout.passive_unregistration_commit_count, unregistrations_before + 1, "safe room rebuild unregisters one passive batch")
 	_expect(not _same_instances(runtime_before, _runtime_instances()), "safe room rebuild replaces all four passive runtime objects")
 	await _record_and_defeat_current_room(_safe_metrics)
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "safe combat four reaches route two")
-	await _choose_route(&"route_02_stable", &"combat_05_stable")
-	await _record_and_defeat_current_room(_safe_metrics)
 	_expect(await _wait_for_room(&"combat_06_final_boss"), "safe run loads the real boss room")
 	var boss_balance := _coordinator.current_snapshot().economy.balance
 	await _record_and_defeat_current_room(_safe_metrics)
 	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "safe settlement chest reaches result")
 	var final := _coordinator.current_snapshot()
-	_assert_completed_run(final, [&"route_01_swarm", &"route_02_stable"], 895, 300, 300, 105, 400, boss_balance, "safe")
-	_expect_eq(final.skills.progress_for(&"element_bolt").level, 3, "safe specialist finishes at bolt Lv3")
-	_assert_final_loadout(final, &"element_bolt", &"elemental_laser", &"elemental_fury")
+	_assert_completed_run(final, boss_balance, "safe")
+	_expect_eq(final.skills.progress_for(&"element_bolt").level, 1, "short demo leaves bolt at Lv1 when four passives consume the shop budget")
+	_assert_final_loadout(final, &"element_bolt", final.loadout.get_skill_id(SkillSlotIds.ACTIVE_2), final.loadout.get_skill_id(SkillSlotIds.ACTIVE_3))
 	_assert_persistent_ids(persistent, "safe")
-	_expect_eq(_unique_int_count(final.route.activated_room_instance_ids), 6, "safe run uses six different RunRoomInstance IDs")
-	_expect_eq(_unique_string_count(final.route.activated_scene_paths), 3, "safe route truthfully uses flat/platform/boss templates")
+	_expect_eq(_unique_int_count(final.route.activated_room_instance_ids), 4, "safe run uses four different RunRoomInstance IDs")
+	_expect_eq(_unique_string_count(final.route.activated_scene_paths), 2, "safe route truthfully uses flat and boss templates")
 	_safe_scene_paths = final.route.activated_scene_paths
 	_finalize_metrics(_safe_metrics, final)
-	_expect_eq(_safe_metrics["chest_dust"], 300, "safe run deterministically receives two 150-dust chests")
-	_expect_eq(_safe_metrics["chest_skills"], [&"elemental_laser", &"elemental_fury", &"element_reclaim"], "safe run deterministically receives the same three chest skills in order")
-	_expect_eq(final.economy.total_earned, 895, "safe earned ledger includes exact base and chest dust")
+	_expect(_safe_metrics["chest_dust"] in [0, 150], "safe run receives at most the one non-guaranteed 150-dust chest")
+	_expect(not (_safe_metrics["chest_skills"] as Array).is_empty(), "safe first chest grants an active skill")
+	_expect_eq(final.economy.total_earned, 345 + int(_safe_metrics["chest_dust"]), "safe earned ledger is fixed base plus typed chest dust")
 	_expect_eq(final.economy.total_spent_on_purchases, 300, "safe purchase ledger charges all four shop-only passives")
-	_expect_eq(final.economy.total_spent_on_upgrades, 300, "safe upgrade ledger retains both bolt upgrade sequences")
-	_expect_eq(final.economy.total_refunded, 105, "safe reset ledger freezes the exact 70 percent refund")
-	_expect_eq(final.economy.balance, 400, "safe final balance is exact after deterministic rewards and spending")
+	_expect_eq(final.economy.total_spent_on_upgrades, 0, "short demo spends no upgrade dust in the four-passive path")
+	_expect_eq(final.economy.total_refunded, 0, "short demo performs no reset in the four-passive path")
+	_expect_eq(final.economy.balance, final.economy.total_earned - 300, "safe final balance conserves fixed rewards and four purchases")
 	print("TASK31_SAFE_METRICS: " + JSON.stringify(_safe_metrics))
 
 
@@ -141,7 +131,7 @@ func _test_failure_and_new_run() -> void:
 	var old_coordinator_id := _coordinator.get_instance_id()
 	var old_session_id := _coordinator.host.run_session.get_instance_id()
 	var old_run_id := failed.route.run_id
-	_risk_run_id = &"task31_risk"
+	_risk_run_id = _pre_shop_dust_run_id("task31_second")
 	_coordinator = await _reload_run_with_override(
 		&"new_run", _risk_run_id, old_coordinator_id,
 		"failed result exposes enabled new-run recovery",
@@ -159,25 +149,18 @@ func _test_failure_and_new_run() -> void:
 
 
 func _test_risk_run() -> void:
-	_risk_metrics = _new_metrics("risk", [&"route_01_pressure", &"route_02_risk"])
+	_risk_metrics = _new_metrics("second", [])
 	_expect_eq(_coordinator.current_snapshot().route.run_id, _risk_run_id, "risk run retains the deterministic override")
 	var persistent := _persistent_ids()
 	await _cast_accepted_slot(SkillSlotIds.ACTIVE_1, &"element_bolt", _risk_metrics)
 	await _record_and_defeat_current_room(_risk_metrics)
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "risk run reaches route one")
-	await _choose_route(&"route_01_pressure", &"combat_02_pressure")
+	_expect(await _wait_for_room(&"combat_02_swarm"), "second run reaches fixed combat two")
 	await _record_and_defeat_current_room(_risk_metrics)
-	_expect(await _wait_for_room(&"combat_03_layer_elite"), "risk combat two flows to combat three")
-	await _record_and_defeat_current_room(_risk_metrics)
-	_expect(await _wait_for_phase(RunPhase.SHOP), "risk combat three reaches the single shop")
-	await _purchase_and_equip(&"element_reclaim", SkillSlotIds.ACTIVE_3)
-	await _purchase_and_equip(&"elemental_laser", SkillSlotIds.ACTIVE_2)
+	_expect(await _wait_for_phase(RunPhase.SHOP), "second combat reaches the single shop")
 	await _purchase_and_equip(&"burning", SkillSlotIds.PASSIVE_1)
 	await _purchase_and_equip(&"unending", SkillSlotIds.PASSIVE_2)
 	await _purchase_and_equip(&"passive_vitality", SkillSlotIds.PASSIVE_3)
 	await _purchase_and_equip(&"passive_energy", SkillSlotIds.PASSIVE_4)
-	await _upgrade_skill(&"element_reclaim", 2, 50)
-	await _upgrade_skill(&"elemental_laser", 2, 65)
 	_assert_four_passive_authority("risk single shop")
 	var registrations_before := _coordinator.host.runtime_loadout.passive_registration_commit_count
 	var unregistrations_before := _coordinator.host.runtime_loadout.passive_unregistration_commit_count
@@ -187,38 +170,34 @@ func _test_risk_run() -> void:
 	_expect_eq(_coordinator.host.runtime_loadout.passive_registration_commit_count, registrations_before + 1, "risk room rebuild registers one passive batch")
 	_expect_eq(_coordinator.host.runtime_loadout.passive_unregistration_commit_count, unregistrations_before + 1, "risk room rebuild unregisters one passive batch")
 	_expect(not _same_instances(runtime_before, _runtime_instances()), "risk room rebuild replaces all four passive runtimes")
-	await _cast_accepted_slot(SkillSlotIds.ACTIVE_2, &"elemental_laser", _risk_metrics)
-	await _record_and_defeat_current_room(_risk_metrics)
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "risk combat four reaches route two")
-	await _choose_route(&"route_02_risk", &"combat_05_risk")
+	var granted_active := _coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_2)
+	_expect(not granted_active.is_empty(), "second run retains the guaranteed first-chest active in A2")
 	await _record_and_defeat_current_room(_risk_metrics)
 	_expect(await _wait_for_room(&"combat_06_final_boss"), "risk run loads the real boss room")
 	_assert_four_passive_authority("risk boss room")
-	await _cast_accepted_slot(SkillSlotIds.ACTIVE_2, &"elemental_laser", _risk_metrics)
+	var boss_cast_slot := SkillSlotIds.ACTIVE_3 if not _coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_3).is_empty() else SkillSlotIds.ACTIVE_2
+	var boss_cast_skill := _coordinator.current_snapshot().loadout.get_skill_id(boss_cast_slot)
+	await _cast_accepted_slot(boss_cast_slot, boss_cast_skill, _risk_metrics)
 	var boss_balance := _coordinator.current_snapshot().economy.balance
 	await _record_and_defeat_current_room(_risk_metrics)
 	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "risk settlement chest reaches result")
 	var final := _coordinator.current_snapshot()
-	_assert_completed_run(final, [&"route_01_pressure", &"route_02_risk"], 1150, 390, 115, 0, 645, boss_balance, "risk")
+	_assert_completed_run(final, boss_balance, "second")
 	_expect_eq(final.skills.progress_for(&"element_bolt").level, 1, "risk bolt remains Lv1")
-	_expect_eq(final.skills.progress_for(&"elemental_laser").level, 2, "risk laser finishes Lv2")
-	_expect_eq(final.skills.progress_for(&"element_reclaim").level, 2, "risk reclaim finishes Lv2")
-	_assert_final_loadout(final, &"element_bolt", &"elemental_laser", &"element_reclaim")
+	_assert_final_loadout(final, &"element_bolt", granted_active, final.loadout.get_skill_id(SkillSlotIds.ACTIVE_3))
 	_assert_persistent_ids(persistent, "risk")
-	_expect_eq(_unique_int_count(final.route.activated_room_instance_ids), 6, "risk run uses six different RunRoomInstance IDs")
-	_expect_eq(_unique_string_count(final.route.activated_scene_paths), 4, "risk run uses all four real room templates")
+	_expect_eq(_unique_int_count(final.route.activated_room_instance_ids), 4, "second run uses four different RunRoomInstance IDs")
+	_expect_eq(_unique_string_count(final.route.activated_scene_paths), 2, "second run uses flat and boss templates")
 	var combined := _safe_scene_paths.duplicate()
 	combined.append_array(final.route.activated_scene_paths)
-	_expect_eq(_unique_string_count(combined), 4, "safe and risk runs collectively cover all four templates")
-	_expect(final.economy.total_earned > int(_safe_metrics["economy"]["earned"]), "risk route earns strictly more than safe route")
+	_expect_eq(_unique_string_count(combined), 2, "both route-free runs cover the fixed two templates")
 	_finalize_metrics(_risk_metrics, final)
-	_expect_eq(_risk_metrics["chest_dust"], 450, "risk run deterministically receives three 150-dust chests")
-	_expect_eq(_risk_metrics["chest_skills"], [&"elemental_laser", &"elemental_fury"], "risk run deterministically receives the same two chest skills")
-	_expect_eq(final.economy.total_earned, 1150, "risk earned ledger includes exact 700 base plus 450 chest dust")
-	_expect_eq(final.economy.total_spent_on_purchases, 390, "risk purchase ledger omits only chest-granted laser")
-	_expect_eq(final.economy.total_spent_on_upgrades, 115, "risk upgrade ledger retains reclaim and laser upgrades")
+	_expect(_risk_metrics["chest_dust"] in [0, 150], "second run receives at most one non-guaranteed dust chest")
+	_expect_eq(final.economy.total_earned, 345 + int(_risk_metrics["chest_dust"]), "second earned ledger is fixed base plus typed chest dust")
+	_expect_eq(final.economy.total_spent_on_purchases, 300, "second purchase ledger charges four passives")
+	_expect_eq(final.economy.total_spent_on_upgrades, 0, "second run performs no upgrades")
 	_expect_eq(final.economy.total_refunded, 0, "risk refund ledger remains exactly zero")
-	_expect_eq(final.economy.balance, 645, "risk final balance is exact after deterministic rewards and spending")
+	_expect_eq(final.economy.balance, final.economy.total_earned - 300, "second final balance conserves rewards and purchases")
 	print("TASK31_RISK_METRICS: " + JSON.stringify(_risk_metrics))
 
 
@@ -342,6 +321,7 @@ func _record_and_defeat_current_room(metrics: Dictionary) -> void:
 	}
 	var economy_before := _coordinator.current_snapshot().economy.total_earned
 	var owned_before := _coordinator.current_snapshot().skills.owned_skill_ids
+	var loadout_before := _coordinator.current_snapshot().loadout
 	var expected_room_dust := _room_enemy_dust(room)
 	await _defeat_current_room()
 	var economy_after := _coordinator.current_snapshot().economy.total_earned
@@ -354,17 +334,17 @@ func _record_and_defeat_current_room(metrics: Dictionary) -> void:
 			var chest_skills: Array = metrics["chest_skills"]
 			chest_skills.append(skill_id)
 			metrics["chest_skills"] = chest_skills
-			match skill_id:
-				&"elemental_laser":
-					_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_2), &"elemental_laser", "chest laser auto-equips into literal first empty A2")
-				&"elemental_fury":
-					_expect_eq(
-						_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_3),
-						&"elemental_fury" if String(metrics["label"]) == "safe" else &"element_reclaim",
-						"safe fury fills literal A3; risk full A1-A3 keeps literal reclaim without overwrite"
-					)
-				&"element_reclaim":
-					_expect(not _loadout_signature(_coordinator.current_snapshot().loadout).values().has(&"element_reclaim"), "safe full active slots keep chest reclaim owned-only without overwrite")
+			var content := CATALOG.content_for(skill_id)
+			var compatible_slots := SkillSlotIds.passive() if content.gameplay_definition.is_passive_skill() else SkillSlotIds.active()
+			var first_empty := StringName()
+			for slot_id: StringName in compatible_slots:
+				if loadout_before.get_skill_id(slot_id).is_empty():
+					first_empty = slot_id
+					break
+			if first_empty.is_empty():
+				_expect(not _loadout_signature(_coordinator.current_snapshot().loadout).values().has(skill_id), "%s remains owned-only when same-type slots are full" % String(skill_id))
+			else:
+				_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(first_empty), skill_id, "%s auto-equips into the literal first empty same-type slot" % String(skill_id))
 	room_record["duration_ms"] = maxi(1, Time.get_ticks_msec() - started)
 	var rooms: Array = metrics["rooms"]
 	rooms.append(room_record)
@@ -506,33 +486,22 @@ func _assert_four_passive_authority(context: String) -> void:
 
 func _assert_completed_run(
 		final: RunSnapshot,
-		route_ids: Array[StringName],
-		earned: int,
-		purchase_spend: int,
-		upgrade_spend: int,
-		refunded: int,
-		balance: int,
 		boss_balance: int,
 		label: String
 ) -> void:
 	_expect(final.result != null and final.result.is_complete(), "%s result is frozen complete" % label)
-	_expect_eq(final.route.completed_combat_rooms, 6, "%s completes six combats" % label)
+	_expect_eq(final.route.completed_combat_rooms, 4, "%s completes four combats" % label)
 	_expect_eq(final.route.shop_visits, 1, "%s visits one physical shop" % label)
-	_expect_eq(final.route.route_choices, 2, "%s confirms two routes" % label)
-	_expect_eq(final.route.selected_route_option_ids, route_ids, "%s freezes exact route IDs" % label)
-	_expect_eq(final.route.activated_room_instance_ids.size(), 6, "%s records six room activations" % label)
-	_expect_eq(final.economy.total_earned, earned, "%s earned ledger is exact" % label)
-	_expect_eq(final.economy.total_spent_on_purchases, purchase_spend, "%s purchase ledger is exact" % label)
-	_expect_eq(final.economy.total_spent_on_upgrades, upgrade_spend, "%s upgrade ledger is exact" % label)
-	_expect_eq(final.economy.total_refunded, refunded, "%s refund ledger is exact" % label)
-	_expect_eq(final.economy.balance, balance, "%s final balance is exact" % label)
+	_expect_eq(final.route.route_choices, 0, "%s confirms zero routes" % label)
+	_expect_eq(final.route.selected_route_option_ids, [], "%s freezes no route IDs" % label)
+	_expect_eq(final.route.activated_room_instance_ids.size(), 4, "%s records four room activations" % label)
 	_expect(final.economy.is_valid() and final.economy.balance == final.economy.conserved_balance(), "%s wallet conserves" % label)
 	_expect_eq(final.economy.balance, boss_balance, "%s boss enemy and room award zero dream dust" % label)
 	_expect(final.shop == null and final.pending_reward == null, "%s result has no stale shop or legacy pending reward" % label)
 	_expect_eq(final.result.final_node_id, &"run_result", "%s boss transaction lands on result" % label)
-	_expect_eq(final.result.completed_combat_rooms, 6, "%s result freezes six combats" % label)
+	_expect_eq(final.result.completed_combat_rooms, 4, "%s result freezes four combats" % label)
 	_expect_eq(final.result.shop_visits, 1, "%s result freezes one shop" % label)
-	_expect_eq(final.result.route_choices, 2, "%s result freezes two routes" % label)
+	_expect_eq(final.result.route_choices, 0, "%s result freezes zero routes" % label)
 
 
 func _assert_final_loadout(final: RunSnapshot, a1: StringName, a2: StringName, a3: StringName) -> void:
@@ -582,7 +551,7 @@ func _new_metrics(label: String, route_ids: Array[StringName]) -> Dictionary:
 	return {
 		"label": label,
 		"started_ms": Time.get_ticks_msec(),
-		"route_ids": [String(route_ids[0]), String(route_ids[1])],
+		"route_ids": [],
 		"rooms": [],
 		"skill_casts": {},
 		"chest_dust": 0,
@@ -657,7 +626,7 @@ func _boot_new_coordinator() -> bool:
 	_coordinator = RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
 	if _coordinator == null:
 		return false
-	_safe_run_id = &"task31_safe"
+	_safe_run_id = _pre_shop_dust_run_id("task31_safe")
 	_coordinator.run_id_override = _safe_run_id
 	root.add_child(_coordinator)
 	current_scene = _coordinator
@@ -666,6 +635,33 @@ func _boot_new_coordinator() -> bool:
 		_overlay = _coordinator.combat_hud.run_overlay as RunOverlayInterface
 		_expect_eq(_coordinator.current_snapshot().route.run_id, _safe_run_id, "safe run boots with the exact deterministic override")
 	return booted
+
+
+func _pre_shop_dust_run_id(prefix: String) -> StringName:
+	for index: int in 256:
+		var run_id := StringName("%s_%03d" % [prefix, index])
+		var session := RunSession.new(
+			CATALOG.reward_definitions(), CATALOG.relic_definitions,
+			CATALOG.initial_owned_skill_ids(), [ElementIds.WATER, ElementIds.FIRE],
+			null, null, RunRulesSnapshot.formal_disabled(), CATALOG, 0, FLOW, run_id
+		)
+		if not session.start_formal_run(&"start", 0).accepted:
+			continue
+		var first := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_first", session.snapshot().revision, first.room_id, 31_000 + index * 2, first.room_scene.resource_path).accepted:
+			continue
+		if not session.claim_formal_room_chest(&"claim_first", session.snapshot().revision, first.room_id).accepted:
+			continue
+		if not session.handle_event(RoomCompletedEvent.new(&"complete_first", first.room_id, 0, 0, first.completion_dream_dust, false)).accepted:
+			continue
+		var second := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_second", session.snapshot().revision, second.room_id, 31_001 + index * 2, second.room_scene.resource_path).accepted:
+			continue
+		var claim := session.claim_formal_room_chest(&"claim_second", session.snapshot().revision, second.room_id)
+		if claim.accepted and claim.chest_reward.kind == RunChestRewardSnapshot.Kind.DREAM_DUST:
+			return run_id
+	_expect(false, "%s finds a deterministic second-room dust cohort" % prefix)
+	return StringName("%s_fallback" % prefix)
 
 
 func _reload_run_with_override(

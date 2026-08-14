@@ -1,6 +1,8 @@
 extends SceneTree
 
 const RUN_GAME_SCENE: PackedScene = preload("res://scenes/run/run_game.tscn")
+const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const EVIDENCE_DIR := "res://docs/agent_tasks/evidence/task40/viewport"
 const DRAG_KIND := &"formal_shop_loadout"
 
@@ -27,7 +29,9 @@ func _run() -> void:
 
 	await _capture_combat("01_combat_hud_1920x1080.png", Vector2i(1920, 1080), &"combat_01_entry", false)
 	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "capture reaches first formal shop")
+	_expect(await _wait_for_room(&"combat_02_swarm"), "capture reaches fixed combat two")
+	await _defeat_current_room()
+	_expect(await _wait_for_phase(RunPhase.SHOP), "capture reaches the single formal shop")
 	await _capture_shop("02_shop_before_click_1920x1080.png", Vector2i(1920, 1080), &"element_bolt", SkillSlotIds.ACTIVE_1)
 
 	var click_before := _coordinator.current_snapshot()
@@ -38,14 +42,14 @@ func _run() -> void:
 	await _capture_shop("03_shop_after_click_before_drag_1920x1080.png", Vector2i(1920, 1080), &"element_bolt", SkillSlotIds.ACTIVE_1)
 
 	var drag_before := _coordinator.current_snapshot()
-	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_bolt", &""), SkillSlotIds.ACTIVE_2)
+	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_bolt", &""), SkillSlotIds.ACTIVE_3)
 	await process_frame
 	var drag_after := _coordinator.current_snapshot()
 	_expect_eq(drag_after.revision, drag_before.revision + 1, "one card drop advances authority exactly once")
 	_expect(drag_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_1).is_empty(), "card drag clears the prior authoritative slot")
-	_expect_eq(drag_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_2), &"element_bolt", "card drag fills A2 authoritatively")
+	_expect_eq(drag_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_3), &"element_bolt", "card drag fills the empty A3 authoritatively")
 	_expect(_visible_text(_overlay).contains("拖拽装配已由权威"), "card drag success feedback is visible")
-	await _capture_shop("04_shop_after_card_drag_1920x1080.png", Vector2i(1920, 1080), &"element_bolt", SkillSlotIds.ACTIVE_2)
+	await _capture_shop("04_shop_after_card_drag_1920x1080.png", Vector2i(1920, 1080), &"element_bolt", SkillSlotIds.ACTIVE_3)
 
 	_expect(_press(&"purchase:element_reclaim"), "capture purchases reclaim through visible control")
 	await process_frame
@@ -53,31 +57,23 @@ func _run() -> void:
 	var equip_before := _coordinator.current_snapshot()
 	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_reclaim", &""), SkillSlotIds.ACTIVE_1)
 	await process_frame
-	_expect_eq(_coordinator.current_snapshot().revision, equip_before.revision + 1, "reclaim card drop advances once")
+	_expect_eq(_coordinator.current_snapshot().revision, equip_before.revision, "reclaim card drop is idempotent after purchase auto-equips A1")
 	var swap_before := _coordinator.current_snapshot()
-	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_reclaim", SkillSlotIds.ACTIVE_1), SkillSlotIds.ACTIVE_2)
+	_overlay.call("_formal_slot_drop", Vector2.ZERO, _payload(&"element_reclaim", SkillSlotIds.ACTIVE_1), SkillSlotIds.ACTIVE_3)
 	await process_frame
 	var swap_after := _coordinator.current_snapshot()
 	_expect_eq(swap_after.revision, swap_before.revision + 1, "one slot-to-slot drop advances once")
 	_expect_eq(swap_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_1), &"element_bolt", "slot swap moves target content back to A1")
-	_expect_eq(swap_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_2), &"element_reclaim", "slot swap moves dragged content into A2")
+	_expect_eq(swap_after.loadout.get_skill_id(SkillSlotIds.ACTIVE_3), &"element_reclaim", "slot swap moves dragged content into A3")
 	_expect(_coordinator.host.runtime_loadout.snapshot().same_mapping(swap_after.loadout), "slot swap keeps RuntimeLoadout aligned")
-	await _capture_shop("05_shop_after_slot_swap_2560x1440.png", Vector2i(2560, 1440), &"element_reclaim", SkillSlotIds.ACTIVE_2)
+	await _capture_shop("05_shop_after_slot_swap_2560x1440.png", Vector2i(2560, 1440), &"element_reclaim", SkillSlotIds.ACTIVE_3)
 
-	_expect(_press(&"leave_shop"), "capture leaves first shop")
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "capture reaches route one")
-	await _select_route(&"route_01_pressure", &"combat_02_pressure")
-	await _defeat_current_room()
-	_expect(await _wait_for_room(&"combat_03_layer_elite"), "capture reaches combat three")
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "capture reaches middle shop")
-	_expect(_press(&"leave_shop"), "capture leaves middle shop")
+	await _leave_physical_shop()
 	_expect(await _wait_for_room(&"combat_04_validation"), "capture reaches combat four")
 	await _capture_combat("06_combat_hud_1366x768.png", Vector2i(1366, 768), &"combat_04_validation", false)
 	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "capture reaches route two")
-	await _select_route(&"route_02_risk", &"combat_05_risk")
-	await _capture_combat("07_corridor_title_2560x1440.png", Vector2i(2560, 1440), &"combat_05_risk", true)
+	_expect(await _wait_for_room(&"combat_06_final_boss"), "capture reaches the final boss directly")
+	await _capture_combat("07_boss_title_2560x1440.png", Vector2i(2560, 1440), &"combat_06_final_boss", true)
 
 	if _failures.is_empty():
 		var directory := ProjectSettings.globalize_path(EVIDENCE_DIR)
@@ -106,6 +102,7 @@ func _boot() -> bool:
 	_coordinator = RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
 	if _coordinator == null:
 		return false
+	_coordinator.run_id_override = _capture_run_id()
 	root.add_child(_coordinator)
 	current_scene = _coordinator
 	var booted := await _wait_for_room(&"combat_01_entry")
@@ -155,22 +152,6 @@ func _capture_shop(file_name: String, size: Vector2i, expected_skill_id: StringN
 	await _store_capture(file_name, size)
 
 
-func _select_route(option_id: StringName, room_id: StringName) -> void:
-	var cards := _overlay.formal_route_cards()
-	var focused := false
-	var options := _coordinator.current_snapshot().route.next_options
-	for index: int in options.size():
-		if options[index].option_id == option_id and index < cards.size():
-			cards[index].pressed.emit()
-			focused = true
-			break
-	await process_frame
-	_expect(focused and _overlay.formal_selected_route_id() == option_id, "route %s is focused without submitting" % String(option_id))
-	_expect(_overlay.formal_route_confirm_button() != null and not _overlay.formal_route_confirm_button().disabled, "focused route enables independent confirm")
-	_overlay.formal_route_confirm_button().pressed.emit()
-	_expect(await _wait_for_room(room_id), "route confirmation loads %s" % String(room_id))
-
-
 func _payload(skill_id: StringName, source_slot_id: StringName) -> Dictionary:
 	return {
 		"kind": DRAG_KIND,
@@ -192,7 +173,11 @@ func _defeat_current_room() -> void:
 	_expect(room != null and room.configured, "capture active room is configured")
 	if room == null:
 		return
-	for enemy: CombatEnemy in room.enemies:
+	var enemies: Array[CombatEnemy] = room.initial_enemies.duplicate()
+	enemies.append_array(room.reinforcement_enemies)
+	for enemy: CombatEnemy in enemies:
+		if not is_instance_valid(enemy) or enemy.defeated:
+			continue
 		_hit_sequence += 1
 		var cast := CastSnapshot.new(
 			_hit_sequence,
@@ -207,7 +192,56 @@ func _defeat_current_room() -> void:
 		var request := HitRequest.new(cast, payload, _hit_sequence, 0, enemy.global_position, Vector2.RIGHT)
 		var result := enemy.combat_receiver.receive_hit(request)
 		_expect(result.accepted and enemy.defeated, "capture enemy is defeated through CombatReceiver")
+		await process_frame
+	_expect(room.room_is_cleared, "capture clears the configured room")
+	_coordinator.player.global_position = room.chest.global_position
+	_coordinator.player.interact_requested.emit()
 	await process_frame
+	if room.room_definition.final_boss:
+		return
+	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _leave_physical_shop() -> void:
+	var shop := _coordinator.active_shop_room
+	_expect(shop != null and shop.exit_portal != null, "single shop exposes its physical exit")
+	if shop == null:
+		return
+	if _overlay.visible:
+		_overlay.toggle_loadout()
+		await process_frame
+	_coordinator.player.global_position = shop.exit_portal.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _capture_run_id() -> StringName:
+	for index: int in 512:
+		var run_id := StringName("task40_capture_%03d" % index)
+		var session := RunSession.new(
+			CATALOG.reward_definitions(), CATALOG.relic_definitions, CATALOG.initial_owned_skill_ids(),
+			[ElementIds.WATER, ElementIds.FIRE], null, null, RunRulesSnapshot.formal_disabled(), CATALOG, 0, FLOW, run_id
+		)
+		if not session.start_formal_run(&"start", 0).accepted:
+			continue
+		var first := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_first", session.snapshot().revision, first.room_id, 40_000 + index * 2, first.room_scene.resource_path).accepted:
+			continue
+		var first_claim := session.claim_formal_room_chest(&"claim_first", session.snapshot().revision, first.room_id)
+		if not first_claim.accepted or first_claim.chest_reward.skill_id == &"element_reclaim":
+			continue
+		if not session.handle_event(RoomCompletedEvent.new(&"complete_first", first.room_id, 0, 0, first.completion_dream_dust, false)).accepted:
+			continue
+		var second := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_second", session.snapshot().revision, second.room_id, 40_001 + index * 2, second.room_scene.resource_path).accepted:
+			continue
+		var second_claim := session.claim_formal_room_chest(&"claim_second", session.snapshot().revision, second.room_id)
+		if second_claim.accepted and second_claim.chest_reward.kind == RunChestRewardSnapshot.Kind.DREAM_DUST:
+			return run_id
+	_expect(false, "Task40 capture finds a non-reclaim first skill and second-room dust cohort")
+	return &"task40_capture_fallback"
 
 
 func _wait_for_room(room_id: StringName) -> bool:

@@ -1,0 +1,4 @@
+"Path","Previous","Current","AddedLines","RemovedLines","Authorized","OtherChange"
+"resources/run/rooms/combat_06_final_boss.tres","display_name = ""战 6 · 占位最终 Boss""","display_name = ""战 4 · 占位最终 Boss""","1","1","yes","no"
+"combat/tests/capture_task49_five_stage_demo_visuals.gd","no delay before boss settle/save","await create_timer(1.0).timeout","1","0","yes","no"
+"all other runtime overlay files","previous L3 cold-root SHA256 set","same SHA256 set","0","0","not applicable","30/30 unchanged"

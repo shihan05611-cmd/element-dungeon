@@ -1,9 +1,9 @@
 class_name RunFlowDefinition
 extends Resource
 
-const REQUIRED_COMBAT_ROOMS: int = 6
+const REQUIRED_COMBAT_ROOMS: int = 4
 const REQUIRED_SHOPS: int = 1
-const REQUIRED_ROUTES: int = 2
+const REQUIRED_ROUTES: int = 0
 
 @export var flow_id: StringName = &""
 @export var entry_node_id: StringName = &"run_entry"

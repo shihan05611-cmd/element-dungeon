@@ -1,0 +1,6 @@
+"Surface","Before","After","Added","Removed","Changed","Result"
+"shared .godot","1169 files","1169 files","0","0","0","ZERO_DRIFT"
+"shared sidecars","3991 files","3991 files","0","0","0","ZERO_DRIFT"
+"cold sidecars","771 files","771 files","0","0","0","ZERO_DRIFT"
+"shared git status","11939 lines","11939 lines","0","0","0","EXACT_MATCH"
+"external Godot processes","3964,16380,17624","3964,16380,17624","0","0","0","UNTOUCHED"

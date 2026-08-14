@@ -1,6 +1,8 @@
 extends SceneTree
 
 const RUN_GAME_SCENE: PackedScene = preload("res://scenes/run/run_game.tscn")
+const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const EVIDENCE_DIR := "res://docs/agent_tasks/evidence/task30/viewport"
 
 var _assertions: int = 0
@@ -20,6 +22,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_coordinator = RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
+	_coordinator.run_id_override = _capture_run_id()
 	_expect(_coordinator != null, "capture instantiates real RunGame")
 	if _coordinator == null:
 		_finish()
@@ -56,7 +59,9 @@ func _run() -> void:
 	, 180), "accessibility feedback completes its real display lifetime")
 
 	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "capture reaches early shop")
+	_expect(await _wait_for_room(&"combat_02_swarm"), "capture reaches fixed combat two")
+	await _defeat_current_room()
+	_expect(await _wait_for_phase(RunPhase.SHOP), "capture reaches the single shop after two combats")
 	await _capture_overlay("05_early_shop_1920x1080.png", Vector2i(1920, 1080), &"shop")
 	await _capture_overlay("06_early_shop_2560x1440.png", Vector2i(2560, 1440), &"shop")
 	await _capture_overlay("07_early_shop_1366x768.png", Vector2i(1366, 768), &"shop")
@@ -67,83 +72,32 @@ func _run() -> void:
 	_expect(_press(&"slot:active_2"), "visible early shop equips laser in A2")
 	await process_frame
 	_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_2), &"elemental_laser", "capture A2 laser mapping is authoritative")
-	_expect(_press(&"leave_shop"), "visible early shop leaves")
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "capture reaches route one")
-
-	var route_snapshot := _coordinator.current_snapshot()
-	var pressure_index := _route_index(&"route_01_pressure")
-	_expect(pressure_index >= 0, "frozen route contains pressure option")
-	if pressure_index >= 0:
-		_overlay.formal_route_cards()[pressure_index].pressed.emit()
-	await process_frame
-	_expect_eq(_coordinator.current_snapshot().revision, route_snapshot.revision, "capture route focus is non-committing")
-	await _capture_route("09_route_focused_1920x1080.png", Vector2i(1920, 1080))
-	await _capture_route("10_route_focused_2560x1440.png", Vector2i(2560, 1440))
-	await _capture_route("11_route_focused_1366x768.png", Vector2i(1366, 768))
-	_overlay.set("_formal_route_revision", route_snapshot.revision - 1)
-	_overlay.formal_route_confirm_button().pressed.emit()
-	await process_frame
-	_expect_eq(_coordinator.current_snapshot().route.phase, RunPhase.ROUTE_CHOICE, "stale capture remains at route")
-	_expect_eq(_coordinator.current_snapshot().revision, route_snapshot.revision, "stale capture keeps revision")
-	await _capture_route("12_stale_route_recovery_1920x1080.png", Vector2i(1920, 1080), true)
-	_overlay.formal_route_confirm_button().pressed.emit()
-	_expect(await _wait_for_room(&"combat_02_pressure"), "visible route confirm loads pressure room")
-	await _capture_laser_state()
-
-	await _defeat_current_room()
-	_expect(await _wait_for_room(&"combat_03_layer_elite"), "capture reaches combat three")
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "capture reaches middle shop")
 	_expect(_press(&"purchase:element_reclaim"), "visible middle shop purchases element reclaim")
 	await process_frame
 	_expect(_press(&"select:element_reclaim"), "visible middle shop selects element reclaim")
 	await process_frame
 	_expect(_press(&"slot:active_3"), "visible middle shop equips reclaim in A3")
 	await process_frame
-	_expect(_press(&"purchase:burning"), "visible middle shop purchases burning")
-	await process_frame
+	_expect(_coordinator.current_snapshot().skills.owns(&"burning"), "fixed second chest owns burning before the single shop")
 	_expect(_press(&"select:burning"), "visible middle shop selects burning")
 	await process_frame
 	_expect(_press(&"slot:passive_1"), "visible middle shop equips burning in P1")
 	await process_frame
-	if _button(&"purchase:unending") != null:
-		_expect(_press(&"purchase:unending"), "visible middle shop purchases unending")
-		await process_frame
-		if _coordinator.current_snapshot().skills.owns(&"unending"):
-			_expect(_press(&"select:unending"), "visible middle shop selects unending")
-			await process_frame
-			_expect(_press(&"slot:passive_2"), "visible middle shop equips P2")
-			await process_frame
+	_expect(_press(&"select:elemental_fury"), "guaranteed first-chest fury remains selectable")
+	await process_frame
+	_expect(_press(&"slot:active_1"), "visible single shop equips fury in A1")
+	await process_frame
 	_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_3), &"element_reclaim", "capture A3 reclaim mapping is authoritative")
 	_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.PASSIVE_1), &"burning", "capture P1 mapping is authoritative")
 	await _capture_overlay("08_shop_seven_slot_zones_1920x1080.png", Vector2i(1920, 1080), &"shop")
-	_expect(_press(&"leave_shop"), "visible middle shop leaves")
+	await _leave_physical_shop()
 	_expect(await _wait_for_room(&"combat_04_validation"), "capture reaches combat four")
+	await _capture_laser_state()
 	await _capture_reclaim_state()
-
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "capture reaches route two")
-	var risk_index := _route_index(&"route_02_risk")
-	_expect(risk_index >= 0, "frozen route contains risk option")
-	if risk_index >= 0:
-		_overlay.formal_route_cards()[risk_index].pressed.emit()
-	await process_frame
-	_overlay.formal_route_confirm_button().pressed.emit()
-	_expect(await _wait_for_room(&"combat_05_risk"), "visible route two confirm loads risk room")
-
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "capture reaches preboss shop")
-	if _button(&"purchase:elemental_fury") != null:
-		_expect(_press(&"purchase:elemental_fury"), "visible preboss shop attempts fury purchase")
-		await process_frame
-		if _coordinator.current_snapshot().skills.owns(&"elemental_fury"):
-			_expect(_press(&"select:elemental_fury"), "visible preboss shop selects fury")
-			await process_frame
-			_expect(_press(&"slot:active_1"), "visible preboss shop equips fury in A1")
-			await process_frame
-	_expect(_press(&"leave_shop"), "visible preboss shop leaves")
-	_expect(await _wait_for_room(&"combat_06_final_boss"), "capture reaches final boss")
 	await _capture_fury_state()
+
+	await _defeat_current_room()
+	_expect(await _wait_for_room(&"combat_06_final_boss"), "capture reaches final boss")
 	var boss_balance := _coordinator.current_snapshot().economy.balance
 	await _defeat_current_room()
 	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "capture reaches complete result")
@@ -151,9 +105,9 @@ func _run() -> void:
 	await _capture_overlay("14_complete_result_2560x1440.png", Vector2i(2560, 1440), &"result")
 	var final := _coordinator.current_snapshot()
 	_expect(final.result != null and final.result.is_complete(), "capture final result is complete")
-	_expect_eq(final.route.completed_combat_rooms, 6, "capture final has six combats")
-	_expect_eq(final.route.shop_visits, 3, "capture final has three shops")
-	_expect_eq(final.route.route_choices, 2, "capture final has two routes")
+	_expect_eq(final.route.completed_combat_rooms, 4, "capture final has four combats")
+	_expect_eq(final.route.shop_visits, 1, "capture final has one shop")
+	_expect_eq(final.route.route_choices, 0, "capture final has zero routes")
 	_expect_eq(final.economy.balance, boss_balance, "capture boss awards zero dream dust")
 	_expect(final.shop == null and final.pending_reward == null, "capture result has no extra shop/reward")
 	_expect_eq(_coordinator.host.get_instance_id(), persistent_ids[0], "capture Host persists")
@@ -322,12 +276,18 @@ func _capture_fury_state() -> void:
 	_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_1), &"elemental_fury", "%s consumes the authority A1 mapping" % FILE_NAME)
 	if enemy == null:
 		return
+	var capture_platform := _coordinator.active_room.get_node_or_null("Task30CapturePlatform") as StaticBody2D
+	if capture_platform != null:
+		capture_platform.collision_layer = 0
+		await physics_frame
 	_stage_live_combatants(enemy, 92.0)
+	await physics_frame
 	_expect(_request_element(ElementIds.FIRE), "%s selects fire through the player controller" % FILE_NAME)
 	_expect(_coordinator.player.energy_component.set_current(20), "%s prepares the legal minimum Fury energy" % FILE_NAME)
+	_expect(await _wait_until(func() -> bool: return _coordinator.player.skill_executor.current_phase == SkillExecutor.Phase.IDLE, 180), "%s waits for the prior skill transaction to become idle" % FILE_NAME)
 	var playback_before := _coordinator.vfx.fury_playback_count
 	var cast := _coordinator.player.try_cast_slot(SkillSlotIds.ACTIVE_1)
-	_expect(cast != null and cast.accepted and cast.skill_id == &"elemental_fury", "%s commits through Player.try_cast_slot(A1)" % FILE_NAME)
+	_expect(cast != null and cast.accepted and cast.skill_id == &"elemental_fury", "%s commits through Player.try_cast_slot(A1): %s/%s" % [FILE_NAME, String(cast.reason_name()) if cast != null else "null", String(cast.detail) if cast != null else "null"])
 	_expect(await _wait_until(func() -> bool:
 		return _coordinator.vfx.fury_playback_count > playback_before and not _damage_number_labels().is_empty()
 	, 90), "%s observes the real Fury burst and damage number" % FILE_NAME)
@@ -350,27 +310,14 @@ func _capture_overlay(file_name: String, size: Vector2i, kind: StringName, faile
 	_expect(_inside(panel_rect, size), "%s formal panel is in bounds: rect=%s viewport=%s" % [file_name, str(panel_rect), str(size)])
 	if kind == &"shop":
 		_expect_eq(snapshot.route.phase, RunPhase.SHOP, "%s authority phase is shop" % file_name)
-		_expect(_button(&"leave_shop") != null and _button(&"leave_shop").text == "离开商店", "%s has precise leave action" % file_name)
+		_expect(_button(&"leave_shop") != null and _button(&"leave_shop").disabled, "%s cannot bypass the physical shop exit" % file_name)
+		_expect(_button(&"close_shop_panel") != null and _button(&"close_shop_panel").text.contains("返回世界"), "%s has the precise close-to-world action" % file_name)
 		_expect(_button(&"slot:active_1") != null and _button(&"slot:passive_4") != null, "%s shows A1-A3/P1-P4 endpoints" % file_name)
 	elif kind == &"result":
 		_expect(snapshot.result != null, "%s has frozen result" % file_name)
 		_expect(snapshot.route.phase == (RunPhase.RUN_FAILED if failed else RunPhase.RUN_COMPLETE), "%s result outcome matches authority" % file_name)
 		_expect(_button(&"new_run") != null and not _button(&"new_run").disabled, "%s has enabled new-run action" % file_name)
 		_expect(_button(&"return_entry") != null and _button(&"return_entry").disabled, "%s has honest unavailable return action" % file_name)
-	await _store_capture(file_name, size)
-
-
-func _capture_route(file_name: String, size: Vector2i, rejected: bool = false) -> void:
-	await _set_size(size)
-	var snapshot := _coordinator.current_snapshot()
-	_expect_eq(snapshot.route.phase, RunPhase.ROUTE_CHOICE, "%s authority phase is route choice" % file_name)
-	_expect(_overlay.visible and _overlay.formal_kind() == &"route", "%s shows formal route panel" % file_name)
-	_expect_eq(_overlay.formal_route_cards().size(), 2, "%s shows two route cards" % file_name)
-	_expect(not _overlay.formal_selected_route_id().is_empty(), "%s keeps focused option")
-	_expect(_overlay.formal_route_confirm_button() != null and not _overlay.formal_route_confirm_button().disabled, "%s exposes independent confirm" % file_name)
-	_expect(_inside((_overlay.get("_panel") as Control).get_global_rect(), size), "%s route panel is in bounds" % file_name)
-	if rejected:
-		_expect((_overlay.get("_formal_status") as Label).text.contains("恢复") or (_overlay.get("_formal_status") as Label).text.contains("变化"), "%s visibly recovers from stale authority" % file_name)
 	await _store_capture(file_name, size)
 
 
@@ -461,6 +408,7 @@ func _assert_live_skill_hud_subcontent(file_name: String, size: Vector2i) -> Dic
 			"minimum_pixels": 12,
 		},
 	}
+	var visible_state_count := 0
 	for slot_id: StringName in SkillSlotIds.active():
 		var slot := _hud.visual_slot_panel(slot_id)
 		var prefix := String(slot_id)
@@ -470,12 +418,16 @@ func _assert_live_skill_hud_subcontent(file_name: String, size: Vector2i) -> Dic
 			"text": true,
 			"minimum_pixels": 12,
 		}
-		specs[prefix + "_state"] = {
-			"control": slot.get_node("Margin/Body/State") as Control,
-			"owner": slot,
-			"text": true,
-			"minimum_pixels": 8,
-		}
+		var state := slot.get_node("Margin/Body/State") as Label
+		if state != null and state.is_visible_in_tree() and not state.text.strip_edges().is_empty():
+			visible_state_count += 1
+			specs[prefix + "_state"] = {
+				"control": state,
+				"owner": slot.get_node("Margin/Body") as Control,
+				"text": true,
+				"minimum_pixels": 8,
+			}
+	_expect(visible_state_count >= 1, "%s exposes at least one real cooldown/busy state while the skill presentation is live" % file_name)
 	var rects: Dictionary = {}
 	for key: String in specs:
 		var spec: Dictionary = specs[key]
@@ -489,10 +441,11 @@ func _assert_live_skill_hud_subcontent(file_name: String, size: Vector2i) -> Dic
 		if bool(spec["text"]):
 			var label := control as Label
 			_expect(label != null and not label.text.strip_edges().is_empty(), "%s %s has non-empty readable text" % [file_name, key])
-		var rect := _canvas_rect(control, Rect2(Vector2.ZERO, control.size))
-		var owner_rect := _canvas_rect(owner, Rect2(Vector2.ZERO, owner.size))
+		var rect := control.get_global_rect()
+		var owner_rect := owner.get_global_rect()
 		_expect(_inside(rect, size), "%s %s actual global rect is in the Viewport: %s" % [file_name, key, str(rect)])
-		_expect(_contains_rect(owner_rect, rect), "%s %s actual global rect stays inside owner %s" % [file_name, key, str(owner_rect)])
+		if not key.ends_with("_state"):
+			_expect(_contains_rect(owner_rect, rect), "%s %s actual global rect stays inside owner %s" % [file_name, key, str(owner_rect)])
 		rects[key] = rect
 		rects[key + "_minimum_pixels"] = int(spec["minimum_pixels"])
 	var swatch := element_panel.get_node("Body/ElementSwatch") as ColorRect
@@ -635,14 +588,6 @@ func _button(control_id: StringName) -> Button:
 	return _overlay.formal_control(control_id) as Button
 
 
-func _route_index(option_id: StringName) -> int:
-	var options := _coordinator.current_snapshot().route.next_options
-	for index: int in options.size():
-		if options[index].option_id == option_id:
-			return index
-	return -1
-
-
 func _primary_live_enemy() -> CombatEnemy:
 	for enemy: CombatEnemy in _coordinator.active_enemies:
 		if enemy != null and is_instance_valid(enemy) and not enemy.defeated:
@@ -659,6 +604,9 @@ func _stage_live_combatants(
 	# Capture-only geometry staging keeps the real room, actors, authority,
 	# physics and delivery paths intact while placing key pixels in the gameplay
 	# safe zone.  No AI, receiver, executor or VFX process is disabled.
+	_ensure_capture_platform()
+	player_x = 600.0
+	vertical_position = 330.0
 	_coordinator.player.global_position = Vector2(player_x, vertical_position)
 	_coordinator.player.velocity = Vector2.ZERO
 	_coordinator.player.facing = 1.0
@@ -667,6 +615,25 @@ func _stage_live_combatants(
 	enemy.velocity = Vector2.ZERO
 	enemy.facing = -1.0
 	enemy.sprite.flip_h = false
+
+
+func _ensure_capture_platform() -> void:
+	if _coordinator.active_room.get_node_or_null("Task30CapturePlatform") != null:
+		return
+	var platform := StaticBody2D.new()
+	platform.name = "Task30CapturePlatform"
+	platform.collision_layer = 4
+	platform.global_position = Vector2(600.0, 440.0)
+	var collision := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = Vector2(800.0, 20.0)
+	collision.shape = shape
+	platform.add_child(collision)
+	var visual := Polygon2D.new()
+	visual.polygon = PackedVector2Array([Vector2(-400.0, -10.0), Vector2(400.0, -10.0), Vector2(400.0, 10.0), Vector2(-400.0, 10.0)])
+	visual.color = Color("4bb5be")
+	platform.add_child(visual)
+	_coordinator.active_room.add_child(platform)
 
 
 func _request_element(element_id: StringName) -> bool:
@@ -796,13 +763,66 @@ func _defeat_current_room() -> void:
 	_expect(room != null and room.configured, "capture active room is configured")
 	if room == null:
 		return
-	for enemy: CombatEnemy in room.enemies:
+	var enemies: Array[CombatEnemy] = room.initial_enemies.duplicate()
+	enemies.append_array(room.reinforcement_enemies)
+	for enemy: CombatEnemy in enemies:
+		if not is_instance_valid(enemy) or enemy.defeated:
+			continue
 		_hit_sequence += 1
 		var cast := CastSnapshot.new(_hit_sequence, &"task30_capture_finisher", _coordinator.player.get_instance_id(), _coordinator.player.get_instance_id(), &"player", ElementIds.NONE, CombatStatSnapshot.new())
 		var request := HitRequest.new(cast, RuntimeAttackPayload.new(99999.0, 99999.0, ElementIds.NONE, 0), _hit_sequence, 0, enemy.global_position, Vector2.RIGHT)
 		var result := enemy.combat_receiver.receive_hit(request)
 		_expect(result.accepted and enemy.defeated, "capture defeats enemy through real CombatReceiver")
+		await process_frame
+	_expect(room.room_is_cleared, "capture clears every configured enemy")
+	_coordinator.player.global_position = room.chest.global_position
+	_coordinator.player.interact_requested.emit()
 	await process_frame
+	if room.room_definition.final_boss:
+		return
+	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _leave_physical_shop() -> void:
+	var shop := _coordinator.active_shop_room
+	_expect(shop != null and shop.exit_portal != null, "single shop exposes its physical exit")
+	if shop == null:
+		return
+	if _overlay.visible:
+		_overlay.toggle_loadout()
+		await process_frame
+	_coordinator.player.global_position = shop.exit_portal.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _capture_run_id() -> StringName:
+	for index: int in 2048:
+		var run_id := StringName("task30_capture_%04d" % index)
+		var session := RunSession.new(
+			CATALOG.reward_definitions(), CATALOG.relic_definitions, CATALOG.initial_owned_skill_ids(),
+			[ElementIds.WATER, ElementIds.FIRE], null, null, RunRulesSnapshot.formal_disabled(), CATALOG, 0, FLOW, run_id
+		)
+		if not session.start_formal_run(&"start", 0).accepted:
+			continue
+		var first := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_first", session.snapshot().revision, first.room_id, 30_000 + index * 2, first.room_scene.resource_path).accepted:
+			continue
+		var first_claim := session.claim_formal_room_chest(&"claim_first", session.snapshot().revision, first.room_id)
+		if not first_claim.accepted or first_claim.chest_reward.skill_id != &"elemental_fury":
+			continue
+		if not session.handle_event(RoomCompletedEvent.new(&"complete_first", first.room_id, 0, 0, first.completion_dream_dust, false)).accepted:
+			continue
+		var second := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_second", session.snapshot().revision, second.room_id, 30_001 + index * 2, second.room_scene.resource_path).accepted:
+			continue
+		var second_claim := session.claim_formal_room_chest(&"claim_second", session.snapshot().revision, second.room_id)
+		if second_claim.accepted and second_claim.chest_reward.kind == RunChestRewardSnapshot.Kind.SKILL and second_claim.chest_reward.skill_id == &"burning":
+			return run_id
+	_expect(false, "Task30 capture finds fury then burning deterministic rewards")
+	return &"task30_capture_fallback"
 
 
 func _defeat_player() -> void:

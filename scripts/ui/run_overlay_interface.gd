@@ -2124,8 +2124,9 @@ func _show_formal_route(cause: StringName = &"") -> void:
 	if not option_ids.has(_formal_selected_route_id):
 		_formal_selected_route_id = &""
 	var context := _label(
-		"已完成战斗 %d/6 · 当前选择：%s" % [
+		"已完成战斗 %d/%d · 当前选择：%s" % [
 			_snapshot.route.completed_combat_rooms,
+			RunFlowDefinition.REQUIRED_COMBAT_ROOMS,
 			"尚未选择" if _formal_selected_route_id.is_empty() else String(_formal_selected_route_id),
 		],
 		14,
@@ -2256,7 +2257,16 @@ func _show_formal_result() -> void:
 	columns.add_child(summary)
 	var summary_box := summary.get_node("Margin/Box") as VBoxContainer
 	summary_box.add_child(_label("战斗进度  %d / %d" % [result.completed_combat_rooms, result.total_combat_rooms], 20, UI.TEXT))
-	summary_box.add_child(_label("商店访问 %d / 1  ·  路线确认 %d / 2" % [result.shop_visits, result.route_choices], 14, UI.TEXT_MUTED))
+	summary_box.add_child(_label(
+		"商店访问 %d / %d  ·  路线确认 %d / %d" % [
+			result.shop_visits,
+			RunFlowDefinition.REQUIRED_SHOPS,
+			result.route_choices,
+			RunFlowDefinition.REQUIRED_ROUTES,
+		],
+		14,
+		UI.TEXT_MUTED
+	))
 	summary_box.add_child(_separator())
 	summary_box.add_child(_label("梦尘收入  +%d" % result.economy.total_earned, 14, UI.SUCCESS))
 	summary_box.add_child(_label("购买支出  -%d" % result.economy.total_spent_on_purchases, 14, UI.TEXT))

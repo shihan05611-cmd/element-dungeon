@@ -1,6 +1,8 @@
 extends SceneTree
 
 const RUN_GAME_SCENE: PackedScene = preload("res://scenes/run/run_game.tscn")
+const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const EVIDENCE_DIR := "res://docs/agent_tasks/evidence/task31/viewport"
 const PASSIVE_IDS: Array[StringName] = [
 	&"burning",
@@ -25,132 +27,95 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	_expect(await _boot(), "capture boots the formal safe RunGame")
+	var safe_run_id := _pre_shop_dust_run_id("task31_capture_safe")
+	_expect(await _boot(safe_run_id), "capture boots the formal first RunGame")
 	if _coordinator == null:
 		_finish()
 		return
 
-	await _capture_combat("01_safe_combat1_flat_1920x1080.png", Vector2i(1920, 1080), &"combat_01_entry", &"arena_flat", 0)
+	await _capture_combat("01_first_combat1_flat_1920x1080.png", Vector2i(1920, 1080), &"combat_01_entry", &"arena_flat", 0)
 	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "safe capture reaches shop one")
+	_expect(await _wait_for_room(&"combat_02_swarm"), "first capture reaches fixed combat two")
+	await _capture_combat("02_first_combat2_flat_1920x1080.png", Vector2i(1920, 1080), &"combat_02_swarm", &"arena_flat", 0)
+	await _defeat_current_room()
+	_expect(await _wait_for_phase(RunPhase.SHOP), "first capture reaches the single shop")
 	await _purchase_and_equip(&"burning", SkillSlotIds.PASSIVE_1)
-	await _capture_shop("02_safe_shop1_build_1920x1080.png", Vector2i(1920, 1080), 45, 1)
-	_expect(_press(&"leave_shop"), "safe capture leaves shop one")
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "safe capture reaches route one")
-	await _focus_route(&"route_01_swarm")
-	await _capture_route("03_safe_route1_swarm_1920x1080.png", Vector2i(1920, 1080), &"route_01_swarm")
-	await _confirm_route(&"combat_02_swarm")
-	await _defeat_current_room()
-	_expect(await _wait_for_room(&"combat_03_layer_elite"), "safe capture reaches combat three")
-	await _capture_combat("04_safe_combat3_platforms_1920x1080.png", Vector2i(1920, 1080), &"combat_03_layer_elite", &"arena_platforms", 1)
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "safe capture reaches shop two")
 	await _purchase_and_equip(&"unending", SkillSlotIds.PASSIVE_2)
 	await _purchase_and_equip(&"passive_vitality", SkillSlotIds.PASSIVE_3)
 	await _purchase_and_equip(&"passive_energy", SkillSlotIds.PASSIVE_4)
-	await _capture_shop("05_safe_shop2_four_passives_1920x1080.png", Vector2i(1920, 1080), 45, 4)
-	_expect(_press(&"leave_shop"), "safe capture leaves shop two")
-	_expect(await _wait_for_room(&"combat_04_validation"), "safe capture reaches combat four")
+	await _capture_shop("03_first_single_shop_four_passives_1920x1080.png", Vector2i(1920, 1080), 70, 4)
+	await _leave_physical_shop()
+	_expect(await _wait_for_room(&"combat_04_validation"), "first capture reaches combat three")
+	await _capture_combat("04_first_combat3_four_passives_1920x1080.png", Vector2i(1920, 1080), &"combat_04_validation", &"arena_flat", 4)
 	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "safe capture reaches route two")
-	await _focus_route(&"route_02_stable")
-	await _capture_route("06_safe_route2_stable_1920x1080.png", Vector2i(1920, 1080), &"route_02_stable")
-	await _confirm_route(&"combat_05_stable")
+	_expect(await _wait_for_room(&"combat_06_final_boss"), "first capture reaches boss")
+	await _capture_combat("05_first_boss_1920x1080.png", Vector2i(1920, 1080), &"combat_06_final_boss", &"arena_boss", 4)
+	var first_boss_balance := _coordinator.current_snapshot().economy.balance
 	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "safe capture reaches shop three")
-	await _upgrade(&"element_bolt", 2, 55)
-	await _upgrade(&"element_bolt", 3, 95)
-	await _reset(&"element_bolt", 105)
-	await _upgrade(&"element_bolt", 2, 55)
-	await _upgrade(&"element_bolt", 3, 95)
-	_expect_eq(_coordinator.current_snapshot().economy.balance, 100, "safe capture preboss balance is 100")
-	_expect(_press(&"leave_shop"), "safe capture leaves shop three")
-	_expect(await _wait_for_room(&"combat_06_final_boss"), "safe capture reaches boss")
-	await _capture_combat("07_safe_boss_1920x1080.png", Vector2i(1920, 1080), &"combat_06_final_boss", &"arena_boss", 4)
-	var safe_boss_balance := _coordinator.current_snapshot().economy.balance
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "safe capture reaches complete result")
-	_assert_complete_result(595, 300, 300, 105, 100, safe_boss_balance, [&"route_01_swarm", &"route_02_stable"], "safe")
-	await _capture_result("08_safe_result_1920x1080.png", Vector2i(1920, 1080), false)
+	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "first capture reaches complete result")
+	_assert_complete_result(495, 300, 0, 0, 195, first_boss_balance, [], "first")
+	await _capture_result("06_first_result_1920x1080.png", Vector2i(1920, 1080), false)
 
-	var safe_session_id := _coordinator.host.run_session.get_instance_id()
-	var safe_run_id := _coordinator.current_snapshot().route.run_id
-	_expect(_press(&"new_run"), "safe result starts the risk run through formal UI")
-	await process_frame
-	await process_frame
+	var first_session_id := _coordinator.host.run_session.get_instance_id()
+	var first_authority_id := _coordinator.current_snapshot().route.run_id
+	var second_run_id := _pre_shop_dust_run_id("task31_capture_second")
+	var scene_changed_signal: Signal = scene_changed
+	_expect(_press(&"new_run"), "first result starts the second run through formal UI")
+	await scene_changed_signal
 	_coordinator = current_scene as RunFlowCoordinator
-	_expect(_coordinator != null, "risk capture receives replacement RunGame")
+	_expect(_coordinator != null, "second capture receives replacement RunGame")
 	if _coordinator == null:
 		_finish()
 		return
-	_expect(await _wait_for_room(&"combat_01_entry"), "risk capture boots combat one")
+	_coordinator.run_id_override = second_run_id
+	_expect(await _wait_for_room(&"combat_01_entry"), "second capture boots combat one")
 	_hud = _coordinator.combat_hud
 	_overlay = _hud.run_overlay as RunOverlayInterface
-	_expect(_coordinator.host.run_session.get_instance_id() != safe_session_id, "risk capture has a new RunSession")
-	_expect(_coordinator.current_snapshot().route.run_id != safe_run_id, "risk capture has a new run ID")
-	_assert_fresh_authority("risk new run")
-	await _capture_combat("09_risk_new_run_flat_2560x1440.png", Vector2i(2560, 1440), &"combat_01_entry", &"arena_flat", 0)
+	_expect(_coordinator.host.run_session.get_instance_id() != first_session_id, "second capture has a new RunSession")
+	_expect(_coordinator.current_snapshot().route.run_id != first_authority_id, "second capture has a new run ID")
+	_assert_fresh_authority("second new run")
+	await _capture_combat("07_second_new_run_flat_2560x1440.png", Vector2i(2560, 1440), &"combat_01_entry", &"arena_flat", 0)
 	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "risk capture reaches shop one")
-	await _purchase_and_equip(&"element_reclaim", SkillSlotIds.ACTIVE_3)
-	_expect(_press(&"leave_shop"), "risk capture leaves shop one")
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "risk capture reaches route one")
-	await _focus_route(&"route_01_pressure")
-	await _capture_route("10_risk_route1_pressure_2560x1440.png", Vector2i(2560, 1440), &"route_01_pressure")
-	await _confirm_route(&"combat_02_pressure")
-	await _capture_combat("11_risk_combat2_pressure_2560x1440.png", Vector2i(2560, 1440), &"combat_02_pressure", &"arena_platforms", 0)
+	_expect(await _wait_for_room(&"combat_02_swarm"), "second capture reaches fixed combat two")
 	await _defeat_current_room()
-	_expect(await _wait_for_room(&"combat_03_layer_elite"), "risk capture reaches combat three")
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "risk capture reaches shop two")
-	await _purchase_and_equip(&"elemental_laser", SkillSlotIds.ACTIVE_2)
+	_expect(await _wait_for_phase(RunPhase.SHOP), "second capture reaches the single shop")
 	await _purchase_and_equip(&"burning", SkillSlotIds.PASSIVE_1)
 	await _purchase_and_equip(&"unending", SkillSlotIds.PASSIVE_2)
-	await _capture_shop("12_risk_shop2_multi_active_2560x1440.png", Vector2i(2560, 1440), 5, 2)
-	_expect(_press(&"leave_shop"), "risk capture leaves shop two")
-	_expect(await _wait_for_room(&"combat_04_validation"), "risk capture reaches combat four")
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "risk capture reaches route two")
-	await _focus_route(&"route_02_risk")
-	await _capture_route("13_risk_route2_corridor_2560x1440.png", Vector2i(2560, 1440), &"route_02_risk")
-	await _confirm_route(&"combat_05_risk")
-	await _capture_combat("14_risk_combat5_corridor_2560x1440.png", Vector2i(2560, 1440), &"combat_05_risk", &"arena_corridor", 2)
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "risk capture reaches shop three")
 	await _purchase_and_equip(&"passive_vitality", SkillSlotIds.PASSIVE_3)
 	await _purchase_and_equip(&"passive_energy", SkillSlotIds.PASSIVE_4)
-	await _upgrade(&"element_reclaim", 2, 50)
-	await _upgrade(&"elemental_laser", 2, 65)
-	await _capture_shop("15_risk_shop3_four_passives_2560x1440.png", Vector2i(2560, 1440), 75, 4)
-	_expect(_press(&"leave_shop"), "risk capture leaves shop three")
-	_expect(await _wait_for_room(&"combat_06_final_boss"), "risk capture reaches boss")
-	await _capture_combat("16_risk_boss_2560x1440.png", Vector2i(2560, 1440), &"combat_06_final_boss", &"arena_boss", 4)
-	var risk_boss_balance := _coordinator.current_snapshot().economy.balance
+	await _capture_shop("08_second_single_shop_four_passives_2560x1440.png", Vector2i(2560, 1440), 70, 4)
+	await _leave_physical_shop()
+	_expect(await _wait_for_room(&"combat_04_validation"), "second capture reaches combat three")
+	await _capture_combat("09_second_combat3_four_passives_2560x1440.png", Vector2i(2560, 1440), &"combat_04_validation", &"arena_flat", 4)
 	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "risk capture reaches complete result")
-	_assert_complete_result(700, 510, 115, 0, 75, risk_boss_balance, [&"route_01_pressure", &"route_02_risk"], "risk")
-	await _capture_result("17_risk_result_2560x1440.png", Vector2i(2560, 1440), false)
+	_expect(await _wait_for_room(&"combat_06_final_boss"), "second capture reaches boss")
+	await _capture_combat("10_second_boss_2560x1440.png", Vector2i(2560, 1440), &"combat_06_final_boss", &"arena_boss", 4)
+	var second_boss_balance := _coordinator.current_snapshot().economy.balance
+	await _defeat_current_room()
+	_expect(await _wait_for_phase(RunPhase.RUN_COMPLETE), "second capture reaches complete result")
+	_assert_complete_result(495, 300, 0, 0, 195, second_boss_balance, [], "second")
+	await _capture_result("11_second_result_2560x1440.png", Vector2i(2560, 1440), false)
 
-	var risk_session_id := _coordinator.host.run_session.get_instance_id()
-	var risk_run_id := _coordinator.current_snapshot().route.run_id
-	_expect(_press(&"new_run"), "risk result starts a fresh authority")
-	await process_frame
-	await process_frame
+	var second_session_id := _coordinator.host.run_session.get_instance_id()
+	var second_authority_id := _coordinator.current_snapshot().route.run_id
+	scene_changed_signal = scene_changed
+	_expect(_press(&"new_run"), "second result starts a fresh authority")
+	await scene_changed_signal
 	_coordinator = current_scene as RunFlowCoordinator
-	_expect(_coordinator != null, "post-risk new run creates a coordinator")
+	_expect(_coordinator != null, "post-second new run creates a coordinator")
 	if _coordinator == null:
 		_finish()
 		return
-	_expect(await _wait_for_room(&"combat_01_entry"), "post-risk new run boots combat one")
+	_expect(await _wait_for_room(&"combat_01_entry"), "post-second new run boots combat one")
 	_hud = _coordinator.combat_hud
 	_overlay = _hud.run_overlay as RunOverlayInterface
-	_expect(_coordinator.host.run_session.get_instance_id() != risk_session_id, "post-risk new run replaces RunSession")
-	_expect(_coordinator.current_snapshot().route.run_id != risk_run_id, "post-risk new run replaces run ID")
-	_assert_fresh_authority("post-risk new run")
-	await _capture_combat("18_new_run_reset_2560x1440.png", Vector2i(2560, 1440), &"combat_01_entry", &"arena_flat", 0)
+	_expect(_coordinator.host.run_session.get_instance_id() != second_session_id, "post-second new run replaces RunSession")
+	_expect(_coordinator.current_snapshot().route.run_id != second_authority_id, "post-second new run replaces run ID")
+	_assert_fresh_authority("post-second new run")
+	await _capture_combat("12_new_run_reset_2560x1440.png", Vector2i(2560, 1440), &"combat_01_entry", &"arena_flat", 0)
 	await _defeat_player()
 	_expect(await _wait_for_phase(RunPhase.RUN_FAILED), "capture reaches failed result through real player receiver")
-	await _capture_result("19_failed_result_2560x1440.png", Vector2i(2560, 1440), true)
+	await _capture_result("13_failed_result_2560x1440.png", Vector2i(2560, 1440), true)
 
 	if _failures.is_empty():
 		var directory := ProjectSettings.globalize_path(EVIDENCE_DIR)
@@ -175,10 +140,11 @@ func _run() -> void:
 	_finish()
 
 
-func _boot() -> bool:
+func _boot(run_id: StringName) -> bool:
 	_coordinator = RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
 	if _coordinator == null:
 		return false
+	_coordinator.run_id_override = run_id
 	root.add_child(_coordinator)
 	current_scene = _coordinator
 	var booted := await _wait_for_room(&"combat_01_entry")
@@ -203,45 +169,6 @@ func _purchase_and_equip(skill_id: StringName, slot_id: StringName) -> void:
 	await process_frame
 	_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(slot_id), skill_id, "%s slot mapping commits" % String(skill_id))
 	_expect(_coordinator.host.runtime_loadout.snapshot().same_mapping(_coordinator.current_snapshot().loadout), "%s runtime mapping aligns" % String(skill_id))
-
-
-func _upgrade(skill_id: StringName, target_level: int, price: int) -> void:
-	var before := _coordinator.current_snapshot()
-	_expect(_press(StringName("upgrade:%s" % String(skill_id))), "%s visible upgrade reaches Lv%d" % [String(skill_id), target_level])
-	await process_frame
-	var after := _coordinator.current_snapshot()
-	_expect_eq(after.skills.progress_for(skill_id).level, target_level, "%s reaches requested level" % String(skill_id))
-	_expect_eq(after.economy.balance, before.economy.balance - price, "%s upgrade charges exact price" % String(skill_id))
-
-
-func _reset(skill_id: StringName, refund: int) -> void:
-	var before := _coordinator.current_snapshot()
-	_expect(_press(StringName("reset:%s" % String(skill_id))), "%s reset opens confirmation" % String(skill_id))
-	await process_frame
-	_expect_eq(_coordinator.current_snapshot().revision, before.revision, "reset focus does not mutate authority")
-	_expect(_press(StringName("reset_confirm:%s" % String(skill_id))), "%s reset confirms visibly" % String(skill_id))
-	await process_frame
-	var after := _coordinator.current_snapshot()
-	_expect_eq(after.skills.progress_for(skill_id).level, 1, "%s reset returns Lv1" % String(skill_id))
-	_expect_eq(after.economy.balance, before.economy.balance + refund, "%s reset credits exact refund" % String(skill_id))
-
-
-func _focus_route(option_id: StringName) -> void:
-	var snapshot := _coordinator.current_snapshot()
-	var index := _route_index(option_id)
-	_expect(index >= 0, "%s exists in frozen route cards" % String(option_id))
-	if index < 0:
-		return
-	_overlay.formal_route_cards()[index].pressed.emit()
-	await process_frame
-	_expect_eq(_coordinator.current_snapshot().revision, snapshot.revision, "%s focus is non-committing" % String(option_id))
-	_expect_eq(_overlay.formal_selected_route_id(), option_id, "%s focus stores exact ID" % String(option_id))
-
-
-func _confirm_route(room_id: StringName) -> void:
-	_expect(_overlay.formal_route_confirm_button() != null and not _overlay.formal_route_confirm_button().disabled, "focused route enables confirm")
-	_overlay.formal_route_confirm_button().pressed.emit()
-	_expect(await _wait_for_room(room_id), "route confirmation loads %s" % String(room_id))
 
 
 func _capture_combat(file_name: String, size: Vector2i, room_id: StringName, template_id: StringName, passive_count: int) -> void:
@@ -280,18 +207,6 @@ func _capture_shop(file_name: String, size: Vector2i, balance: int, passive_coun
 	await _store_capture(file_name, size)
 
 
-func _capture_route(file_name: String, size: Vector2i, option_id: StringName) -> void:
-	await _set_size(size)
-	var snapshot := _coordinator.current_snapshot()
-	_expect_eq(snapshot.route.phase, RunPhase.ROUTE_CHOICE, "%s authority phase is route choice" % file_name)
-	_expect(_overlay.visible and _overlay.formal_kind() == &"route", "%s shows formal route overlay" % file_name)
-	_expect_eq(snapshot.route.next_options.size(), 2, "%s has two frozen route options" % file_name)
-	_expect_eq(_overlay.formal_selected_route_id(), option_id, "%s focuses the intended option" % file_name)
-	_expect(not _overlay.formal_route_confirm_button().disabled, "%s exposes independent confirm" % file_name)
-	_expect(_inside((_overlay.get("_panel") as Control).get_global_rect(), size), "%s route panel is in bounds" % file_name)
-	await _store_capture(file_name, size)
-
-
 func _capture_result(file_name: String, size: Vector2i, failed: bool) -> void:
 	await _set_size(size)
 	var snapshot := _coordinator.current_snapshot()
@@ -326,9 +241,9 @@ func _assert_four_passives(context: String, require_runtime: bool) -> void:
 func _assert_complete_result(earned: int, purchases: int, upgrades: int, refunded: int, balance: int, boss_balance: int, routes: Array[StringName], label: String) -> void:
 	var final := _coordinator.current_snapshot()
 	_expect(final.result != null and final.result.is_complete(), "%s result is complete" % label)
-	_expect_eq(final.route.completed_combat_rooms, 6, "%s completes six combat rooms" % label)
-	_expect_eq(final.route.shop_visits, 3, "%s visits three shops" % label)
-	_expect_eq(final.route.route_choices, 2, "%s confirms two routes" % label)
+	_expect_eq(final.route.completed_combat_rooms, 4, "%s completes four combat rooms" % label)
+	_expect_eq(final.route.shop_visits, 1, "%s visits one shop" % label)
+	_expect_eq(final.route.route_choices, 0, "%s confirms zero routes" % label)
 	_expect_eq(final.route.selected_route_option_ids, routes, "%s route IDs are frozen" % label)
 	_expect_eq(final.economy.total_earned, earned, "%s earned ledger is exact" % label)
 	_expect_eq(final.economy.total_spent_on_purchases, purchases, "%s purchase ledger is exact" % label)
@@ -364,7 +279,9 @@ func _defeat_current_room() -> void:
 	_expect(room != null and room.configured, "capture advances a configured real room")
 	if room == null:
 		return
-	for enemy: CombatEnemy in room.enemies:
+	var enemies: Array[CombatEnemy] = room.initial_enemies.duplicate()
+	enemies.append_array(room.reinforcement_enemies)
+	for enemy: CombatEnemy in enemies:
 		if enemy.defeated:
 			continue
 		_hit_sequence += 1
@@ -372,7 +289,55 @@ func _defeat_current_room() -> void:
 		var request := HitRequest.new(cast, RuntimeAttackPayload.new(99999.0, 99999.0, ElementIds.NONE, 0), _hit_sequence, 0, enemy.global_position, Vector2.RIGHT)
 		var hit := enemy.combat_receiver.receive_hit(request)
 		_expect(hit.accepted and enemy.defeated, "capture defeats enemy through real CombatReceiver")
+		await process_frame
+	_expect(room.room_is_cleared, "capture clears the configured room")
+	_coordinator.player.global_position = room.chest.global_position
+	_coordinator.player.interact_requested.emit()
 	await process_frame
+	if room.room_definition.final_boss:
+		return
+	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _leave_physical_shop() -> void:
+	var shop := _coordinator.active_shop_room
+	_expect(shop != null and shop.exit_portal != null, "single shop exposes its physical exit")
+	if shop == null:
+		return
+	if _overlay.visible:
+		_overlay.toggle_loadout()
+		await process_frame
+	_coordinator.player.global_position = shop.exit_portal.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _pre_shop_dust_run_id(prefix: String) -> StringName:
+	for index: int in 512:
+		var run_id := StringName("%s_%03d" % [prefix, index])
+		var session := RunSession.new(
+			CATALOG.reward_definitions(), CATALOG.relic_definitions, CATALOG.initial_owned_skill_ids(),
+			[ElementIds.WATER, ElementIds.FIRE], null, null, RunRulesSnapshot.formal_disabled(), CATALOG, 0, FLOW, run_id
+		)
+		if not session.start_formal_run(&"start", 0).accepted:
+			continue
+		var first := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_first", session.snapshot().revision, first.room_id, 31_000 + index * 2, first.room_scene.resource_path).accepted:
+			continue
+		if not session.claim_formal_room_chest(&"claim_first", session.snapshot().revision, first.room_id).accepted:
+			continue
+		if not session.handle_event(RoomCompletedEvent.new(&"complete_first", first.room_id, 0, 0, first.completion_dream_dust, false)).accepted:
+			continue
+		var second := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_second", session.snapshot().revision, second.room_id, 31_001 + index * 2, second.room_scene.resource_path).accepted:
+			continue
+		var claim := session.claim_formal_room_chest(&"claim_second", session.snapshot().revision, second.room_id)
+		if claim.accepted and claim.chest_reward.kind == RunChestRewardSnapshot.Kind.DREAM_DUST:
+			return run_id
+	_expect(false, "%s finds a deterministic second-room dust cohort" % prefix)
+	return StringName("%s_fallback" % prefix)
 
 
 func _defeat_player() -> void:
@@ -382,14 +347,6 @@ func _defeat_player() -> void:
 	var request := HitRequest.new(cast, RuntimeAttackPayload.new(99999.0, 99999.0, ElementIds.NONE, 0), _hit_sequence, 0, _coordinator.player.global_position, Vector2.LEFT)
 	_expect(_coordinator.player.combat_receiver.receive_hit(request).accepted, "capture player defeat uses real CombatReceiver")
 	await process_frame
-
-
-func _route_index(option_id: StringName) -> int:
-	var options := _coordinator.current_snapshot().route.next_options
-	for index: int in options.size():
-		if options[index].option_id == option_id:
-			return index
-	return -1
 
 
 func _button(control_id: StringName) -> Button:

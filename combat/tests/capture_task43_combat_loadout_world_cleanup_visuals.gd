@@ -1,9 +1,11 @@
 extends SceneTree
 
-const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_two_layer_six_combat.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const RUN_GAME: PackedScene = preload("res://scenes/run/run_game.tscn")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
+const PRESSURE_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_02_pressure.tres")
+const LAYER_ELITE_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_03_layer_elite.tres")
 const OUTPUT_DIR := "res://docs/agent_tasks/evidence/task43/screenshots"
 
 var _failures: Array[String] = []
@@ -40,7 +42,7 @@ func _run() -> void:
 		refs.append(weakref(enemy))
 		_defeat(enemy)
 	await process_frame
-	_assert(room.room_is_cleared and coordinator.combat_loadout_available(), "two waves open the same page authority gate")
+	_assert(room.room_is_cleared and coordinator.combat_loadout_available(), "all configured enemies open the same page authority gate")
 	_assert(_all_freed(refs), "all formal corpse nodes are absent before evidence")
 	overlay.toggle_loadout()
 	coordinator.player.global_position = room.chest.global_position
@@ -61,15 +63,10 @@ func _run() -> void:
 	_assert(room.chest.visible and room.chest.consumed and _chest_grounded(room), "opened chest is visible and grounded")
 	_assert(coordinator.host.runtime_loadout.snapshot().get_skill_id(_slot_for_skill(after_claim.loadout, auto_skill)) == auto_skill, "HUD authority retains the auto-equipped skill")
 	await _save("task43_03_world_no_corpses_grounded_chest_hud_1920x1080.png", Vector2i(1920, 1080))
-	coordinator.player.global_position = room.portal.global_position
-	coordinator.player.interact_requested.emit()
-	_assert(await _wait_until(func() -> bool: return coordinator.current_snapshot().route.phase == RunPhase.ROUTE_CHOICE, 180), "C1 world portal reaches route choice")
-	_assert(coordinator.choose_route(&"route_01_pressure").accepted, "capture selects the fixed pressure route through authority")
-	_assert(await _wait_combat(coordinator, &"combat_02_pressure"), "formal RunGame loads combat_02_pressure")
-	await _capture_platform(coordinator, &"combat_02_pressure", "task43_04_pressure_lower_platform_real_jump_2560x1440.png")
-	await _clear_claim_and_exit(coordinator)
-	_assert(await _wait_combat(coordinator, &"combat_03_layer_elite"), "pressure portal loads formal combat_03_layer_elite")
-	await _capture_platform(coordinator, &"combat_03_layer_elite", "task43_05_layer_elite_lower_platform_real_jump_2560x1440.png")
+	coordinator.queue_free()
+	await process_frame
+	await _capture_platform(PRESSURE_ROOM, "task43_04_pressure_lower_platform_real_jump_2560x1440.png")
+	await _capture_platform(LAYER_ELITE_ROOM, "task43_05_layer_elite_lower_platform_real_jump_2560x1440.png")
 	_assert(_saved.size() == 5, "capture writes exactly five Task43 PNG files")
 	print("Task43 visual capture: 1 test, %d images, %d failures" % [_saved.size(), _failures.size()])
 	for path: String in _saved:
@@ -103,15 +100,22 @@ func _first_chest_skill_run_id() -> StringName:
 	return &"task43_capture_fallback"
 
 
-func _capture_platform(coordinator: RunFlowCoordinator, room_id: StringName, file_name: String) -> void:
+func _capture_platform(definition: CombatRoomDefinition, file_name: String) -> void:
 	root.size = Vector2i(2560, 1440)
-	var definition := FLOW.combat_room_for(room_id)
+	var room_id := definition.room_id
 	_assert(definition.room_scene.resource_path == "res://scenes/run/rooms/room_arena_platforms.tscn", "%s uses the shared platform template" % String(room_id))
-	var room := coordinator.active_room
-	_assert(room != null and room.room_id == room_id and room.scene_path == definition.room_scene.resource_path, "%s is the active formal room" % String(room_id))
+	var stage := Node2D.new()
+	root.add_child(stage)
+	current_scene = stage
+	var room := definition.room_scene.instantiate() as RunRoomInstance
+	stage.add_child(room)
+	_assert(room.configure(definition), "%s retained room resource configures" % String(room_id))
+	room.activate()
 	for enemy: CombatEnemy in room.enemies:
 		enemy.ai_enabled = false
-	var player := coordinator.player
+	var player := PLAYER_SCENE.instantiate() as PlayerCharacter
+	stage.add_child(player)
+	player.global_position = room.player_spawn_global_position()
 	var grounded_frames := 0
 	for _frame: int in 120:
 		await physics_frame
@@ -158,6 +162,8 @@ func _capture_platform(coordinator: RunFlowCoordinator, room_id: StringName, fil
 	_assert(landed and player.global_position.distance_to(spawn) > 80.0, "%s reaches LowerPlatform only through real input/physics" % String(room_id))
 	await _settle()
 	await _save(file_name, Vector2i(2560, 1440))
+	stage.queue_free()
+	await process_frame
 
 
 func _clear_claim_and_exit(coordinator: RunFlowCoordinator) -> void:

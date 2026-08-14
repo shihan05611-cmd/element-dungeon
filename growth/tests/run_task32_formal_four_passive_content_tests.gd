@@ -2,6 +2,7 @@ extends SceneTree
 
 const RUN_GAME_SCENE: PackedScene = preload("res://scenes/run/run_game.tscn")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const PASSIVE_IDS: Array[StringName] = [
 	&"burning",
 	&"unending",
@@ -30,7 +31,7 @@ func _run() -> void:
 	_run_test("new_stat_passives_are_purchase_only_static_content", _test_new_content_contract)
 
 	_coordinator = RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
-	_coordinator.run_id_override = &"task32_passive_flow"
+	_coordinator.run_id_override = _pre_shop_dust_run_id()
 	_expect(_coordinator != null, "real RunGame instantiates for Task32")
 	if _coordinator == null:
 		_finish()
@@ -120,22 +121,12 @@ func _test_new_content_contract() -> void:
 
 func _test_first_shop() -> void:
 	await _finish_current_room()
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "combat one chest and portal reach route one")
-	var pressure_index := _route_index(&"route_01_pressure")
-	_expect(pressure_index >= 0, "formal route exposes the pressure option")
-	if pressure_index < 0:
-		return
-	_overlay.formal_route_cards()[pressure_index].pressed.emit()
-	await process_frame
-	_overlay.formal_route_confirm_button().pressed.emit()
-	_expect(await _wait_for_room(&"combat_02_pressure"), "visible route confirmation reaches combat two")
+	_expect(await _wait_for_room(&"combat_02_swarm"), "combat one reaches the fixed second combat")
 	await _finish_current_room()
-	_expect(await _wait_for_room(&"combat_03_layer_elite"), "combat two flows to the layer elite")
-	await _finish_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "combat three opens the single formal shop")
+	_expect(await _wait_for_phase(RunPhase.SHOP), "combat two opens the single formal shop")
 	_expect(_overlay.visible and _overlay.formal_kind() == &"shop", "formal shop UI is live")
 	var before := _coordinator.current_snapshot()
-	_expect(before.economy.balance >= 365 and before.economy.balance == before.economy.total_earned, "single shop balance exactly reflects three rooms plus typed chest dust")
+	_expect(before.economy.balance >= 220 and before.economy.balance == before.economy.total_earned, "single shop balance exactly reflects two rooms plus typed chest rewards")
 	_expect_eq(before.shop.offers.size(), _unowned_shop_offer_count(before), "single shop offers every and only unowned purchasable content")
 	var burning_offer := _offer_for_skill(before.shop, &"burning")
 	_expect(burning_offer != null, "first shop has formal burning offer")
@@ -190,7 +181,7 @@ func _test_first_shop() -> void:
 func _test_second_shop() -> void:
 	_expect(await _wait_for_phase(RunPhase.SHOP), "all four passives are handled in the one formal shop")
 	var second_shop := _coordinator.current_snapshot()
-	_expect(second_shop.economy.total_earned >= 365, "first three combats plus typed chests fund the single shop")
+	_expect(second_shop.economy.total_earned >= 220, "first two combats plus typed chests fund the single shop")
 	_expect_eq(second_shop.economy.balance, second_shop.economy.total_earned - 75, "single shop balance reflects the first passive purchase")
 
 	var purchases := [
@@ -278,6 +269,33 @@ func _offer_for_skill(shop: ShopSnapshot, skill_id: StringName) -> ShopOfferSnap
 		if offer.skill_id == skill_id:
 			return offer
 	return null
+
+
+func _pre_shop_dust_run_id() -> StringName:
+	for index: int in 256:
+		var run_id := StringName("task32_passive_flow_%03d" % index)
+		var session := RunSession.new(
+			CATALOG.reward_definitions(), CATALOG.relic_definitions,
+			CATALOG.initial_owned_skill_ids(), [ElementIds.WATER, ElementIds.FIRE],
+			null, null, RunRulesSnapshot.formal_disabled(), CATALOG, 0, FLOW, run_id
+		)
+		if not session.start_formal_run(&"start", 0).accepted:
+			continue
+		var first := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_first", session.snapshot().revision, first.room_id, 32_000 + index * 2, first.room_scene.resource_path).accepted:
+			continue
+		if not session.claim_formal_room_chest(&"claim_first", session.snapshot().revision, first.room_id).accepted:
+			continue
+		if not session.handle_event(RoomCompletedEvent.new(&"complete_first", first.room_id, 0, 0, first.completion_dream_dust, false)).accepted:
+			continue
+		var second := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_second", session.snapshot().revision, second.room_id, 32_001 + index * 2, second.room_scene.resource_path).accepted:
+			continue
+		var claim := session.claim_formal_room_chest(&"claim_second", session.snapshot().revision, second.room_id)
+		if claim.accepted and claim.chest_reward.kind == RunChestRewardSnapshot.Kind.DREAM_DUST:
+			return run_id
+	_expect(false, "a deterministic second-room dust cohort exists for the four-passive budget")
+	return &"task32_passive_flow_fallback"
 
 
 func _button(control_id: StringName) -> Button:

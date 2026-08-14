@@ -110,17 +110,20 @@ func _refresh_labels() -> void:
 			_player.energy_component.current_energy,
 			_player.energy_component.maximum,
 		]
-	title_label.text = "RUN GAME · 六战原型"
-	state_label.text = "阶段 %s · 战斗 %d/6 · %s%s" % [
+	title_label.text = "RUN GAME · 五阶段演示"
+	state_label.text = "阶段 %s · 战斗 %d/%d · %s%s" % [
 		String(RunPhase.name_of(route.phase)).to_upper(),
 		route.completed_combat_rooms,
+		RunFlowDefinition.REQUIRED_COMBAT_ROOMS,
 		room_name,
 		health_text,
 	]
-	economy_label.text = "梦尘 %d · 商店 %d/3 · 路线 %d/2 · Rev %d" % [
+	economy_label.text = "梦尘 %d · 商店 %d/%d · 路线 %d/%d · Rev %d" % [
 		_snapshot.economy.balance,
 		route.shop_visits,
+		RunFlowDefinition.REQUIRED_SHOPS,
 		route.route_choices,
+		RunFlowDefinition.REQUIRED_ROUTES,
 		_snapshot.revision,
 	]
 	loadout_label.text = "七槽 %s" % _loadout_text(_snapshot.loadout)
@@ -135,7 +138,7 @@ func _refresh_labels() -> void:
 	)
 	_update_route_buttons(route.next_options)
 	if _snapshot.result != null:
-		state_label.text = "结算 %s · 六战 %d/%d · 余额 %d" % [
+		state_label.text = "结算 %s · 五阶段战斗 %d/%d · 余额 %d" % [
 			"通关" if _snapshot.result.is_complete() else "失败",
 			_snapshot.result.completed_combat_rooms,
 			_snapshot.result.total_combat_rooms,

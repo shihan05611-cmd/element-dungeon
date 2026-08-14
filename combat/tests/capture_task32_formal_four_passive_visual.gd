@@ -2,6 +2,7 @@ extends SceneTree
 
 const RUN_GAME_SCENE: PackedScene = preload("res://scenes/run/run_game.tscn")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const EVIDENCE_DIR := "res://docs/agent_tasks/evidence/task32/viewport"
 const PASSIVE_IDS: Array[StringName] = [
 	&"burning",
@@ -32,6 +33,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_coordinator = RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
+	_coordinator.run_id_override = _pre_shop_dust_run_id()
 	_expect(_coordinator != null, "capture instantiates the real RunGame")
 	if _coordinator == null:
 		_finish()
@@ -43,26 +45,11 @@ func _run() -> void:
 	_overlay = _hud.run_overlay as RunOverlayInterface
 
 	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "capture reaches the first formal shop")
-	await _purchase_and_equip(&"burning", SkillSlotIds.PASSIVE_1)
-	_expect(_press(&"leave_shop"), "capture leaves first shop through the visible control")
-	_expect(await _wait_for_phase(RunPhase.ROUTE_CHOICE), "capture reaches the formal route choice")
-	var route_revision := _coordinator.current_snapshot().revision
-	var pressure_index := _route_index(&"route_01_pressure")
-	_expect(pressure_index >= 0, "capture route exposes the pressure option")
-	if pressure_index < 0:
-		_finish()
-		return
-	_overlay.formal_route_cards()[pressure_index].pressed.emit()
-	await process_frame
-	_expect_eq(_coordinator.current_snapshot().revision, route_revision, "route focus is non-committing")
-	_overlay.formal_route_confirm_button().pressed.emit()
-	_expect(await _wait_for_phase(RunPhase.COMBAT), "visible route confirmation reaches combat two")
+	_expect(await _wait_for_room(&"combat_02_swarm"), "capture reaches fixed combat two")
 	await _defeat_current_room()
-	_expect(await _wait_for_room(&"combat_03_layer_elite"), "capture reaches the formal layer elite")
-	await _defeat_current_room()
-	_expect(await _wait_for_phase(RunPhase.SHOP), "capture reaches the second formal shop")
+	_expect(await _wait_for_phase(RunPhase.SHOP), "capture reaches the single formal shop")
 
+	await _purchase_and_equip(&"burning", SkillSlotIds.PASSIVE_1)
 	await _purchase_and_equip(&"unending", SkillSlotIds.PASSIVE_2)
 	await _purchase_and_equip(&"passive_vitality", SkillSlotIds.PASSIVE_3)
 	await _purchase_and_equip(&"passive_energy", SkillSlotIds.PASSIVE_4)
@@ -77,7 +64,7 @@ func _run() -> void:
 	await _capture_shop("01_shop_four_passives_1920x1080.png", Vector2i(1920, 1080))
 	await _capture_shop("02_shop_four_passives_2560x1440.png", Vector2i(2560, 1440))
 
-	_expect(_press(&"leave_shop"), "capture leaves the second shop through the visible control")
+	await _leave_physical_shop()
 	_expect(await _wait_for_room(&"combat_04_validation"), "capture reaches real combat four after room rebuild")
 	_combat_evidence_revision = _coordinator.current_snapshot().revision
 	_assert_four_passive_authority("combat setup")
@@ -126,6 +113,7 @@ func _purchase_and_equip(skill_id: StringName, slot_id: StringName) -> void:
 	_expect(purchased.skills.owns(skill_id), "%s ownership is authoritative" % String(skill_id))
 	_expect_eq(purchased.economy.balance, before.economy.balance - 75, "%s charges the formal price once" % String(skill_id))
 	_expect_eq(purchased.revision, before.revision + 1, "%s purchase advances authority once" % String(skill_id))
+	var already_equipped := purchased.loadout.get_skill_id(slot_id) == skill_id
 	_expect(_press(StringName("select:%s" % String(skill_id))), "%s selects through the visible owned list" % String(skill_id))
 	await process_frame
 	var equip_revision := _coordinator.current_snapshot().revision
@@ -133,7 +121,7 @@ func _purchase_and_equip(skill_id: StringName, slot_id: StringName) -> void:
 	await process_frame
 	var equipped := _coordinator.current_snapshot()
 	_expect_eq(equipped.loadout.get_skill_id(slot_id), skill_id, "%s slot mapping commits immediately" % String(skill_id))
-	_expect_eq(equipped.revision, equip_revision + 1, "%s equip advances authority once" % String(skill_id))
+	_expect_eq(equipped.revision, equip_revision if already_equipped else equip_revision + 1, "%s equip is idempotent when purchase already auto-equipped it" % String(skill_id))
 	_expect(_coordinator.host.runtime_loadout.snapshot().same_mapping(equipped.loadout), "%s runtime mapping matches authority immediately" % String(skill_id))
 
 
@@ -147,7 +135,7 @@ func _capture_shop(file_name: String, size: Vector2i) -> void:
 	var panel := _overlay.get("_panel") as Control
 	_expect(panel != null and _inside(panel.get_global_rect(), _logical_viewport_rect()), "%s shop panel is fully inside the logical safe area" % file_name)
 	var copy := _visible_text(_overlay)
-	for required: String in ["梦尘余额  65", "购买支出 300", "权威即时配装", "P1", "燃烧", "P2", "不息", "P3", "坚韧体魄", "P4", "元素储备"]:
+	for required: String in ["梦尘余额  70", "购买支出 300", "权威即时配装", "P1", "燃烧", "P2", "不息", "P3", "坚韧体魄", "P4", "元素储备"]:
 		_expect(copy.contains(required), "%s contains readable formal copy: %s" % [file_name, required])
 	for index: int in PASSIVE_IDS.size():
 		var slot_button := _button(StringName("slot:%s" % String(SkillSlotIds.passive()[index])))
@@ -199,9 +187,9 @@ func _assert_four_passive_authority(context: String) -> void:
 	var snapshot := _coordinator.current_snapshot()
 	var runtime := _coordinator.host.runtime_loadout
 	_expect(snapshot != null and snapshot.economy.is_valid(), "%s has a valid authority snapshot" % context)
-	_expect_eq(snapshot.economy.total_earned, 365, "%s wallet records formal earnings" % context)
+	_expect_eq(snapshot.economy.total_earned, 370, "%s wallet records formal earnings" % context)
 	_expect_eq(snapshot.economy.total_spent_on_purchases, 300, "%s wallet records four purchases" % context)
-	_expect_eq(snapshot.economy.balance, 65, "%s wallet conserves to 65" % context)
+	_expect_eq(snapshot.economy.balance, 70, "%s wallet conserves to 70" % context)
 	_expect(snapshot.revision > 0, "%s exposes a positive authority revision" % context)
 	_expect_eq(snapshot.loadout.entries.size(), 7, "%s keeps exactly seven loadout slots" % context)
 	for index: int in PASSIVE_IDS.size():
@@ -217,11 +205,11 @@ func _assert_four_passive_authority(context: String) -> void:
 
 
 func _stage_live_combatants() -> void:
-	_coordinator.player.global_position = Vector2(430.0, 395.0)
+	_coordinator.player.global_position = Vector2(430.0, 300.0)
 	_coordinator.player.velocity = Vector2.ZERO
 	var offset := 0.0
 	for enemy: CombatEnemy in _coordinator.active_enemies:
-		enemy.global_position = Vector2(690.0 + offset, 395.0)
+		enemy.global_position = Vector2(690.0 + offset, 300.0)
 		enemy.velocity = Vector2.ZERO
 		offset += 72.0
 
@@ -231,7 +219,11 @@ func _defeat_current_room() -> void:
 	_expect(room != null and room.configured, "capture uses a configured real combat room")
 	if room == null:
 		return
-	for enemy: CombatEnemy in room.enemies:
+	var enemies: Array[CombatEnemy] = room.initial_enemies.duplicate()
+	enemies.append_array(room.reinforcement_enemies)
+	for enemy: CombatEnemy in enemies:
+		if not is_instance_valid(enemy) or enemy.defeated:
+			continue
 		_hit_sequence += 1
 		var cast := CastSnapshot.new(
 			_hit_sequence,
@@ -246,7 +238,55 @@ func _defeat_current_room() -> void:
 		var request := HitRequest.new(cast, payload, _hit_sequence, 0, enemy.global_position, Vector2.RIGHT)
 		var hit := enemy.combat_receiver.receive_hit(request)
 		_expect(hit.accepted and enemy.defeated, "capture defeats room enemy through real CombatReceiver")
+		await process_frame
+	_expect(room.room_is_cleared, "capture clears the configured room")
+	_coordinator.player.global_position = room.chest.global_position
+	_coordinator.player.interact_requested.emit()
 	await process_frame
+	if room.room_definition.final_boss:
+		return
+	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _leave_physical_shop() -> void:
+	var shop := _coordinator.active_shop_room
+	_expect(shop != null and shop.exit_portal != null, "single shop exposes its physical exit")
+	if shop == null:
+		return
+	if _overlay.visible:
+		_overlay.toggle_loadout()
+		await process_frame
+	_coordinator.player.global_position = shop.exit_portal.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
+
+
+func _pre_shop_dust_run_id() -> StringName:
+	for index: int in 256:
+		var run_id := StringName("task32_capture_%03d" % index)
+		var session := RunSession.new(
+			CATALOG.reward_definitions(), CATALOG.relic_definitions, CATALOG.initial_owned_skill_ids(),
+			[ElementIds.WATER, ElementIds.FIRE], null, null, RunRulesSnapshot.formal_disabled(), CATALOG, 0, FLOW, run_id
+		)
+		if not session.start_formal_run(&"start", 0).accepted:
+			continue
+		var first := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_first", session.snapshot().revision, first.room_id, 32_000 + index * 2, first.room_scene.resource_path).accepted:
+			continue
+		if not session.claim_formal_room_chest(&"claim_first", session.snapshot().revision, first.room_id).accepted:
+			continue
+		if not session.handle_event(RoomCompletedEvent.new(&"complete_first", first.room_id, 0, 0, first.completion_dream_dust, false)).accepted:
+			continue
+		var second := FLOW.combat_room_for(session.snapshot().route.pending_node_id)
+		if not session.accept_room_transition(&"accept_second", session.snapshot().revision, second.room_id, 32_001 + index * 2, second.room_scene.resource_path).accepted:
+			continue
+		var claim := session.claim_formal_room_chest(&"claim_second", session.snapshot().revision, second.room_id)
+		if claim.accepted and claim.chest_reward.kind == RunChestRewardSnapshot.Kind.DREAM_DUST:
+			return run_id
+	_expect(false, "Task32 capture finds a deterministic second-room dust cohort")
+	return &"task32_capture_fallback"
 
 
 func _press(control_id: StringName) -> bool:
@@ -260,14 +300,6 @@ func _press(control_id: StringName) -> bool:
 
 func _button(control_id: StringName) -> Button:
 	return _overlay.formal_control(control_id) as Button
-
-
-func _route_index(option_id: StringName) -> int:
-	var options := _coordinator.current_snapshot().route.next_options
-	for index: int in options.size():
-		if options[index].option_id == option_id:
-			return index
-	return -1
 
 
 func _wait_for_room(room_id: StringName) -> bool:

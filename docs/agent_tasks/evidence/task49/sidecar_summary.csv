@@ -1,0 +1,4 @@
+path,uid,baseline_present,generated_in_formal_scan,repository_uid_hits,result
+growth/tests/run_task49_five_stage_demo_flow_tests.gd.uid,uid://bfqt5a0jpcp76,no,yes,1,KEEP
+combat/tests/capture_task49_five_stage_demo_visuals.gd.uid,uid://c6xermvhhqy23,no,yes,1,KEEP
+

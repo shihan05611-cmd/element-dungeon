@@ -56,7 +56,7 @@ theme_override_constants/separation = 7
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.83, 0.44, 1)
 theme_override_font_sizes/font_size = 20
-text = "RUN GAME · 六战原型"
+text = "RUN GAME · 五阶段演示"
 
 [node name="State" type="Label" parent="Root/Panel/Margin/VBox"]
 layout_mode = 2

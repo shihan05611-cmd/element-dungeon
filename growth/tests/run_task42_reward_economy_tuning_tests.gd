@@ -1,6 +1,6 @@
 extends SceneTree
 
-const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_two_layer_six_combat.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const COHORT_SIZE: int = 512
 const FIRST_ROOM_ID: StringName = &"combat_01_entry"
@@ -29,8 +29,15 @@ func _test_formal_cohort_repeatability_and_distribution() -> void:
 	_expect(reward_ids.has(FOUR_POOL_OWNED_ID), "four-candidate fixture owns one real reward_pool skill")
 	var initial_ids := CATALOG.initial_owned_skill_ids()
 	initial_ids.append(FOUR_POOL_OWNED_ID)
-	var candidate_ids := reward_ids.duplicate()
-	candidate_ids.erase(FOUR_POOL_OWNED_ID)
+	var candidate_ids: Array[StringName] = []
+	for content: SkillContentDefinition in CATALOG.skill_contents:
+		if (
+			content != null
+			and content.reward_pool
+			and content.gameplay_definition.is_active_skill()
+			and not initial_ids.has(content.skill_id)
+		):
+			candidate_ids.append(content.skill_id)
 	var skill_count := 0
 	var dust_count := 0
 	var candidate_counts: Dictionary = {}
@@ -55,21 +62,21 @@ func _test_formal_cohort_repeatability_and_distribution() -> void:
 			_expect_eq(first.dream_dust, 150, "%s dust branch is exactly 150" % String(run_id))
 	var skill_percent := float(skill_count) * 100.0 / float(COHORT_SIZE)
 	var dust_percent := float(dust_count) * 100.0 / float(COHORT_SIZE)
-	_expect(skill_percent >= 45.0 and skill_percent <= 55.0, "first-chest skill share stays within 45-55 percent")
-	_expect(dust_percent >= 45.0 and dust_percent <= 55.0, "first-chest dust share stays within 45-55 percent")
+	_expect_eq(skill_count, COHORT_SIZE, "guaranteed first chest awards a skill for the full non-exhausted cohort")
+	_expect_eq(dust_count, 0, "guaranteed first chest awards no dust while an active candidate remains")
 	_expect_eq(skill_count + dust_count, COHORT_SIZE, "cohort accounts for every formal claim")
 	for candidate_id: StringName in candidate_ids:
 		var count := int(candidate_counts[candidate_id])
 		var percent := float(count) * 100.0 / float(maxi(1, skill_count))
-		_expect(count > 0, "%s is reachable on the skill branch" % String(candidate_id))
-		_expect(percent >= 20.0 and percent <= 30.0, "%s occupies 20-30 percent of four-candidate skill claims" % String(candidate_id))
+		_expect(count > 0, "%s is reachable on the guaranteed active branch" % String(candidate_id))
+		_expect(percent >= 25.0 and percent <= 40.0, "%s occupies 25-40 percent of three active candidates" % String(candidate_id))
 	_distribution = {
 		"cohort_size": COHORT_SIZE,
 		"skill_count": skill_count,
 		"dust_count": dust_count,
 		"skill_percent": snappedf(skill_percent, 0.01),
 		"dust_percent": snappedf(dust_percent, 0.01),
-		"four_candidate_skill_counts": _string_key_dictionary(candidate_counts),
+		"active_candidate_skill_counts": _string_key_dictionary(candidate_counts),
 	}
 
 
@@ -105,14 +112,10 @@ func _test_empty_pool_and_transaction_guards() -> void:
 
 func _test_frozen_reward_and_room_economy() -> void:
 	_expect_eq(RunChestRewardSnapshot.DREAM_DUST_AMOUNT, 150, "normal chest dust amount is frozen at 150")
-	var safe_pre_shop := _room_dust(&"combat_01_entry") + _room_dust(&"combat_02_swarm") + _room_dust(&"combat_03_layer_elite")
-	var risk_pre_shop := _room_dust(&"combat_01_entry") + _room_dust(&"combat_02_pressure") + _room_dust(&"combat_03_layer_elite")
-	var safe_total := safe_pre_shop + _room_dust(&"combat_04_validation") + _room_dust(&"combat_05_stable")
-	var risk_total := risk_pre_shop + _room_dust(&"combat_04_validation") + _room_dust(&"combat_05_risk")
-	_expect_eq(safe_total, 595, "safe five-room base income is frozen at 595")
-	_expect_eq(risk_total, 700, "risk five-room base income is frozen at 700")
-	_expect_eq(safe_pre_shop, 345, "safe base income before the single shop is frozen at 345")
-	_expect_eq(risk_pre_shop, 365, "risk base income before the single shop is frozen at 365")
+	var demo_pre_shop := _room_dust(&"combat_01_entry") + _room_dust(&"combat_02_swarm")
+	var demo_total := demo_pre_shop + _room_dust(&"combat_04_validation")
+	_expect_eq(demo_total, 345, "fixed three-normal-room demo base income is 345")
+	_expect_eq(demo_pre_shop, 220, "fixed two-combat pre-shop base income is 220")
 	var boss := FLOW.combat_room_for(&"combat_06_final_boss")
 	_expect(boss != null and boss.final_boss, "final room remains the formal Boss")
 	_expect_eq(_spawn_dust(boss), 0, "Boss kill dream dust is frozen at zero")

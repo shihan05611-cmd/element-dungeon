@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/run/run_flow_coordinator.gd" id="1_coordinator"]
-[ext_resource type="Resource" path="res://resources/run/flows/prototype_two_layer_six_combat.tres" id="2_flow"]
+[ext_resource type="Resource" path="res://resources/run/flows/prototype_five_stage_demo.tres" id="2_flow"]
 [ext_resource type="Resource" path="res://resources/content/run_content_catalog.tres" id="3_catalog"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="4_player"]
 [ext_resource type="Script" path="res://scripts/run_session_host.gd" id="5_host"]

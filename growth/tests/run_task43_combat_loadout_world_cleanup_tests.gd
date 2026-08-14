@@ -1,9 +1,11 @@
 extends SceneTree
 
-const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_two_layer_six_combat.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const RUN_GAME: PackedScene = preload("res://scenes/run/run_game.tscn")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
+const PRESSURE_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_02_pressure.tres")
+const LAYER_ELITE_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_03_layer_elite.tres")
 
 var _tests := 0
 var _assertions := 0
@@ -67,7 +69,7 @@ func _test_formal_acquisition_auto_equip_atomicity() -> void:
 	)
 	_expect(session.start_formal_run(&"start", 0).accepted, "formal auto-equip fixture starts through RunSession")
 	var sequence := 0
-	for room_index: int in 3:
+	for room_index: int in 2:
 		var pending := session.snapshot().route.pending_node_id
 		var room := FLOW.combat_room_for(pending)
 		sequence += 1
@@ -100,21 +102,20 @@ func _test_formal_acquisition_auto_equip_atomicity() -> void:
 			StringName("complete_%d" % sequence), pending, 0, 0,
 			definition.completion_dream_dust, definition.final_boss
 		)).accepted, "formal room %d completes" % (room_index + 1))
-		if room_index == 0:
-			_expect(session.choose_formal_route(&"route", session.snapshot().revision, &"route_01_pressure").accepted, "fixed pressure route enters the Task40 cohort")
-	_expect(session.snapshot().route.phase == RunPhase.SHOP and session.snapshot().shop != null, "three formal rooms reach the single shop")
+	_expect(session.snapshot().route.phase == RunPhase.SHOP and session.snapshot().shop != null, "two formal rooms reach the demo shop")
 	_expect_eq(session.snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_1), &"element_bolt", "fixed cohort retains bolt in A1")
-	_expect_eq(session.snapshot().loadout.get_skill_id(SkillSlotIds.PASSIVE_1), &"burning", "fixed cohort auto-equips first chest burning into literal P1")
+	_expect(not session.snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_2).is_empty(), "guaranteed first active chest auto-equips into literal A2")
 
-	var purchased_burning := _purchase(session, &"unending", &"buy_unending")
-	_expect_eq(purchased_burning.loadout.get_skill_id(SkillSlotIds.PASSIVE_2), &"unending", "shop passive purchase auto-equips into literal P2 after chest P1")
+	var purchased_burning := _purchase(session, &"burning", &"buy_burning")
+	_expect_eq(purchased_burning.loadout.get_skill_id(SkillSlotIds.PASSIVE_1), &"burning", "shop passive purchase auto-equips into literal P1")
 	var replay_before := session.snapshot()
-	var burning_offer := _offer_for_skill(replay_before.shop, &"unending")
-	var replay_purchase := session.purchase_skill(&"buy_unending", replay_before.revision - 1, replay_before.shop.session_id, burning_offer.offer_id)
+	var burning_offer := _offer_for_skill(replay_before.shop, &"burning")
+	var replay_purchase := session.purchase_skill(&"buy_burning", replay_before.revision - 1, replay_before.shop.session_id, burning_offer.offer_id)
 	_expect(replay_purchase.accepted, "identical shop purchase command replays successfully")
 	_expect_eq(session.snapshot().revision, replay_before.revision, "purchase replay changes no run revision")
 	_expect_eq(session.snapshot().loadout.revision, replay_before.loadout.revision, "purchase replay changes no loadout revision")
 
+	_purchase(session, &"unending", &"buy_unending")
 	_purchase(session, &"passive_vitality", &"buy_vitality")
 	_purchase(session, &"passive_energy", &"buy_energy")
 	var full_passives := session.snapshot()
@@ -137,7 +138,8 @@ func _test_formal_acquisition_auto_equip_atomicity() -> void:
 		else:
 			_expect_eq(after_active.loadout.get_skill_id(first_empty), skill_id, "%s fills literal first empty active slot" % String(skill_id))
 			_expect_eq(after_active.loadout.revision, before_active.loadout.revision + 1, "%s auto-equip advances loadout once" % String(skill_id))
-	_expect_eq(_slot_values(session.snapshot().loadout, SkillSlotIds.active()).slice(0, 2), [&"element_bolt", &"elemental_laser"], "active A1/A2 identities remain literal and frozen")
+	_expect_eq(session.snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_1), &"element_bolt", "active A1 identity remains literal and frozen")
+	_expect(not session.snapshot().loadout.get_skill_id(SkillSlotIds.ACTIVE_2).is_empty(), "active A2 retains the guaranteed first-chest acquisition")
 
 
 func _test_combat_loadout_gate_and_formal_cleanup() -> void:
@@ -172,17 +174,18 @@ func _test_combat_loadout_gate_and_formal_cleanup() -> void:
 	for enemy: CombatEnemy in room.initial_enemies:
 		initial_refs.append(weakref(enemy))
 		_defeat(enemy)
-	_expect(room.reinforcement_activated, "initial wave death synchronously activates the existing reinforcement batch")
+	_expect(room.reinforcement_activated, "single-wave completion synchronously closes the reinforcement gate")
 	await process_frame
 	_expect(_all_refs_freed(initial_refs), "formal initial-wave enemy nodes are gone on the next frame")
-	_expect(not room.room_is_cleared, "initial wave alone does not open the clear gate")
+	_expect(room.room_is_cleared, "first-room initial wave opens the clear gate immediately")
 	var reinforcement_refs: Array[WeakRef] = []
 	for enemy: CombatEnemy in room.reinforcement_enemies:
 		reinforcement_refs.append(weakref(enemy))
 		_defeat(enemy)
 	await process_frame
 	_expect(_all_refs_freed(reinforcement_refs), "formal reinforcement nodes are gone on the next frame")
-	_expect(room.room_is_cleared and room.chest.visible, "two waves still reveal exactly one chest")
+	_expect(reinforcement_refs.is_empty(), "first room creates no reinforcement nodes")
+	_expect(room.room_is_cleared and room.chest.visible, "single wave reveals exactly one chest")
 	_expect(coordinator.combat_loadout_available(), "same room opens combat loadout authority only after true clear")
 	_expect(overlay.visible and _visible_text(overlay).contains("可点击或拖拽调整"), "same open page refreshes to the clear state")
 	_expect(_chest_bottom_is_grounded(room), "normal chest alpha-visible bottom is grounded at 540±2 pixels")
@@ -249,8 +252,9 @@ func _test_boss_release_and_projectile_stop() -> void:
 
 
 func _test_shared_platform_real_jump_reachability() -> void:
-	for room_id: StringName in [&"combat_02_pressure", &"combat_03_layer_elite"]:
-		var definition := FLOW.combat_room_for(room_id)
+	var platform_rooms: Array[CombatRoomDefinition] = [PRESSURE_ROOM, LAYER_ELITE_ROOM]
+	for definition: CombatRoomDefinition in platform_rooms:
+		var room_id := definition.room_id
 		_expect(definition.room_scene.resource_path == "res://scenes/run/rooms/room_arena_platforms.tscn", "%s uses the shared platform template" % String(room_id))
 		var stage := Node2D.new()
 		root.add_child(stage)

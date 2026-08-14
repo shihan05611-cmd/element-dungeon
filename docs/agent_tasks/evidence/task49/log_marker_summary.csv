@@ -1,0 +1,6 @@
+marker,count,files_scanned
+SCRIPT ERROR,0,32
+Parse Error,0,32
+ERROR:,0,32
+WARNING:,0,32
+CrashHandlerException,0,32

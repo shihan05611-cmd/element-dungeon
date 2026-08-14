@@ -1,6 +1,6 @@
 extends SceneTree
 
-const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_two_layer_six_combat.tres")
+const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const RUN_GAME: PackedScene = preload("res://scenes/run/run_game.tscn")
 const BOSS_PROJECTILE: PackedScene = preload("res://scenes/run/boss_arc_projectile.tscn")
@@ -33,12 +33,14 @@ func _test_single_shop_flow_graph() -> void:
 		routes += 1 if node.kind == RunNodeKind.ROUTE else 0
 		boss += 1 if node.kind == RunNodeKind.BOSS else 0
 	_expect_eq(shops, 1, "flow contains one shop")
-	_expect_eq(routes, 2, "flow contains two route choices")
+	_expect_eq(routes, 0, "demo flow contains no route choices")
 	_expect_eq(boss, 1, "flow contains one boss")
-	_expect_eq(FLOW.node_for(&"combat_01_entry").next_node_id, &"route_01_first_branch", "C1 portal reaches route one")
-	_expect_eq(FLOW.node_for(&"combat_03_layer_elite").next_node_id, &"shop_01_mid", "C3 portal reaches the physical shop")
-	_expect_eq(FLOW.node_for(&"combat_05_stable").next_node_id, &"combat_06_final_boss", "C5 reaches boss without a third shop")
-	for room_id: StringName in [&"combat_01_entry", &"combat_02_swarm", &"combat_02_pressure", &"combat_03_layer_elite", &"combat_04_validation", &"combat_05_stable", &"combat_05_risk"]:
+	_expect_eq(FLOW.node_for(&"combat_01_entry").next_node_id, &"combat_02_swarm", "C1 portal reaches C2 directly")
+	_expect_eq(FLOW.node_for(&"combat_02_swarm").next_node_id, &"shop_demo_mid", "C2 portal reaches the physical shop")
+	_expect_eq(FLOW.node_for(&"combat_04_validation").next_node_id, &"combat_06_final_boss", "C3 reaches boss directly")
+	var first := FLOW.combat_room_for(&"combat_01_entry")
+	_expect(first.single_wave and first.enemy_spawns.size() == 2 and first.reinforcement_spawns.is_empty(), "C1 is the explicit two-enemy single-wave exception")
+	for room_id: StringName in [&"combat_02_swarm", &"combat_04_validation"]:
 		var room := FLOW.combat_room_for(room_id)
 		_expect(room.enemy_spawns.size() >= 3 and room.enemy_spawns.size() <= 5, "%s initial wave is 3-5" % String(room_id))
 		_expect(room.reinforcement_spawns.size() >= 2 and room.reinforcement_spawns.size() <= 3, "%s reinforcement wave is 2-3" % String(room_id))
@@ -46,7 +48,7 @@ func _test_single_shop_flow_graph() -> void:
 
 
 func _test_dormant_reinforcement_and_clear_gate() -> void:
-	var definition := FLOW.combat_room_for(&"combat_01_entry")
+	var definition := FLOW.combat_room_for(&"combat_02_swarm")
 	var room := definition.room_scene.instantiate() as RunRoomInstance
 	root.add_child(room)
 	_expect(room.configure(definition), "room configures both waves")
@@ -128,14 +130,10 @@ func _test_physical_safe_path_and_boss_settlement() -> void:
 	current_scene = coordinator
 	_expect(await _wait_combat(coordinator, &"combat_01_entry"), "RunGame starts in C1")
 	await _clear_claim_and_portal(coordinator, &"combat_01_entry")
-	_expect(await _wait_phase(coordinator, RunPhase.ROUTE_CHOICE), "C1 physical portal reaches route one")
-	_expect(coordinator.choose_route(&"route_01_swarm").accepted, "safe route one selected")
 	_expect(await _wait_combat(coordinator, &"combat_02_swarm"), "safe C2 room loads")
 	await _clear_claim_and_portal(coordinator, &"combat_02_swarm")
-	_expect(await _wait_combat(coordinator, &"combat_03_layer_elite"), "C3 loads after C2 portal")
-	await _clear_claim_and_portal(coordinator, &"combat_03_layer_elite")
-	_expect(await _wait_phase(coordinator, RunPhase.SHOP), "C3 portal reaches one shop")
-	_expect(await _wait_until(func() -> bool: return coordinator.active_shop_room != null, 180), "physical shop replaces C3")
+	_expect(await _wait_phase(coordinator, RunPhase.SHOP), "C2 portal reaches one shop")
+	_expect(await _wait_until(func() -> bool: return coordinator.active_shop_room != null, 180), "physical shop replaces C2")
 	var overlay := coordinator.combat_hud.run_overlay as RunOverlayInterface
 	var shop_before := _authority_signature(coordinator.current_snapshot())
 	var shop_session_id := coordinator.current_snapshot().shop.session_id
@@ -176,11 +174,7 @@ func _test_physical_safe_path_and_boss_settlement() -> void:
 	await _press_interact()
 	_expect(await _wait_combat(coordinator, &"combat_04_validation"), "shop exit portal calls existing leave transaction")
 	await _clear_claim_and_portal(coordinator, &"combat_04_validation")
-	_expect(await _wait_phase(coordinator, RunPhase.ROUTE_CHOICE), "C4 portal reaches route two")
-	_expect(coordinator.choose_route(&"route_02_stable").accepted, "safe route two selected")
-	_expect(await _wait_combat(coordinator, &"combat_05_stable"), "safe C5 loads")
-	await _clear_claim_and_portal(coordinator, &"combat_05_stable")
-	_expect(await _wait_combat(coordinator, &"combat_06_final_boss"), "C5 portal loads boss directly")
+	_expect(await _wait_combat(coordinator, &"combat_06_final_boss"), "C3 portal loads boss directly")
 	var boss := coordinator.active_room.enemies[0]
 	_expect(is_equal_approx(boss.boss_visual_scale, 1.7) and boss.get_node_or_null("BossPurpleOutline") != null, "boss is 1.7x with purple outline")
 	boss.player = coordinator.player
@@ -213,7 +207,7 @@ func _test_physical_safe_path_and_boss_settlement() -> void:
 	_expect(final.route.phase == RunPhase.RUN_COMPLETE and final.result != null and final.result.is_complete(), "settlement chest enters Results")
 	_expect_eq(final.economy.balance, before_boss_chest.economy.balance, "boss settlement chest grants zero reward")
 	_expect_eq(final.route.shop_visits, 1, "complete run visits one shop")
-	_expect_eq(final.route.completed_combat_rooms, 6, "complete run finishes six battles")
+	_expect_eq(final.route.completed_combat_rooms, 4, "complete run finishes four battles")
 	coordinator.queue_free()
 	await process_frame
 
@@ -227,7 +221,7 @@ func _clear_claim_and_portal(coordinator: RunFlowCoordinator, expected_room: Str
 	for enemy: CombatEnemy in room.reinforcement_enemies:
 		_defeat(enemy)
 	await process_frame
-	_expect(room.room_is_cleared, "%s clears only after both waves" % String(expected_room))
+	_expect(room.room_is_cleared, "%s clears after all configured enemies" % String(expected_room))
 	_expect_eq(coordinator.current_snapshot().route.current_room_id, expected_room, "kills do not auto-complete the room")
 	coordinator.player.global_position = room.chest.global_position
 	coordinator.player.interact_requested.emit()

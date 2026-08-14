@@ -17,7 +17,7 @@ dream_dust_reward = 0
 [resource]
 script = ExtResource("1_room")
 room_id = &"combat_06_final_boss"
-display_name = "战 6 · 占位最终 Boss"
+display_name = "战 4 · 占位最终 Boss"
 template_label = "终焉王座"
 encounter_label = "强化占位首领"
 environment_label = "封闭首领场"

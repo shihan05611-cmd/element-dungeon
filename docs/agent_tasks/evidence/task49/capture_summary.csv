@@ -1,0 +1,12 @@
+order,entry,tests,assertions,screenshots,result,log
+12,capture_task29_full_run_visual.gd,1,54,4,PASS,logs/formal02/12_capture_task29.log
+13,capture_task30_run_ui_visuals.gd,1,1180,16,PASS,logs/formal02/13_capture_task30.log
+14,capture_task31_full_run_visuals.gd,1,525,13,PASS,logs/formal02/14_capture_task31.log
+15,capture_task32_formal_four_passive_visual.gd,n/a,404,4,PASS,logs/formal02/15_capture_task32.log
+16,capture_task40_drag_compact_hud_visuals.gd,1,140,7,PASS,logs/formal02/16_capture_task40.log
+17,capture_task41_physical_flow_visuals.gd,n/a,n/a,10,PASS,logs/formal02/17_capture_task41.log
+18,capture_task42_reward_economy_visuals.gd,n/a,n/a,5,PASS,logs/formal02/18_capture_task42.log
+19,capture_task43_combat_loadout_world_cleanup_visuals.gd,1,n/a,5,PASS,logs/formal02/19_capture_task43.log
+20,capture_task49_five_stage_demo_visuals.gd,1,n/a,6,PASS,logs/formal02/20_capture_task49.log
+TOTAL,all_captures,n/a,at_least_2303,70,PASS,
+

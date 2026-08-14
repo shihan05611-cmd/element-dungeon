@@ -1,0 +1,14 @@
+order,entry,tests,assertions,result,log
+1,run_task49_five_stage_demo_flow_tests.gd,5,103,PASS,logs/formal02/01_task49_specialist.log
+2,run_task29_run_flow_contract_tests.gd,6,128,PASS,logs/formal02/02_task29_flow_contract.log
+3,run_task31_content_balance_tests.gd,9,276,PASS,logs/formal02/03_task31_content_balance.log
+4,run_task32_formal_four_passive_content_tests.gd,5,168,PASS,logs/formal02/04_task32_four_passive.log
+5,run_task41_physical_flow_waves_boss_tests.gd,4,84,PASS,logs/formal02/05_task41_physical_flow.log
+6,run_task42_reward_economy_tuning_tests.gd,3,2206,PASS,logs/formal02/06_task42_reward_economy.log
+7,run_task43_combat_loadout_world_cleanup_tests.gd,4,105,PASS,logs/formal02/07_task43_loadout_cleanup.log
+8,run_task29_real_room_flow_tests.gd,1,74,PASS,logs/formal02/08_combat_task29_real_flow.log
+9,run_task30_run_ui_tests.gd,9,166,PASS,logs/formal02/09_combat_task30_ui.log
+10,run_task31_full_run_e2e_tests.gd,4,383,PASS,logs/formal02/10_combat_task31_e2e.log
+11,run_task40_drag_compact_hud_tests.gd,4,103,PASS,logs/formal02/11_combat_task40_drag.log
+TOTAL,all_runners,54,3796,PASS,
+
