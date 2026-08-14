@@ -1,0 +1,257 @@
+﻿col,row,name,blank_manifest,alpha_bbox_local,visible_pixels,partial_alpha_pixels,touch_left,touch_right,touch_top,touch_bottom,outside_cell_pixels
+0,0,background_wall_base_a_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+1,0,background_wall_base_b_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+2,0,background_wall_base_c_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+3,0,background_wall_base_d_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+4,0,background_wall_crack_a_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+5,0,background_wall_crack_b_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+6,0,background_wall_deep_groove_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+7,0,background_wall_dark_arch_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+8,0,background_wall_macro_block_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+9,0,background_wall_base_e_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+10,0,background_wall_base_f_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+11,0,background_wall_base_g_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+12,0,background_wall_base_h_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+13,0,background_wall_tide_mark_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+14,0,background_wall_damp_patch_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+15,0,background_wall_sealed_niche_r0,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+0,1,background_wall_base_a_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+1,1,background_wall_base_b_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+2,1,background_wall_base_c_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+3,1,background_wall_base_d_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+4,1,background_wall_crack_a_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+5,1,background_wall_crack_b_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+6,1,background_wall_deep_groove_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+7,1,background_wall_dark_arch_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+8,1,background_wall_macro_block_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+9,1,background_wall_base_e_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+10,1,background_wall_base_f_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+11,1,background_wall_base_g_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+12,1,background_wall_base_h_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+13,1,background_wall_tide_mark_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+14,1,background_wall_damp_patch_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+15,1,background_wall_sealed_niche_r1,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+0,2,background_wall_base_a_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+1,2,background_wall_base_b_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+2,2,background_wall_base_c_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+3,2,background_wall_base_d_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+4,2,background_wall_crack_a_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+5,2,background_wall_crack_b_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+6,2,background_wall_deep_groove_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+7,2,background_wall_dark_arch_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+8,2,background_wall_macro_block_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+9,2,background_wall_base_e_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+10,2,background_wall_base_f_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+11,2,background_wall_base_g_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+12,2,background_wall_base_h_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+13,2,background_wall_tide_mark_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+14,2,background_wall_damp_patch_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+15,2,background_wall_sealed_niche_r2,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+0,3,background_wall_base_a_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+1,3,background_wall_base_b_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+2,3,background_wall_base_c_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+3,3,background_wall_base_d_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+4,3,background_wall_crack_a_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+5,3,background_wall_crack_b_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+6,3,background_wall_deep_groove_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+7,3,background_wall_dark_arch_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+8,3,background_wall_macro_block_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+9,3,background_wall_base_e_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+10,3,background_wall_base_f_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+11,3,background_wall_base_g_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+12,3,background_wall_base_h_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+13,3,background_wall_tide_mark_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+14,3,background_wall_damp_patch_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+15,3,background_wall_sealed_niche_r3,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+0,4,tidal_stone_solid_isolated_m000,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+1,4,tidal_stone_solid_endpoint_n_m001,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+2,4,tidal_stone_solid_endpoint_e_m004,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+3,4,tidal_stone_solid_corner_ne_inner_ne_m005,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+4,4,tidal_stone_solid_corner_ne_m007,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+5,4,tidal_stone_solid_endpoint_s_m016,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+6,4,tidal_stone_solid_straight_ns_m017,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+7,4,tidal_stone_solid_corner_es_inner_se_m020,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+8,4,tidal_stone_solid_tee_open_w_inner_ne_se_m021,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+9,4,tidal_stone_solid_tee_open_w_inner_se_m023,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+10,4,tidal_stone_solid_corner_es_m028,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+11,4,tidal_stone_solid_tee_open_w_inner_ne_m029,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+12,4,tidal_stone_solid_tee_open_w_m031,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+13,4,tidal_stone_solid_endpoint_w_m064,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+14,4,tidal_stone_solid_corner_nw_inner_nw_m065,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+15,4,tidal_stone_solid_straight_ew_m068,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+0,5,tidal_stone_solid_tee_open_s_inner_ne_nw_m069,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+1,5,tidal_stone_solid_tee_open_s_inner_nw_m071,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+2,5,tidal_stone_solid_corner_sw_inner_sw_m080,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+3,5,tidal_stone_solid_tee_open_e_inner_sw_nw_m081,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+4,5,tidal_stone_solid_tee_open_n_inner_se_sw_m084,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+5,5,tidal_stone_solid_cross_inner_ne_se_sw_nw_m085,no,"(0, 0, 32, 32)",912,0,true,true,true,true,0
+6,5,tidal_stone_solid_cross_inner_se_sw_nw_m087,no,"(0, 0, 32, 32)",940,0,true,true,true,true,0
+7,5,tidal_stone_solid_tee_open_n_inner_sw_m092,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+8,5,tidal_stone_solid_cross_inner_ne_sw_nw_m093,no,"(0, 0, 32, 32)",940,0,true,true,true,true,0
+9,5,tidal_stone_solid_cross_inner_sw_nw_m095,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+10,5,tidal_stone_solid_corner_sw_m112,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+11,5,tidal_stone_solid_tee_open_e_inner_nw_m113,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+12,5,tidal_stone_solid_tee_open_n_inner_se_m116,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+13,5,tidal_stone_solid_cross_inner_ne_se_nw_m117,no,"(0, 0, 32, 32)",940,0,true,true,true,true,0
+14,5,tidal_stone_solid_cross_inner_se_nw_m119,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+15,5,tidal_stone_solid_tee_open_n_m124,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+0,6,tidal_stone_solid_cross_inner_ne_nw_m125,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+1,6,tidal_stone_solid_cross_inner_nw_m127,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+2,6,tidal_stone_solid_corner_nw_m193,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+3,6,tidal_stone_solid_tee_open_s_inner_ne_m197,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+4,6,tidal_stone_solid_tee_open_s_m199,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+5,6,tidal_stone_solid_tee_open_e_inner_sw_m209,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+6,6,tidal_stone_solid_cross_inner_ne_se_sw_m213,no,"(0, 0, 32, 32)",940,0,true,true,true,true,0
+7,6,tidal_stone_solid_cross_inner_se_sw_m215,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+8,6,tidal_stone_solid_cross_inner_ne_sw_m221,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+9,6,tidal_stone_solid_cross_inner_sw_m223,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+10,6,tidal_stone_solid_tee_open_e_m241,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+11,6,tidal_stone_solid_cross_inner_ne_se_m245,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+12,6,tidal_stone_solid_cross_inner_se_m247,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+13,6,tidal_stone_solid_cross_inner_ne_m253,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+14,6,tidal_stone_solid_cross_m255,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+15,6,blank_solid_reserved_6_15,yes,None,0,0,false,false,false,false,0
+0,7,tidal_ground_top_a,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+1,7,tidal_ground_top_b,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+2,7,tidal_ground_top_c,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+3,7,tidal_vertical_wall_a,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+4,7,tidal_vertical_wall_b,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+5,7,tidal_vertical_wall_c,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+6,7,tidal_wall_foot_left,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+7,7,tidal_wall_foot_center,no,"(0, 0, 32, 32)",912,0,true,true,true,true,0
+8,7,tidal_wall_foot_right,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+9,7,tidal_ground_edge_left,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+10,7,tidal_ground_edge_right,no,"(0, 0, 32, 32)",996,0,true,true,true,true,0
+11,7,tidal_stone_full_variant_a,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+12,7,tidal_stone_full_variant_b,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+13,7,tidal_stone_full_variant_c,no,"(0, 0, 32, 32)",1024,0,true,true,true,true,0
+14,7,tidal_ground_to_wall_transition_a,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+15,7,tidal_ground_to_wall_transition_b,no,"(0, 0, 32, 32)",968,0,true,true,true,true,0
+0,8,platform_left_cap,no,"(0, 6, 32, 26)",274,0,true,true,false,false,0
+1,8,platform_center_a,no,"(0, 10, 32, 18)",248,0,true,true,false,false,0
+2,8,platform_center_b,no,"(0, 10, 32, 18)",254,0,true,true,false,false,0
+3,8,platform_center_c,no,"(0, 10, 32, 18)",254,0,true,true,false,false,0
+4,8,platform_right_cap,no,"(0, 6, 32, 26)",270,0,true,true,false,false,0
+5,8,platform_broken_left,no,"(0, 6, 32, 26)",235,0,true,true,false,false,0
+6,8,platform_broken_right,no,"(0, 6, 32, 26)",235,0,true,true,false,false,0
+7,8,platform_support_short,no,"(12, 14, 20, 32)",144,0,false,false,false,true,0
+8,8,platform_support_tall,no,"(11, 2, 21, 32)",300,0,false,false,false,true,0
+9,8,platform_underhang_a,no,"(4, 0, 28, 15)",234,0,false,false,true,false,0
+10,8,platform_underhang_b,no,"(4, 0, 28, 15)",234,0,false,false,true,false,0
+11,8,blank_platform_reserved_8_11,yes,None,0,0,false,false,false,false,0
+12,8,blank_platform_reserved_8_12,yes,None,0,0,false,false,false,false,0
+13,8,blank_platform_reserved_8_13,yes,None,0,0,false,false,false,false,0
+14,8,blank_platform_reserved_8_14,yes,None,0,0,false,false,false,false,0
+15,8,blank_platform_reserved_8_15,yes,None,0,0,false,false,false,false,0
+0,9,blank_platform_reserved_9_0,yes,None,0,0,false,false,false,false,0
+1,9,blank_platform_reserved_9_1,yes,None,0,0,false,false,false,false,0
+2,9,blank_platform_reserved_9_2,yes,None,0,0,false,false,false,false,0
+3,9,blank_platform_reserved_9_3,yes,None,0,0,false,false,false,false,0
+4,9,blank_platform_reserved_9_4,yes,None,0,0,false,false,false,false,0
+5,9,blank_platform_reserved_9_5,yes,None,0,0,false,false,false,false,0
+6,9,blank_platform_reserved_9_6,yes,None,0,0,false,false,false,false,0
+7,9,blank_platform_reserved_9_7,yes,None,0,0,false,false,false,false,0
+8,9,blank_platform_reserved_9_8,yes,None,0,0,false,false,false,false,0
+9,9,blank_platform_reserved_9_9,yes,None,0,0,false,false,false,false,0
+10,9,blank_platform_reserved_9_10,yes,None,0,0,false,false,false,false,0
+11,9,blank_platform_reserved_9_11,yes,None,0,0,false,false,false,false,0
+12,9,blank_platform_reserved_9_12,yes,None,0,0,false,false,false,false,0
+13,9,blank_platform_reserved_9_13,yes,None,0,0,false,false,false,false,0
+14,9,blank_platform_reserved_9_14,yes,None,0,0,false,false,false,false,0
+15,9,blank_platform_reserved_9_15,yes,None,0,0,false,false,false,false,0
+0,10,blank_platform_reserved_10_0,yes,None,0,0,false,false,false,false,0
+1,10,blank_platform_reserved_10_1,yes,None,0,0,false,false,false,false,0
+2,10,blank_platform_reserved_10_2,yes,None,0,0,false,false,false,false,0
+3,10,blank_platform_reserved_10_3,yes,None,0,0,false,false,false,false,0
+4,10,blank_platform_reserved_10_4,yes,None,0,0,false,false,false,false,0
+5,10,blank_platform_reserved_10_5,yes,None,0,0,false,false,false,false,0
+6,10,blank_platform_reserved_10_6,yes,None,0,0,false,false,false,false,0
+7,10,blank_platform_reserved_10_7,yes,None,0,0,false,false,false,false,0
+8,10,blank_platform_reserved_10_8,yes,None,0,0,false,false,false,false,0
+9,10,blank_platform_reserved_10_9,yes,None,0,0,false,false,false,false,0
+10,10,blank_platform_reserved_10_10,yes,None,0,0,false,false,false,false,0
+11,10,blank_platform_reserved_10_11,yes,None,0,0,false,false,false,false,0
+12,10,blank_platform_reserved_10_12,yes,None,0,0,false,false,false,false,0
+13,10,blank_platform_reserved_10_13,yes,None,0,0,false,false,false,false,0
+14,10,blank_platform_reserved_10_14,yes,None,0,0,false,false,false,false,0
+15,10,blank_platform_reserved_10_15,yes,None,0,0,false,false,false,false,0
+0,11,foreground_tidal_occluder_00,no,"(0, 0, 32, 32)",459,0,true,true,true,true,0
+1,11,foreground_tidal_occluder_01,no,"(0, 0, 32, 32)",1022,0,true,true,true,true,0
+2,11,foreground_tidal_occluder_02,no,"(0, 6, 32, 32)",368,0,true,true,false,true,0
+3,11,foreground_tidal_occluder_03,no,"(12, 0, 21, 31)",105,0,false,false,true,false,0
+4,11,foreground_tidal_occluder_04,no,"(0, 19, 32, 32)",244,0,true,true,false,true,0
+5,11,foreground_tidal_occluder_05,no,"(0, 27, 32, 32)",160,0,true,true,false,true,0
+6,11,foreground_tidal_occluder_06,no,"(0, 0, 12, 32)",278,0,true,false,true,true,0
+7,11,foreground_tidal_occluder_07,no,"(20, 0, 32, 32)",278,0,false,true,true,true,0
+8,11,foreground_tidal_occluder_08,no,"(0, 0, 32, 32)",459,0,true,true,true,true,0
+9,11,foreground_tidal_occluder_09,no,"(0, 0, 32, 32)",1022,0,true,true,true,true,0
+10,11,foreground_tidal_occluder_10,no,"(0, 6, 32, 32)",368,0,true,true,false,true,0
+11,11,foreground_tidal_occluder_11,no,"(12, 0, 21, 31)",105,0,false,false,true,false,0
+12,11,foreground_tidal_occluder_12,no,"(0, 19, 32, 32)",244,0,true,true,false,true,0
+13,11,foreground_tidal_occluder_13,no,"(0, 27, 32, 32)",160,0,true,true,false,true,0
+14,11,foreground_tidal_occluder_14,no,"(0, 0, 12, 32)",278,0,true,false,true,true,0
+15,11,foreground_tidal_occluder_15,no,"(20, 0, 32, 32)",278,0,false,true,true,true,0
+0,12,foreground_tidal_occluder_16,no,"(0, 0, 32, 32)",459,0,true,true,true,true,0
+1,12,foreground_tidal_occluder_17,no,"(0, 0, 32, 32)",1022,0,true,true,true,true,0
+2,12,foreground_tidal_occluder_18,no,"(0, 6, 32, 32)",368,0,true,true,false,true,0
+3,12,foreground_tidal_occluder_19,no,"(12, 0, 21, 31)",105,0,false,false,true,false,0
+4,12,blank_foreground_reserved_12_4,yes,None,0,0,false,false,false,false,0
+5,12,blank_foreground_reserved_12_5,yes,None,0,0,false,false,false,false,0
+6,12,blank_foreground_reserved_12_6,yes,None,0,0,false,false,false,false,0
+7,12,blank_foreground_reserved_12_7,yes,None,0,0,false,false,false,false,0
+8,12,blank_foreground_reserved_12_8,yes,None,0,0,false,false,false,false,0
+9,12,blank_foreground_reserved_12_9,yes,None,0,0,false,false,false,false,0
+10,12,blank_foreground_reserved_12_10,yes,None,0,0,false,false,false,false,0
+11,12,blank_foreground_reserved_12_11,yes,None,0,0,false,false,false,false,0
+12,12,blank_foreground_reserved_12_12,yes,None,0,0,false,false,false,false,0
+13,12,blank_foreground_reserved_12_13,yes,None,0,0,false,false,false,false,0
+14,12,blank_foreground_reserved_12_14,yes,None,0,0,false,false,false,false,0
+15,12,blank_foreground_reserved_12_15,yes,None,0,0,false,false,false,false,0
+0,13,decor_tidal_00,no,"(0, 0, 23, 22)",173,0,true,false,true,false,0
+1,13,decor_tidal_01,no,"(0, 6, 32, 32)",368,0,true,true,false,true,0
+2,13,decor_tidal_02,no,"(8, 5, 20, 29)",28,0,false,false,false,false,0
+3,13,decor_tidal_03,no,"(5, 15, 27, 28)",111,0,false,false,false,false,0
+4,13,decor_tidal_04,no,"(7, 12, 25, 31)",116,0,false,false,false,false,0
+5,13,decor_tidal_05,no,"(12, 3, 20, 31)",72,0,false,false,false,false,0
+6,13,decor_tidal_06,no,"(3, 12, 30, 21)",58,0,false,false,false,false,0
+7,13,decor_tidal_07,no,"(13, 12, 20, 20)",56,0,false,false,false,false,0
+8,13,decor_tidal_08,no,"(11, 12, 22, 30)",128,0,false,false,false,false,0
+9,13,decor_tidal_09,no,"(7, 19, 30, 32)",145,0,false,false,false,true,0
+10,13,decor_tidal_10,no,"(13, 13, 20, 20)",49,0,false,false,false,false,0
+11,13,decor_tidal_11,no,"(7, 24, 26, 28)",19,0,false,false,false,false,0
+12,13,decor_tidal_12,no,"(0, 0, 23, 22)",173,0,true,false,true,false,0
+13,13,decor_tidal_13,no,"(0, 6, 32, 32)",368,0,true,true,false,true,0
+14,13,decor_tidal_14,no,"(8, 5, 20, 29)",28,0,false,false,false,false,0
+15,13,decor_tidal_15,no,"(5, 15, 27, 28)",111,0,false,false,false,false,0
+0,14,decor_tidal_16,no,"(7, 12, 25, 31)",116,0,false,false,false,false,0
+1,14,decor_tidal_17,no,"(12, 3, 20, 31)",72,0,false,false,false,false,0
+2,14,decor_tidal_18,no,"(3, 12, 30, 21)",58,0,false,false,false,false,0
+3,14,decor_tidal_19,no,"(13, 12, 20, 20)",56,0,false,false,false,false,0
+4,14,decor_tidal_20,no,"(11, 12, 22, 30)",128,0,false,false,false,false,0
+5,14,decor_tidal_21,no,"(7, 19, 30, 32)",145,0,false,false,false,true,0
+6,14,decor_tidal_22,no,"(13, 13, 20, 20)",49,0,false,false,false,false,0
+7,14,decor_tidal_23,no,"(7, 24, 26, 28)",19,0,false,false,false,false,0
+8,14,blank_decor_reserved_14_8,yes,None,0,0,false,false,false,false,0
+9,14,blank_decor_reserved_14_9,yes,None,0,0,false,false,false,false,0
+10,14,blank_decor_reserved_14_10,yes,None,0,0,false,false,false,false,0
+11,14,blank_decor_reserved_14_11,yes,None,0,0,false,false,false,false,0
+12,14,blank_decor_reserved_14_12,yes,None,0,0,false,false,false,false,0
+13,14,blank_decor_reserved_14_13,yes,None,0,0,false,false,false,false,0
+14,14,blank_decor_reserved_14_14,yes,None,0,0,false,false,false,false,0
+15,14,blank_decor_reserved_14_15,yes,None,0,0,false,false,false,false,0
+0,15,blank_decor_reserved_15_0,yes,None,0,0,false,false,false,false,0
+1,15,blank_decor_reserved_15_1,yes,None,0,0,false,false,false,false,0
+2,15,blank_decor_reserved_15_2,yes,None,0,0,false,false,false,false,0
+3,15,blank_decor_reserved_15_3,yes,None,0,0,false,false,false,false,0
+4,15,blank_decor_reserved_15_4,yes,None,0,0,false,false,false,false,0
+5,15,blank_decor_reserved_15_5,yes,None,0,0,false,false,false,false,0
+6,15,blank_decor_reserved_15_6,yes,None,0,0,false,false,false,false,0
+7,15,blank_decor_reserved_15_7,yes,None,0,0,false,false,false,false,0
+8,15,blank_decor_reserved_15_8,yes,None,0,0,false,false,false,false,0
+9,15,blank_decor_reserved_15_9,yes,None,0,0,false,false,false,false,0
+10,15,blank_decor_reserved_15_10,yes,None,0,0,false,false,false,false,0
+11,15,blank_decor_reserved_15_11,yes,None,0,0,false,false,false,false,0
+12,15,blank_decor_reserved_15_12,yes,None,0,0,false,false,false,false,0
+13,15,blank_decor_reserved_15_13,yes,None,0,0,false,false,false,false,0
+14,15,blank_decor_reserved_15_14,yes,None,0,0,false,false,false,false,0
+15,15,blank_decor_reserved_15_15,yes,None,0,0,false,false,false,false,0

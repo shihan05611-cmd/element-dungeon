@@ -1,0 +1,24 @@
+﻿gate,pass,evidence
+formal_dimensions_and_rgba,true,six exact target canvases
+hard_alpha_formal_png,true,0 partial-alpha pixels
+terrain_masks,true,47 independent legal 8-neighbor masks
+manifest_cells,true,every 16x16 coordinate named
+background_cyclic_edges,true,all 64 background variants left=right and top=bottom
+platform_center_edges,true,center a/b/c connection profiles match
+platform_cap_connections,true,left/right caps match center connection pixels
+atlas_cell_bleed,true,exact 32x32 crop/composite boundary
+chest_shared_baseline,true,visible last row y=70
+portal_shared_baseline,true,visible last row y=92
+runtime_reference_scan,true,0 hits in permitted runtime text scope; protected project.godot excluded
+import_sidecars,true,no Task53 .import files
+frozen_masters,true,three source SHA-256 values unchanged
+legacy_assets_present,true,old runtime candidates remain for later migration
+background_key_nine_unique,true,4 base + 2 crack + groove + arch + macro have unique raw pixels
+background_all_64_unique,true,64/64 raw 32x32 RGBA pixel hashes are unique
+background_duplicate_groups,true,largest raw-pixel duplicate group is 1
+preview_uses_full_background_pool,true,24x12 preview uses every exact background tile
+preview_single_tile_frequency,true,no exact tile exceeds 10/288 cells
+preview_no_exact_stamp_adjacency,true,0 direct horizontal/vertical identical exact-tile neighbors
+preview_broad_plane_rhythm,true,same-family broad base adjacency confirms macro clustering
+protected_atlas_regions_unchanged,true,Terrain/platform/foreground/decor raw pixels unchanged
+passed_non_background_assets_unchanged,true,chest/portal/Tidal Sentry SHA-256 unchanged

@@ -1,0 +1,4 @@
+﻿path,exists,bytes,sha256,task53_action
+assets/generated/vfx/run_reward_chest/chest_closed.png,true,58245,BB7A572ACED90F0E397FE151B0220208B2046F9E701FE53DBB159C5445D0FEDE,read-only fingerprint; not modified or deleted
+assets/generated/vfx/run_reward_chest/chest_open.png,true,60531,A9BF6820C3DC137031B9C0CF3F77A5957EDE16CEDDD731DCA3D2090D410111F1,read-only fingerprint; not modified or deleted
+assets/generated/vfx/run_route_portal/portal.png,true,60194,162847F5D6062E2DE5E935759F5CF2726F2A280E60DB0FBA417D6D0B60BC600A,read-only fingerprint; not modified or deleted
