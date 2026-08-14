@@ -1,6 +1,6 @@
 # 任务 56：闪避穿过活跃敌人且不携带目标位移
 
-状态：IN_PROGRESS
+状态：REVIEW
 负责人：独立玩法执行任务（中枢派发）
 依赖：任务 48、52（均 ACCEPTED）
 Git 基线：`main` HEAD `5c0f2ee24ab8c1e494e1e185666c94edd7b79228`
@@ -91,4 +91,6 @@ Task56 只授权修改 `scripts/player.gd` 的闪避碰撞生命周期，不授�
 - 执行职责候选审计：当前可见项目任务中没有空闲且同职责、可证明无上下文压力的玩法执行对话；Task54/53 分别属于已取消地图可行性与美术 Review，不复用。处置：创建新的独立玩法执行任务，任务书自包含，压力等级 `GREEN`。
 - 执行对话：`threadId=019ffef1-5a9e-7050-a516-0e837a163100`，`hostId=local`；实际派发模型 `gpt-5.6-sol`，推理等级 `high`；隔离 Codex worktree `C:\Users\heliashi\.codex\worktrees\abf7\元素地牢-4.7`。
 - 首个 `wait_threads(timeoutMs: 0)` cursor：`ffc26f01-65d1-41d0-af01-db09011a0919:1`；快照为执行中。中枢后续使用该实际任务 id/cursor 主动跟踪，单行回执仅作断线唤醒。
-- 独立 L2 Review 对话：执行冻结后另行审计与登记，不由执行者自验收。
+- 执行冻结收取：单行回执于 2026-08-14 成功唤醒当前中枢；随后 `wait_threads` cursor 更新为 `ffc26f01-65d1-41d0-af01-db09011a0919:6`，并由 `read_thread` 收取完整交付。回执未作为验收依据。
+- 独立 L2 Review 对话：`threadId=019fff0f-a838-7ee1-8fb6-fdc9b75ea330`，`hostId=local`；模型 `gpt-5.6-sol`，推理等级 `high`；隔离 worktree `C:\Users\heliashi\.codex\worktrees\953f\元素地牢-4.7`。
+- Review 首个 `wait_threads(timeoutMs: 0)` cursor：`9f1a9ddf-7f3d-463d-b4fd-9ee04538ccdc:1`；快照为执行中。Review 不由执行者自验收。
