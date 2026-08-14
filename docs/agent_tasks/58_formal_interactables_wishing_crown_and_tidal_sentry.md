@@ -1,6 +1,6 @@
 # 任务 58：正式交互物、许愿皇冠与潮汐哨兵接线
 
-状态：REVIEW
+状态：IN_PROGRESS
 负责人：独立世界交互/敌人工程执行任务（中枢派发）
 依赖：任务 53、57（ACCEPTED）
 Git 基线：`main` HEAD `51b8ffde0894fd430517225e693b7c44008038aa`
@@ -70,6 +70,7 @@ Review Thinking：`high`
 - `scripts/run/run_shop_room_instance.gd`
 - `scripts/run/run_flow_coordinator.gd`
 - `scripts/run/run_flow_smoke_panel.gd`
+- `scripts/ui/run_overlay_interface.gd`（仅 rework2：拆分既有 L 配装入口与皇冠 F 商店入口，不新增页面）
 - `scenes/run/rooms/room_shop_formal.tscn`
 - `scenes/run/enemies/tidal_sentry.tscn`（新增）
 - `scripts/run/enemies/tidal_sentry.gd`（新增）
@@ -131,3 +132,18 @@ Review Thinking：`high`
 - fresh capture `1 test / 7 images`、180 帧 smoke、post-capture scan、final scan 均通过；final sidecar `951→951` 零差异。前两次视觉查看/取帧迭代已单列 attempts，正式第三次七图保留原始 1920×1080 字节。
 - overlay manifest 已把任务书状态纠正为 `A`；最终非 evidence overlay 为 `10 D / 16 M / 6 A` 共 32 项。六张正式 PNG 哈希未变，旧运行引用与十项旧文件均为零，保护路径与 Task57 几何零差异。
 - rework1 证据冻结于 `C:\Users\heliashi\.codex\worktrees\b487\元素地牢-4.7\docs\agent_tasks\evidence\task58\rework1\`。独立 Reviewer 必须使用全新 rework1 Review 冷根/profile，复核监听顺序稳定性、同栈诊断以及 capture 夹具未弱化视觉证明。
+
+## 10. rework1 独立复审退回（2026-08-14）
+
+- 结论：`FAIL / FROZEN`。rework1 的同栈闪现修复、`23 tests / 981 assertions`、七张 fresh 原图、180 帧、final scan、overlay/PNG/删除/sidecar/保护对账均独立通过。
+- 新阻塞：正式 CombatHUD 的物理 `L` 仍调用 `RunOverlayInterface.toggle_loadout()`；该方法在 `SHOP` 且 Overlay 关闭时走 `toggle_shop`，重新显示商店内容。Review-only 物理键诊断实测 `OVERLAY_BEFORE_L=false`、`OVERLAY_AFTER_PHYSICAL_L=true`、`active_shop_room=true`，确认 `L` 可绕过皇冠打开商店交互。
+- rework1 Review 冷根/profile：`task58-review-rework1-20260814-02` / `task58-review-rework1-profile-20260814-02`。原 Reviewer 在写入原始复审证据后遇到网络流断开；正式日志、诊断夹具、截图及冻结对账已落在 `C:\Users\heliashi\.codex\worktrees\5750\元素地牢-4.7\docs\agent_tasks\evidence\task58\review_rework1\`，中枢按冻结文件收取，不把断线误判为候选故障。
+
+## 11. rework2 用户对齐与冻结路径（2026-08-14）
+
+- 用户明确：不新建商店页或配置页，不做 UI 重构；只把现有商店交互入口与现有全局配装/配置入口分开。
+- 物理 `L` 继续切换既有全局配装/配置内容；在 `SHOP` 中允许 Overlay 可见，但不得显示商店标题/商品/购买升级控件，不得创建或提交 shop draft，不得产生经济或离店事务。
+- 皇冠近距 `F` 是打开既有商店交互内容的唯一入口。商店权威 snapshot 只准备/刷新数据，不得主动显示；Coordinator 的皇冠交互必须调用明确的现有商店显示入口，而不是仅设置 `visible=true`。
+- 最低风险实现：仅在 `scripts/ui/run_overlay_interface.gd` 将 `toggle_loadout()` 的 SHOP 分支改为既有全局配装展示，并暴露一个仅供正式皇冠交互调用的显式商店显示方法；`scripts/run/run_flow_coordinator.gd` 在皇冠 F 时调用它。不得新增 scene/node、复制交易逻辑或修改 `scripts/combat_hud.gd`。
+- rework2 专项必须覆盖：入店同栈隐藏；隐藏态按物理 L 只出现全局配装且 shop draft/事务计数不变；关闭 L 页后皇冠 F 才出现商店内容；重复 F、购买/升级、关闭重开、出口事务保持。
+- rework2 使用全新执行冷根/profile：`C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-exec-rework2-20260814-03` / `C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-exec-rework2-profile-20260814-03`，完整重跑 L3 后冻结回审。
