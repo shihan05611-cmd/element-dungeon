@@ -1,6 +1,6 @@
 # 任务 56：闪避穿过活跃敌人且不携带目标位移
 
-状态：PENDING
+状态：IN_PROGRESS
 负责人：独立玩法执行任务（中枢派发）
 依赖：任务 48、52（均 ACCEPTED）
 Git 基线：`main` HEAD `5c0f2ee24ab8c1e494e1e185666c94edd7b79228`
@@ -89,5 +89,6 @@ Task56 只授权修改 `scripts/player.gd` 的闪避碰撞生命周期，不授�
 ## 8. 协调记录
 
 - 执行职责候选审计：当前可见项目任务中没有空闲且同职责、可证明无上下文压力的玩法执行对话；Task54/53 分别属于已取消地图可行性与美术 Review，不复用。处置：创建新的独立玩法执行任务，任务书自包含，压力等级 `GREEN`。
-- 执行对话 `threadId`/`hostId`、实际模型/推理和首个 `wait_threads` cursor：派发后由中枢回填。
+- 执行对话：`threadId=019ffef1-5a9e-7050-a516-0e837a163100`，`hostId=local`；实际派发模型 `gpt-5.6-sol`，推理等级 `high`；隔离 Codex worktree `C:\Users\heliashi\.codex\worktrees\abf7\元素地牢-4.7`。
+- 首个 `wait_threads(timeoutMs: 0)` cursor：`ffc26f01-65d1-41d0-af01-db09011a0919:1`；快照为执行中。中枢后续只使用该实际任务 id/cursor 主动跟踪，不要求跨对话回传。
 - 独立 L2 Review 对话：执行冻结后另行审计与登记，不由执行者自验收。
