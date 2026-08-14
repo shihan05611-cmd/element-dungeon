@@ -1,0 +1,6 @@
+path,execution_manifest_status,actual_fixed_baseline_status,source_cold_sha_match,result
+docs/agent_tasks/58_formal_interactables_wishing_crown_and_tidal_sentry.md,M,A,YES,FAIL_MANIFEST_STATUS
+other_21_non_evidence_overlay_files,M_or_A,M_or_A,YES,PASS
+taskbook_plus_other_21_non_evidence_overlay_files,22,22,YES,PASS_COUNT
+taskbook_section_3_exact_deletions,10_D,10_D,YES,PASS
+docs/agent_tasks/evidence/task58/**,GLOB,GLOB,execution_manifest_36_of_36_valid,PASS

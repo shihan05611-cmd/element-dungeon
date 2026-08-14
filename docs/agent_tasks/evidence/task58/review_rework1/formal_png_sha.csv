@@ -1,0 +1,7 @@
+"Path","ExpectedSHA256","ActualSHA256","Result"
+"assets/art_preview/world_objects/wishing_crown_v1.png","3cc3557eaa97349116a7ef5251abd0586aebd9f3e3bb283b89585c5e76fd7095","3cc3557eaa97349116a7ef5251abd0586aebd9f3e3bb283b89585c5e76fd7095","PASS"
+"assets/world/enemies/tidal_sentry/tidal_sentry_idle_v1.png","10c931dd8823f5da24aa6a6efc13d00944a0eb57f07bf7aaee6ec531786f65f1","10c931dd8823f5da24aa6a6efc13d00944a0eb57f07bf7aaee6ec531786f65f1","PASS"
+"assets/world/interactables/run_reward_chest/chest_closed_v2.png","2714dac5a5ec44b7c092a7d2f3574fb0e71a6529090138051de1fa154c400d97","2714dac5a5ec44b7c092a7d2f3574fb0e71a6529090138051de1fa154c400d97","PASS"
+"assets/world/interactables/run_reward_chest/chest_open_v2.png","cbc4344454b8d0d969545046a53a1b037cdb354091a4d526b5009285e0f74d68","cbc4344454b8d0d969545046a53a1b037cdb354091a4d526b5009285e0f74d68","PASS"
+"assets/world/interactables/run_route_portal/portal_active_v2.png","0eddaa9c484fedb119c31da6e081141549fcd4297e7823151c4a2bd330a7c2ea","0eddaa9c484fedb119c31da6e081141549fcd4297e7823151c4a2bd330a7c2ea","PASS"
+"assets/world/interactables/run_route_portal/portal_locked_v2.png","b9cffeac3d5037feb793072e6a8317a01a8d2422a230ed9671fc5a59acc30ffd","b9cffeac3d5037feb793072e6a8317a01a8d2422a230ed9671fc5a59acc30ffd","PASS"

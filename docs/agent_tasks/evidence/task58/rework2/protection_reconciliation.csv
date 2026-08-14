@@ -1,0 +1,11 @@
+target,expected,actual,status
+project.godot,baseline_equal,baseline_equal,PASS
+scripts/player.gd,baseline_equal,baseline_equal,PASS
+scripts/enemy.gd,baseline_equal,baseline_equal,PASS
+scenes/run/rooms/room_arena_tidal_battle_02.tscn,baseline_equal,baseline_equal,PASS
+shared_worktree/.godot,absent,absent,PASS
+shared_godot_pid_17624,alive_responding,alive_responding,PASS
+shared_godot_ai_pid_3964,alive_responding,alive_responding,PASS
+global_instakill_runner,not_read_or_run,not_read_or_run,PASS
+git_writes,zero,zero,PASS
+subagents,zero,zero,PASS

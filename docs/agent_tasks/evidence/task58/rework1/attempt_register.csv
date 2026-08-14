@@ -1,0 +1,4 @@
+attempt,result,formal_status,reason
+attempts/capture_attempt1/09_task58_fresh_visual_capture_attempt1.log,1 test 7 images 0 failures,excluded,initial same-state composition superseded during original-size QA
+attempts/capture_attempt2/09_task58_fresh_visual_capture_attempt2.log,1 test 7 images 0 failures,excluded,portal-focused composition retained but high-resolution tiled QA remained ambiguous
+logs/09_task58_fresh_visual_capture_final.log,1 test 7 images 0 failures,FORMAL,third fresh capture with portal-focused movement and 0.75 second stable draw

@@ -1,13 +1,14 @@
-[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
 [ext_resource type="Script" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
 [ext_resource type="PackedScene" path="res://scenes/run/rooms/room_arena_tidal_battle_02.tscn" id="3_template"]
 [ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="4_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/run/enemies/tidal_sentry.tscn" id="5_sentry"]
 
 [sub_resource type="Resource" id="SpawnA"]
 script = ExtResource("2_spawn")
-enemy_scene = ExtResource("4_enemy")
+enemy_scene = ExtResource("5_sentry")
 enemy_id = &"swarm_left"
 local_position = Vector2(1200, 513)
 maximum_health = 55

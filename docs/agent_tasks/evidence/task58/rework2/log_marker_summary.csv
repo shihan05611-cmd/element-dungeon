@@ -1,0 +1,13 @@
+log,SCRIPT_ERROR,Parse_Error,ERROR,WARNING,CrashHandlerException
+01_cold_first_editor_scan.log,0,0,0,0,0
+02_task58_specialized.log,0,0,0,0,0
+03_task41_physical_flow.log,0,0,0,0,0
+04_task43_combat_loadout.log,0,0,0,0,0
+05_task51_boss_projectile.log,0,0,0,0,0
+06_task29_real_room_flow.log,0,0,0,0,0
+07_task31_full_run_e2e.log,0,0,0,0,0
+08_task57_geometry_flow.log,0,0,0,0,0
+09_task58_fresh_visual_capture.log,0,0,0,0,0
+10_post_capture_editor_scan.log,0,0,0,0,0
+11_run_game_180_smoke.log,0,0,0,0,0
+12_final_editor_scan.log,0,0,0,0,0

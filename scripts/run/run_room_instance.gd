@@ -5,7 +5,7 @@ signal room_cleared(room_id: StringName, room_instance_id: int)
 
 const CHEST_SCENE: PackedScene = preload("res://scenes/run/interactables/run_reward_chest.tscn")
 const PORTAL_SCENE: PackedScene = preload("res://scenes/run/interactables/run_route_portal.tscn")
-const CHEST_OPEN_TEXTURE: Texture2D = preload("res://assets/generated/vfx/run_reward_chest/chest_open.png")
+const CHEST_OPEN_TEXTURE: Texture2D = preload("res://assets/world/interactables/run_reward_chest/chest_open_v2.png")
 
 @export var template_id: StringName = &""
 @export var template_display_name: String = ""

@@ -1,0 +1,8 @@
+check,expected,actual,status
+deleted,10,10,PASS
+modified,19,19,PASS
+added,6,6,PASS
+non_evidence_total,35,35,PASS
+taskbook_status,A,A,PASS
+cold_root_candidate_mismatch,0,0,PASS
+old_runtime_reference_hits,0,0,PASS

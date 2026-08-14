@@ -1,0 +1,5 @@
+scope,before_count,after_count,change,detail,result
+cold final scan,955,957,+2,"combat/tests/capture_task58_formal_interactables_crown_sentry.gd.uid; combat/tests/run_task58_formal_interactables_crown_sentry_tests.gd.uid",PASS expected Task58 runner UID generation
+cold existing sidecars,955,955,0,all pre-scan paths lengths and SHA256 unchanged,PASS
+workspace Task58 generated UIDs,0,0,0,not overlaid because exact allowlist names only runner scripts,PASS
+workspace .godot,0,0,0,directory absent and no workspace Godot command executed,PASS

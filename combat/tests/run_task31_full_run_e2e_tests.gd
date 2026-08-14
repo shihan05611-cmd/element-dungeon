@@ -53,6 +53,7 @@ func _test_safe_run() -> void:
 	_expect(await _wait_for_room(&"combat_02_swarm"), "safe combat one reaches fixed combat two")
 	await _record_and_defeat_current_room(_safe_metrics)
 	_expect(await _wait_for_phase(RunPhase.SHOP), "safe combat two reaches the single shop")
+	await _open_physical_shop_from_crown("safe")
 	await _purchase_and_equip(&"burning", SkillSlotIds.PASSIVE_1)
 	await _purchase_and_equip(&"unending", SkillSlotIds.PASSIVE_2)
 	await _purchase_and_equip(&"passive_vitality", SkillSlotIds.PASSIVE_3)
@@ -157,6 +158,7 @@ func _test_risk_run() -> void:
 	_expect(await _wait_for_room(&"combat_02_swarm"), "second run reaches fixed combat two")
 	await _record_and_defeat_current_room(_risk_metrics)
 	_expect(await _wait_for_phase(RunPhase.SHOP), "second combat reaches the single shop")
+	await _open_physical_shop_from_crown("risk")
 	await _purchase_and_equip(&"burning", SkillSlotIds.PASSIVE_1)
 	await _purchase_and_equip(&"unending", SkillSlotIds.PASSIVE_2)
 	await _purchase_and_equip(&"passive_vitality", SkillSlotIds.PASSIVE_3)
@@ -439,6 +441,20 @@ func _leave_physical_shop() -> void:
 	_expect(not _overlay.visible and shop_room.visible and shop_room.exit_portal.prompt.visible, "world shop and F prompt remain visible at the portal")
 	await _press_interact_input()
 	await process_frame
+
+
+func _open_physical_shop_from_crown(label: String) -> void:
+	_expect(await _wait_until(func() -> bool: return _coordinator.active_shop_room != null, 480), "%s SHOP activates the physical room before merchant entry" % label)
+	var shop_room := _coordinator.active_shop_room
+	if shop_room == null:
+		return
+	_expect(not _overlay.visible and _overlay.formal_kind() != &"shop", "%s SHOP starts hidden without merchant content" % label)
+	var before := _authority_signature(_coordinator.current_snapshot())
+	_coordinator.player.global_position = shop_room.wishing_crown.global_position
+	await _press_interact_input()
+	_expect(_overlay.visible and _overlay.formal_kind() == &"shop", "%s physical crown F opens the existing merchant content" % label)
+	_expect(_overlay.formal_shop_draft_instance_id() != 0, "%s physical crown F creates the formal ShopDraft" % label)
+	_expect_eq(_authority_signature(_coordinator.current_snapshot()), before, "%s physical crown F mutates no run/economy authority" % label)
 
 
 func _press_interact_input() -> void:

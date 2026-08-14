@@ -1,6 +1,6 @@
 # Run route portal v2 manifest
 
-状态：`TASK53 FORMAL STATIC SPRITES / REVIEW CANDIDATE`
+状态：`TASK58 FORMAL RUNTIME / REVIEW`
 
 - Canvas: `64×96 RGBA`, hard alpha, bottom-center anchor.
 - Shared formal visible baseline: local `y=92`; canvas center `x=32`.
@@ -10,3 +10,5 @@
 - State semantics are real images: restrained dark inner aperture versus bright single energy ring. Do not simulate locked state with modulate.
 - Static sprites only. No breathing/rotation sequence is included; any later animation must keep the stone frame fixed.
 - Common top/bottom/center and shared baseline are demonstrated in `docs/agent_tasks/evidence/task53/qa/interactable_anchor_qa.png`.
+- Runtime wiring: `RunWorldInteractable.set_locked()` selects locked v2 or active v2 directly; the shop exit starts active. Sprite local Y offset `42` preserves every Task57 combat/shop marker within `1 world px` at integer `1x`.
+- The retired `assets/generated/vfx/run_route_portal/**` package has zero production references and its four exact files were removed by Task58 after SHA freeze and runtime verification.

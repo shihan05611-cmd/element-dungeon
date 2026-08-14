@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/run/run_world_interactable.gd" id="1_interactable"]
-[ext_resource type="Texture2D" path="res://assets/generated/vfx/run_route_portal/portal.png" id="2_texture"]
+[ext_resource type="Texture2D" path="res://assets/world/interactables/run_route_portal/portal_locked_v2.png" id="2_locked"]
+[ext_resource type="Texture2D" path="res://assets/world/interactables/run_route_portal/portal_active_v2.png" id="3_active"]
 
 [sub_resource type="StyleBoxFlat" id="PromptStyle"]
 bg_color = Color(0.035, 0.04, 0.08, 0.9)
@@ -23,11 +24,13 @@ interaction_distance = 108.0
 prompt_text = "进入传送门"
 locked = true
 locked_text = "先开启宝箱"
+locked_texture = ExtResource("2_locked")
+active_texture = ExtResource("3_active")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1
-texture = ExtResource("2_texture")
-scale = Vector2(0.56, 0.56)
+position = Vector2(0, 42)
+texture = ExtResource("2_locked")
 
 [node name="Prompt" type="Label" parent="."]
 offset_left = -118.0

@@ -1,0 +1,15 @@
+category,name,tests,assertions_or_images,result,exit_code,log
+scan,cold-first editor scan formal,0,0,PASS,0,logs/02_cold_first_editor_scan_formal.log
+specialized,Task58 formal interactables crown sentry,3,77,PASS,0,logs/03_task58_specialized.log
+regression,Task41 physical flow waves boss,4,84,PASS,0,logs/04_task41.log
+regression,Task43 combat loadout cleanup,4,105,PASS,0,logs/05_task43.log
+regression,Task51 boss projectile clearance,2,49,PASS,0,logs/06_task51_boss_projectile.log
+regression,Task29 real room flow,1,74,PASS,0,logs/07_task29.log
+regression,Task31 full run E2E,4,383,PASS,0,logs/08_task31.log
+regression,Task57 full room geometry flow,5,205,PASS,0,logs/09_task57.log
+capture,Task58 fresh visual capture,1,7 images,PASS,0,logs/10b_task58_fresh_capture_formal.log
+smoke,RunGame,0,180 frames,PASS,0,logs/11_run_game_180_smoke.log
+scan,final editor scan,0,0,PASS,0,logs/12_final_editor_scan.log
+review_diagnostic,SHOP initial visibility ordering,1,4 observations,FAIL,1,logs/13_review_shop_initial_visibility.log
+scan,final freeze editor scan after diagnostic,0,0,PASS,0,logs/14_final_editor_scan_freeze.log
+formal_total,Task58 plus required regressions,23,977,PASS,0,

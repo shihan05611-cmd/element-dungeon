@@ -1,0 +1,16 @@
+scope,method,result,detail
+formal PNG bytes,source and cold SHA256 plus Task58 asset assertions,PASS,all six match frozen taskbook SHA and dimensions
+old runtime references,rg scripts scenes resources,PASS,zero references to retired chest/portal roots
+old deletion list,exact Test-Path,PASS,all ten false
+Task57 Battle02 scene,Git blob against fixed baseline,PASS,1593e47cc4faf6febaa5738c59e2bf0a8ff982c9
+RunGame scene,Git blob against fixed baseline,PASS,7e519d4e4c812b333d731601fd5f6d6ebbd25b40
+Battle02 background,Git blob against fixed baseline,PASS,3e8e78c8b6b7967f1c25c7bdaa9040de60ba26e5
+project.godot,Git blob against fixed baseline,PASS,2c0714d6b08e04ea69b3d697b2540e53d875259f
+scripts/player.gd,Git blob against fixed baseline,PASS,99c55f6873abe0674e70de97322c631880dfc7ea
+scripts/enemy.gd,Git blob against fixed baseline,PASS,903044f07c974086d9ff7c6101cfab6e2b4144a6
+Battle02 SpawnA,specialized runtime and focused resource diff,PASS,TidalSentry with HP55 reward15 and unchanged position/count
+final scan sidecars,before/after path bytes SHA,PASS,1091 to 1091; added 0 removed 0 changed 0
+execution worktree,git status before/after and Test-Path .godot,PASS,status identical and .godot absent
+shared processes,passive Get-Process,PASS,PID17624 and PID3964 original start times alive Responding True
+global_instakill,review discipline,PASS,runner not read run copied modified deleted or claimed
+Git writes,review discipline,PASS,no add commit push reset restore checkout clean or stash

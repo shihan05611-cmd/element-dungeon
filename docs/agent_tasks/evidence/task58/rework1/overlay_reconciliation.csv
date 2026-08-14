@@ -1,0 +1,7 @@
+scope,expected,actual,result,detail
+fixed baseline Task58 taskbook status,A,A,PASS,51b8ffde does not contain the taskbook and overlay_manifest now records A
+non-evidence deleted,10,10,PASS,exact taskbook deletion list
+non-evidence modified,16,16,PASS,all within Task58 production or migrated-test allowlist
+non-evidence added,6,6,PASS,taskbook plus five new production/test files
+non-evidence total,32,32,PASS,no extra path
+evidence glob,docs/agent_tasks/evidence/task58/**,docs/agent_tasks/evidence/task58/**,PASS,explicit evidence allowlist

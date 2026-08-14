@@ -1,0 +1,4 @@
+attempt,status,exit_code,stderr_bytes,reason,official_result
+post_capture_sandbox_attempt_1,ENVIRONMENT_ERROR,0,125,Windows root certificate store unavailable in sandbox,NO
+post_capture_sandbox_attempt_2,ENVIRONMENT_ERROR,0,125,Windows root certificate store unavailable in sandbox,NO
+post_capture_official_retry,PASS,0,0,same cold root/profile outside sandbox for system certificate access,YES

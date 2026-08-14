@@ -1,0 +1,37 @@
+status,path,allowlist_basis
+D,assets/generated/vfx/run_reward_chest/chest_closed.png,taskbook section 3 exact deletion 1
+D,assets/generated/vfx/run_reward_chest/chest_closed.png.import,taskbook section 3 exact deletion 2
+D,assets/generated/vfx/run_reward_chest/chest_open.png,taskbook section 3 exact deletion 3
+D,assets/generated/vfx/run_reward_chest/chest_open.png.import,taskbook section 3 exact deletion 4
+D,assets/generated/vfx/run_reward_chest/manifest.md,taskbook section 3 exact deletion 5
+D,assets/generated/vfx/run_reward_chest/prompt.md,taskbook section 3 exact deletion 6
+D,assets/generated/vfx/run_route_portal/manifest.md,taskbook section 3 exact deletion 7
+D,assets/generated/vfx/run_route_portal/portal.png,taskbook section 3 exact deletion 8
+D,assets/generated/vfx/run_route_portal/portal.png.import,taskbook section 3 exact deletion 9
+D,assets/generated/vfx/run_route_portal/prompt.md,taskbook section 3 exact deletion 10
+M,assets/world/enemies/tidal_sentry/manifest_v1.md,formal asset manifest allowlist
+M,assets/world/interactables/run_reward_chest/manifest_v2.md,formal asset manifest allowlist
+M,assets/world/interactables/run_route_portal/manifest_v2.md,formal asset manifest allowlist
+M,docs/art/像素美术规范_v1.md,current authority art document allowlist
+M,docs/art/宝箱与传送门正式采纳交接清单.md,current authority art document allowlist
+M,docs/vfx/final_asset_manifest.md,current authority VFX document allowlist
+A,docs/agent_tasks/58_formal_interactables_wishing_crown_and_tidal_sentry.md,taskbook allowlist and absent from fixed baseline
+M,growth/tests/run_task41_physical_flow_waves_boss_tests.gd,rework2 section 4.2 exact obsolete L shop-entry assertion migration
+M,growth/tests/run_task43_combat_loadout_world_cleanup_tests.gd,explicit frozen assertion migration allowlist
+M,combat/tests/run_task31_full_run_e2e_tests.gd,rework2 section 4.2 exact obsolete automatic shop-entry fixture migration
+M,resources/run/rooms/combat_02_swarm.tres,production allowlist
+M,scenes/run/interactables/run_reward_chest.tscn,production allowlist
+M,scenes/run/interactables/run_route_portal.tscn,production allowlist
+M,scenes/run/rooms/room_shop_formal.tscn,production allowlist
+M,scripts/run/run_flow_coordinator.gd,production allowlist
+M,scripts/run/run_flow_smoke_panel.gd,production allowlist
+M,scripts/run/run_room_instance.gd,production allowlist
+M,scripts/run/run_shop_room_instance.gd,production allowlist
+M,scripts/run/run_world_interactable.gd,production allowlist
+M,scripts/ui/run_overlay_interface.gd,rework2 narrow production allowlist
+A,combat/tests/capture_task58_formal_interactables_crown_sentry.gd,test allowlist
+A,combat/tests/run_task58_formal_interactables_crown_sentry_tests.gd,test allowlist
+A,scenes/run/enemies/tidal_sentry.tscn,production allowlist
+A,scenes/run/interactables/run_wishing_crown.tscn,production allowlist
+A,scripts/run/enemies/tidal_sentry.gd,production allowlist
+GLOB,docs/agent_tasks/evidence/task58/**,evidence allowlist

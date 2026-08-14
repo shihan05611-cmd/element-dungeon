@@ -1,0 +1,149 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+SCRIPT ERROR: Invalid call. Nonexistent function 'is_passive' in base 'Nil'.
+   at: _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+   GDScript backtrace (most recent call first):
+       [0] _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+SCRIPT ERROR: Invalid call. Nonexistent function 'is_passive' in base 'Nil'.
+   at: _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+   GDScript backtrace (most recent call first):
+       [0] _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+SCRIPT ERROR: Invalid call. Nonexistent function 'is_passive' in base 'Nil'.
+   at: _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+   GDScript backtrace (most recent call first):
+       [0] _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+SCRIPT ERROR: Invalid call. Nonexistent function 'is_passive' in base 'Nil'.
+   at: _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+   GDScript backtrace (most recent call first):
+       [0] _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+TASK31_SAFE_METRICS: {"chest_dust":150,"chest_skills":["element_reclaim","burning"],"economy":{"balance":495,"earned":495,"purchases":0,"refunded":0,"upgrades":0},"final_levels":{"element_bolt":1,"element_reclaim":1,"elemental_laser":0},"final_loadout":{"active_1":"element_bolt","active_2":"element_reclaim","active_3":"","passive_1":"burning","passive_2":"","passive_3":"","passive_4":""},"label":"safe","rooms":[{"duration_ms":36,"enemy_count":2,"instance_id":157370289061,"room_id":"combat_01_entry","scene_path":"res://scenes/run/rooms/room_arena_flat.tscn","template_id":"arena_tidal_battle_01"},{"duration_ms":27,"enemy_count":5,"instance_id":186579422357,"room_id":"combat_02_swarm","scene_path":"res://scenes/run/rooms/room_arena_tidal_battle_02.tscn","template_id":"arena_tidal_battle_02"},{"duration_ms":230,"enemy_count":5,"instance_id":470315699411,"room_id":"combat_04_validation","scene_path":"res://scenes/run/rooms/room_arena_flat.tscn","template_id":"arena_tidal_battle_01"},{"duration_ms":69,"enemy_count":1,"instance_id":550712118572,"room_id":"combat_06_final_boss","scene_path":"res://scenes/run/rooms/room_arena_boss.tscn","template_id":"arena_tidal_boss"}],"route_ids":[],"skill_casts":{"element_bolt":1},"skill_usage_percent":{"element_bolt":100.0},"total_duration_ms":5428}
+PASS: complete_result_return_boundary_and_new_authority
+PASS: failure_result_and_second_new_authority
+SCRIPT ERROR: Invalid call. Nonexistent function 'is_passive' in base 'Nil'.
+   at: _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+   GDScript backtrace (most recent call first):
+       [0] _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+SCRIPT ERROR: Invalid call. Nonexistent function 'is_passive' in base 'Nil'.
+   at: _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+   GDScript backtrace (most recent call first):
+       [0] _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+SCRIPT ERROR: Invalid call. Nonexistent function 'is_passive' in base 'Nil'.
+   at: _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+   GDScript backtrace (most recent call first):
+       [0] _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+SCRIPT ERROR: Invalid call. Nonexistent function 'is_passive' in base 'Nil'.
+   at: _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+   GDScript backtrace (most recent call first):
+       [0] _purchase_and_equip (res://combat/tests/run_task31_full_run_e2e_tests.gd:225)
+TASK31_RISK_METRICS: {"chest_dust":150,"chest_skills":["elemental_fury","unending"],"economy":{"balance":495,"earned":495,"purchases":0,"refunded":0,"upgrades":0},"final_levels":{"element_bolt":1,"element_reclaim":0,"elemental_laser":0},"final_loadout":{"active_1":"element_bolt","active_2":"elemental_fury","active_3":"","passive_1":"unending","passive_2":"","passive_3":"","passive_4":""},"label":"second","rooms":[{"duration_ms":36,"enemy_count":2,"instance_id":629581810400,"room_id":"combat_01_entry","scene_path":"res://scenes/run/rooms/room_arena_flat.tscn","template_id":"arena_tidal_battle_01"},{"duration_ms":27,"enemy_count":5,"instance_id":667162774213,"room_id":"combat_02_swarm","scene_path":"res://scenes/run/rooms/room_arena_tidal_battle_02.tscn","template_id":"arena_tidal_battle_02"},{"duration_ms":231,"enemy_count":5,"instance_id":955160464234,"room_id":"combat_04_validation","scene_path":"res://scenes/run/rooms/room_arena_flat.tscn","template_id":"arena_tidal_battle_01"},{"duration_ms":67,"enemy_count":1,"instance_id":1035556883171,"room_id":"combat_06_final_boss","scene_path":"res://scenes/run/rooms/room_arena_boss.tscn","template_id":"arena_tidal_boss"}],"route_ids":[],"skill_casts":{"element_bolt":1},"skill_usage_percent":{"element_bolt":100.0},"total_duration_ms":5578}
+TASK 31 FULL RUN E2E TESTS FAILED: 109 failures / 358 assertions
+  - burning purchases through visible formal control
+  - burning ownership commits
+  - burning charges exactly once (expected 295, got 370)
+  - burning purchase advances authority once (expected 22, got 21)
+  - burning starts at frozen Lv1/no spend
+  - unending purchases through visible formal control
+  - unending ownership commits
+  - unending charges exactly once (expected 295, got 370)
+  - unending purchase advances authority once (expected 22, got 21)
+  - unending starts at frozen Lv1/no spend
+  - passive_vitality purchases through visible formal control
+  - passive_vitality ownership commits
+  - passive_vitality charges exactly once (expected 295, got 370)
+  - passive_vitality purchase advances authority once (expected 22, got 21)
+  - passive_vitality starts at frozen Lv1/no spend
+  - passive_energy purchases through visible formal control
+  - passive_energy ownership commits
+  - passive_energy charges exactly once (expected 295, got 370)
+  - passive_energy purchase advances authority once (expected 22, got 21)
+  - passive_energy starts at frozen Lv1/no spend
+  - safe middle shop P1 has the expected passive (expected burning, got )
+  - safe middle shop owns burning
+  - safe middle shop P2 has the expected passive (expected unending, got )
+  - safe middle shop owns unending
+  - safe middle shop P3 has the expected passive (expected passive_vitality, got )
+  - safe middle shop owns passive_vitality
+  - safe middle shop P4 has the expected passive (expected passive_energy, got )
+  - safe middle shop owns passive_energy
+  - safe middle shop runtime registers four passives in slot order (expected [&"burning", &"unending", &"passive_vitality", &"passive_energy"], got [])
+  - safe middle shop runtime passives are unique (expected 4, got 0)
+  - safe middle shop runtime covers P1-P4 (expected [&"passive_1", &"passive_2", &"passive_3", &"passive_4"], got [])
+  - formal shop exposes the visible close-to-world control
+  - formal shop footer cannot bypass the physical exit
+  - L toggle closes the formal shop panel before world traversal
+  - world shop and F prompt remain visible at the portal
+  - safe combat four P1 has the expected passive (expected burning, got )
+  - safe combat four owns burning
+  - safe combat four P2 has the expected passive (expected unending, got )
+  - safe combat four owns unending
+  - safe combat four P3 has the expected passive (expected passive_vitality, got )
+  - safe combat four owns passive_vitality
+  - safe combat four P4 has the expected passive (expected passive_energy, got )
+  - safe combat four owns passive_energy
+  - safe combat four runtime registers four passives in slot order (expected [&"burning", &"unending", &"passive_vitality", &"passive_energy"], got [])
+  - safe combat four runtime passives are unique (expected 4, got 0)
+  - safe combat four runtime covers P1-P4 (expected [&"passive_1", &"passive_2", &"passive_3", &"passive_4"], got [])
+  - safe room rebuild registers one passive batch (expected 1, got 0)
+  - safe room rebuild unregisters one passive batch (expected 1, got 0)
+  - safe room rebuild replaces all four passive runtime objects
+  - final P2 mapping is exact (expected unending, got )
+  - final P3 mapping is exact (expected passive_vitality, got )
+  - final P4 mapping is exact (expected passive_energy, got )
+  - safe purchase ledger charges all four shop-only passives (expected 300, got 0)
+  - safe final balance conserves fixed rewards and four purchases (expected 195, got 495)
+  - burning purchases through visible formal control
+  - burning ownership commits
+  - burning charges exactly once (expected 295, got 370)
+  - burning purchase advances authority once (expected 22, got 21)
+  - burning starts at frozen Lv1/no spend
+  - unending purchases through visible formal control
+  - unending ownership commits
+  - unending charges exactly once (expected 295, got 370)
+  - unending purchase advances authority once (expected 22, got 21)
+  - unending starts at frozen Lv1/no spend
+  - passive_vitality purchases through visible formal control
+  - passive_vitality ownership commits
+  - passive_vitality charges exactly once (expected 295, got 370)
+  - passive_vitality purchase advances authority once (expected 22, got 21)
+  - passive_vitality starts at frozen Lv1/no spend
+  - passive_energy purchases through visible formal control
+  - passive_energy ownership commits
+  - passive_energy charges exactly once (expected 295, got 370)
+  - passive_energy purchase advances authority once (expected 22, got 21)
+  - passive_energy starts at frozen Lv1/no spend
+  - risk single shop P1 has the expected passive (expected burning, got )
+  - risk single shop owns burning
+  - risk single shop P2 has the expected passive (expected unending, got )
+  - risk single shop owns unending
+  - risk single shop P3 has the expected passive (expected passive_vitality, got )
+  - risk single shop owns passive_vitality
+  - risk single shop P4 has the expected passive (expected passive_energy, got )
+  - risk single shop owns passive_energy
+  - risk single shop runtime registers four passives in slot order (expected [&"burning", &"unending", &"passive_vitality", &"passive_energy"], got [])
+  - risk single shop runtime passives are unique (expected 4, got 0)
+  - risk single shop runtime covers P1-P4 (expected [&"passive_1", &"passive_2", &"passive_3", &"passive_4"], got [])
+  - formal shop exposes the visible close-to-world control
+  - formal shop footer cannot bypass the physical exit
+  - L toggle closes the formal shop panel before world traversal
+  - world shop and F prompt remain visible at the portal
+  - risk room rebuild registers one passive batch (expected 1, got 0)
+  - risk room rebuild unregisters one passive batch (expected 1, got 0)
+  - risk room rebuild replaces all four passive runtimes
+  - risk boss room P1 has the expected passive (expected burning, got unending)
+  - risk boss room owns burning
+  - risk boss room P2 has the expected passive (expected unending, got )
+  - risk boss room P3 has the expected passive (expected passive_vitality, got )
+  - risk boss room owns passive_vitality
+  - risk boss room P4 has the expected passive (expected passive_energy, got )
+  - risk boss room owns passive_energy
+  - risk boss room runtime registers four passives in slot order (expected [&"burning", &"unending", &"passive_vitality", &"passive_energy"], got [&"unending"])
+  - risk boss room runtime passives are unique (expected 4, got 1)
+  - risk boss room runtime covers P1-P4 (expected [&"passive_1", &"passive_2", &"passive_3", &"passive_4"], got [&"passive_1"])
+  - elemental_fury records a real accepted cast
+  - final P1 mapping is exact (expected burning, got unending)
+  - final P2 mapping is exact (expected unending, got )
+  - final P3 mapping is exact (expected passive_vitality, got )
+  - final P4 mapping is exact (expected passive_energy, got )
+  - second purchase ledger charges four passives (expected 300, got 0)
+  - second final balance conserves rewards and purchases (expected 195, got 495)

@@ -1,0 +1,5 @@
+attempt,classification,outcome,replaced_by,reason
+attempts/01_cold_first_editor_scan.log,excluded environment attempt,system root certificate store ERROR,logs/01_cold_first_editor_scan_formal.log,sandbox certificate environment only
+attempts/03_task58_specialized_attempt1.log,excluded test fixture iteration,player hurtbox unavailable after fixture disabled process mode,logs/03_task58_specialized_final.log,test fixture corrected without production expansion
+attempts/05_task43_combat_loadout.log,excluded migrated frozen assertion,2 legacy bottom-anchor assertions failed,logs/05_task43_combat_loadout_formal.log,allowed formula migration includes sprite offset and half-open pixel edge
+attempts/10_task58_visual_capture.log,excluded visual iteration,programmatic pass but crown guide overlap and clutter,logs/10_task58_visual_capture_formal.log,composition refined and recaptured

@@ -1,6 +1,6 @@
 # Run reward chest v2 manifest
 
-状态：`TASK53 FORMAL STATIC SPRITES / REVIEW CANDIDATE`
+状态：`TASK58 FORMAL RUNTIME / REVIEW`
 
 - Canvas: `80×72 RGBA`, hard alpha, bottom-center anchor.
 - Shared formal visible baseline: local `y=70`; canvas center `x=40`.
@@ -10,3 +10,5 @@
 - State semantics are structural: closed lid versus raised lid and dark interior. Do not synthesize open state with modulate.
 - Static sprites only. No open-transition animation frames are included.
 - Common bottom-center and fixed source scaling preserve body width, latch center and floor contact; see `docs/agent_tasks/evidence/task53/qa/interactable_anchor_qa.png`.
+- Runtime wiring: `run_reward_chest.tscn` uses closed v2 at integer `1x`; `RunRoomInstance.open_chest()` supplies open v2 after the existing authoritative claim succeeds. Sprite local Y offset `4` preserves Task57 ground markers within `1 world px`.
+- The retired `assets/generated/vfx/run_reward_chest/**` package has zero production references and its six exact files were removed by Task58 after SHA freeze and runtime verification.

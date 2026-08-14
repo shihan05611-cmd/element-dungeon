@@ -5,6 +5,7 @@ enum Kind {
 	CHEST,
 	PORTAL,
 	SHOP_EXIT,
+	SHOP_CROWN,
 }
 
 @export var kind: Kind = Kind.CHEST
@@ -13,6 +14,8 @@ enum Kind {
 @export var locked: bool = false
 @export var prompt_text: String = "按 F 交互"
 @export var locked_text: String = "尚未解锁"
+@export var locked_texture: Texture2D
+@export var active_texture: Texture2D
 
 var consumed: bool:
 	get:
@@ -25,6 +28,7 @@ var _consumed: bool = false
 
 
 func _ready() -> void:
+	_refresh_visual_state()
 	_refresh_prompt()
 
 
@@ -36,6 +40,7 @@ func set_locked(value: bool, reason: String = "") -> void:
 	locked = value
 	if not reason.is_empty():
 		locked_text = reason
+	_refresh_visual_state()
 	_refresh_prompt()
 
 
@@ -56,6 +61,14 @@ func open_chest(open_texture: Texture2D, reward_copy: String) -> void:
 		sprite.texture = open_texture
 	mark_consumed(reward_copy)
 	prompt.visible = true
+
+
+func _refresh_visual_state() -> void:
+	if sprite == null:
+		return
+	var state_texture := locked_texture if locked else active_texture
+	if state_texture != null:
+		sprite.texture = state_texture
 
 
 func _refresh_prompt() -> void:

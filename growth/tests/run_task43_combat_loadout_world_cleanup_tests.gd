@@ -366,7 +366,11 @@ func _chest_bottom_is_grounded(room: RunRoomInstance) -> bool:
 		for x: int in image.get_width():
 			if image.get_pixel(x, y).a > 0.01:
 				max_alpha_y = maxi(max_alpha_y, y)
-	var bottom := room.chest.global_position.y + (float(max_alpha_y) - float(image.get_height()) * 0.5) * sprite.scale.y
+	var bottom := (
+		room.chest.global_position.y
+		+ sprite.position.y
+		+ (float(max_alpha_y + 1) - float(image.get_height()) * 0.5) * sprite.scale.y
+	)
 	var ground_shape := room.get_node("Ground/CollisionShape2D") as CollisionShape2D
 	var rectangle := ground_shape.shape as RectangleShape2D
 	var ground_top := ground_shape.global_position.y - rectangle.size.y * 0.5

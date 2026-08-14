@@ -1,0 +1,15 @@
+scope,method,result,detail
+project.godot,git diff versus fixed baseline,PASS,zero diff
+scripts/player.gd,git diff versus fixed baseline,PASS,zero diff
+scripts/enemy.gd,git diff versus fixed baseline,PASS,zero diff
+Task57 Battle02 room geometry,git diff of room_arena_tidal_battle_02.tscn plus Task57 regression,PASS,room scene zero diff and 5 tests 205 assertions
+Combat02 definition,focused diff,PASS,only SpawnA enemy_scene changed while position HP55 reward15 unchanged
+formal PNG bytes,SHA256 freeze and final verification,PASS,all six match taskbook hashes
+old runtime references,rg scripts scenes resources,PASS,zero
+old deletion list,exact Test-Path for ten entries,PASS,all false
+Tidal Sentry static contract,source scan plus specialized runtime,PASS,no random patrol navigation and velocity.x always zero
+shared Godot PID17624,passive Get-Process only,PASS,alive Responding=True and not controlled
+shared godot-ai PID3964,passive Get-Process only,PASS,alive Responding=True and not controlled
+user global_instakill runner,execution discipline,PASS,not read run copied modified deleted staged or claimed
+translation import history and external dirt,git status allowlist reconciliation,PASS,no unrelated path claimed
+Git writes,execution discipline,PASS,no add commit push reset restore checkout clean or stash

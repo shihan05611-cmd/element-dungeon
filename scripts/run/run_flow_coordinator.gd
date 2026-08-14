@@ -11,6 +11,7 @@ signal room_activated(
 signal flow_error(detail: StringName)
 signal ui_command_result(command: StringName, result: RunCommandResult)
 signal combat_loadout_availability_changed(available: bool)
+signal shop_ui_visibility_changed(visible: bool)
 
 @export var flow_definition: RunFlowDefinition
 @export var content_catalog: RunContentCatalog
@@ -61,6 +62,7 @@ var _transition_scheduled: bool = false
 var _transition_in_progress: bool = false
 var _last_error: StringName = &""
 var _interaction_busy: bool = false
+var _shop_ui_visible: bool = false
 
 
 func _ready() -> void:
@@ -376,6 +378,9 @@ func _on_session_snapshot_changed(snapshot: RunSnapshot, _cause: StringName) -> 
 		_transition_scheduled = true
 		call_deferred("_load_pending_room")
 	elif snapshot.route.phase == RunPhase.SHOP and _active_shop_room == null:
+		# Keep the formal Overlay closed inside this authority signal stack;
+		# the deferred room swap must not expose a merchant frame.
+		_set_shop_ui_visible(false)
 		call_deferred("_enter_shop_room")
 
 
@@ -401,6 +406,7 @@ func _enter_shop_room() -> void:
 	vfx.clear_presentations()
 	player.global_position = shop.player_spawn_global_position()
 	player.velocity = Vector2.ZERO
+	_set_shop_ui_visible(false)
 
 
 func _on_interact_requested() -> void:
@@ -410,9 +416,12 @@ func _on_interact_requested() -> void:
 	if _active_shop_room != null:
 		var shop_target := _active_shop_room.interaction_target_at(player.global_position)
 		if shop_target != null:
-			var shop_result := leave_shop()
-			if shop_result.accepted:
-				shop_target.mark_consumed("正在传送")
+			if shop_target.kind == RunWorldInteractable.Kind.SHOP_CROWN:
+				_open_shop_ui_from_crown()
+			elif shop_target.kind == RunWorldInteractable.Kind.SHOP_EXIT:
+				var shop_result := leave_shop()
+				if shop_result.accepted:
+					shop_target.mark_consumed("正在传送")
 		_interaction_busy = false
 		return
 	if _active_room == null or not _active_room.room_is_cleared:
@@ -478,6 +487,31 @@ func _clear_transient_deliveries() -> void:
 	for child: Node in get_children():
 		if child is DeliveryBase:
 			child.queue_free()
+
+
+func _set_shop_ui_visible(value: bool) -> void:
+	var changed := _shop_ui_visible != value
+	_shop_ui_visible = value
+	if combat_hud != null and combat_hud.run_overlay != null:
+		combat_hud.run_overlay.visible = value
+		if value:
+			combat_hud.run_overlay.move_to_front()
+	if changed:
+		shop_ui_visibility_changed.emit(value)
+
+
+func _open_shop_ui_from_crown() -> bool:
+	if combat_hud == null or combat_hud.run_overlay == null:
+		return false
+	var overlay := combat_hud.run_overlay as RunOverlayInterface
+	var was_shop_visible := overlay.visible and overlay.formal_kind() == &"shop"
+	if not overlay.show_formal_shop_from_world_interaction():
+		return false
+	_shop_ui_visible = true
+	overlay.move_to_front()
+	if not was_shop_visible:
+		shop_ui_visibility_changed.emit(true)
+	return true
 
 
 func _next_command_id(prefix: StringName) -> StringName:

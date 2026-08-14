@@ -1,0 +1,5 @@
+attempt,status,scope,reason
+preflight_contract_check,BLOCKED,read_only_no_godot,"Task41 frozen L-opens-shop assertions conflict with rework2 L-opens-combat_loadout contract; Task41 absent from rework2 modification allowlist"
+baseline_tar_extract,REPLACED,cold_root_setup,"Windows tar rejected several Unicode paths; exact partial cold root was validated, removed, and rebuilt from Git ZIP archive before any Godot command"
+task31_old_shop_entry,BLOCKED,attempts/02_task31_requires_crown_entry.log,"Task31 reaches SHOP and directly requests merchant controls without crown F; 109 failures / 358 assertions under the formal unique-entry behavior"
+capture_headless_timeout,REPLACED,attempts/capture_attempt1_timeout.log,"headless capture reached no frame_post_draw and wrote zero screenshots; only this run's PID20260/35616 were terminated, then Windows/OpenGL formal capture passed"

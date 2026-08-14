@@ -137,7 +137,25 @@ func _test_physical_safe_path_and_boss_settlement() -> void:
 	var overlay := coordinator.combat_hud.run_overlay as RunOverlayInterface
 	var shop_before := _authority_signature(coordinator.current_snapshot())
 	var shop_session_id := coordinator.current_snapshot().shop.session_id
+	var shop_commands: Array[StringName] = []
+	coordinator.ui_command_result.connect(func(command: StringName, _result: RunCommandResult) -> void: shop_commands.append(command))
+	_expect(not overlay.visible and overlay.formal_kind() != &"shop", "SHOP starts hidden without merchant content")
+	_expect_eq(overlay.formal_shop_draft_instance_id(), 0, "SHOP snapshot creates no ShopDraft before crown F")
+	await _press_physical_loadout(coordinator)
+	_expect(overlay.visible and overlay.formal_kind() == &"combat_loadout", "physical L opens the existing global loadout content in SHOP")
+	_expect(overlay.formal_control(&"leave_shop") == null and overlay.formal_control(&"purchase:burning") == null and overlay.formal_control(&"upgrade:element_bolt") == null, "physical L exposes no merchant, purchase, or upgrade controls")
+	_expect_eq(overlay.formal_shop_draft_instance_id(), 0, "physical L creates no ShopDraft")
+	_expect_eq(_authority_signature(coordinator.current_snapshot()), shop_before, "physical L mutates no shop/economy authority")
+	_expect(shop_commands.is_empty(), "physical L submits no purchase, upgrade, loadout, or leave command")
+	await _press_physical_loadout(coordinator)
+	_expect(not overlay.visible, "second physical L closes the global loadout content")
+	_expect_eq(_authority_signature(coordinator.current_snapshot()), shop_before, "global loadout close preserves complete authority")
+	var shop_room := coordinator.active_shop_room
+	coordinator.player.global_position = shop_room.wishing_crown.global_position
+	await _press_interact()
+	_expect(overlay.visible and overlay.formal_kind() == &"shop", "nearby crown F is the merchant content entry")
 	var draft_id := overlay.formal_shop_draft_instance_id()
+	_expect(draft_id != 0, "crown F creates the unique ShopDraft")
 	var close_button := overlay.formal_control(&"close_shop_panel") as Button
 	_expect(close_button != null and close_button.visible and not close_button.disabled, "formal shop exposes an enabled visible close-to-world button")
 	_expect(close_button.focus_mode == Control.FOCUS_ALL and close_button.text.contains("返回世界") and close_button.text.contains("L"), "shop close button is keyboard focusable with explicit world/L copy")
@@ -147,18 +165,14 @@ func _test_physical_safe_path_and_boss_settlement() -> void:
 	await process_frame
 	_expect(not overlay.visible, "shop close button reveals the physical world")
 	_expect_eq(_authority_signature(coordinator.current_snapshot()), shop_before, "closing the shop panel mutates no authority")
-	overlay.toggle_loadout()
-	await process_frame
-	_expect(overlay.visible and overlay.formal_kind() == &"shop", "L toggle reopens the same formal shop")
-	_expect_eq(coordinator.current_snapshot().shop.session_id, shop_session_id, "L reopen retains the same shop session")
-	_expect_eq(overlay.formal_shop_draft_instance_id(), draft_id, "L reopen retains the same shop draft")
-	leave_button = overlay.formal_control(&"leave_shop") as Button
-	_expect(leave_button != null and leave_button.disabled, "reopened shop footer remains disabled")
-	overlay.toggle_loadout()
-	await process_frame
-	_expect(not overlay.visible, "second L toggle returns to the physical shop world")
+	await _press_physical_loadout(coordinator)
+	_expect(overlay.visible and overlay.formal_kind() == &"combat_loadout", "physical L after merchant close still opens only global loadout content")
+	_expect(overlay.formal_control(&"leave_shop") == null and overlay.formal_control(&"purchase:burning") == null, "reopened global loadout still contains no merchant controls")
+	_expect_eq(overlay.formal_shop_draft_instance_id(), draft_id, "physical L creates no replacement ShopDraft")
+	_expect_eq(coordinator.current_snapshot().shop.session_id, shop_session_id, "physical L retains the same authority shop session")
+	await _press_physical_loadout(coordinator)
+	_expect(not overlay.visible, "second physical L returns to the physical shop world")
 	_expect_eq(_authority_signature(coordinator.current_snapshot()), shop_before, "close/reopen/close preserves the complete authority signature")
-	var shop_room := coordinator.active_shop_room
 	var start_x := coordinator.player.global_position.x
 	Input.action_press(&"move_right")
 	var reached_portal := false
@@ -283,6 +297,14 @@ func _press_interact() -> void:
 	release.action = &"interact"
 	release.pressed = false
 	Input.parse_input_event(release)
+	await process_frame
+
+
+func _press_physical_loadout(coordinator: RunFlowCoordinator) -> void:
+	var event := InputEventKey.new()
+	event.pressed = true
+	event.physical_keycode = KEY_L
+	coordinator.combat_hud._unhandled_input(event)
 	await process_frame
 
 

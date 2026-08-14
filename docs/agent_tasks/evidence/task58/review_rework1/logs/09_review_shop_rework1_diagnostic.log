@@ -1,0 +1,13 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+INITIAL_SHOP_CAUSE=room_completed
+INITIAL_SHOP_OVERLAY=false
+INITIAL_SHOP_ACTIVE_ROOM=false
+PURCHASE_CAUSE=shop_skill_purchased
+PURCHASE_OVERLAY=true
+PURCHASE_ACTIVE_ROOM=true
+UPGRADE_CAUSE=active_skill_upgraded
+UPGRADE_OVERLAY=true
+UPGRADE_ACTIVE_ROOM=true
+TASK58 REWORK1 REVIEW SHOP DIAGNOSTIC PASSED: 3 synchronous snapshots, 21 checks

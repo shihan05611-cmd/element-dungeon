@@ -49,14 +49,26 @@ Task 17 did not modify Catalog, SkillDefinition, combat, growth, Player, Enemy, 
 
 Both Task32 icons are 256×256 RGBA alpha assets generated with the built-in `image_gen` workflow, removed from a flat chroma-key background with the official imagegen helper, and checked at original size plus 64×64 and 32×32. Their exact prompts, source hashes, final hashes, alpha statistics and usage boundaries are recorded in each skill directory's `prompt.md` and `manifest.md`. Task32 adds no animation sheet, particle, presentation scene, runtime delivery, world trigger or VFX script.
 
-## Task 39 run-flow and boss asset additions
+## Task 39 run-flow and boss asset additions (current Task58 runtime paths)
 
 | Asset | Stable PNG | Intended display |
 |---|---|---|
-| Reward chest, closed | `assets/generated/vfx/run_reward_chest/chest_closed.png` | World object, about 96–128 px |
-| Reward chest, open | `assets/generated/vfx/run_reward_chest/chest_open.png` | Same body/angle/palette; lid and contained inner light only change |
-| Route portal | `assets/generated/vfx/run_route_portal/portal.png` | World object, about 96–128 px; engine owns any breathing/rotation |
+| Reward chest, closed | `assets/world/interactables/run_reward_chest/chest_closed_v2.png` | Formal 80×72, bottom-center, integer 1× |
+| Reward chest, open | `assets/world/interactables/run_reward_chest/chest_open_v2.png` | Real open-state image selected only after the existing chest claim succeeds |
+| Route portal, locked | `assets/world/interactables/run_route_portal/portal_locked_v2.png` | Formal 64×96 locked state, integer 1× |
+| Route portal, active | `assets/world/interactables/run_route_portal/portal_active_v2.png` | Real active state; shop exit starts active |
 | Elemental Reaction Energy / 元素回响 | `assets/generated/vfx/passive_reaction_energy/icon.png` | HUD 32×32 or 64×64; reaction burst and return channels, not a capacity reservoir |
 | Boss arc projectile | `assets/generated/vfx/boss_arc_projectile/projectile.png` | Left-facing low projectile, about 96×48; collision and movement remain Task41-owned |
 
 All five Task39 files are 256×256 RGBA alpha cutouts made with the built-in `image_gen` workflow, flat `#00ff00` chroma-key sources, and the official `remove_chroma_key.py` helper. Task39 adds no scripts, scenes, animation, collision, combat timing, flow logic, or shared `.godot` output. Exact prompts, source/final hashes, alpha statistics, import UIDs, and display boundaries are recorded in each asset directory and `docs/agent_tasks/evidence/task39/README.md`.
+
+Task58 retired the former Task39 chest and portal packages only after freezing all ten exact file hashes, migrating the three production references to zero, and validating real closed/open and locked/active texture changes. No compatibility copies or fallback preloads remain. The Task39 paragraph above remains source history; the table now names the current formal runtime assets.
+
+## Task 58 world-object and ranged-enemy wiring
+
+| Asset | Formal PNG | Runtime boundary |
+|---|---|---|
+| Wishing Crown | `assets/art_preview/world_objects/wishing_crown_v1.png` | Standalone shop-world object; nearby F only reveals the existing shop UI |
+| Tidal Sentry | `assets/world/enemies/tidal_sentry/tidal_sentry_idle_v1.png` | Static Battle02 platform enemy at 3×; reuses existing ProjectileDelivery |
+
+The crown does not submit purchases, loadout changes, shop exit, wallet or revision mutations. The Sentry adds no random movement, patrol, navigation or shared projectile protocol.

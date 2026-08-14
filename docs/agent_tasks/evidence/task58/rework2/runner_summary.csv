@@ -1,0 +1,14 @@
+order,runner,status,tests,assertions,log
+1,cold_first_editor_scan,PASS,0,0,logs/01_cold_first_editor_scan.log
+2,task58_specialized,PASS,3,104,logs/02_task58_specialized.log
+3,task41_physical_flow,PASS,4,95,logs/03_task41_physical_flow.log
+4,task43_combat_loadout,PASS,4,105,logs/04_task43_combat_loadout.log
+5,task51_boss_projectile,PASS,2,49,logs/05_task51_boss_projectile.log
+6,task29_real_room_flow,PASS,1,74,logs/06_task29_real_room_flow.log
+7,task31_full_run_e2e,PASS,4,393,logs/07_task31_full_run_e2e.log
+8,task57_geometry_flow,PASS,5,205,logs/08_task57_geometry_flow.log
+9,task58_fresh_visual_capture,PASS,1,7_images,logs/09_task58_fresh_visual_capture.log
+10,post_capture_editor_scan,PASS,0,0,logs/10_post_capture_editor_scan.log
+11,run_game_180_smoke,PASS,0,180_frames,logs/11_run_game_180_smoke.log
+12,final_editor_scan,PASS,0,0,logs/12_final_editor_scan.log
+TOTAL,formal_test_suites,PASS,23,1025,

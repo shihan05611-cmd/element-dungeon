@@ -1,0 +1,7 @@
+path,width,height,alpha_bbox,partial_alpha_pixels,sha256
+assets/world/interactables/run_reward_chest/chest_closed_v2.png,80,72,"8,16,70,70",0,2714DAC5A5EC44B7C092A7D2F3574FB0E71A6529090138051DE1FA154C400D97
+assets/world/interactables/run_reward_chest/chest_open_v2.png,80,72,"6,3,73,70",0,CBC4344454B8D0D969545046A53A1B037CDB354091A4D526B5009285E0F74D68
+assets/world/interactables/run_route_portal/portal_locked_v2.png,64,96,"6,5,56,92",0,B9CFFEAC3D5037FEB793072E6A8317A01A8D2422A230ED9671FC5A59ACC30FFD
+assets/world/interactables/run_route_portal/portal_active_v2.png,64,96,"6,5,57,92",0,0EDDAA9C484FEDB119C31DA6E081141549FCD4297E7823151C4A2BD330A7C2EA
+assets/art_preview/world_objects/wishing_crown_v1.png,160,128,"8,9,151,117",0,3CC3557EAA97349116A7EF5251ABD0586AEBD9F3E3BB283B89585C5E76FD7095
+assets/world/enemies/tidal_sentry/tidal_sentry_idle_v1.png,100,100,"37,42,63,59",0,10C931DD8823F5DA24AA6A6EFC13D00944A0EB57F07BF7AAEE6EC531786F65F1

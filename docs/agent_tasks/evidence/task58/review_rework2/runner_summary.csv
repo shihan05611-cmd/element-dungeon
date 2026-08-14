@@ -1,0 +1,15 @@
+order,category,runner,status,tests,assertions_or_artifacts,exit_code,log
+1,scan,cold-first editor scan,PASS,0,0,0,logs/01_cold_first_editor_scan.log
+2,formal,Task58 specialized,PASS,3,104,0,logs/02_task58_specialized.log
+3,formal,Task41 physical flow,PASS,4,95,0,logs/03_task41_physical_flow.log
+4,formal,Task43 combat loadout,PASS,4,105,0,logs/04_task43_combat_loadout.log
+5,formal,Task51 boss projectile,PASS,2,49,0,logs/05_task51_boss_projectile.log
+6,formal,Task29 real room flow,PASS,1,74,0,logs/06_task29_real_room_flow.log
+7,formal,Task31 full run E2E,PASS,4,393,0,logs/07_task31_full_run_e2e.log
+8,formal,Task57 geometry flow,PASS,5,205,0,logs/08_task57_geometry_flow.log
+9,review-only,physical L/F shop semantics,PASS,1,42_checks,0,logs/09_review_physical_shop_semantics.log
+10,capture,Task58 fresh visual capture,PASS,1,7_images,0,logs/10_task58_fresh_capture.log
+11,scan,post-capture editor scan,PASS,0,0,0,logs/11_post_capture_editor_scan.log
+12,smoke,RunGame,PASS,0,180_frames,0,logs/12_run_game_180_smoke.log
+13,scan,final editor scan,PASS,0,0,0,logs/13_final_editor_scan.log
+TOTAL,formal_test_suites,Task58+41+43+51+29+31+57,PASS,23,1025,0,

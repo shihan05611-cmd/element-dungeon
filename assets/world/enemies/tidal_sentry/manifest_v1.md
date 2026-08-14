@@ -1,6 +1,6 @@
 # Tidal Sentry idle v1 manifest
 
-状态：`TASK53 FORMAL STATIC RANGED-ENEMY ART / REVIEW CANDIDATE`
+状态：`TASK58 FORMAL RUNTIME / REVIEW`
 
 - File: `assets/world/enemies/tidal_sentry/tidal_sentry_idle_v1.png`
 - SHA-256: `10C931DD8823F5DA24AA6A6EFC13D00944A0EB57F07BF7AAEE6EC531786F65F1`
@@ -10,3 +10,6 @@
 - This deliverable is exactly one static idle sprite. It contains no projectile, muzzle flash, walk, attack or hurt frame.
 - Future engineering should reuse the project's existing projectile delivery / boss projectile path; no projectile asset is supplied here.
 - Generation source and prompt record: `docs/agent_tasks/evidence/task53/sources/`; the formal 100×100 file is the only runtime candidate.
+- Runtime wiring: `scenes/run/enemies/tidal_sentry.tscn` displays this file at exact `3x` and inherits the existing `CombatEnemy` receiver, element, health, death and reward protocol through `TidalSentry`.
+- Behavior is intentionally static: gravity-only platform settling, zero horizontal movement, deterministic Player lookup and `1.9 s` horizontal shots through the existing `boss_arc_projectile.tscn` / `ProjectileDelivery` lifecycle. No random, patrol, navigation or new delivery contract is used.
+- Formal placement: `combat_02_swarm.tres` SpawnA / `InitialEnemySpawns/Spawn1`, preserving `55 HP` and `15` dream dust on Battle02's lower platform.

@@ -1,0 +1,5 @@
+scope,path,before_reference,after_reference,status
+production_scene,scenes/run/interactables/run_reward_chest.tscn,assets/generated/vfx/run_reward_chest/chest_closed.png,assets/world/interactables/run_reward_chest/chest_closed_v2.png,MIGRATED
+production_script,scripts/run/run_room_instance.gd,assets/generated/vfx/run_reward_chest/chest_open.png,assets/world/interactables/run_reward_chest/chest_open_v2.png,MIGRATED
+production_scene,scenes/run/interactables/run_route_portal.tscn,assets/generated/vfx/run_route_portal/portal.png,assets/world/interactables/run_route_portal/portal_locked_v2.png + portal_active_v2.png,MIGRATED
+production_scan,*.gd/*.tscn/*.tres/*.res/*.gdshader under res:// excluding tests/docs,3 runtime references,0 runtime references,PASS

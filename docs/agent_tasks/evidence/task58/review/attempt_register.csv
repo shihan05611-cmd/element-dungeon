@@ -1,0 +1,3 @@
+attempt,classification,outcome,replaced_by,reason
+logs/01_cold_first_editor_scan.log,excluded reviewer environment attempt,exit 0 but Windows get_system_dir ERROR in stderr,logs/02_cold_first_editor_scan_formal.log,USERPROFILE isolation was too broad; cold root/profile were deleted and rebuilt from fixed baseline before formal scan
+logs/10_task58_fresh_capture.log,excluded renderer attempt,terminated exit -1 with no images,logs/10b_task58_fresh_capture_formal.log,headless driver emitted no frame_post_draw; only review PIDs 38244/32880 were stopped

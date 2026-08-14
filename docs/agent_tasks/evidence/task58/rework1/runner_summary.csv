@@ -1,0 +1,14 @@
+category,name,tests,assertions_or_images,result,official_log
+specialized,Task58 formal interactables crown sentry rework1,3,81,PASS,logs/02_task58_specialized.log
+regression,Task41 physical flow waves boss,4,84,PASS,logs/03_task41_physical_flow.log
+regression,Task43 combat loadout cleanup,4,105,PASS,logs/04_task43_combat_loadout.log
+regression,Task51 boss projectile clearance,2,49,PASS,logs/05_task51_boss_projectile.log
+regression,Task29 real room flow,1,74,PASS,logs/06_task29_real_room_flow.log
+regression,Task31 full run E2E,4,383,PASS,logs/07_task31_full_run_e2e.log
+regression,Task57 full room geometry flow,5,205,PASS,logs/08_task57_geometry_flow.log
+capture,Task58 rework1 fresh visual capture,1,7 images,PASS,logs/09_task58_fresh_visual_capture_final.log
+smoke,RunGame 180 frames,0,180 frames,PASS,logs/11_run_game_180_smoke.log
+scan,cold-first editor scan,0,0,PASS,logs/01_cold_first_editor_scan.log
+scan,post-capture editor scan,0,0,PASS,logs/10_post_capture_editor_scan.log
+scan,final editor scan,0,0,PASS,logs/12_final_editor_scan.log
+total_assertion_tests,Task58 rework1 plus direct regressions,23,981,PASS,

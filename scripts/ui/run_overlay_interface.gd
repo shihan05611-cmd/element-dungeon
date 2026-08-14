@@ -112,10 +112,10 @@ func toggle_loadout() -> void:
 		if _snapshot != null and _snapshot.route.phase in [RunPhase.SHOP, RunPhase.COMBAT]:
 			if visible:
 				hide_overlay()
-			elif _snapshot.route.phase == RunPhase.COMBAT:
-				_show_formal_combat_loadout(&"toggle_combat")
 			else:
-				_render_formal_phase(_snapshot, &"toggle_shop")
+				_show_formal_combat_loadout(
+					&"toggle_combat" if _snapshot.route.phase == RunPhase.COMBAT else &"toggle_shop_loadout"
+				)
 		return
 	if visible:
 		if _reward_offer != null:
@@ -1404,13 +1404,32 @@ func formal_route_submit_count() -> int:
 	return _formal_route_submit_count
 
 
+func show_formal_shop_from_world_interaction() -> bool:
+	if (
+		not _formal_mode
+		or _snapshot == null
+		or _snapshot.route.phase != RunPhase.SHOP
+		or _snapshot.shop == null
+	):
+		return false
+	_show_formal_shop(&"wishing_crown_interaction")
+	return visible and _formal_kind == &"shop"
+
+
 func _render_formal_phase(snapshot: RunSnapshot, cause: StringName) -> void:
 	if not _formal_mode or snapshot == null:
 		return
 	_snapshot = snapshot
 	match snapshot.route.phase:
 		RunPhase.SHOP:
-			_show_formal_shop(cause)
+			if visible and _formal_kind == &"shop":
+				_show_formal_shop(cause)
+			elif visible and _formal_kind == &"combat_loadout":
+				_show_formal_combat_loadout(cause)
+			else:
+				_formal_command_busy = false
+				_formal_route_submitting = false
+				visible = false
 		RunPhase.ROUTE_CHOICE:
 			_show_formal_route(cause)
 		RunPhase.RUN_COMPLETE, RunPhase.RUN_FAILED:
@@ -1450,7 +1469,8 @@ func _formal_begin(kind: StringName, heading: String, subtitle: String) -> void:
 func _show_formal_combat_loadout(cause: StringName = &"") -> void:
 	if _snapshot == null or _host == null or _catalog == null:
 		return
-	_formal_shop_draft = null
+	if _snapshot.route.phase != RunPhase.SHOP:
+		_formal_shop_draft = null
 	_working_loadout = _snapshot.loadout
 	var available := bool(_formal_coordinator.call("combat_loadout_available"))
 	_formal_begin(

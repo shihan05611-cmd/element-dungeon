@@ -6,6 +6,7 @@ var _host: RunSessionHost
 var _player: PlayerCharacter
 var _snapshot: RunSnapshot
 var _status_detail: String = ""
+var _shop_ui_visible: bool = false
 
 @onready var title_label: Label = $Root/Panel/Margin/VBox/Title
 @onready var state_label: Label = $Root/Panel/Margin/VBox/State
@@ -48,6 +49,7 @@ func configure(
 	if _coordinator != null:
 		_coordinator.room_activated.connect(_on_room_activated)
 		_coordinator.flow_error.connect(_on_error)
+		_coordinator.shop_ui_visibility_changed.connect(_on_shop_ui_visibility_changed)
 	if _host != null and _host.run_session != null:
 		_on_snapshot(_host.run_session.snapshot(), &"configured")
 
@@ -66,6 +68,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.keycode == KEY_2 or event.physical_keycode == KEY_2:
 			_choose_route(1)
 	elif _snapshot.route.phase == RunPhase.SHOP:
+		if not _shop_ui_visible:
+			return
 		if event.keycode == KEY_P or event.physical_keycode == KEY_P:
 			_purchase_first()
 		elif event.keycode == KEY_ENTER or event.physical_keycode == KEY_ENTER:
@@ -74,7 +78,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_snapshot(snapshot: RunSnapshot, cause: StringName = &"") -> void:
 	_snapshot = snapshot
+	if snapshot == null or snapshot.route.phase != RunPhase.SHOP:
+		_shop_ui_visible = false
 	_status_detail = String(cause)
+	_refresh_labels()
+
+
+func _on_shop_ui_visibility_changed(value: bool) -> void:
+	_shop_ui_visible = value
 	_refresh_labels()
 
 
@@ -131,7 +142,7 @@ func _refresh_labels() -> void:
 	if not _status_detail.is_empty():
 		hint_label.text += "\n" + _status_detail
 	route_buttons.visible = route.phase == RunPhase.ROUTE_CHOICE
-	shop_buttons.visible = route.phase == RunPhase.SHOP
+	shop_buttons.visible = route.phase == RunPhase.SHOP and _shop_ui_visible
 	result_buttons.visible = (
 		route.phase == RunPhase.RUN_COMPLETE
 		or route.phase == RunPhase.RUN_FAILED
@@ -202,7 +213,11 @@ func _phase_hint(phase: int) -> String:
 		RunPhase.COMBAT:
 			return "A/D移动 · SPACE跳跃 · J普攻 · 1/2/3主动 · E切元素"
 		RunPhase.SHOP:
-			return "P购买首个可负担技能 · ENTER离开商店"
+			return (
+				"P购买首个可负担技能 · ENTER离开商店"
+				if _shop_ui_visible
+				else "靠近许愿皇冠并按 F 打开商店"
+			)
 		RunPhase.ROUTE_CHOICE:
 			return "按 1/2 或点击路线；选择将加载真实目标房"
 		RunPhase.RUN_COMPLETE:

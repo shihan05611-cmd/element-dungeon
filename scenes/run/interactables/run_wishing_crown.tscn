@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/run/run_world_interactable.gd" id="1_interactable"]
+[ext_resource type="Texture2D" path="res://assets/art_preview/world_objects/wishing_crown_v1.png" id="2_texture"]
+
+[sub_resource type="StyleBoxFlat" id="PromptStyle"]
+bg_color = Color(0.05, 0.03, 0.08, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.98, 0.72, 0.22, 0.95)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="RunWishingCrown" type="Node2D"]
+z_index = 4
+script = ExtResource("1_interactable")
+kind = 3
+interaction_distance = 132.0
+prompt_text = "向许愿皇冠祈愿"
+locked_text = "商店尚未开放"
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(0, -53)
+texture = ExtResource("2_texture")
+
+[node name="Prompt" type="Label" parent="."]
+offset_left = -128.0
+offset_top = -182.0
+offset_right = 128.0
+offset_bottom = -148.0
+theme_override_colors/font_color = Color(1, 0.88, 0.48, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("PromptStyle")
+text = "F · 向许愿皇冠祈愿"
+horizontal_alignment = 1
+vertical_alignment = 1
