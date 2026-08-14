@@ -1,6 +1,6 @@
 # 任务 58：正式交互物、许愿皇冠与潮汐哨兵接线
 
-状态：REVIEW
+状态：IN_PROGRESS
 负责人：独立世界交互/敌人工程执行任务（中枢派发）
 依赖：任务 53、57（ACCEPTED）
 Git 基线：`main` HEAD `51b8ffde0894fd430517225e693b7c44008038aa`
@@ -112,3 +112,12 @@ Review Thinking：`high`
 - 执行对话：`threadId=019fffaf-6a95-7071-b19f-7d2ebe735f12`，`hostId=local`；实际模型 `gpt-5.6-sol`，推理等级 `high`；隔离 worktree `C:\Users\heliashi\.codex\worktrees\b487\元素地牢-4.7`。首个 `wait_threads(timeoutMs: 0)` cursor 为 `b44e5207-476e-4d22-964b-10b2f39a086c:1`；中枢主动跟踪，单行回执只作断线兜底。
 - 执行已于 2026-08-14 冻结为 `REVIEW`：候选 worktree `C:\Users\heliashi\.codex\worktrees\b487\元素地牢-4.7`；初核确认非 evidence 变更与任务书 allowlist 一致，`project.godot`、`scripts/player.gd`、`scripts/enemy.gd` 及 Task57 Battle02 房间几何相对固定基线零差异。
 - 独立 L3 Review 对话：`threadId=019fffdb-46d7-7eb2-a79f-4a57038deb33`，`hostId=local`；实际模型 `gpt-5.6-sol`，推理等级 `high`；隔离 worktree `C:\Users\heliashi\.codex\worktrees\5750\元素地牢-4.7`。Review 冷根冻结为 `C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-review-20260814-01`，独立 profile 冻结为 `C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-review-profile-20260814-01`；不得由执行者自行 Review 或 ACCEPTED。
+
+## 8. 首轮独立 L3 Review 退回（2026-08-14）
+
+- 结论：`FAIL / FROZEN`。Review 自动化、fresh 七图、180 帧 smoke、final scan、PNG/删除/sidecar/保护对账均通过，但存在一项玩家可观察功能缺陷和一项 evidence 状态错误。
+- 功能缺陷：`SHOP` 权威快照同步触发正式商店 Overlay 显示；Coordinator 直到下一 deferred frame 进入商店房后才隐藏。Review-only 诊断在同一个 `SHOP` 快照回调中实测 `OVERLAY_VISIBLE_AT_SHOP_SNAPSHOT=true`、`SHOP_ROOM_ACTIVE_AT_SHOP_SNAPSHOT=false`，违反“入店 UI 初始关闭、只有皇冠近距 F 才打开”。现有专项等到 `active_shop_room != null` 后才检查，遗漏该帧序。
+- evidence 缺陷：固定基线 `51b8ffde0894fd430517225e693b7c44008038aa` 中不存在本任务书，执行 `overlay_manifest.csv` 应将其记为 `A`，不能记为 `M`；其余 21 个非 evidence overlay 文件、十项精确删除和 evidence glob 均匹配。
+- 首轮 Review 证据冻结于 `C:\Users\heliashi\.codex\worktrees\5750\元素地牢-4.7\docs\agent_tasks\evidence\task58\review\`；诊断日志为 `logs/13_review_shop_initial_visibility.log`。Reviewer 未修改生产候选、未做 Git 写入。
+- rework1 仅允许在既有 Task58 allowlist 内修复同帧初始隐藏时序、补充不等待 deferred/active shop room 的专项断言，并修正 overlay manifest 状态；不得扩到经济、Task57 几何、通用敌人/弹体或 `RunOverlayInterface`。若现有 allowlist 无法实现，必须 `BLOCKED` 回传证据。
+- rework1 使用全新执行冷根 `C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-exec-rework1-20260814-02` 与独立 profile `C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-exec-rework1-profile-20260814-02`；修复后完整重跑 Task58 L3 门禁并冻结为 `REVIEW`。
