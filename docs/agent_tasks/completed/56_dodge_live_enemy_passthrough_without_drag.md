@@ -1,6 +1,6 @@
 # 任务 56：闪避穿过活跃敌人且不携带目标位移
 
-状态：REVIEW
+状态：ACCEPTED
 负责人：独立玩法执行任务（中枢派发）
 依赖：任务 48、52（均 ACCEPTED）
 Git 基线：`main` HEAD `5c0f2ee24ab8c1e494e1e185666c94edd7b79228`
@@ -94,3 +94,22 @@ Task56 只授权修改 `scripts/player.gd` 的闪避碰撞生命周期，不授�
 - 执行冻结收取：单行回执于 2026-08-14 成功唤醒当前中枢；随后 `wait_threads` cursor 更新为 `ffc26f01-65d1-41d0-af01-db09011a0919:6`，并由 `read_thread` 收取完整交付。回执未作为验收依据。
 - 独立 L2 Review 对话：`threadId=019fff0f-a838-7ee1-8fb6-fdc9b75ea330`，`hostId=local`；模型 `gpt-5.6-sol`，推理等级 `high`；隔离 worktree `C:\Users\heliashi\.codex\worktrees\953f\元素地牢-4.7`。
 - Review 首个 `wait_threads(timeoutMs: 0)` cursor：`9f1a9ddf-7f3d-463d-b4fd-9ee04538ccdc:1`；快照为执行中。Review 不由执行者自验收。
+- Review 冻结收取：单行回执于 2026-08-14 唤醒当前中枢；中枢随后通过 `wait_threads` 收取完成事件，cursor 更新为 `7abeadbd-c942-49fa-b402-e54abcee3ece:1`，并通过 `read_thread` 读取完整 Review 过程与冻结记录。回执未作为验收依据。
+
+## 9. L2 执行交付（2026-08-14，冻结）
+
+- 实际执行模型：`gpt-5.6-sol`；推理等级：`high`。独立 worktree 起点 `HEAD fffc91ec5e371ce06f5e5b69d19ce313b8d7f061`，生产基线为其父 `5c0f2ee24ab8c1e494e1e185666c94edd7b79228`。
+- 生产修复仅涉及 `scripts/player.gd` 的闪避碰撞生命周期：保存完整 `collision_layer`，闪避期间只关闭 PlayerBody 层暴露，继续保留 WorldBlocker mask，并由既有统一 `_finish_dodge()` 精确恢复完整 layer/mask。
+- Task56 专项：修复前稳定复现普通敌人被携带 `134.7315px`、正式 terminal Boss 被携带 `79.7279px`；修复后 `4 tests / 36 assertions / 0 failures / exit 0`。覆盖活跃普通敌人、正式 Boss、5 身位穿越、`0.35px` 非自主位移容差、墙阻挡、正常/撞墙/死亡/退出恢复和闪避结束后的实体阻挡。
+- Task48 完整回归：`5 tests / 55 assertions / 0 failures / exit 0`；直接 combat 回归：`27 tests / 124 assertions / 0 failures / exit 0`。
+- 正式 Boss 房非 headless OpenGL 视觉 smoke：`1 test / 3 images / 0 failures / exit 0`。三张 `1920×1080` 原图分别证明 ready、mid-overlap、recovered，Boss 未被携带到终点。
+- 正式日志 `05..09` 合并扫描 `SCRIPT ERROR / Parse Error / ERROR: / WARNING: / CrashHandlerException` 命中 `0`。
+- 最终候选及 evidence 全部位于 Task56 allowlist；执行未修改敌人、`CombatReceiver`、场景、碰撞层定义或 Task48 runner，未控制共享 Godot/editor/godot-ai，Git 写操作为零。
+
+## 10. 中枢接受记录（2026-08-14）
+
+- 独立 L2 Review：`PASS`。Review 使用 Godot `4.7.1.stable.official.a13da4feb`、独立 profile 和 `GODOT_AI_MODE=disabled` 复跑 Task56 专项 `4/36/0`、Task48 完整回归 `5/55/0`、正式 Boss 房 smoke `1 test / 3 images / 0 failures`，正式 stdout 五类错误标记为 `0`。
+- Review 确认普通敌人和正式 Boss 的物理进程保持开启，仅关闭自主水平意图；玩家开放地面完成 5 身位穿越、墙体继续截断、所有结束/中断路径恢复进入前 layer/mask，且目标水平非自主位移均不超过 `0.35px`。
+- mid-overlap 图因动画采样发生可解释哈希变化，但原尺寸视觉仍明确显示半透明玩家与 Boss 重叠，专项数值断言独立证明 Boss 未被携带；L2 接受该残余风险。
+- 中枢集成时仅向共享 `scripts/player.gd` 精确应用四处 Task56 闪避 hunk；用户既有未提交 global_instakill hunk保持原样，未运行、暂存、删除或认领其 runner、UID 与产物。
+- 结论：Task56 `ACCEPTED`；归档并建立精确 Git 检查点，不 push。

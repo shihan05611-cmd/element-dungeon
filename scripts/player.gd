@@ -16,6 +16,7 @@ const HURT_DURATION := 0.34
 const DODGE_DURATION := 0.18
 const DODGE_COOLDOWN := 0.55
 const DODGE_DISTANCE_IN_BODY_WIDTHS := 5.0
+const PLAYER_BODY_COLLISION_LAYER := 1
 const ENEMY_BODY_COLLISION_LAYER := 2
 const WORLD_BLOCKER_COLLISION_LAYER := 3
 const ELEMENT_BEAM_DELIVERY_SCRIPT := preload(
@@ -56,6 +57,8 @@ var _dodge_cooldown_remaining: float = 0.0
 var _dodge_direction: float = 1.0
 var _dodge_target_distance: float = 0.0
 var _dodge_distance_traveled: float = 0.0
+var _dodge_saved_collision_layer: int = 0
+var _dodge_has_saved_collision_layer: bool = false
 var _dodge_saved_collision_mask: int = 0
 var _dodge_has_saved_collision_mask: bool = false
 var _dodge_saved_sprite_modulate := Color.WHITE
@@ -379,6 +382,8 @@ func _try_start_dodge() -> bool:
 	_dodge_elapsed = 0.0
 	_dodge_distance_traveled = 0.0
 	_dodge_target_distance = body_width * DODGE_DISTANCE_IN_BODY_WIDTHS
+	_dodge_saved_collision_layer = collision_layer
+	_dodge_has_saved_collision_layer = true
 	_dodge_saved_collision_mask = collision_mask
 	_dodge_has_saved_collision_mask = true
 	_dodge_saved_velocity = velocity
@@ -389,6 +394,7 @@ func _try_start_dodge() -> bool:
 	velocity = Vector2.ZERO
 	_dodging = true
 	combat_receiver.dodging = true
+	set_collision_layer_value(PLAYER_BODY_COLLISION_LAYER, false)
 	set_collision_mask_value(ENEMY_BODY_COLLISION_LAYER, false)
 	set_collision_mask_value(WORLD_BLOCKER_COLLISION_LAYER, true)
 	_start_dodge_visual()
@@ -418,6 +424,9 @@ func _finish_dodge(start_cooldown: bool = true, resume_presentation: bool = true
 	_dodging = false
 	if combat_receiver != null:
 		combat_receiver.dodging = false
+	if _dodge_has_saved_collision_layer:
+		collision_layer = _dodge_saved_collision_layer
+		_dodge_has_saved_collision_layer = false
 	if _dodge_has_saved_collision_mask:
 		collision_mask = _dodge_saved_collision_mask
 		_dodge_has_saved_collision_mask = false
