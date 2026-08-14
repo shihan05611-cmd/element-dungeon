@@ -126,7 +126,7 @@ Review Thinking：`high`
 - Task56 在独立 worktree 并行修改 `scripts/player.gd`；Task57 与其生产 allowlist 零重叠，不得读取或整合 Task56 未验收候选。
 - task12..34 历史 `.import` 删除、Task47、Task54/55 取消产物、translation/import/`.godot`/中文保护文档和其他未跟踪文件全部保护。
 - Godot PID17624、godot-ai PID3964 为共享实例；禁止连接、关闭、重启、reload、reimport、保存或控制。
-- 执行者不使用子 Agent，不执行 `git add/commit/push/reset/restore/checkout/clean/stash`，不自行 `ACCEPTED`。完成后更新为 `REVIEW` 并冻结；不得跨对话回传大段内容，中枢只通过 `wait_threads/read_thread` 收取。
+- 执行者不使用子 Agent，不执行 `git add/commit/push/reset/restore/checkout/clean/stash`，不自行 `ACCEPTED`。完成后更新为 `REVIEW` 并冻结；中枢以 `wait_threads/read_thread` 为主收取，冻结后仅按最新 `CENTRAL_REVIEW_RULES.md` 向本次派发的当前中枢发送一次固定格式单行回执，禁止大段跨对话交付。
 
 ## 8. 后续拆分（不属于 Task57）
 
@@ -143,5 +143,5 @@ Task58 会触及商店交互、敌人和正式 spawn 资源，与本任务房间
 - 路径对齐：用户已明确选择“完整背景 + 平台碰撞”，不再比较 TileSet/分层方案；本任务采用不改 `project.godot` 的统一 Camera zoom + 1536×832 authored world，为满足相同可观察目标的最低风险迁移。
 - 执行职责候选审计：Task54 为已取消 TileSet 可行性且对话历史目标冲突；Task53 为美术 Review；均不复用。Task57 为跨公共房间模板的 L3 场景工程，创建全新独立执行任务，压力等级 `GREEN`。
 - 执行对话：`threadId=019fff06-10c0-7401-84fd-7a559dc8ab2f`，`hostId=local`；实际模型 `gpt-5.6-sol`，推理等级 `high`；隔离 worktree `C:\Users\heliashi\.codex\worktrees\ecd6\元素地牢-4.7`。
-- 首个 `wait_threads(timeoutMs: 0)` cursor：`1d971891-1353-4aca-9a02-1c9b4b534272:1`；快照为执行中。中枢只使用该实际 id/cursor 主动跟踪，不要求跨对话回传。
+- 首个 `wait_threads(timeoutMs: 0)` cursor：`1d971891-1353-4aca-9a02-1c9b4b534272:1`；快照为执行中。中枢使用该实际 id/cursor 主动跟踪，单行回执仅作断线唤醒。
 - 独立 L3 Review 对话：执行冻结后另行创建、登记和主动跟踪。

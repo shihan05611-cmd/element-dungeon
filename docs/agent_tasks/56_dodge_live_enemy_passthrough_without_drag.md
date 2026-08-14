@@ -84,11 +84,11 @@ Task56 只授权修改 `scripts/player.gd` 的闪避碰撞生命周期，不授�
 - 不修改 `project.godot`、`scripts/enemy.gd`、`combat/components/combat_receiver.gd`、玩家/敌人场景、Boss 房、碰撞层定义、Task48/52 归档或历史 evidence。
 - 不以关闭敌人物理进程、冻结所有敌人、结束后复位敌人坐标、缩短距离或直接传送玩家通过测试。
 - 不使用子 Agent；不执行 `git add/commit/push/reset/restore/checkout/clean/stash`；不自行标记 `ACCEPTED`。
-- 完成后将本任务状态更新为 `REVIEW`，回填精确修改、测试/断言/日志、视觉检查、保护对账和 Git 写操作为零声明，然后在执行任务内冻结。不得跨对话向中枢发送大段回传；中枢通过 `wait_threads` 主动收取。
+- 完成后将本任务状态更新为 `REVIEW`，回填精确修改、测试/断言/日志、视觉检查、保护对账和 Git 写操作为零声明，然后在执行任务内冻结。中枢继续通过 `wait_threads` 主动收取；冻结后仅按最新 `CENTRAL_REVIEW_RULES.md` 向本次派发的当前中枢发送一次固定格式单行回执，禁止大段跨对话交付。
 
 ## 8. 协调记录
 
 - 执行职责候选审计：当前可见项目任务中没有空闲且同职责、可证明无上下文压力的玩法执行对话；Task54/53 分别属于已取消地图可行性与美术 Review，不复用。处置：创建新的独立玩法执行任务，任务书自包含，压力等级 `GREEN`。
 - 执行对话：`threadId=019ffef1-5a9e-7050-a516-0e837a163100`，`hostId=local`；实际派发模型 `gpt-5.6-sol`，推理等级 `high`；隔离 Codex worktree `C:\Users\heliashi\.codex\worktrees\abf7\元素地牢-4.7`。
-- 首个 `wait_threads(timeoutMs: 0)` cursor：`ffc26f01-65d1-41d0-af01-db09011a0919:1`；快照为执行中。中枢后续只使用该实际任务 id/cursor 主动跟踪，不要求跨对话回传。
+- 首个 `wait_threads(timeoutMs: 0)` cursor：`ffc26f01-65d1-41d0-af01-db09011a0919:1`；快照为执行中。中枢后续使用该实际任务 id/cursor 主动跟踪，单行回执仅作断线唤醒。
 - 独立 L2 Review 对话：执行冻结后另行审计与登记，不由执行者自验收。
