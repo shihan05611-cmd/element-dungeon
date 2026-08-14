@@ -1,6 +1,6 @@
 # 任务 57：完整房间背景、远景相机与平台碰撞迁移
 
-状态：REVIEW
+状态：IN_PROGRESS
 负责人：独立场景/玩法工程执行任务（中枢派发）
 依赖：任务 49、51、53（ACCEPTED）；用户已接受本任务五张美术母版
 Git 基线：`main` HEAD `b080de734d8a9dd321a62ec13a4152b00b8989f7`
@@ -145,3 +145,4 @@ Task58 会触及商店交互、敌人和正式 spawn 资源，与本任务房间
 - 执行对话：`threadId=019fff06-10c0-7401-84fd-7a559dc8ab2f`，`hostId=local`；实际模型 `gpt-5.6-sol`，推理等级 `high`；隔离 worktree `C:\Users\heliashi\.codex\worktrees\ecd6\元素地牢-4.7`。
 - 首个 `wait_threads(timeoutMs: 0)` cursor：`1d971891-1353-4aca-9a02-1c9b4b534272:1`；快照为执行中。中枢使用该实际 id/cursor 主动跟踪，单行回执仅作断线唤醒。
 - 独立 L3 Review 对话：`threadId=019fff4a-2d4d-7421-9584-082624eaf5cb`，`hostId=local`；实际模型 `gpt-5.6-sol`，推理等级 `high`；隔离 worktree `C:\Users\heliashi\.codex\worktrees\2c19\元素地牢-4.7`。首个 `wait_threads(timeoutMs: 0)` cursor 为 `12296fbe-4300-43a2-a967-3f99fb297cf6:1`；中枢已明确纠正启动时的二次委托表述，Review 禁止使用子 Agent，必须由当前可见对话本人完成。
+- 首轮独立 L3 Review 结论：`FAIL`。固定基线 + 22 项 overlay、五个直接回归、6 图、180 帧 smoke、final scan、日志、sidecar 与共享零漂移均通过，但 Task57 专项首轮在 `formal Boss projectile remains operational without a dais` 出现 `1/205` 失败，随后两轮 `205/205` 通过，证明冷启动/帧序门禁不稳定。冻结 Review 证据位于 `C:\Users\heliashi\.codex\cold-roots\element-dungeon\task57-review-profile-20260814-01`；任务退回原执行对话，只允许在既有 allowlist 内定位并消除该不稳定，不接受、不合入生产候选。
