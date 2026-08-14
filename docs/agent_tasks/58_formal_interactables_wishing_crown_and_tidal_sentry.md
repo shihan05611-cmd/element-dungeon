@@ -1,6 +1,6 @@
 # 任务 58：正式交互物、许愿皇冠与潮汐哨兵接线
 
-状态：IN_PROGRESS
+状态：REVIEW
 负责人：独立世界交互/敌人工程执行任务（中枢派发）
 依赖：任务 53、57（ACCEPTED）
 Git 基线：`main` HEAD `51b8ffde0894fd430517225e693b7c44008038aa`
@@ -149,3 +149,13 @@ Review Thinking：`high`
 - Task41 既有“物理 L 重开商店”属于被本轮用户目标明确取代的旧入口断言，按 §4.2 允许精确迁移为“L 只开全局配装、皇冠 F 才开商店”；Task41 其余物理流程、波次、Boss、经济、配装和几何断言不得删除或放宽。
 - Task31 两条正式流程均冻结了“SHOP 自动可见后直接取按钮”的旧入口，按 §4.2 允许只在原购买/升级/配装/离店步骤前加入真实世界皇冠近距 F；不得直接调用 Overlay 商店内部方法，原五阶段、`4/1/0`、奖励、经济、重开和失败流程断言不得删除或放宽，正式 `4/383` 必须至少保持。相对固定基线的最终非 evidence overlay 预期为 `10 D / 19 M / 6 A`，共 35 项。
 - rework2 使用全新执行冷根/profile：`C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-exec-rework2-20260814-03` / `C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-exec-rework2-profile-20260814-03`，完整重跑 L3 后冻结回审。
+
+## 12. rework2 冻结回审（2026-08-14）
+
+- 执行结论：`REVIEW / FROZEN`；实际模型/推理仍为 `gpt-5.6-sol / high`，无子 Agent、无 Git 写入。
+- 入口已按用户冻结目标分离：物理 `L` 在 SHOP 仅打开既有 `combat_loadout`；皇冠近距 `F` 调用显式世界交互入口打开既有商店内容；未新增页面、scene、node，未修改 `scripts/combat_hud.gd`。
+- rework2 专项 `3/104`；Task41 `4/95`、Task43 `4/105`、Task51 `2/49`、Task29 `1/74`、Task31 `4/393`、Task57 `5/205`，合计 `23 tests / 1025 assertions` 全通过。
+- fresh capture `7` 张、180 帧 smoke、post-capture/final scan 均通过；最终 overlay manifest 为固定基线 `51b8ffde0894fd430517225e693b7c44008038aa` 上 `10 D / 19 M / 6 A = 35`，任务书状态为 `A`。
+- Task31 首次旧入口回归失败 `109/358` 已保留在 attempts；正式迁移后保持原 `383` 条并新增 `10` 条入口断言。Task41 正式为 `4/95`；独立 Reviewer 必须逐行确认减少的 `10` 条仅为被用户目标取代的重复 L/商店入口断言，未削弱物理移动、波次、Boss、经济、配装或几何门禁。
+- 六张正式 PNG、十项旧资产删除、sidecar、保护路径与 Task57 几何均报告零漂移。rework2 执行证据冻结于 `C:\Users\heliashi\.codex\worktrees\b487\元素地牢-4.7\docs\agent_tasks\evidence\task58\rework2\`。
+- 进入最终独立 L3 Review；必须使用全新冷根/profile，保留首轮与 rework1 的 FAIL 证据，不得复用其日志、截图或运行目录。
