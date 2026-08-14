@@ -1,6 +1,6 @@
 # 任务 58：正式交互物、许愿皇冠与潮汐哨兵接线
 
-状态：PENDING
+状态：IN_PROGRESS
 负责人：独立世界交互/敌人工程执行任务（中枢派发）
 依赖：任务 53、57（ACCEPTED）
 Git 基线：`main` HEAD `51b8ffde0894fd430517225e693b7c44008038aa`
@@ -109,4 +109,5 @@ Review Thinking：`high`
 ## 7. 协调记录
 
 - 复杂路径对齐：采用“既有事务/交互节点 + 显式图片状态 + 专用静态 Sentry 子类”的最低风险迁移；不重构商店事务、不改通用敌人基类、不新增弹体体系。
-- 执行对话与 Review 对话、实际模型/推理、worktree/cold root 和 `wait_threads` cursor 由中枢派发后回填。
+- 执行对话：`threadId=019fffaf-6a95-7071-b19f-7d2ebe735f12`，`hostId=local`；实际模型 `gpt-5.6-sol`，推理等级 `high`；隔离 worktree `C:\Users\heliashi\.codex\worktrees\b487\元素地牢-4.7`。首个 `wait_threads(timeoutMs: 0)` cursor 为 `b44e5207-476e-4d22-964b-10b2f39a086c:1`；中枢主动跟踪，单行回执只作断线兜底。
+- 独立 L3 Review 对话在执行冻结后登记；不得由执行者自行 Review 或 ACCEPTED。
