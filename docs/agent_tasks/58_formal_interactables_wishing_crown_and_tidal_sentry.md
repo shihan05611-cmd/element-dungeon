@@ -1,6 +1,6 @@
 # 任务 58：正式交互物、许愿皇冠与潮汐哨兵接线
 
-状态：IN_PROGRESS
+状态：REVIEW
 负责人：独立世界交互/敌人工程执行任务（中枢派发）
 依赖：任务 53、57（ACCEPTED）
 Git 基线：`main` HEAD `51b8ffde0894fd430517225e693b7c44008038aa`
@@ -121,3 +121,13 @@ Review Thinking：`high`
 - 首轮 Review 证据冻结于 `C:\Users\heliashi\.codex\worktrees\5750\元素地牢-4.7\docs\agent_tasks\evidence\task58\review\`；诊断日志为 `logs/13_review_shop_initial_visibility.log`。Reviewer 未修改生产候选、未做 Git 写入。
 - rework1 仅允许在既有 Task58 allowlist 内修复同帧初始隐藏时序、补充不等待 deferred/active shop room 的专项断言，并修正 overlay manifest 状态；不得扩到经济、Task57 几何、通用敌人/弹体或 `RunOverlayInterface`。若现有 allowlist 无法实现，必须 `BLOCKED` 回传证据。
 - rework1 使用全新执行冷根 `C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-exec-rework1-20260814-02` 与独立 profile `C:\Users\heliashi\.codex\cold-roots\element-dungeon\task58-exec-rework1-profile-20260814-02`；修复后完整重跑 Task58 L3 门禁并冻结为 `REVIEW`。
+
+## 9. rework1 冻结回审（2026-08-14）
+
+- 执行结论：`REVIEW / FROZEN`；实际模型/推理仍为 `gpt-5.6-sol / high`，无子 Agent、无 Git 写入。
+- 生产修复仅修改既有 allowlist 的 `scripts/run/run_flow_coordinator.gd`：首次收到 `SHOP` 权威快照且 `active_shop_room == null` 时，在同步 snapshot 回调内立即执行 `_set_shop_ui_visible(false)`，再 deferred 创建世界商店房；未修改 `RunOverlayInterface`，后续已有商店房中的购买/升级 snapshot 不走该隐藏分支。
+- 正式专项新增四个同信号栈断言：不等待 deferred、不等待 `active_shop_room`，捕获外部 `SHOP` snapshot 回调当下 Overlay=false、shop room=false，并保持皇冠 F 打开、重复交互无事务副作用、关闭重开和出口事务门禁。
+- rework1 固定基线仍为 `51b8ffde0894fd430517225e693b7c44008038aa`；全新执行冷根/profile 首条 4.7.1 cold-first scan 退出 0。专项 `3/81`，Task41/43/51/29/31/57 `20/900`，合计 `23 tests / 981 assertions` 全通过。
+- fresh capture `1 test / 7 images`、180 帧 smoke、post-capture scan、final scan 均通过；final sidecar `951→951` 零差异。前两次视觉查看/取帧迭代已单列 attempts，正式第三次七图保留原始 1920×1080 字节。
+- overlay manifest 已把任务书状态纠正为 `A`；最终非 evidence overlay 为 `10 D / 16 M / 6 A` 共 32 项。六张正式 PNG 哈希未变，旧运行引用与十项旧文件均为零，保护路径与 Task57 几何零差异。
+- rework1 证据冻结于 `C:\Users\heliashi\.codex\worktrees\b487\元素地牢-4.7\docs\agent_tasks\evidence\task58\rework1\`。独立 Reviewer 必须使用全新 rework1 Review 冷根/profile，复核监听顺序稳定性、同栈诊断以及 capture 夹具未弱化视觉证明。
