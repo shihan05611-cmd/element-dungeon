@@ -1,0 +1,17 @@
+order,gate,process_pid,tests,assertions,result,log
+1,cold-first editor scan,,,,PASS,logs/01_cold_first_editor_scan.log
+2,Task57 specialized attempt 1,31320,5,205,PASS,logs/02_task57_specialized_attempt1.log
+3,Task57 specialized attempt 2,35796,5,205,PASS,logs/02_task57_specialized_attempt2.log
+4,Task57 specialized attempt 3,9536,5,205,PASS,logs/02_task57_specialized_attempt3.log
+5,Task57 specialized attempt 4,12228,5,205,PASS,logs/02_task57_specialized_attempt4.log
+6,Task57 specialized attempt 5,2480,5,205,PASS,logs/02_task57_specialized_attempt5.log
+7,Task41,4888,4,84,PASS,logs/03_task41_physical_flow.log
+8,Task43,38324,4,105,PASS,logs/04_task43_world_cleanup.log
+9,Task51,35888,2,49,PASS,logs/05_task51_boss_projectile.log
+10,Task29,34632,1,74,PASS,logs/06_task29_real_room_flow.log
+11,Task31,28564,4,383,PASS,logs/07_task31_full_run_e2e.log
+12,reused six-image hash and original-size audit,,1,6 images,PASS,visual_reuse_manifest.csv
+13,main RunGame 180-frame smoke,15116,,,PASS,logs/08_main_run_180_frame_smoke.log
+14,final editor scan,37996,,,PASS,logs/09_final_editor_scan.log
+summary,Task57 repeatability,,25,1025,PASS,5 independent processes
+summary,direct regressions,,15,695,PASS,5 direct runners

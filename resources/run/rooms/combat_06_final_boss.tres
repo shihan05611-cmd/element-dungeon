@@ -9,7 +9,7 @@
 script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"final_boss_placeholder"
-local_position = Vector2(820, 420)
+local_position = Vector2(920, 660)
 maximum_health = 280
 defense_flat = 3.0
 dream_dust_reward = 0

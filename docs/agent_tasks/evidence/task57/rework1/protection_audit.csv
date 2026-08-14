@@ -1,0 +1,11 @@
+target,baseline_or_start,current_or_end,result
+project.godot blob,2c0714d6b08e04ea69b3d697b2540e53d875259f,2c0714d6b08e04ea69b3d697b2540e53d875259f,PASS
+scripts/player.gd blob,5794fbdcf1fc41c210dbe18848c3844d106acfaf,5794fbdcf1fc41c210dbe18848c3844d106acfaf,PASS
+scripts/enemy.gd blob,903044f07c974086d9ff7c6101cfab6e2b4144a6,903044f07c974086d9ff7c6101cfab6e2b4144a6,PASS
+scenes/player.tscn blob,e1d8819a402391c336b79d3854186c6fe50fbdda,e1d8819a402391c336b79d3854186c6fe50fbdda,PASS
+scenes/combat_hud.tscn blob,b6bda40057a70a015bb8fb3e484a531172fdcba9,b6bda40057a70a015bb8fb3e484a531172fdcba9,PASS
+shared Godot process,PID 17624 started 2026-08-13 19:31:04,PID 17624 responding,PASS
+shared godot-ai process,PID 3964 started 2026-08-13 19:31:23,PID 3964 responding,PASS
+global_instakill dedicated runner,not accessed,not accessed,PASS
+Task56 candidate,not read or integrated,not read or integrated,PASS
+Git write operations,0,0,PASS

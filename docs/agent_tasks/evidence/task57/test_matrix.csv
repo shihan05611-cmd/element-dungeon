@@ -1,0 +1,13 @@
+order,scope,log,tests,assertions,result
+1,cold-first editor scan,logs/01_cold_first_editor_scan.log,,,PASS
+2,Task57 specialized,logs/02_task57_specialized.log,5,205,PASS
+3,Task41 physical flow,logs/03_task41_physical_flow.log,4,84,PASS
+4,Task43 world cleanup,logs/04_task43_world_cleanup.log,4,105,PASS
+5,Task51 boss projectile,logs/05_task51_boss_projectile.log,2,49,PASS
+6,Task29 real room flow,logs/06_task29_real_room_flow.log,1,74,PASS
+7,Task31 full run E2E,logs/07_task31_full_run_e2e.log,4,383,PASS
+8,Task57 six-image capture,logs/08_task57_six_image_capture.log,1,6 images,PASS
+9,main RunGame 180-frame smoke,logs/09_main_run_180_frame_smoke.log,,,PASS
+10,final editor scan,logs/10_final_editor_scan.log,,,PASS
+summary,direct tests,,15,695,PASS
+summary,formal log marker scan,10 logs,0 hits,,PASS

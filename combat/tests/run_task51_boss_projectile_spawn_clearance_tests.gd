@@ -5,8 +5,7 @@ const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
 const PROJECTILE_RADIUS := 13.0
 const PROJECTILE_VISIBLE_BOTTOM := 15.04
 const PROJECTILE_SPEED := 255.0
-const DAIS_SUPPORT_TOP := 452.0
-const GROUND_SUPPORT_TOP := 540.0
+const GROUND_SUPPORT_TOP := 692.0
 
 var _tests: int = 0
 var _assertions: int = 0
@@ -18,34 +17,33 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	await _run_async_test("dais_left_and_right_clearance", _test_dais_left_and_right_clearance)
-	await _run_async_test("walked_ground_left_and_right_clearance", _test_walked_ground_left_and_right_clearance)
+	await _run_async_test("main_ground_has_no_hidden_dais", _test_main_ground_has_no_hidden_dais)
+	await _run_async_test("main_ground_left_and_right_clearance", _test_main_ground_left_and_right_clearance)
 	_finish()
 
 
-func _test_dais_left_and_right_clearance() -> void:
-	for direction_x: float in [-1.0, 1.0]:
-		var context := await _create_boss_context(false)
-		var boss := context[&"boss"] as CombatEnemy
-		_expect(boss.is_on_floor(), "dais boss is settled on a physics support")
-		_expect(is_equal_approx(boss.global_position.y, 420.0), "dais boss retains the formal root Y=420")
-		await _verify_spawn(context, direction_x, DAIS_SUPPORT_TOP, "dais")
-		await _destroy_context(context)
+func _test_main_ground_has_no_hidden_dais() -> void:
+	var context := await _create_boss_context()
+	var room := context[&"room"] as RunRoomInstance
+	var boss := context[&"boss"] as CombatEnemy
+	_expect(room.get_node_or_null("BossDais") == null, "BossDais is removed from the formal Boss room")
+	_expect_eq(_one_way_shape_count(room), 0, "formal Boss room contains zero hidden one-way platforms")
+	_expect(boss.is_on_floor(), "Boss is settled on the main-ground physics support")
+	_expect(absf(boss.global_position.y - 660.0) <= 0.25, "Boss settles at the formal main-ground root Y=660 (got %.3f)" % boss.global_position.y)
+	await _destroy_context(context)
 
 
-func _test_walked_ground_left_and_right_clearance() -> void:
+func _test_main_ground_left_and_right_clearance() -> void:
 	for direction_x: float in [-1.0, 1.0]:
-		var context := await _create_boss_context(true)
+		var context := await _create_boss_context()
 		var boss := context[&"boss"] as CombatEnemy
-		_expect(bool(context[&"walked_off_dais"]), "boss reaches main ground through real AI physics movement")
-		_expect(boss.is_on_floor(), "walked boss is settled on the main-ground physics support")
-		_expect(absf(boss.global_position.y - 508.0) <= 0.25, "walked boss settles at the formal main-ground root Y=508 (got %.3f)" % boss.global_position.y)
-		_expect(boss.global_position.x < 690.0, "walked boss exits the dais footprint before the ground shot")
+		_expect(boss.is_on_floor(), "Boss is settled on the only main-ground physics support")
+		_expect(absf(boss.global_position.y - 660.0) <= 0.25, "Boss remains at the formal main-ground root Y=660")
 		await _verify_spawn(context, direction_x, GROUND_SUPPORT_TOP, "ground")
 		await _destroy_context(context)
 
 
-func _create_boss_context(walk_to_ground: bool) -> Dictionary:
+func _create_boss_context() -> Dictionary:
 	var world := Node2D.new()
 	world.name = "Task51World"
 	root.add_child(world)
@@ -59,32 +57,18 @@ func _create_boss_context(walk_to_ground: bool) -> Dictionary:
 	boss.set("_boss_projectile_cooldown", 9999.0)
 
 	var player := PLAYER_SCENE.instantiate() as PlayerCharacter
-	player.global_position = Vector2(500.0, 508.0)
+	player.global_position = Vector2(500.0, 660.0)
 	world.add_child(player)
 	boss.player = player
-	var walked_off_dais := false
-	if walk_to_ground:
-		boss.ai_enabled = true
-		boss.patrol_target_x = 500.0
-		for _frame: int in 360:
-			await physics_frame
-			if boss.is_on_floor() and boss.global_position.y > 500.0 and boss.global_position.x < 690.0:
-				walked_off_dais = true
-				break
-		boss.ai_enabled = false
-		boss.velocity = Vector2.ZERO
+	boss.ai_enabled = false
+	for _frame: int in 12:
 		await physics_frame
-	else:
-		boss.ai_enabled = false
-		for _frame: int in 4:
-			await physics_frame
 
 	return {
 		&"world": world,
 		&"room": room,
 		&"boss": boss,
 		&"player": player,
-		&"walked_off_dais": walked_off_dais,
 	}
 
 
@@ -92,7 +76,7 @@ func _verify_spawn(context: Dictionary, direction_x: float, support_top: float, 
 	var world := context[&"world"] as Node2D
 	var boss := context[&"boss"] as CombatEnemy
 	var player := context[&"player"] as PlayerCharacter
-	player.global_position = Vector2(boss.global_position.x + direction_x * 240.0, 508.0)
+	player.global_position = Vector2(boss.global_position.x + direction_x * 240.0, 660.0)
 	await physics_frame
 
 	var created: Array[Node] = []
@@ -153,6 +137,13 @@ func _blocker_overlaps(projectile: ProjectileDelivery) -> Array[Dictionary]:
 	query.collide_with_areas = false
 	query.margin = projectile.query_margin
 	return projectile.get_world_2d().direct_space_state.intersect_shape(query, projectile.max_contact_results)
+
+
+func _one_way_shape_count(node: Node) -> int:
+	var count := 1 if node is CollisionShape2D and (node as CollisionShape2D).one_way_collision else 0
+	for child: Node in node.get_children():
+		count += _one_way_shape_count(child)
+	return count
 
 
 func _destroy_context(context: Dictionary) -> void:

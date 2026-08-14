@@ -1,0 +1,6 @@
+marker,formal_logs,hits,result
+SCRIPT ERROR,13,0,PASS
+Parse Error,13,0,PASS
+ERROR:,13,0,PASS
+WARNING:,13,0,PASS
+CrashHandlerException,13,0,PASS

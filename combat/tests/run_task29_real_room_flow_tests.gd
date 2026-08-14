@@ -54,7 +54,7 @@ func _run() -> void:
 	await _finish_current_room(coordinator)
 	_expect(await _wait_for_room(coordinator, &"combat_02_swarm"), "combat one loads the fixed second combat")
 	_record_room(coordinator, scene_paths, room_instances)
-	_expect_eq(coordinator.active_room.template_id, &"arena_flat", "fixed second combat reuses the flat template")
+	_expect_eq(coordinator.active_room.template_id, &"arena_tidal_battle_02", "fixed second combat uses Battle Room 02")
 
 	await _finish_current_room(coordinator)
 	_expect(await _wait_for_phase(coordinator, RunPhase.SHOP), "combat two reaches the single physical shop")
@@ -68,12 +68,12 @@ func _run() -> void:
 	coordinator.player.interact_requested.emit()
 	_expect(await _wait_for_room(coordinator, &"combat_04_validation"), "middle shop loads combat four")
 	_record_room(coordinator, scene_paths, room_instances)
-	_expect_eq(coordinator.active_room.template_id, &"arena_flat", "third combat uses the validation flat template")
+	_expect_eq(coordinator.active_room.template_id, &"arena_tidal_battle_01", "third combat reuses Battle Room 01")
 
 	await _finish_current_room(coordinator)
 	_expect(await _wait_for_room(coordinator, &"combat_06_final_boss"), "third combat loads boss arena directly")
 	_record_room(coordinator, scene_paths, room_instances)
-	_expect_eq(coordinator.active_room.template_id, &"arena_boss", "boss uses dedicated PackedScene")
+	_expect_eq(coordinator.active_room.template_id, &"arena_tidal_boss", "boss uses dedicated full-room PackedScene")
 	var before_boss := coordinator.host.run_session.snapshot()
 	var boss_balance := before_boss.economy.balance
 	await _finish_current_room(coordinator)
@@ -95,7 +95,7 @@ func _run() -> void:
 	_expect_eq(scene_paths.size(), 4, "four scene activations recorded by runner")
 	_expect_eq(room_instances.size(), 4, "four room instance activations recorded by runner")
 	_expect_eq(_unique_int_count(room_instances), 4, "every combat uses a different RunRoomInstance")
-	_expect_eq(_unique_string_count(scene_paths), 2, "run observes the fixed flat and boss PackedScene templates")
+	_expect_eq(_unique_string_count(scene_paths), 3, "run observes Battle01, Battle02, and Boss PackedScene templates")
 	_expect_eq(coordinator.room_container.get_child_count(), 1, "only one active RunRoomInstance remains at result")
 	_expect_eq(coordinator.activated_scene_paths, final.route.activated_scene_paths, "coordinator history matches authority history")
 	_expect_eq(coordinator.activated_room_instance_ids, final.route.activated_room_instance_ids, "instance history matches authority history")

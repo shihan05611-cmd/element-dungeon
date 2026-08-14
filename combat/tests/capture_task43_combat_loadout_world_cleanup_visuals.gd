@@ -4,8 +4,8 @@ const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_fiv
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const RUN_GAME: PackedScene = preload("res://scenes/run/run_game.tscn")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
-const PRESSURE_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_02_pressure.tres")
-const LAYER_ELITE_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_03_layer_elite.tres")
+const BATTLE_01_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_04_validation.tres")
+const BATTLE_02_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_02_swarm.tres")
 const OUTPUT_DIR := "res://docs/agent_tasks/evidence/task43/screenshots"
 
 var _failures: Array[String] = []
@@ -65,8 +65,8 @@ func _run() -> void:
 	await _save("task43_03_world_no_corpses_grounded_chest_hud_1920x1080.png", Vector2i(1920, 1080))
 	coordinator.queue_free()
 	await process_frame
-	await _capture_platform(PRESSURE_ROOM, "task43_04_pressure_lower_platform_real_jump_2560x1440.png")
-	await _capture_platform(LAYER_ELITE_ROOM, "task43_05_layer_elite_lower_platform_real_jump_2560x1440.png")
+	await _capture_platform(BATTLE_01_ROOM, "task43_04_battle01_center_platform_real_jump_2560x1440.png", "res://scenes/run/rooms/room_arena_flat.tscn", 484.0, 699.0, 837.0)
+	await _capture_platform(BATTLE_02_ROOM, "task43_05_battle02_lower_platform_real_jump_2560x1440.png", "res://scenes/run/rooms/room_arena_tidal_battle_02.tscn", 528.0, 1110.0, 1252.0)
 	_assert(_saved.size() == 5, "capture writes exactly five Task43 PNG files")
 	print("Task43 visual capture: 1 test, %d images, %d failures" % [_saved.size(), _failures.size()])
 	for path: String in _saved:
@@ -100,10 +100,10 @@ func _first_chest_skill_run_id() -> StringName:
 	return &"task43_capture_fallback"
 
 
-func _capture_platform(definition: CombatRoomDefinition, file_name: String) -> void:
+func _capture_platform(definition: CombatRoomDefinition, file_name: String, scene_path: String, target_y: float, target_min_x: float, target_max_x: float) -> void:
 	root.size = Vector2i(2560, 1440)
 	var room_id := definition.room_id
-	_assert(definition.room_scene.resource_path == "res://scenes/run/rooms/room_arena_platforms.tscn", "%s uses the shared platform template" % String(room_id))
+	_assert(definition.room_scene.resource_path == scene_path, "%s uses its formal full-room platform template" % String(room_id))
 	var stage := Node2D.new()
 	root.add_child(stage)
 	current_scene = stage
@@ -142,9 +142,9 @@ func _capture_platform(definition: CombatRoomDefinition, file_name: String) -> v
 		if (
 			rising_airborne
 			and player.is_on_floor()
-			and player.global_position.y < 430.0
-			and player.global_position.x >= 280.0
-			and player.global_position.x <= 580.0
+			and absf(player.global_position.y - target_y) <= 3.0
+			and player.global_position.x >= target_min_x
+			and player.global_position.x <= target_max_x
 		):
 			Input.action_release(&"move_right")
 			platform_floor_frames += 1
@@ -159,7 +159,7 @@ func _capture_platform(definition: CombatRoomDefinition, file_name: String) -> v
 	release.pressed = false
 	Input.parse_input_event(release)
 	_assert(rising_airborne, "%s real jump input produces upward velocity while airborne" % String(room_id))
-	_assert(landed and player.global_position.distance_to(spawn) > 80.0, "%s reaches LowerPlatform only through real input/physics" % String(room_id))
+	_assert(landed and player.global_position.distance_to(spawn) > 80.0, "%s reaches its first formal platform only through real input/physics" % String(room_id))
 	await _settle()
 	await _save(file_name, Vector2i(2560, 1440))
 	stage.queue_free()
@@ -241,7 +241,10 @@ func _chest_grounded(room: RunRoomInstance) -> bool:
 			if image.get_pixel(x, y).a > 0.01:
 				max_y = maxi(max_y, y)
 	var bottom := room.chest.global_position.y + (float(max_y) - float(image.get_height()) * 0.5) * sprite.scale.y
-	return absf(bottom - 540.0) <= 2.0
+	var ground_shape := room.get_node("Ground/CollisionShape2D") as CollisionShape2D
+	var rectangle := ground_shape.shape as RectangleShape2D
+	var ground_top := ground_shape.global_position.y - rectangle.size.y * 0.5
+	return absf(bottom - ground_top) <= 2.0
 
 
 func _visible_text(node: Node) -> String:

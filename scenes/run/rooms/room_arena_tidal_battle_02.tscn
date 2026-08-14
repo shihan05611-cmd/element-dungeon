@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/run/run_room_instance.gd" id="1_room"]
-[ext_resource type="Texture2D" path="res://assets/world/rooms/tidal_dungeon/full_rooms/tidal_battle_room_01_full_v1.png" id="2_background"]
+[ext_resource type="Texture2D" path="res://assets/world/rooms/tidal_dungeon/full_rooms/tidal_battle_room_02_full_v1.png" id="2_background"]
 
 [sub_resource type="RectangleShape2D" id="GroundShape"]
 size = Vector2(1536, 256)
@@ -9,14 +9,14 @@ size = Vector2(1536, 256)
 [sub_resource type="RectangleShape2D" id="WallShape"]
 size = Vector2(64, 1024)
 
-[sub_resource type="RectangleShape2D" id="LeftPlatformShape"]
-size = Vector2(204, 16)
+[sub_resource type="RectangleShape2D" id="UpperPlatformShape"]
+size = Vector2(435, 16)
 
-[sub_resource type="RectangleShape2D" id="CenterPlatformShape"]
-size = Vector2(138, 16)
+[sub_resource type="RectangleShape2D" id="MiddlePlatformShape"]
+size = Vector2(241, 16)
 
-[sub_resource type="RectangleShape2D" id="RightPlatformShape"]
-size = Vector2(202, 16)
+[sub_resource type="RectangleShape2D" id="LowerPlatformShape"]
+size = Vector2(142, 16)
 
 [sub_resource type="StyleBoxFlat" id="TitleStyle"]
 bg_color = Color(0.025, 0.045, 0.075, 0.82)
@@ -24,16 +24,16 @@ border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.3, 0.68, 0.78, 0.8)
+border_color = Color(0.38, 0.48, 0.82, 0.86)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[node name="RoomArenaFlat" type="Node2D"]
+[node name="RoomArenaTidalBattle02" type="Node2D"]
 script = ExtResource("1_room")
-template_id = &"arena_tidal_battle_01"
-template_display_name = "潮汐回廊"
+template_id = &"arena_tidal_battle_02"
+template_display_name = "潮汐断阶"
 
 [node name="DarkBacking" type="Polygon2D" parent="."]
 z_index = -2
@@ -51,7 +51,7 @@ collision_layer = 4
 collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
-position = Vector2(768, 758)
+position = Vector2(768, 762)
 shape = SubResource("GroundShape")
 
 [node name="LeftWall" type="StaticBody2D" parent="."]
@@ -70,60 +70,60 @@ collision_mask = 3
 position = Vector2(1568, 416)
 shape = SubResource("WallShape")
 
-[node name="LeftPlatform" type="StaticBody2D" parent="."]
+[node name="UpperPlatform" type="StaticBody2D" parent="."]
 collision_layer = 4
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftPlatform"]
-position = Vector2(329, 427)
-shape = SubResource("LeftPlatformShape")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UpperPlatform"]
+position = Vector2(332.5, 310)
+shape = SubResource("UpperPlatformShape")
 one_way_collision = true
 
-[node name="CenterPlatform" type="StaticBody2D" parent="." groups=["task57_required_platform"]]
+[node name="MiddlePlatform" type="StaticBody2D" parent="."]
 collision_layer = 4
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CenterPlatform"]
-position = Vector2(768, 523)
-shape = SubResource("CenterPlatformShape")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MiddlePlatform"]
+position = Vector2(873.5, 404)
+shape = SubResource("MiddlePlatformShape")
 one_way_collision = true
 
-[node name="RightPlatform" type="StaticBody2D" parent="."]
+[node name="LowerPlatform" type="StaticBody2D" parent="." groups=["task57_required_platform"]]
 collision_layer = 4
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RightPlatform"]
-position = Vector2(1207, 427)
-shape = SubResource("RightPlatformShape")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LowerPlatform"]
+position = Vector2(1181, 567)
+shape = SubResource("LowerPlatformShape")
 one_way_collision = true
 
 [node name="PlayerSpawn" type="Marker2D" parent="."]
-position = Vector2(610, 584)
+position = Vector2(970, 588)
 
 [node name="InitialEnemySpawns" type="Node2D" parent="."]
 
 [node name="Spawn1" type="Marker2D" parent="InitialEnemySpawns"]
-position = Vector2(740, 469)
+position = Vector2(1200, 513)
 
 [node name="Spawn2" type="Marker2D" parent="InitialEnemySpawns"]
-position = Vector2(1000, 584)
+position = Vector2(850, 588)
 
 [node name="Spawn3" type="Marker2D" parent="InitialEnemySpawns"]
-position = Vector2(420, 584)
+position = Vector2(1300, 588)
 
 [node name="ReinforcementSpawns" type="Node2D" parent="."]
 
 [node name="Spawn1" type="Marker2D" parent="ReinforcementSpawns"]
-position = Vector2(520, 584)
+position = Vector2(600, 588)
 
 [node name="Spawn2" type="Marker2D" parent="ReinforcementSpawns"]
-position = Vector2(1200, 584)
+position = Vector2(1000, 588)
 
 [node name="RewardChestSpawn" type="Marker2D" parent="."]
-position = Vector2(760, 591)
+position = Vector2(760, 595)
 
 [node name="RoutePortalSpawn" type="Marker2D" parent="."]
-position = Vector2(1400, 544)
+position = Vector2(1400, 548)
 
 [node name="EnemyContainer" type="Node2D" parent="."]
 
@@ -132,9 +132,9 @@ offset_left = 40.0
 offset_top = 42.0
 offset_right = 480.0
 offset_bottom = 84.0
-theme_override_colors/font_color = Color(0.77, 0.94, 1, 1)
+theme_override_colors/font_color = Color(0.78, 0.86, 1, 1)
 theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("TitleStyle")
-text = "潮汐回廊"
+text = "潮汐断阶"
 horizontal_alignment = 1
 vertical_alignment = 1

@@ -4,8 +4,8 @@ const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_fiv
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const RUN_GAME: PackedScene = preload("res://scenes/run/run_game.tscn")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
-const PRESSURE_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_02_pressure.tres")
-const LAYER_ELITE_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_03_layer_elite.tres")
+const BATTLE_01_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_04_validation.tres")
+const BATTLE_02_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_02_swarm.tres")
 
 var _tests := 0
 var _assertions := 0
@@ -188,7 +188,7 @@ func _test_combat_loadout_gate_and_formal_cleanup() -> void:
 	_expect(room.room_is_cleared and room.chest.visible, "single wave reveals exactly one chest")
 	_expect(coordinator.combat_loadout_available(), "same room opens combat loadout authority only after true clear")
 	_expect(overlay.visible and _visible_text(overlay).contains("可点击或拖拽调整"), "same open page refreshes to the clear state")
-	_expect(_chest_bottom_is_grounded(room), "normal chest alpha-visible bottom is grounded at 540±2 pixels")
+	_expect(_chest_bottom_is_grounded(room), "normal chest alpha-visible bottom matches the authored ground")
 	_expect(_all_refs_freed(initial_refs) and _all_refs_freed(reinforcement_refs), "grounded chest presentation does not depend on enemy corpse nodes")
 
 	var wallet_before := coordinator.current_snapshot().economy.balance
@@ -246,16 +246,20 @@ func _test_boss_release_and_projectile_stop() -> void:
 	await physics_frame
 	_expect(_projectile_count(stage) <= projectile_count_at_death, "released Boss produces no new projectile")
 	_expect(fired_at_death == 1 and room.room_is_cleared, "Boss firing freezes and settlement chest appears")
-	_expect(_chest_bottom_is_grounded(room), "Boss settlement chest alpha-visible bottom is grounded at 540±2 pixels")
+	_expect(_chest_bottom_is_grounded(room), "Boss settlement chest alpha-visible bottom matches the authored ground")
 	stage.queue_free()
 	await process_frame
 
 
 func _test_shared_platform_real_jump_reachability() -> void:
-	var platform_rooms: Array[CombatRoomDefinition] = [PRESSURE_ROOM, LAYER_ELITE_ROOM]
-	for definition: CombatRoomDefinition in platform_rooms:
+	var platform_rooms: Array[Dictionary] = [
+		{"definition": BATTLE_01_ROOM, "scene": "res://scenes/run/rooms/room_arena_flat.tscn", "target_y": 484.0, "target_min_x": 699.0, "target_max_x": 837.0},
+		{"definition": BATTLE_02_ROOM, "scene": "res://scenes/run/rooms/room_arena_tidal_battle_02.tscn", "target_y": 528.0, "target_min_x": 1110.0, "target_max_x": 1252.0},
+	]
+	for case: Dictionary in platform_rooms:
+		var definition: CombatRoomDefinition = case["definition"]
 		var room_id := definition.room_id
-		_expect(definition.room_scene.resource_path == "res://scenes/run/rooms/room_arena_platforms.tscn", "%s uses the shared platform template" % String(room_id))
+		_expect_eq(definition.room_scene.resource_path, case["scene"], "%s uses its formal full-room platform template" % String(room_id))
 		var stage := Node2D.new()
 		root.add_child(stage)
 		current_scene = stage
@@ -270,7 +274,7 @@ func _test_shared_platform_real_jump_reachability() -> void:
 		player.global_position = room.player_spawn_global_position()
 		_expect(await _wait_until(func() -> bool: return player.is_on_floor(), 30), "%s player settles on ground before input" % String(room_id))
 		var spawn_position := player.global_position
-		_expect(spawn_position.y > 430.0, "%s starts on the ground below LowerPlatform" % String(room_id))
+		_expect(spawn_position.y > float(case["target_y"]), "%s starts below the reachable platform" % String(room_id))
 		Input.action_press(&"move_right")
 		var jump := InputEventAction.new()
 		jump.action = &"jump"
@@ -288,11 +292,11 @@ func _test_shared_platform_real_jump_reachability() -> void:
 		for _frame: int in 150:
 			await physics_frame
 			left_ground = left_ground or not player.is_on_floor()
-			if left_ground and player.is_on_floor() and player.global_position.y < 430.0 and player.global_position.x >= 280.0 and player.global_position.x <= 580.0:
+			if left_ground and player.is_on_floor() and absf(player.global_position.y - float(case["target_y"])) <= 3.0 and player.global_position.x >= float(case["target_min_x"]) and player.global_position.x <= float(case["target_max_x"]):
 				landed_on_lower = true
 				break
 		Input.action_release(&"move_right")
-		_expect(landed_on_lower, "%s reaches LowerPlatform with real jump input and physics frames" % String(room_id))
+		_expect(landed_on_lower, "%s reaches its first formal platform with real jump input and physics frames" % String(room_id))
 		_expect(player.global_position.distance_to(spawn_position) > 80.0, "%s records physical movement from the ground spawn" % String(room_id))
 		stage.queue_free()
 		await process_frame
@@ -363,7 +367,10 @@ func _chest_bottom_is_grounded(room: RunRoomInstance) -> bool:
 			if image.get_pixel(x, y).a > 0.01:
 				max_alpha_y = maxi(max_alpha_y, y)
 	var bottom := room.chest.global_position.y + (float(max_alpha_y) - float(image.get_height()) * 0.5) * sprite.scale.y
-	return absf(bottom - 540.0) <= 2.0
+	var ground_shape := room.get_node("Ground/CollisionShape2D") as CollisionShape2D
+	var rectangle := ground_shape.shape as RectangleShape2D
+	var ground_top := ground_shape.global_position.y - rectangle.size.y * 0.5
+	return absf(bottom - ground_top) <= 2.0
 
 
 func _projectile_count(node: Node) -> int:

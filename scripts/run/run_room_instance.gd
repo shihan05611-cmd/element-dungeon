@@ -86,13 +86,16 @@ func configure(definition: CombatRoomDefinition) -> bool:
 	var enemy_container := get_node_or_null("EnemyContainer")
 	if enemy_container == null:
 		return _fail(&"room_template_missing_enemy_container")
+	if not _validate_authored_markers(definition):
+		return false
 	_definition = definition
-	for spawn: EnemySpawnDefinition in definition.enemy_spawns:
+	for index: int in definition.enemy_spawns.size():
+		var spawn: EnemySpawnDefinition = definition.enemy_spawns[index]
 		var enemy := spawn.enemy_scene.instantiate() as CombatEnemy
 		if enemy == null:
 			return _fail(&"enemy_scene_protocol_mismatch")
 		enemy.name = String(spawn.enemy_id)
-		enemy.position = spawn.local_position
+		enemy.position = _spawn_marker("InitialEnemySpawns", index).position
 		enemy_container.add_child(enemy)
 		if not enemy.configure_run_spawn(spawn, definition.final_boss):
 			enemy.queue_free()
@@ -102,12 +105,13 @@ func configure(definition: CombatRoomDefinition) -> bool:
 			enemy.enemy_defeated.connect(defeated_callback)
 		_enemies.append(enemy)
 		_initial_enemies.append(enemy)
-	for spawn: EnemySpawnDefinition in definition.reinforcement_spawns:
+	for index: int in definition.reinforcement_spawns.size():
+		var spawn: EnemySpawnDefinition = definition.reinforcement_spawns[index]
 		var enemy := spawn.enemy_scene.instantiate() as CombatEnemy
 		if enemy == null:
 			return _fail(&"enemy_scene_protocol_mismatch")
 		enemy.name = String(spawn.enemy_id)
-		enemy.position = spawn.local_position
+		enemy.position = _spawn_marker("ReinforcementSpawns", index).position
 		enemy_container.add_child(enemy)
 		if not enemy.configure_run_spawn(spawn, false):
 			enemy.queue_free()
@@ -217,16 +221,36 @@ func _create_interactables() -> void:
 	add_child(container)
 	_chest = CHEST_SCENE.instantiate() as RunWorldInteractable
 	_chest.name = "SettlementChest" if _definition.final_boss else "RewardChest"
-	_chest.position = Vector2(760, 501)
+	_chest.position = (get_node("RewardChestSpawn") as Marker2D).position
 	_chest.visible = false
 	_chest.set_enabled(false)
 	container.add_child(_chest)
 	if not _definition.final_boss:
 		_portal = PORTAL_SCENE.instantiate() as RunWorldInteractable
-		_portal.position = Vector2(1000, 454)
+		_portal.position = (get_node("RoutePortalSpawn") as Marker2D).position
 		_portal.visible = false
 		_portal.set_enabled(false)
 		container.add_child(_portal)
+
+
+func _validate_authored_markers(definition: CombatRoomDefinition) -> bool:
+	var chest_marker := get_node_or_null("RewardChestSpawn") as Marker2D
+	if chest_marker == null:
+		return _fail(&"room_template_missing_reward_chest_spawn")
+	var portal_marker := get_node_or_null("RoutePortalSpawn") as Marker2D
+	if not definition.final_boss and portal_marker == null:
+		return _fail(&"room_template_missing_route_portal_spawn")
+	for index: int in definition.enemy_spawns.size():
+		if _spawn_marker("InitialEnemySpawns", index) == null:
+			return _fail(&"room_template_missing_initial_enemy_spawn")
+	for index: int in definition.reinforcement_spawns.size():
+		if _spawn_marker("ReinforcementSpawns", index) == null:
+			return _fail(&"room_template_missing_reinforcement_spawn")
+	return true
+
+
+func _spawn_marker(group_name: String, index: int) -> Marker2D:
+	return get_node_or_null("%s/Spawn%d" % [group_name, index + 1]) as Marker2D
 
 
 func _reveal_clear_interactables() -> void:

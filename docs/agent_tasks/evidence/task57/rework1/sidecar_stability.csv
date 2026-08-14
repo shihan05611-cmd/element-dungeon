@@ -1,0 +1,5 @@
+scope,before,after,added,removed,content_changed,result
+cold .uid + adjacent .import + .godot/imported,955,955,0,0,0,PASS
+workspace runtime .import,0,0,0,0,0,PASS
+workspace Task57 .gd.uid,0,0,0,0,0,PASS
+cold Task57 natural .gd.uid,2,2,0,0,0,PASS

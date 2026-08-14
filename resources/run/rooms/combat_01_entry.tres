@@ -9,7 +9,7 @@
 script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"entry_guard"
-local_position = Vector2(820, 494)
+local_position = Vector2(740, 469)
 maximum_health = 70
 dream_dust_reward = 20
 
@@ -17,7 +17,7 @@ dream_dust_reward = 20
 script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"entry_guard_b"
-local_position = Vector2(720, 494)
+local_position = Vector2(1000, 584)
 maximum_health = 70
 dream_dust_reward = 0
 
