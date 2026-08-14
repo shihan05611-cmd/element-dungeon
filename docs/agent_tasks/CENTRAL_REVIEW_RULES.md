@@ -150,6 +150,8 @@
 - 执行者不能给出最终 Review 结论，但 L1/L2 可以按 `REVIEW_AGENT_RULES.md` 复用可信的执行侧结果；独立性来自职责分离、diff/边界复核和规定的抽查或复跑，不等于每次重建发布级环境。
 - 未标等级时默认 L2。L1 必须由任务书明确指定；L1/L2 发现公共接口、随机/偶发失败、跨域或无法安全复现等信号时升级 L3。
 - L1 不建冷副本；L2 默认使用执行者冻结验证根或其他安全现成环境，不另建冷副本；L3 才按 `REVIEW_L3_PLAYBOOK.md` 建全新冷副本与独立 profile。
+- 从下一次新建 L3 冷副本起，执行与 Review 统一使用 `C:\Users\heliashi\.codex\cold-roots\element-dungeon\<task-specific-subdir>` 下互不复用的任务专属子目录；任务书必须登记冷根与 profile 的绝对路径，执行者只能访问自己的子目录，不得读取或修改兄弟任务冷根。
+- 专用冷根只承载固定基线、精确 overlay、独立 profile、测试日志和临时截图，不存放权威资产、不替代任务 evidence 归档；目录可写不解除 Git 写入、共享 Godot、保护项和破坏性清理禁令。已经在既有隔离路径运行的任务不得中途迁移。
 - 任何等级都不得控制共享 Godot 编辑器/MCP 保存、reload 或 reimport。L1/L2 若无法在不污染共享项目的前提下运行，必须升级，不得冒险写共享缓存或 sidecar。
 - Review-only 夹具不进入正式项目。
 
