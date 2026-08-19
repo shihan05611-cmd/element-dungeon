@@ -1,0 +1,9 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS: open_ground_direction_duration_cooldown
+PASS: damage_rejection_enemy_pass_and_world_wall
+PASS: action_gates_and_post_dodge_recovery
+PASS: interrupt_death_respawn_and_exit_cleanup
+PASS: source_and_input_contracts
+TASK 48 DODGE INTEGRATION TESTS PASSED: 5 tests, 55 assertions

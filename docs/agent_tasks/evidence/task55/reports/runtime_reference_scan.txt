@@ -1,0 +1,3 @@
+Scope: project runtime *.gd/*.tscn/*.tres; docs/.godot/project.godot/global_instakill excluded by protection rule.
+Task55 new asset reference hits: 0
+PASS: 0 references; no engineering connection performed.

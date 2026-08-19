@@ -1,0 +1,14 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS reuse_requires_finished_detached_cleanup
+PASS pooled_water_then_fire_has_no_runtime_leak
+PASS melee_and_delayed_reset_initial_hit_index
+PASS common_projectile_ignores_current_element_and_skill_mutation
+PASS exclusive_auto_switch_spawns_locked_fire_projectile
+PASS delayed_area_keeps_queued_water_snapshot
+PASS multi_hit_indices_share_one_locked_snapshot
+PASS wall_and_max_distance_clean_runtime_references
+PASS tree_exit_cleans_and_allows_reset
+PASS element_projectile_presentation_resets_between_uses
+DELIVERY REUSE TESTS PASSED: 10 tests, 105 assertions

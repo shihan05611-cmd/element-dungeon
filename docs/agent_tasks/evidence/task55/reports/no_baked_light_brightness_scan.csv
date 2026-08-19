@@ -1,0 +1,4 @@
+﻿path,threshold_luminance,bright_pixels,largest_4_connected_bright_cluster,automated_interpretation
+assets/world/rooms/tidal_dungeon/platform_room_v1/background_wall_v1.png,110,0,0,PASS: no obvious bright core/glow candidate
+assets/world/rooms/tidal_dungeon/platform_room_v1/back_decor_v1.png,110,0,0,PASS: no obvious bright core/glow candidate
+assets/world/rooms/tidal_dungeon/platform_room_v1/front_decor_v1.png,110,0,0,PASS: no obvious bright core/glow candidate

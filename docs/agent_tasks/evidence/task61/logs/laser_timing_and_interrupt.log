@@ -1,0 +1,9 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+boss form=ember countered_by=water counter_hit_threshold=15
+laser cast accepted=true
+RESULT elapsed_seconds=7.50 final_form=tide counter_hits_now=0 total_switch_count=1
+RESULT telegraph_started=true hits_during_telegraph=46 fired_while_hit=true shots_fired=1
+second laser cast accepted=true
+RESULT boss_fired=true player_health_before=100 player_health_after=90 laser_interrupted_by_hit=true

@@ -1,0 +1,14 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS task59_validation_error_branches
+PASS task59_equivalence_horizontal_zero_telegraph
+PASS task59_diagonal_direction_and_angle_limit
+PASS task59_zero_vector_falls_back_to_facing
+PASS task59_diagonal_spawn_clears_world_blocker
+PASS task59_telegraph_timing_lock_and_stillness
+PASS task59_death_during_telegraph_cancels
+PASS task59_cancel_telegraph_on_hurt_both_branches
+PASS task59_spread_count_symmetric_independent
+PASS task59_sprite_rotation_matches_direction
+TASK 59 ENEMY PROJECTILE PROFILE TESTS PASSED: 10 tests, 116 assertions

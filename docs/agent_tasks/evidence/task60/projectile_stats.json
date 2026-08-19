@@ -1,0 +1,92 @@
+{
+  "boss_ember_bolt_v1.png": {
+    "size": [
+      32,
+      16
+    ],
+    "mode": "RGBA",
+    "sha256": "8f52f0d4c855e98a015d66089f08f8c3853e7de07b48a92d97f202d4da9ded88",
+    "bytes": 249,
+    "alpha_bbox": [
+      1,
+      1,
+      31,
+      14
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.507812,
+    "facing": "right"
+  },
+  "boss_tide_bolt_v1.png": {
+    "size": [
+      32,
+      16
+    ],
+    "mode": "RGBA",
+    "sha256": "6161b5665495687a08dc6911006c1ec98bbc4030962986d3097106d3938ee650",
+    "bytes": 255,
+    "alpha_bbox": [
+      1,
+      1,
+      31,
+      14
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.507812,
+    "facing": "right"
+  },
+  "boss_plain_bolt_v1.png": {
+    "size": [
+      32,
+      16
+    ],
+    "mode": "RGBA",
+    "sha256": "359cba3a0cde791869169e05939c0d720d595ac4bced941f2ea27b837ee8af66",
+    "bytes": 248,
+    "alpha_bbox": [
+      1,
+      1,
+      31,
+      14
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.507812,
+    "facing": "right"
+  },
+  "sentry_tide_bolt_v1.png": {
+    "size": [
+      32,
+      16
+    ],
+    "mode": "RGBA",
+    "sha256": "94fcba1e0c1938d8a27c0a4b4be4ed66839d4789337a66347730646f2afbb7da",
+    "bytes": 251,
+    "alpha_bbox": [
+      1,
+      1,
+      31,
+      14
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.507812,
+    "facing": "right"
+  },
+  "bolt_impact_v1.png": {
+    "size": [
+      96,
+      24
+    ],
+    "mode": "RGBA",
+    "sha256": "15a855c83dc12eed687dd0f39e6c03bbde73f977dbbd990bba257a9335576838",
+    "bytes": 562,
+    "alpha_bbox": [
+      5,
+      2,
+      92,
+      22
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.434028,
+    "layout": "4 frames, 24x24 each, horizontal strip"
+  }
+}

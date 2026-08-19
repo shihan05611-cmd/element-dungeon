@@ -1,0 +1,71 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS: formal_catalog_has_four_active_and_five_passive_contents
+PASS: new_stat_passives_are_purchase_only_static_content
+SCRIPT ERROR: Invalid access to property or key 'disabled' on a base object of type 'Nil'.
+   at: _test_first_shop (res://growth/tests/run_task32_formal_four_passive_content_tests.gd:178)
+   GDScript backtrace (most recent call first):
+       [0] _test_first_shop (res://growth/tests/run_task32_formal_four_passive_content_tests.gd:178)
+TASK 32 FORMAL FOUR PASSIVE CONTENT TESTS FAILED: 61 failures / 167 assertions
+  - formal shop UI is live
+  - visible formal control purchases burning
+  - burning ownership commits
+  - burning charges exactly 75 dream dust (expected 295, got 370)
+  - purchase ledger charges once (expected 75, got 0)
+  - successful purchase advances authority once (expected 22, got 21)
+  - burning automatic P1 loadout advances exactly once (expected 2, got 1)
+  - duplicate purchase rejects before a second charge
+  - duplicate purchase changes no authority state (expected [21, 370, 370, 0, [&"element_bolt", &"elemental_laser"], ["active_1=element_bolt", "active_2=elemental_laser", "active_3=", "passive_1=", "passive_2=", "passive_3=", "passive_4="], &"shop_session_1"], got [22, 295, 370, 75, [&"element_bolt", &"burning", &"elemental_laser"], ["active_1=element_bolt", "active_2=elemental_laser", "active_3=", "passive_1=burning", "passive_2=", "passive_3=", "passive_4="], &"shop_session_1"])
+  - formal passive rejects active progression
+  - passive upgrade rejection changes nothing (expected [21, 370, 370, 0, [&"element_bolt", &"elemental_laser"], ["active_1=element_bolt", "active_2=elemental_laser", "active_3=", "passive_1=", "passive_2=", "passive_3=", "passive_4="], &"shop_session_1"], got [22, 295, 370, 75, [&"element_bolt", &"burning", &"elemental_laser"], ["active_1=element_bolt", "active_2=elemental_laser", "active_3=", "passive_1=burning", "passive_2=", "passive_3=", "passive_4="], &"shop_session_1"])
+  - purchase atomically maps burning to P1 (expected burning, got )
+  - P1 RuntimeLoadout matches RunSnapshot immediately
+  - unending has a real visible purchase control
+  - unending purchases through formal UI
+  - unending commits purchased ownership
+  - unending charges exactly 75 (expected 220, got 295)
+  - unending purchase advances authority once (expected 23, got 22)
+  - unending automatic loadout advances exactly once (expected 3, got 2)
+  - unending is frozen level-free passive progress
+  - unending purchase atomically maps to its literal passive endpoint (expected unending, got )
+  - passive_vitality has a real visible purchase control
+  - passive_vitality purchases through formal UI
+  - passive_vitality commits purchased ownership
+  - passive_vitality charges exactly 75 (expected 220, got 295)
+  - passive_vitality purchase advances authority once (expected 23, got 22)
+  - passive_vitality automatic loadout advances exactly once (expected 3, got 2)
+  - passive_vitality is frozen level-free passive progress
+  - passive_vitality purchase atomically maps to its literal passive endpoint (expected passive_vitality, got )
+  - passive_energy has a real visible purchase control
+  - passive_energy purchases through formal UI
+  - passive_energy commits purchased ownership
+  - passive_energy charges exactly 75 (expected 220, got 295)
+  - passive_energy purchase advances authority once (expected 23, got 22)
+  - passive_energy automatic loadout advances exactly once (expected 3, got 2)
+  - passive_energy is frozen level-free passive progress
+  - passive_energy purchase atomically maps to its literal passive endpoint (expected passive_energy, got )
+  - four formal passive purchases spend exactly 300 (expected 300, got 75)
+  - wallet exactly conserves typed rewards minus four purchases (expected 70, got 295)
+  - P2 contains the intended unique passive (expected unending, got )
+  - unending is authority-owned
+  - P3 contains the intended unique passive (expected passive_vitality, got )
+  - passive_vitality is authority-owned
+  - P4 contains the intended unique passive (expected passive_energy, got )
+  - passive_energy is authority-owned
+  - four Runtime passives are unique (expected 4, got 1)
+  - Runtime passives register once in P1-P4 order (expected [&"burning", &"unending", &"passive_vitality", &"passive_energy"], got [&"burning"])
+  - Runtime audit covers P1-P4 (expected [&"passive_1", &"passive_2", &"passive_3", &"passive_4"], got [&"passive_1"])
+  - four concrete passive runtime instances exist before room rebuild (expected 4, got 1)
+  - each P1-P4 slot has a distinct runtime object (expected 4, got 1)
+  - room rebuild retains P1-P4 skill identities (expected [&"burning", &"unending", &"passive_vitality", &"passive_energy"], got [&"burning"])
+  - room rebuild has no duplicate passive registration (expected 4, got 1)
+  - room rebuild retains P1-P4 slot audit (expected [&"passive_1", &"passive_2", &"passive_3", &"passive_4"], got [&"passive_1"])
+  - room rebuild creates four runtime instances (expected 4, got 1)
+  - rebuilt runtime instances remain distinct (expected 4, got 1)
+  - combat HUD P2 consumes the formal icon
+  - combat HUD P2 consumes the formal name
+  - combat HUD P3 consumes the formal icon
+  - combat HUD P3 consumes the formal name
+  - combat HUD P4 consumes the formal icon
+  - combat HUD P4 consumes the formal name

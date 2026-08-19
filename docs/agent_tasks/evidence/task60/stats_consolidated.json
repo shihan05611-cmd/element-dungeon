@@ -1,0 +1,315 @@
+{
+  "boss_plain_idle_v1.png": {
+    "size": [
+      200,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "8361760c7ff73de5efea0e9f71f7e234b714eb80742d298b0470afef4fe2e729",
+    "bytes": 827,
+    "alpha_bbox": [
+      44,
+      98,
+      124,
+      173
+    ],
+    "partial_alpha_px": 171,
+    "opaque_coverage": 0.0756
+  },
+  "boss_ember_idle_v1.png": {
+    "size": [
+      200,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "e1395ab9bef6de53cf8bed61f70461af6433f3c9549cb84224bf995f998e9378",
+    "bytes": 909,
+    "alpha_bbox": [
+      44,
+      98,
+      124,
+      173
+    ],
+    "partial_alpha_px": 171,
+    "opaque_coverage": 0.0756
+  },
+  "boss_tide_idle_v1.png": {
+    "size": [
+      200,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "6779fd1a4cd7454312c115e5b911c07c110682270fb11eb82adc2f9bbe8f7703",
+    "bytes": 1058,
+    "alpha_bbox": [
+      43,
+      97,
+      125,
+      173
+    ],
+    "partial_alpha_px": 501,
+    "opaque_coverage": 0.0756
+  },
+  "boss_plain_walk_v1.png": {
+    "size": [
+      200,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "92c1b2840b1c2820e6324984c533b410a7cc7d4964799b39f4d500d5c85e70a2",
+    "bytes": 804,
+    "alpha_bbox": [
+      44,
+      98,
+      124,
+      173
+    ],
+    "partial_alpha_px": 171,
+    "opaque_coverage": 0.076
+  },
+  "boss_ember_walk_v1.png": {
+    "size": [
+      200,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "c7145851f5db618a200550523b29ead4d26ced3e715c88cda03312a2ab15fbb1",
+    "bytes": 877,
+    "alpha_bbox": [
+      44,
+      98,
+      124,
+      173
+    ],
+    "partial_alpha_px": 171,
+    "opaque_coverage": 0.076
+  },
+  "boss_tide_walk_v1.png": {
+    "size": [
+      200,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "0f9e45cbef7b2a6b4a495cf7347805ede4657749086dd85ecff33733405915a5",
+    "bytes": 1008,
+    "alpha_bbox": [
+      43,
+      97,
+      125,
+      173
+    ],
+    "partial_alpha_px": 474,
+    "opaque_coverage": 0.076
+  },
+  "boss_plain_attack_v1.png": {
+    "size": [
+      200,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "8cfb69b120d1bcd8c81d396da73864c26c6a7b036f533e160dc135b2d7ebad1f",
+    "bytes": 1279,
+    "alpha_bbox": [
+      36,
+      58,
+      160,
+      173
+    ],
+    "partial_alpha_px": 261,
+    "opaque_coverage": 0.1316
+  },
+  "boss_ember_attack_v1.png": {
+    "size": [
+      200,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "0ca1ba76fe457ca2d0fc13d6c7878913f0096fbafc67365070f4106215cadb0c",
+    "bytes": 1332,
+    "alpha_bbox": [
+      36,
+      58,
+      160,
+      173
+    ],
+    "partial_alpha_px": 261,
+    "opaque_coverage": 0.1316
+  },
+  "boss_tide_attack_v1.png": {
+    "size": [
+      200,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "9e0c2b62dd096dfe74ac51cec4b3c7c10ecaab78a8abde3f5b8651d9be914fb2",
+    "bytes": 1737,
+    "alpha_bbox": [
+      35,
+      57,
+      161,
+      173
+    ],
+    "partial_alpha_px": 963,
+    "opaque_coverage": 0.1316
+  },
+  "boss_hurt_v1.png": {
+    "size": [
+      200,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "fab5f5a868578d2bb7d5bced74373b3dd61fb281aa7d973b205998255499cd90",
+    "bytes": 808,
+    "alpha_bbox": [
+      40,
+      98,
+      120,
+      173
+    ],
+    "partial_alpha_px": 171,
+    "opaque_coverage": 0.0752
+  },
+  "boss_death_v1.png": {
+    "size": [
+      200,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "64056d2fee42bae6670fbbf0685b6c215b3fd56cb4c953a31554ce4c38a9cf0e",
+    "bytes": 750,
+    "alpha_bbox": [
+      44,
+      114,
+      124,
+      173
+    ],
+    "partial_alpha_px": 171,
+    "opaque_coverage": 0.0656
+  },
+  "boss_ember_bolt_v1.png": {
+    "size": [
+      32,
+      16
+    ],
+    "mode": "RGBA",
+    "sha256": "8f52f0d4c855e98a015d66089f08f8c3853e7de07b48a92d97f202d4da9ded88",
+    "bytes": 249,
+    "alpha_bbox": [
+      1,
+      1,
+      31,
+      14
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.507812,
+    "facing": "right"
+  },
+  "boss_tide_bolt_v1.png": {
+    "size": [
+      32,
+      16
+    ],
+    "mode": "RGBA",
+    "sha256": "6161b5665495687a08dc6911006c1ec98bbc4030962986d3097106d3938ee650",
+    "bytes": 255,
+    "alpha_bbox": [
+      1,
+      1,
+      31,
+      14
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.507812,
+    "facing": "right"
+  },
+  "boss_plain_bolt_v1.png": {
+    "size": [
+      32,
+      16
+    ],
+    "mode": "RGBA",
+    "sha256": "359cba3a0cde791869169e05939c0d720d595ac4bced941f2ea27b837ee8af66",
+    "bytes": 248,
+    "alpha_bbox": [
+      1,
+      1,
+      31,
+      14
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.507812,
+    "facing": "right"
+  },
+  "sentry_tide_bolt_v1.png": {
+    "size": [
+      32,
+      16
+    ],
+    "mode": "RGBA",
+    "sha256": "94fcba1e0c1938d8a27c0a4b4be4ed66839d4789337a66347730646f2afbb7da",
+    "bytes": 251,
+    "alpha_bbox": [
+      1,
+      1,
+      31,
+      14
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.507812,
+    "facing": "right"
+  },
+  "bolt_impact_v1.png": {
+    "size": [
+      96,
+      24
+    ],
+    "mode": "RGBA",
+    "sha256": "15a855c83dc12eed687dd0f39e6c03bbde73f977dbbd990bba257a9335576838",
+    "bytes": 562,
+    "alpha_bbox": [
+      5,
+      2,
+      92,
+      22
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.434028,
+    "layout": "4 frames, 24x24 each, horizontal strip"
+  },
+  "telegraph_alert_static_v1.png": {
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "sha256": "394389e16addd080b5f19a192963b99c822b4dcc0573061f60940513f4f31873",
+    "bytes": 228,
+    "alpha_bbox": [
+      12,
+      3,
+      20,
+      29
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.166016,
+    "purpose": "reduced-motion single frame"
+  },
+  "telegraph_alert_v1.png": {
+    "size": [
+      96,
+      32
+    ],
+    "mode": "RGBA",
+    "sha256": "463362f9e38c4a7c36ef7d9d0f33dae9c610972f8ca0e7f4d9a9ffde933b83b8",
+    "bytes": 338,
+    "alpha_bbox": [
+      12,
+      2,
+      84,
+      29
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.166016,
+    "layout": "3 frames, 32x32 each, horizontal strip, bounce sequence"
+  }
+}

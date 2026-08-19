@@ -1,0 +1,21 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS task61_switch_counter_exact_15_and_reset
+PASS task61_same_element_does_not_count
+PASS task61_alternation_cap_enters_plain
+PASS task61_plain_form_exit_both_branches
+PASS task61_plain_form_no_attachment
+PASS task61_plain_form_reaction_behavior
+PASS task61_same_element_mitigation_exact_value
+PASS task61_cross_element_bonus_damage
+PASS task61_attach_layers_regen_cap_reset
+PASS task61_hit_does_not_interrupt_attack_or_telegraph
+PASS task61_poise_break_and_reset
+PASS task61_form_transition_presentation
+PASS task61_melee_telegraph_waiting_to_active
+PASS task61_ranged_telegraph_lock_and_count
+PASS task61_summon_cap_and_death_cleanup
+PASS task61_death_flow_zero_dream_dust
+PASS task61_damage_resolver_validation_branches
+TASK 61 BOSS THREE FORM TESTS PASSED: 17 tests, 87 assertions

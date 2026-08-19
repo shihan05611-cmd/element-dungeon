@@ -1,0 +1,38 @@
+{
+  "telegraph_alert_static_v1.png": {
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "sha256": "394389e16addd080b5f19a192963b99c822b4dcc0573061f60940513f4f31873",
+    "bytes": 228,
+    "alpha_bbox": [
+      12,
+      3,
+      20,
+      29
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.166016,
+    "purpose": "reduced-motion single frame"
+  },
+  "telegraph_alert_v1.png": {
+    "size": [
+      96,
+      32
+    ],
+    "mode": "RGBA",
+    "sha256": "463362f9e38c4a7c36ef7d9d0f33dae9c610972f8ca0e7f4d9a9ffde933b83b8",
+    "bytes": 338,
+    "alpha_bbox": [
+      12,
+      2,
+      84,
+      29
+    ],
+    "partial_alpha_px": 0,
+    "opaque_coverage": 0.166016,
+    "layout": "3 frames, 32x32 each, horizontal strip, bounce sequence"
+  }
+}

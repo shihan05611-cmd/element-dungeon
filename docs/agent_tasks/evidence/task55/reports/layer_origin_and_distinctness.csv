@@ -1,0 +1,4 @@
+﻿path,canvas,origin,alpha_coverage,partial_alpha_pixels,alpha_bbox,raw_pixel_sha256
+assets/world/rooms/tidal_dungeon/platform_room_v1/background_wall_v1.png,768x416,"0,0",1.000000,0,"(0, 0, 768, 416)",E2A5E80720C5A0D743EE73D974E01EACE63298B468407F263737B8D91DE7C1AE
+assets/world/rooms/tidal_dungeon/platform_room_v1/back_decor_v1.png,768x416,"0,0",0.139817,0,"(30, 6, 734, 366)",8B07364EBE236C80059CC114B015A95ECDEFD029D1CFF8E212C8095A7B598ACC
+assets/world/rooms/tidal_dungeon/platform_room_v1/front_decor_v1.png,768x416,"0,0",0.088232,0,"(0, 0, 768, 416)",BFF1D52C9FF92D0E57E01D5A5D3958DF29A384750E68F031214F04FB1302DA84

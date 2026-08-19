@@ -1,0 +1,61 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS: formal_scene_and_seven_slot_hud
+PASS: combat_semantics_and_accessibility
+PASS: combat_one_advances_without_route_ui
+SCRIPT ERROR: Invalid access to property or key 'pressed' on a base object of type 'Nil'.
+   at: _test_early_shop_authority_and_recovery (res://combat/tests/run_task30_run_ui_tests.gd:118)
+   GDScript backtrace (most recent call first):
+       [0] _test_early_shop_authority_and_recovery (res://combat/tests/run_task30_run_ui_tests.gd:118)
+       [1] _finish_current_room (res://combat/tests/run_task30_run_ui_tests.gd:343)
+SCRIPT ERROR: Invalid access to property or key 'pressed' on a base object of type 'Nil'.
+   at: _test_middle_shop_levels_max_and_second_passive (res://combat/tests/run_task30_run_ui_tests.gd:180)
+   GDScript backtrace (most recent call first):
+       [0] _test_middle_shop_levels_max_and_second_passive (res://combat/tests/run_task30_run_ui_tests.gd:180)
+       [1] _run_async_test (res://combat/tests/run_task30_run_ui_tests.gd:435)
+       [2] _run (res://combat/tests/run_task30_run_ui_tests.gd:38)
+       [3] _run_async_test (res://combat/tests/run_task30_run_ui_tests.gd:436)
+       [4] _test_early_shop_authority_and_recovery (res://combat/tests/run_task30_run_ui_tests.gd:118)
+       [5] _finish_current_room (res://combat/tests/run_task30_run_ui_tests.gd:343)
+PASS: middle_shop_levels_max_and_second_passive
+SCRIPT ERROR: Invalid access to property or key 'completed_combat_rooms' on a base object of type 'Nil'.
+   at: _test_preboss_shop_and_complete_result (res://combat/tests/run_task30_run_ui_tests.gd:226)
+   GDScript backtrace (most recent call first):
+       [0] _test_preboss_shop_and_complete_result (res://combat/tests/run_task30_run_ui_tests.gd:226)
+       [1] _wait_for_phase (res://combat/tests/run_task30_run_ui_tests.gd:380)
+       [2] _wait_until (res://combat/tests/run_task30_run_ui_tests.gd:395)
+SCRIPT ERROR: Invalid access to property or key 'pressed' on a base object of type 'Nil'.
+   at: _test_new_run_creates_new_authority (res://combat/tests/run_task30_run_ui_tests.gd:249)
+   GDScript backtrace (most recent call first):
+       [0] _test_new_run_creates_new_authority (res://combat/tests/run_task30_run_ui_tests.gd:249)
+       [1] _run_async_test (res://combat/tests/run_task30_run_ui_tests.gd:435)
+       [2] _run (res://combat/tests/run_task30_run_ui_tests.gd:41)
+       [3] _run_async_test (res://combat/tests/run_task30_run_ui_tests.gd:436)
+       [4] _test_preboss_shop_and_complete_result (res://combat/tests/run_task30_run_ui_tests.gd:226)
+       [5] _wait_for_phase (res://combat/tests/run_task30_run_ui_tests.gd:380)
+       [6] _wait_until (res://combat/tests/run_task30_run_ui_tests.gd:395)
+PASS: new_run_creates_new_authority
+SCRIPT ERROR: Out of bounds get index '0' (on base: 'Array')
+   at: _test_failed_result_is_distinct (res://combat/tests/run_task30_run_ui_tests.gd:268)
+   GDScript backtrace (most recent call first):
+       [0] _test_failed_result_is_distinct (res://combat/tests/run_task30_run_ui_tests.gd:268)
+       [1] _run_async_test (res://combat/tests/run_task30_run_ui_tests.gd:435)
+       [2] _run (res://combat/tests/run_task30_run_ui_tests.gd:42)
+       [3] _run_async_test (res://combat/tests/run_task30_run_ui_tests.gd:436)
+       [4] _test_preboss_shop_and_complete_result (res://combat/tests/run_task30_run_ui_tests.gd:226)
+       [5] _wait_for_phase (res://combat/tests/run_task30_run_ui_tests.gd:380)
+       [6] _wait_until (res://combat/tests/run_task30_run_ui_tests.gd:395)
+PASS: failed_result_is_distinct
+TASK 30 RUN UI TESTS FAILED: 11 failures / 93 assertions
+  - formal shop opens automatically
+  - shop shows dream-dust balance
+  - shop shows fixed purchase prices
+  - shop exposes strict seven-slot zone
+  - owned active exposes independent upgrade
+  - visible run has configured active room
+  - combat three loads Boss directly
+  - Boss remains active for settlement verification
+  - visible run has configured active room
+  - boss settlement chest opens complete result
+  - result is frozen complete

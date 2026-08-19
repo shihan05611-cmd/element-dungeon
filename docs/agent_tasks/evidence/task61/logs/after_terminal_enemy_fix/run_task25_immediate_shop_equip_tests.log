@@ -1,0 +1,12 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS task25_legal_equip_is_immediate
+PASS task25_move_and_unequip_are_immediate
+PASS task25_rejections_are_atomic
+PASS task25_identical_mapping_is_idempotent
+PASS task25_pending_stats_survive_rebase
+PASS task25_confirm_has_no_second_loadout_commit
+PASS task25_ui_paths_and_failure_recovery
+PASS task25_reward_explicit_confirm_is_preserved
+TASK 25 IMMEDIATE SHOP EQUIP TESTS PASSED: 8 tests, 242 assertions

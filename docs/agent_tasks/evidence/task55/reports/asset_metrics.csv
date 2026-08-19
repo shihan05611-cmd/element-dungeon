@@ -1,0 +1,8 @@
+﻿path,width,height,mode,bytes,sha256,alpha_coverage,partial_alpha_pixels,alpha_bbox,max_luminance,pixels_luminance_gt_120
+assets/world/rooms/tidal_dungeon/platform_room_v1/background_wall_v1.png,768,416,RGBA,44464,E4EF73A15F3EFB39D8FC88CCC01081F56C331BD185D489332ACA007AD38A48E4,1.000000,0,"(0, 0, 768, 416)",49,0
+assets/world/rooms/tidal_dungeon/platform_room_v1/back_decor_v1.png,768,416,RGBA,26112,0E75805A1C959889A0F07C8F879D20EBFA65903176F67D3E4CE114749291C449,0.139817,0,"(30, 6, 734, 366)",81,0
+assets/world/rooms/tidal_dungeon/platform_room_v1/front_decor_v1.png,768,416,RGBA,13477,F79B5C1A679CAD7209036328D6AB7A969146785F6D6CDEF16E484AB959130F45,0.088232,0,"(0, 0, 768, 416)",81,0
+assets/world/rooms/tidal_dungeon/platform_room_v1/ground_floor_v1.png,768,64,RGBA,7184,20BC95128605EDFF3EA93F02481A43E9842D0FE91922FDD17C401B71A4EE42F9,0.994446,0,"(0, 0, 768, 64)",93,0
+assets/world/rooms/tidal_dungeon/platform_room_v1/platform_short_v1.png,160,32,RGBA,1428,DC74F20CBA4EE8DD7509185D4D19C96E6AB9AB070CBCECC74331954A50564B68,0.904687,0,"(0, 0, 160, 32)",93,0
+assets/world/rooms/tidal_dungeon/platform_room_v1/platform_medium_v1.png,224,32,RGBA,1385,FF7A05672F186FDF67DA4CC3B8BB1732A6550A7382C2E4E0844E7427ABEA8583,0.922712,0,"(0, 0, 224, 32)",93,0
+assets/world/rooms/tidal_dungeon/platform_room_v1/platform_long_v1.png,320,32,RGBA,1777,3AC1C0EED33D069E6E7271344D4A77150B1293DD073DAB630EE96B7DED047716,0.992578,0,"(0, 0, 320, 32)",93,0

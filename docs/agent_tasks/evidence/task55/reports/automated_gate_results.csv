@@ -1,0 +1,17 @@
+﻿gate,pass,evidence
+runtime_png_exact_sizes,true,7/7 exact source canvases
+runtime_png_rgba,true,7/7 RGBA
+layer_same_canvas_origin,true,wall/back/front share exact canvas and origin
+wall_opaque,true,background wall is full opaque plane
+decor_true_transparency,true,back/front are sparse transparent overlays
+layers_pixel_distinct,true,three layers have different raw RGBA content
+no_partial_alpha_runtime,true,hard 0/255 alpha at target size
+automated_no_baked_light,true,no luminance>110 core or halo candidate; manual review still required
+front_decor_sparse,true,front coverage <=12%
+platform_topline,true,all standable tops align at local y=0 within 1px
+platform_full_width,true,top/collision span covers each declared width
+platform_independent_sources,true,ground/short/medium/long trace to four distinct source images
+nearest_2x_composite,true,exact 2x room canvas
+runtime_reference_zero,true,0 engineering references
+import_sidecars_zero,true,0 Task55 .import files
+protected_hashes,true,Task53/49/52 and accepted art inputs unchanged

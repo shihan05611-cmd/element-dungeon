@@ -1,0 +1,9 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS: five_stage_graph_is_linear
+PASS: first_room_is_immediate_single_wave
+PASS: first_room_guarantees_unowned_active
+PASS: active_pool_exhaustion_falls_back_idempotently
+PASS: domain_progression_is_combat_combat_shop_combat_boss
+SUMMARY: 5 tests, 103 assertions, 0 failures

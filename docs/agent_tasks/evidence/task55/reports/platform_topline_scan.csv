@@ -1,0 +1,5 @@
+﻿name,path,canvas,visible_columns,top_y_min,top_y_max,topline_difference,visible_bbox,source_sha256
+ground,assets/world/rooms/tidal_dungeon/platform_room_v1/ground_floor_v1.png,768x64,768,0,0,0,"(0, 0, 768, 64)",D235F8ACB7C6BD2FF5C829423F565334A288CA93960491273AB889FEA0BDEE63
+short,assets/world/rooms/tidal_dungeon/platform_room_v1/platform_short_v1.png,160x32,160,0,0,0,"(0, 0, 160, 32)",67D0351D19DFCC0C7A9E7E5CA0B7C0E0CA57D4A85908FD8670D4D9A687455ACD
+medium,assets/world/rooms/tidal_dungeon/platform_room_v1/platform_medium_v1.png,224x32,224,0,0,0,"(0, 0, 224, 32)",626A5C5FDF0506C864381D45BDDCA90B4DCF94A41F21B8BAA4620EAE6CA58E53
+long,assets/world/rooms/tidal_dungeon/platform_room_v1/platform_long_v1.png,320x32,320,0,0,0,"(0, 0, 320, 32)",9656D26E5AF61785C30D6525ACBE1BF08DFDA459CC86049D52F41B3FCFD483F3

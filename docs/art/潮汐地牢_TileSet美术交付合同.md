@@ -1,9 +1,11 @@
 # 潮汐地牢 TileSet 美术交付合同
 
-状态：Task53 精确 atlas 与 QA 已完成，等待独立复核；Godot TileSet 尚未配置  
-默认工程方案：Godot `TileSet + TileMapLayer`  
+状态：`DEPRECATED / USER_REJECTED RUNTIME DIRECTION`  
+当前工程禁令：不得继续创建或接入 Godot `TileSet + TileMapLayer`；不得消费已删除的 Task53 运行 atlas  
 本文件边界：定义可切片、可平铺的美术资产合同；不创建 `.tres`、不配置 TileMapLayer、不接场景、不删除旧素材  
 明确排除：Task49、Task52
+
+> 2026-08-14 用户在 Task54 可行性切片期间明确停止瓦片地图路线，后续转为亲自探索房间构图。本文件仅保留为 Task53 历史验收记录，不是当前需求、实现依据或可复用任务书。若新对话需要地图方案，必须重新向用户对齐，不得从本文件恢复 TileSet 路线。
 
 ## 1. 冻结决定
 
@@ -16,9 +18,9 @@
 - SHA-256：`44508C796CD7D4D4D5DE7F181F84A51F382C7E208604103033268E659EE7E8D6`；
 - 内容：4×4 概念集合，包含墙面、地面、平台、角块、碎石与晶体灯；
 - 用途：冻结颜色、材质、像素颗粒、左上光源和构件语言；
-- 限制：该冻结母版不是精确 32×32 atlas，不允许直接配置为 Godot TileSet；Task53 正式 atlas 位于 `assets/world/tilesets/tidal_dungeon/tidal_dungeon_atlas_v1.png`。
+- 限制：该冻结母版不是运行资产；Task53 曾生成的精确 atlas 已在用户放弃瓦片路线后从 `assets/world` 清理。
 
-Task53 已以此母版为视觉依据整理到固定 32×32 网格。除非工程预研证明 TileSet + TileMapLayer 的实际代价明显过高，并由新中枢回报用户重新对齐，否则不得改用大量 Polygon2D、独立 Sprite2D 拼墙或其他临时方案代替正式瓦片地图。
+Task53 曾以此母版为视觉依据整理固定 32×32 网格；该实现路径已被用户后续决定明确取代。不得将本历史条款解释为继续瓦片工程的授权。
 
 ## 2. 基准尺寸与显示比例
 

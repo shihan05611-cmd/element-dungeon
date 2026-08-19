@@ -1,0 +1,4 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+TASK34_PERF_JSON={"counter_source":"adapter_instrumentation_replay","elapsed_usec":142055,"fixture":"projectile","health_match_count":200,"implementation":"after_scratch","metrics":{"candidate_scan_count":200,"cast_motion_count":24000,"intersect_shape_count":24200,"parameter_build_count":800,"probe_count":200,"query_calls":12000,"rest_info_count":200,"scratch_parameter_count":800,"sort_comparison_count":0},"node_add_count":200,"node_free_count_in_measurement":0,"node_instantiate_count":200,"phase":"measured","projectile_count":200,"reason_counts":{"hit":200},"runner":"perf_projectile_cast_v1","sample":0,"seed":4107,"steps_per_projectile":60,"total_steps":12000,"trace_sha256":"67ec8c0d02b36bc5d3de4a7d5383b3d71b42d788ae5313f444487d4252b1b798","trace_terminal_hits":200,"valid":true}

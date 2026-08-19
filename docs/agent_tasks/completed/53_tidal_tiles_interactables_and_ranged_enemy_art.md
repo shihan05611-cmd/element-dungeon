@@ -1,5 +1,7 @@
 # 任务 53：潮汐瓦片、交互物与静态远程怪正式美术资产
 
+> **后续决策覆盖（2026-08-14）**：Task53 的宝箱、传送门与 Tidal Sentry 资产仍保持接受；地图 TileSet/atlas 运行方向已被用户在 Task54 期间取消，运行 atlas 已从 `assets/world` 清理。本文中的 atlas `ACCEPTED` 仅是历史美术验收，不再授权任何工程消费、恢复或接线。
+
 状态：ACCEPTED
 负责人：美术专用职责对话 `019ffb00-0624-76a1-85b0-946bdce0f982`
 依赖：Task49、Task52（均 ACCEPTED）；用户已冻结潮汐地牢视觉母版与 TileSet 路径
