@@ -1,14 +1,14 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 ## Dependency-free headless Agent C test entry point:
 ## Godot --headless --path <project> --script res://combat/tests/run_delivery_tests.gd
 
 const HURTBOX_LAYER: int = 1
 const WALL_LAYER: int = 2
 
-var _failures: Array[String] = []
-var _assertions: int = 0
-var _tests: int = 0
+var _harness := TestHarness.new()
 var _world: Node2D
 
 
@@ -43,39 +43,20 @@ func _run_all() -> void:
 	await _run_test("queued_receiver_is_ignored_safely", _test_queued_receiver_is_ignored_safely)
 	await _run_test("finish_clears_delivery_cache", _test_finish_clears_delivery_cache)
 
-	if _failures.is_empty():
-		print("DELIVERY TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr(
-			"DELIVERY TESTS FAILED: %d/%d tests, %d assertions"
-			% [_failures.size(), _tests, _assertions]
-		)
-		for failure in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("DELIVERY TESTS"))
 
 
 func _run_test(test_name: String, test_callable: Callable) -> void:
-	_tests += 1
-	var failure_count := _failures.size()
-	await test_callable.call()
-	if _failures.size() == failure_count:
-		print("PASS " + test_name)
-	else:
-		for index in range(failure_count, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, test_callable)
 	await _reset_world()
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (expected %s, got %s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)
 
 
 func _cast(cast_id: int, element_id: StringName = ElementIds.WATER) -> CastSnapshot:

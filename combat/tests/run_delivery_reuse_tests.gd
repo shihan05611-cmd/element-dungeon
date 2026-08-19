@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 ## Agent C round-two tests: locked element/skill presentation, delayed and
 ## multi-hit attacks, and safe optional pool reuse.
 
@@ -7,9 +9,7 @@ const HURTBOX_LAYER: int = 1
 const WALL_LAYER: int = 2
 const ELEMENT_PROJECTILE_SCENE: PackedScene = preload("res://scenes/element_projectile.tscn")
 
-var _failures: Array[String] = []
-var _assertions: int = 0
-var _tests: int = 0
+var _harness := TestHarness.new()
 var _world: Node2D
 
 
@@ -34,39 +34,20 @@ func _run_all() -> void:
 	await _run_test("tree_exit_cleans_and_allows_reset", _test_tree_exit_cleans_and_allows_reset)
 	await _run_test("element_projectile_presentation_resets_between_uses", _test_element_projectile_presentation_resets_between_uses)
 
-	if _failures.is_empty():
-		print("DELIVERY REUSE TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr(
-			"DELIVERY REUSE TESTS FAILED: %d failures / %d tests, %d assertions"
-			% [_failures.size(), _tests, _assertions]
-		)
-		for failure in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("DELIVERY REUSE TESTS"))
 
 
 func _run_test(test_name: String, test_callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await test_callable.call()
-	if _failures.size() == before:
-		print("PASS " + test_name)
-	else:
-		for index in range(before, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, test_callable)
 	await _reset_world()
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (expected %s, got %s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)
 
 
 func _cast(

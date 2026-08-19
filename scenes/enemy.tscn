@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemy.gd" id="1_enemy"]
 [ext_resource type="SpriteFrames" path="res://resources/animations/enemy_frames.tres" id="2_frames"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://combat/components/element_carrier.gd" id="4_carrier"]
 [ext_resource type="Script" path="res://combat/components/combat_receiver.gd" id="5_receiver"]
 [ext_resource type="Script" path="res://combat/delivery/combat_hurtbox.gd" id="6_hurtbox"]
+[ext_resource type="PackedScene" path="res://scenes/combat/enemy_telegraph_indicator.tscn" id="7_telegraph"]
 
 [sub_resource type="CapsuleShape2D" id="BodyShape"]
 radius = 16.0
@@ -72,4 +73,6 @@ theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 14
 text = "战斗测试目标"
 horizontal_alignment = 1
+
+[node name="EnemyTelegraphIndicator" parent="." instance=ExtResource("7_telegraph")]
 

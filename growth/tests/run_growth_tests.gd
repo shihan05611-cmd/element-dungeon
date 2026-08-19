@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 ## Dependency-free headless entry point:
 ## Godot --headless --path <project> --script res://growth/tests/run_growth_tests.gd
 
@@ -79,9 +81,7 @@ class FakeRuntimeLoadoutPort:
 		return RuntimeLoadoutChangeResult.success(current)
 
 
-var _failures: Array[String] = []
-var _assertions: int = 0
-var _tests: int = 0
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -111,25 +111,11 @@ func _initialize() -> void:
 	_run("snapshot_collections_are_copied", _test_snapshot_collections_are_copied)
 	_run("invalid_events_do_not_mutate_run", _test_invalid_events_do_not_mutate_run)
 
-	if _failures.is_empty():
-		print("GROWTH TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("GROWTH TESTS FAILED: %d/%d tests, %d assertions" % [_failures.size(), _tests, _assertions])
-		for failure in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("GROWTH TESTS"))
 
 
 func _run(test_name: String, test_callable: Callable) -> void:
-	_tests += 1
-	var previous_failures := _failures.size()
-	test_callable.call()
-	if _failures.size() == previous_failures:
-		print("PASS: " + test_name)
-	else:
-		for index in range(previous_failures, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, test_callable)
 
 
 func _test_experience_below_threshold() -> void:
@@ -618,19 +604,13 @@ func _option_content(offer: RewardOffer) -> Array[StringName]:
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected=%s, actual=%s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)
 
 
 func _expect_float(actual: float, expected: float, message: String) -> void:
-	_assertions += 1
-	if not is_equal_approx(actual, expected):
-		_failures.append("%s (expected=%s, actual=%s)" % [message, expected, actual])
+	_harness.expect_float(actual, expected, message)
 

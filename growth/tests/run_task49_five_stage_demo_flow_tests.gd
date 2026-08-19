@@ -3,10 +3,9 @@ extends SceneTree
 const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const OLD_FLOW_PATH := "res://resources/run/flows/prototype_two_layer_six_combat.tres"
+const TestHarness := preload("res://combat/tests/test_harness.gd")
 
-var _tests := 0
-var _assertions := 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _room_instance_sequence := 4900
 var _command_sequence := 0
 var _hit_sequence := 0
@@ -192,23 +191,15 @@ func _next_command(prefix: StringName) -> StringName:
 
 
 func _run_test(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	print("PASS: %s" % test_name if _failures.size() == before else "FAIL: %s" % test_name)
+	await _harness.run_test(test_name, callable)
 
 
 func _run_async_test(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await callable.call()
-	print("PASS: %s" % test_name if _failures.size() == before else "FAIL: %s" % test_name)
+	await _harness.run_test(test_name, callable)
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)
 
 
 func _expect_eq(actual: Variant, expected: Variant, description: String) -> void:
@@ -216,7 +207,4 @@ func _expect_eq(actual: Variant, expected: Variant, description: String) -> void
 
 
 func _finish() -> void:
-	print("SUMMARY: %d tests, %d assertions, %d failures" % [_tests, _assertions, _failures.size()])
-	for failure: String in _failures:
-		push_error(failure)
-	quit(0 if _failures.is_empty() else 1)
+	quit(_harness.report("TASK 49 FIVE STAGE DEMO FLOW TESTS"))

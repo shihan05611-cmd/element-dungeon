@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const ROOM_IDS: Array[StringName] = [
@@ -21,9 +23,7 @@ const PASSIVE_IDS: Array[StringName] = [
 	&"passive_energy",
 ]
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -58,9 +58,6 @@ func _test_catalog_and_modes() -> void:
 	_expect_eq(rules.relic_mode, RunFeatureMode.Value.DISABLED, "relic runtime is disabled")
 	_expect(not rules.legacy_free_rewards_enabled, "legacy free rewards are disabled")
 	_expect_eq(rules.upgrade_refund_basis_points, 7000, "upgrade refund is frozen at 70 percent")
-	_expect(not rules.terminal_shop_enabled, "terminal shop remains disabled")
-	_expect_eq(rules.terminal_enemy_dream_dust_reward, 0, "terminal enemy dust rule is zero")
-	_expect_eq(rules.terminal_room_dream_dust_reward, 0, "terminal room dust rule is zero")
 
 
 func _test_active_progression() -> void:
@@ -297,31 +294,16 @@ func _unique_count(values: Array[StringName]) -> int:
 
 
 func _run_test(test_name: String, test_callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	test_callable.call()
-	if _failures.size() == before:
-		print("PASS: " + test_name)
+	await _harness.run_test(test_name, test_callable)
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)
 
 
 func _expect_eq(actual: Variant, expected: Variant, description: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected %s, got %s)" % [description, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, description)
 
 
 func _finish() -> void:
-	if _failures.is_empty():
-		print("TASK 31 CONTENT BALANCE TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("TASK 31 CONTENT BALANCE TESTS FAILED: %d failures / %d assertions" % [_failures.size(), _assertions])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 31 CONTENT BALANCE TESTS"))

@@ -1,9 +1,10 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 ## Focused contract-edge checks kept separate from the behavior suite.
 
-var _failures: Array[String] = []
-var _assertions: int = 0
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -11,14 +12,7 @@ func _initialize() -> void:
 	_test_active_room_identity_is_frozen()
 	_test_duplicate_catalog_ids_are_configuration_errors()
 	_test_run_cannot_finish_before_six_rooms()
-	if _failures.is_empty():
-		print("GROWTH CONTRACT EDGE TESTS PASSED: 4 tests, %d assertions" % _assertions)
-		quit(0)
-	else:
-		printerr("GROWTH CONTRACT EDGE TESTS FAILED: %d failures, %d assertions" % [_failures.size(), _assertions])
-		for failure in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("GROWTH CONTRACT EDGE TESTS", 4))
 
 
 func _test_loadout_snapshot_reports_duplicate_keys() -> void:
@@ -84,13 +78,9 @@ func _test_run_cannot_finish_before_six_rooms() -> void:
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected=%s, actual=%s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)
 

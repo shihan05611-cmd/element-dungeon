@@ -7,9 +7,17 @@ var offensive_damage: float
 var reaction_multiplier: float
 var reacted_damage: float
 var defense_flat: float
+## Element-mitigation multiplier applied after the flat defense subtraction
+## (Task 61 §3.6). 1.0 means "no mitigation" and is the default for every
+## caller outside the Boss same-element path.
+var mitigation_factor: float
 var mitigated_damage: float
 var final_damage: int
 var validation_error: StringName
+
+var mitigation_applied: bool:
+	get:
+		return mitigation_factor < 1.0
 
 
 func _init(
@@ -19,7 +27,8 @@ func _init(
 		p_defense_flat: float,
 		p_mitigated_damage: float,
 		p_final_damage: int,
-		p_validation_error: StringName = &""
+		p_validation_error: StringName = &"",
+		p_mitigation_factor: float = 1.0
 ) -> void:
 	offensive_damage = p_offensive_damage
 	reaction_multiplier = p_reaction_multiplier
@@ -28,6 +37,7 @@ func _init(
 	mitigated_damage = p_mitigated_damage
 	final_damage = p_final_damage
 	validation_error = p_validation_error
+	mitigation_factor = p_mitigation_factor
 	if validation_error.is_empty():
 		validation_error = _validate_values()
 
@@ -45,6 +55,8 @@ func _validate_values() -> StringName:
 		return &"invalid_reacted_damage"
 	if not is_finite(defense_flat) or defense_flat < 0.0:
 		return &"invalid_defense"
+	if not is_finite(mitigation_factor) or mitigation_factor <= 0.0 or mitigation_factor > 1.0:
+		return &"invalid_mitigation_factor"
 	if not is_finite(mitigated_damage):
 		return &"invalid_mitigated_damage"
 	if final_damage < 0:

@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const ACTIVE_BOLT: SkillDefinition = preload("res://resources/element_bolt.tres")
 const ACTIVE_WATER: SkillDefinition = preload("res://resources/skills/water_lance.tres")
 const ACTIVE_FIRE: SkillDefinition = preload("res://resources/skills/fire_lance.tres")
@@ -58,9 +60,7 @@ class RejectingRuntimePort:
 		return inner.try_replace_snapshot(candidate)
 
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -71,31 +71,11 @@ func _initialize() -> void:
 	_run("four_passive_runtime_lifecycle", _test_four_passive_runtime_lifecycle)
 	_run("run_session_immediate_authority_and_task27_protection", _test_run_session_immediate_authority_and_task27_protection)
 
-	if _failures.is_empty():
-		print("TASK 28 SEVEN SLOT PASSIVE TESTS PASSED: %d tests, %d assertions" % [
-			_tests,
-			_assertions,
-		])
-		quit(0)
-	else:
-		printerr("TASK 28 SEVEN SLOT PASSIVE TESTS FAILED: %d failures / %d assertions" % [
-			_failures.size(),
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 28 SEVEN SLOT PASSIVE TESTS"))
 
 
 func _run(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if _failures.size() == before:
-		print("PASS task28_" + test_name)
-	else:
-		for index: int in range(before, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, callable)
 
 
 func _test_slot_order_empty_and_resource_contract() -> void:
@@ -763,12 +743,8 @@ func _progress_equal(left: SkillProgressSnapshot, right: SkillProgressSnapshot) 
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)
 
 
 func _expect_eq(actual: Variant, expected: Variant, description: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected %s, got %s)" % [description, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, description)

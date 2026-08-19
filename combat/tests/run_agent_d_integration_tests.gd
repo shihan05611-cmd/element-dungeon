@@ -1,9 +1,10 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const ROOM_SCENE: PackedScene = preload("res://scenes/test_room.tscn")
 
-var _failures: Array[String] = []
-var _assertions: int = 0
+var _harness := TestHarness.new()
 var _room: Node2D
 var _player: PlayerCharacter
 var _target: CombatEnemy
@@ -46,17 +47,7 @@ func _run() -> void:
 	if is_instance_valid(_room):
 		_room.queue_free()
 	await process_frame
-	if _failures.is_empty():
-		print("AGENT D INTEGRATION TESTS PASSED: 9 tests, %d assertions" % _assertions)
-		quit(0)
-	else:
-		printerr("AGENT D INTEGRATION TESTS FAILED: %d failures / %d assertions" % [
-			_failures.size(),
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("AGENT D INTEGRATION TESTS", 9))
 
 
 func _test_scene_contracts() -> void:
@@ -323,6 +314,4 @@ func _wait_physics(frame_count: int) -> void:
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)

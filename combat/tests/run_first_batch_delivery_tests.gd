@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 ## Task 15 focused test entry point:
 ## Godot --headless --path <project> --script
 ## res://combat/tests/run_first_batch_delivery_tests.gd
@@ -7,9 +9,7 @@ extends SceneTree
 const HURTBOX_LAYER: int = 8
 const WALL_LAYER: int = 4
 
-var _failures: Array[String] = []
-var _assertions: int = 0
-var _tests: int = 0
+var _harness := TestHarness.new()
 var _world: Node2D
 var _next_cast_id: int = 15000
 
@@ -57,54 +57,24 @@ func _run_all() -> void:
 	await _run_test("reclaim_snapshot_mismatch_rejects_whole_transaction", _test_reclaim_snapshot_mismatch_rejects_whole_transaction)
 	await _run_test("reclaim_energy_mismatch_rejects_whole_transaction", _test_reclaim_energy_mismatch_rejects_whole_transaction)
 
-	if _failures.is_empty():
-		print("TASK 15 FIRST BATCH TESTS PASSED: %d tests, %d assertions" % [
-			_tests,
-			_assertions,
-		])
-		quit(0)
-	else:
-		printerr("TASK 15 FIRST BATCH TESTS FAILED: %d/%d tests, %d assertions" % [
-			_failures.size(),
-			_tests,
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 15 FIRST BATCH TESTS"))
 
 
 func _run_test(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await callable.call()
-	if _failures.size() == before:
-		print("PASS: " + test_name)
-	else:
-		for index in range(before, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, callable)
 	await _reset_world()
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (expected=%s, actual=%s)" % [
-		message,
-		str(expected),
-		str(actual),
-	])
+	_harness.expect_eq(actual, expected, message)
 
 
 func _expect_float(actual: float, expected: float, message: String) -> void:
-	_expect(
-		is_equal_approx(actual, expected),
-		"%s (expected=%s, actual=%s)" % [message, expected, actual]
-	)
+	_harness.expect_float(actual, expected, message)
 
 
 func _reset_world() -> void:

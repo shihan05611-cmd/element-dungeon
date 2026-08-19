@@ -1,10 +1,10 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const ROOM_SCENE: PackedScene = preload("res://scenes/test_room.tscn")
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _room: Node2D
 var _player: PlayerCharacter
 var _enemy: CombatEnemy
@@ -54,14 +54,7 @@ func _run() -> void:
 	if is_instance_valid(_room):
 		_room.queue_free()
 	await process_frame
-	if _failures.is_empty():
-		print("TASK 24 COMPACT HUD REWARD TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("TASK 24 COMPACT HUD REWARD TESTS FAILED: %d failures / %d assertions" % [_failures.size(), _assertions])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 24 COMPACT HUD REWARD TESTS"))
 
 
 func _test_dual_anchor_resolution_matrix() -> void:
@@ -417,22 +410,12 @@ func _all_visible_text(node: Node) -> String:
 
 
 func _run_test(name: String, callback: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callback.call()
-	if _failures.size() == before:
-		print("PASS task24_" + name)
+	await _harness.run_test(name, callback)
 
 
 func _run_async_test(name: String, callback: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await callback.call()
-	if _failures.size() == before:
-		print("PASS task24_" + name)
+	await _harness.run_test(name, callback)
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)

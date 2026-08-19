@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const ROOM_SCENE: PackedScene = preload("res://scenes/test_room.tscn")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const HURTBOX_LAYER: int = 8
@@ -11,9 +13,7 @@ class TargetRig:
 	var carrier: ElementCarrier
 	var hurtbox: CombatHurtbox
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _identity: int = 38_000
 
 
@@ -254,29 +254,16 @@ func _standalone_reaction_result(cast_id: int, delivery_id: int, hit_index: int,
 
 
 func _run_async(name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await callable.call()
-	if _failures.size() == before:
-		print("PASS: " + name)
+	await _harness.run_test(name, callable)
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (expected=%s, actual=%s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)
 
 
 func _finish() -> void:
-	if _failures.is_empty():
-		print("TASK 38 RECLAIM REACTION ENERGY TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("TASK 38 RECLAIM REACTION ENERGY TESTS FAILED: %d failures / %d assertions" % [_failures.size(), _assertions])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 38 RECLAIM REACTION ENERGY TESTS"))

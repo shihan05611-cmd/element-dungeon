@@ -1,10 +1,10 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const RUN_GAME_SCENE: PackedScene = preload("res://scenes/run/run_game.tscn")
 
-var _tests: int = 1
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _hit_sequence: int = 700000
 
 
@@ -230,29 +230,12 @@ func _unique_string_name_count(values: Array[StringName]) -> int:
 
 
 func _finish() -> void:
-	if _failures.is_empty():
-		print("TASK 29 REAL ROOM FLOW TESTS PASSED: %d tests, %d assertions" % [
-			_tests,
-			_assertions,
-		])
-		quit(0)
-	else:
-		printerr("TASK 29 REAL ROOM FLOW TESTS FAILED: %d failures / %d assertions" % [
-			_failures.size(),
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("REAL ROOM FLOW TEST", 1))
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)
 
 
 func _expect_eq(actual: Variant, expected: Variant, description: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected %s, got %s)" % [description, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, description)

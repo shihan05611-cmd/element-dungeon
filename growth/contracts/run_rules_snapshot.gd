@@ -21,18 +21,6 @@ var legacy_free_rewards_enabled: bool:
 	get:
 		return _legacy_free_rewards_enabled
 
-var terminal_enemy_dream_dust_reward: int:
-	get:
-		return 0
-
-var terminal_room_dream_dust_reward: int:
-	get:
-		return 0
-
-var terminal_shop_enabled: bool:
-	get:
-		return false
-
 var validation_error: StringName:
 	get:
 		return _validation_error

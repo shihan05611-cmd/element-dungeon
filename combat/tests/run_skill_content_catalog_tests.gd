@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 ## Task 16 focused content/catalog and production-wiring runner.
 
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
@@ -45,9 +47,7 @@ class RecordingPassivePort:
 			registered_ids.append(runtime.skill_id)
 
 
-var _failures: Array[String] = []
-var _assertions: int = 0
-var _tests: int = 0
+var _harness := TestHarness.new()
 var _room: Node2D
 var _player: PlayerCharacter
 var _target: CombatEnemy
@@ -91,20 +91,7 @@ func _run() -> void:
 	if is_instance_valid(_room):
 		_room.queue_free()
 	await process_frame
-	if _failures.is_empty():
-		print("TASK 16 CONTENT CATALOG TESTS PASSED: %d tests, %d assertions" % [
-			_tests,
-			_assertions,
-		])
-		quit(0)
-	else:
-		printerr("TASK 16 CONTENT CATALOG TESTS FAILED: %d failures / %d assertions" % [
-			_failures.size(),
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 16 CONTENT CATALOG TESTS"))
 
 
 func _test_formal_catalog_shape() -> void:
@@ -534,22 +521,12 @@ func _seed_containing(
 
 
 func _run_test(test_name: String, test_callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	test_callable.call()
-	if _failures.size() == before:
-		print("PASS " + test_name)
+	await _harness.run_test(test_name, test_callable)
 
 
 func _run_async_test(test_name: String, test_callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await test_callable.call()
-	if _failures.size() == before:
-		print("PASS " + test_name)
+	await _harness.run_test(test_name, test_callable)
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)

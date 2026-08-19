@@ -1,0 +1,104 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_idle_v1.png" id="1_plain_idle"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_walk_v1.png" id="2_plain_walk"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_attack_v1.png" id="3_plain_attack"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_idle_v1.png" id="4_ember_idle"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_walk_v1.png" id="5_ember_walk"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_attack_v1.png" id="6_ember_attack"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_idle_v1.png" id="7_tide_idle"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_walk_v1.png" id="8_tide_walk"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_attack_v1.png" id="9_tide_attack"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_hurt_v1.png" id="10_hurt"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_death_v1.png" id="11_death"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_plain_idle")
+}],
+"loop": true,
+"name": &"plain_idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_plain_walk")
+}],
+"loop": true,
+"name": &"plain_walk",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_plain_attack")
+}],
+"loop": false,
+"name": &"plain_attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_ember_idle")
+}],
+"loop": true,
+"name": &"ember_idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_ember_walk")
+}],
+"loop": true,
+"name": &"ember_walk",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_ember_attack")
+}],
+"loop": false,
+"name": &"ember_attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_tide_idle")
+}],
+"loop": true,
+"name": &"tide_idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_tide_walk")
+}],
+"loop": true,
+"name": &"tide_walk",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_tide_attack")
+}],
+"loop": false,
+"name": &"tide_attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_hurt")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_death")
+}],
+"loop": false,
+"name": &"death",
+"speed": 5.0
+}]

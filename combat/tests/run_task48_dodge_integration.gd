@@ -1,10 +1,10 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const ROOM_SCENE: PackedScene = preload("res://scenes/test_room.tscn")
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _identity: int = 48_000
 
 
@@ -117,7 +117,9 @@ func _test_action_gates_and_recovery() -> void:
 	player.set_collision_mask_value(3, false)
 	player.velocity = Vector2(0.0, 10.0)
 	player.move_and_slide()
-	_expect(not player.is_on_floor() and not bool(player.call(&"_try_start_dodge")), "airborne state rejects dodge startup")
+	_expect(not player.is_on_floor(), "fixture is airborne before the air-dodge check")
+	_expect(bool(player.call(&"_try_start_dodge")), "airborne state now allows a dodge start (air dash)")
+	player.call(&"_finish_dodge", false, false)
 	player.set_collision_mask_value(3, true)
 	player.global_position = Vector2(420.0, 470.0)
 	player.velocity = Vector2.ZERO
@@ -203,7 +205,7 @@ func _test_interrupt_cleanup() -> void:
 
 
 func _test_source_and_input_contracts() -> void:
-	_tests += 1
+	_harness.tests += 1
 	var source := FileAccess.get_file_as_string("res://scripts/player.gd")
 	var dodge_source := source.substr(source.find("func _try_start_dodge"), source.find("func _idle_animation_name") - source.find("func _try_start_dodge"))
 	_expect(InputMap.has_action(&"dodge"), "dodge input action is registered")
@@ -257,31 +259,18 @@ func _dispose_room(room: Node) -> void:
 
 
 func _run_async(name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await callable.call()
-	if _failures.size() == before:
-		print("PASS: " + name)
+	await _harness.run_test(name, callable)
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (expected=%s, actual=%s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)
 
 
 func _finish() -> void:
 	Input.action_release(&"move_left")
 	Input.action_release(&"move_right")
-	if _failures.is_empty():
-		print("TASK 48 DODGE INTEGRATION TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("TASK 48 DODGE INTEGRATION TESTS FAILED: %d failures / %d assertions" % [_failures.size(), _assertions])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 48 DODGE INTEGRATION TESTS"))

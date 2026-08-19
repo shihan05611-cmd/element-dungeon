@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 
 class RejectingLoadoutPort:
@@ -22,9 +24,7 @@ class RejectingLoadoutPort:
 		return RuntimeLoadoutChangeResult.rejected(&"task27_final_port_rejected", snapshot())
 
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -40,20 +40,7 @@ func _initialize() -> void:
 	_run_test("final_loadout_port_rejection_is_atomic", _test_final_loadout_port_rejection_is_atomic)
 	_run_test("snapshot_collections_are_copies", _test_snapshot_collections_are_copies)
 
-	if _failures.is_empty():
-		print("TASK 27 RUN ECONOMY PROGRESSION TESTS PASSED: %d tests, %d assertions" % [
-			_tests,
-			_assertions,
-		])
-		quit(0)
-	else:
-		printerr("TASK 27 RUN ECONOMY PROGRESSION TESTS FAILED: %d failures / %d assertions" % [
-			_failures.size(),
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 27 RUN ECONOMY PROGRESSION TESTS"))
 
 
 func _test_catalog_and_frozen_rules() -> void:
@@ -81,9 +68,6 @@ func _test_catalog_and_frozen_rules() -> void:
 	_expect_eq(snapshot.rules.progression_mode, RunFeatureMode.Value.DISABLED, "progression mode frozen disabled")
 	_expect_eq(snapshot.rules.relic_mode, RunFeatureMode.Value.DISABLED, "relic mode frozen disabled")
 	_expect_eq(snapshot.rules.upgrade_refund_basis_points, 7000, "refund is frozen at 7000 basis points")
-	_expect_eq(snapshot.rules.terminal_enemy_dream_dust_reward, 0, "terminal enemy reward is explicitly zero")
-	_expect_eq(snapshot.rules.terminal_room_dream_dust_reward, 0, "terminal room reward is explicitly zero")
-	_expect(not snapshot.rules.terminal_shop_enabled, "terminal shop is explicitly disabled")
 
 
 func _test_disabled_observe_enabled_modes() -> void:
@@ -537,21 +521,12 @@ func _signature(snapshot: RunSnapshot) -> String:
 
 
 func _run_test(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if _failures.size() == before:
-		print("PASS: " + test_name)
-	else:
-		for index: int in range(before, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, callable)
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (actual=%s expected=%s)" % [message, str(actual), str(expected)])
+	_harness.expect_eq(actual, expected, message)

@@ -6,10 +6,9 @@ const RUN_GAME: PackedScene = preload("res://scenes/run/run_game.tscn")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
 const BATTLE_01_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_04_validation.tres")
 const BATTLE_02_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_02_swarm.tres")
+const TestHarness := preload("res://combat/tests/test_harness.gd")
 
-var _tests := 0
-var _assertions := 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _hit_sequence := 43_000_000
 
 
@@ -233,7 +232,9 @@ func _test_boss_release_and_projectile_stop() -> void:
 	boss.player = player
 	var death_count := [0]
 	boss.enemy_defeated.connect(func() -> void: death_count[0] += 1)
-	boss.call("_spawn_boss_projectile")
+	var boss_direction: Vector2 = boss.call("_resolve_accurate_direction", boss.ranged_projectile_profile, boss.player.global_position)
+	boss.call("_apply_facing", boss_direction)
+	boss.call("_launch_ranged_projectile", boss.ranged_projectile_profile, boss_direction, &"boss_arc")
 	var fired_at_death := boss.boss_projectiles_fired
 	var projectile_count_at_death := _projectile_count(stage)
 	var boss_ref: WeakRef = weakref(boss)
@@ -412,23 +413,16 @@ func _wait_until(predicate: Callable, frame_limit: int) -> bool:
 
 
 func _run_test(name: String, body: Callable) -> void:
-	_tests += 1
-	var failures_before := _failures.size()
-	body.call()
-	print("PASS: %s" % name if _failures.size() == failures_before else "FAIL: %s" % name)
+	await _harness.run_test(name, body)
 
 
 func _run_async_test(name: String, body: Callable) -> void:
-	_tests += 1
-	var failures_before := _failures.size()
-	await body.call()
-	print("PASS: %s" % name if _failures.size() == failures_before else "FAIL: %s" % name)
+	await _harness.run_test(name, body)
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
+	_harness.expect(condition, message)
 	if not condition:
-		_failures.append(message)
 		push_error("FAIL: %s" % message)
 
 
@@ -437,7 +431,4 @@ func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
 
 
 func _finish() -> void:
-	print("Task43 combat/loadout/cleanup tests: %d tests, %d assertions, %d failures" % [_tests, _assertions, _failures.size()])
-	for failure: String in _failures:
-		print("  - %s" % failure)
-	quit(0 if _failures.is_empty() else 1)
+	quit(_harness.report("TASK 43 COMBAT LOADOUT WORLD CLEANUP TESTS"))

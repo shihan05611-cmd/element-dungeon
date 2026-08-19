@@ -885,10 +885,10 @@ func advance_relics(delta: float) -> RunCommandResult:
 	if not is_finite(delta) or delta < 0.0:
 		return RunCommandResult.rejected(RunCommandResult.RejectReason.INVALID_ARGUMENT, &"invalid_relic_delta")
 	if _rules.relic_mode != RunFeatureMode.Value.ENABLED:
-		return RunCommandResult.success(snapshot())
+		return RunCommandResult.success()
 	if _relic_controller.advance(delta):
 		return _commit_and_publish(&"relic_cooldowns_advanced")
-	return RunCommandResult.success(snapshot())
+	return RunCommandResult.success()
 
 
 func _handle_enemy_killed(event: EnemyKilledEvent) -> RunCommandResult:

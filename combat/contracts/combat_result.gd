@@ -91,6 +91,12 @@ var final_damage: int:
 	get:
 		return _final_damage
 
+## Task 61 §3.6: true when a fixed element-mitigation factor (< 1.0) was
+## applied to this hit's final damage (e.g. Boss same-element immunity).
+var mitigation_applied: bool:
+	get:
+		return _mitigation_applied
+
 var reaction_triggered: bool:
 	get:
 		return _reaction_consumed > 0
@@ -148,6 +154,7 @@ var _offensive_damage: float = 0.0
 var _reacted_damage: float = 0.0
 var _mitigated_damage: float = 0.0
 var _final_damage: int = 0
+var _mitigation_applied: bool = false
 var _reaction_consumed: int = 0
 var _reaction_multiplier: float = 1.0
 var _water_delta: int = 0
@@ -184,6 +191,7 @@ static func from_plan(plan: CombatPlan) -> CombatResult:
 		result._reacted_damage = plan.damage_resolution.reacted_damage
 		result._mitigated_damage = plan.damage_resolution.mitigated_damage
 		result._final_damage = plan.damage_resolution.final_damage
+		result._mitigation_applied = plan.damage_resolution.mitigation_applied
 		result._current_health = plan.health_after
 		result._maximum_health = plan.maximum_health
 		result._health_delta = plan.health_delta()
@@ -205,6 +213,8 @@ static func from_plan(plan: CombatPlan) -> CombatResult:
 		result._append_tag_once(String(result._source_element_id))
 	if result.reaction_triggered:
 		result._append_tag_once("reaction")
+	if result._mitigation_applied:
+		result._append_tag_once("same_element_mitigated")
 	return result
 
 

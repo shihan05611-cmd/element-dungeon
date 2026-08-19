@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 ## Task 10 end-to-end contract runner:
 ## Godot --headless --path <project> --script res://combat/tests/run_agent_d_growth_integration_tests.gd
 
@@ -33,9 +35,7 @@ class RecordingGrowthPort:
 		return true
 
 
-var _failures: Array[String] = []
-var _assertions: int = 0
-var _tests: int = 0
+var _harness := TestHarness.new()
 var _room: Node2D
 var _player: PlayerCharacter
 var _target: CombatEnemy
@@ -84,30 +84,18 @@ func _run() -> void:
 	_run_test("persisted_four_passive_multi_enemy_room", _test_persisted_four_passive_multi_enemy_room)
 	_run_test("zero_active_four_passive_shop", _test_zero_active_four_passive_shop)
 	await _test_ordinary_attack_completes_host_room()
-	_tests += 1
+	_harness.tests += 1
 
 	for tween: Tween in get_processed_tweens():
 		tween.kill()
 	if is_instance_valid(_room):
 		_room.queue_free()
 	await process_frame
-	if _failures.is_empty():
-		print("AGENT D TASK 10 TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("AGENT D TASK 10 TESTS FAILED: %d failures / %d assertions" % [
-			_failures.size(),
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("AGENT D TASK 10 TESTS"))
 
 
 func _run_test(test_name: String, test_callable: Callable) -> void:
-	_tests += 1
-	test_callable.call()
-	print("PASS " + test_name)
+	await _harness.run_test(test_name, test_callable)
 
 
 func _test_formal_shared_runtime() -> void:
@@ -693,6 +681,4 @@ func _unique_count(values: Array[StringName]) -> int:
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)

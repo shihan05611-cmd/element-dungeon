@@ -1,0 +1,78 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/run/enemies/boss_tide_ember.gd" id="1_boss"]
+[ext_resource type="SpriteFrames" path="res://resources/animations/boss_tide_ember_frames.tres" id="2_frames"]
+[ext_resource type="Script" path="res://combat/components/damage_receiver.gd" id="3_damage"]
+[ext_resource type="Script" path="res://combat/components/element_carrier.gd" id="4_carrier"]
+[ext_resource type="Script" path="res://combat/components/combat_receiver.gd" id="5_receiver"]
+[ext_resource type="Script" path="res://combat/delivery/combat_hurtbox.gd" id="6_hurtbox"]
+[ext_resource type="PackedScene" path="res://scenes/combat/enemy_telegraph_indicator.tscn" id="7_telegraph"]
+
+[sub_resource type="CapsuleShape2D" id="BodyShape"]
+radius = 16.0
+height = 36.0
+
+[sub_resource type="CapsuleShape2D" id="HurtShape"]
+radius = 26.0
+height = 64.0
+
+[node name="BossTideEmber" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_boss")
+
+[node name="BodyCollision" type="CollisionShape2D" parent="."]
+position = Vector2(0, 14)
+shape = SubResource("BodyShape")
+
+[node name="CombatHurtbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+monitorable = true
+script = ExtResource("6_hurtbox")
+receiver_path = NodePath("../CombatReceiver")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CombatHurtbox"]
+position = Vector2(0, 6)
+shape = SubResource("HurtShape")
+
+[node name="DamageReceiver" type="Node" parent="."]
+script = ExtResource("3_damage")
+configured_maximum_health = 280
+configured_starting_health = 280
+defense_flat = 3.0
+
+[node name="ElementCarrier" type="Node" parent="."]
+script = ExtResource("4_carrier")
+
+[node name="CombatReceiver" type="Node" parent="."]
+script = ExtResource("5_receiver")
+target_team_id = &"enemy"
+element_carrier_path = NodePath("../ElementCarrier")
+damage_receiver_path = NodePath("../DamageReceiver")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(0, -90)
+sprite_frames = ExtResource("2_frames")
+animation = &"ember_idle"
+scale = Vector2(2, 2)
+z_index = 2
+
+[node name="Prompt" type="Label" parent="."]
+visible = false
+offset_left = -74.0
+offset_top = -220.0
+offset_right = 74.0
+offset_bottom = -193.0
+theme_override_colors/font_color = Color(1, 0.88, 0.55, 1)
+theme_override_colors/font_shadow_color = Color(0.05, 0.05, 0.08, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 14
+text = "熔汐之王"
+horizontal_alignment = 1
+
+[node name="EnemyTelegraphIndicator" parent="." instance=ExtResource("7_telegraph")]
+position = Vector2(0, -240)

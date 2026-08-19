@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 class RecordingEffectPort:
 	extends GrowthEffectPort
 
@@ -73,9 +75,7 @@ class SharedSevenSlotPort:
 		return RuntimeLoadoutChangeResult.success(current)
 
 
-var _failures: Array[String] = []
-var _assertions: int = 0
-var _tests: int = 0
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -90,25 +90,11 @@ func _initialize() -> void:
 	_run("event_fields_are_immutable_and_complete", _test_event_fields_are_immutable_and_complete)
 	_run("sequence_state_isolated_between_sessions", _test_sequence_state_isolated_between_sessions)
 
-	if _failures.is_empty():
-		print("GROWTH 06 CONTRACT TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("GROWTH 06 CONTRACT TESTS FAILED: %d/%d tests, %d assertions" % [_failures.size(), _tests, _assertions])
-		for failure in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("GROWTH 06 CONTRACT TESTS"))
 
 
 func _run(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if _failures.size() == before:
-		print("PASS: " + test_name)
-	else:
-		for index in range(before, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, callable)
 
 
 func _test_shared_snapshot_sort_copy_revision() -> void:
@@ -357,12 +343,8 @@ func _form_event(
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected=%s, actual=%s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)

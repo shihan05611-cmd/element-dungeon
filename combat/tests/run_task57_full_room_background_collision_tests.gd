@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const RUN_GAME: PackedScene = preload("res://scenes/run/run_game.tscn")
 const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
@@ -13,9 +15,7 @@ const ROOM_HEIGHT := 832.0
 const PLAYER_MARKER_OFFSET := 46.0
 const PLAYER_BODY_BOTTOM := 31.0
 
-var _tests := 0
-var _assertions := 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _hit_sequence := 57_000_000
 
 
@@ -155,7 +155,7 @@ func _test_boss_has_only_main_ground_and_keeps_projectiles() -> void:
 	for side: float in [-1.0, 1.0]:
 		player.global_position = boss.global_position + Vector2(side * 320.0, 0.0)
 		var fired_before: int = boss.boss_projectiles_fired
-		boss.call("_spawn_boss_projectile")
+		_fire_immediate_shot(boss)
 		await physics_frame
 		_expect_eq(boss.boss_projectiles_fired, fired_before + 1, "Boss fires from main ground toward side %d" % int(side))
 		_expect(_delivery_count(stage) >= 1, "Boss main-ground projectile survives its first physics frame")
@@ -217,7 +217,7 @@ func _test_formal_five_stage_roomcontainer_transaction() -> void:
 	var created_deliveries: Array[Node] = []
 	boss.delivery_created.connect(func(delivery: Node) -> void: created_deliveries.append(delivery), CONNECT_ONE_SHOT)
 	var fired_before: int = boss.boss_projectiles_fired
-	boss.call("_spawn_boss_projectile")
+	_fire_immediate_shot(boss)
 	var delivery_entered_lifecycle := await _wait_until(func() -> bool:
 		if created_deliveries.is_empty():
 			return false
@@ -450,6 +450,19 @@ func _one_way_shape_count(node: Node) -> int:
 	return count
 
 
+## Task 61 retires scripts/enemy.gd's terminal_enemy-gated
+## _spawn_boss_projectile() direct-call entry point (now owned entirely by
+## BossTideEmber's own _physics_process()). Reproduces the same
+## deterministic "fire now, no telegraph wait" behavior directly against the
+## still-generic _resolve_accurate_direction()/_apply_facing()/
+## _launch_ranged_projectile() methods shared with TidalSentry.
+func _fire_immediate_shot(boss: CombatEnemy) -> void:
+	var profile := boss.ranged_projectile_profile
+	var direction: Vector2 = boss.call("_resolve_accurate_direction", profile, boss.player.global_position)
+	boss.call("_apply_facing", direction)
+	boss.call("_launch_ranged_projectile", profile, direction, &"boss_arc")
+
+
 func _delivery_count(node: Node) -> int:
 	var count := 1 if node is DeliveryBase else 0
 	for child: Node in node.get_children():
@@ -483,45 +496,24 @@ func _unique_int_count(values: Array[int]) -> int:
 
 
 func _run_test(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if _failures.size() == before:
-		print("PASS: " + test_name)
+	await _harness.run_test(test_name, callable)
 
 
 func _run_async_test(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await callable.call()
-	if _failures.size() == before:
-		print("PASS: " + test_name)
+	await _harness.run_test(test_name, callable)
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)
 
 
 func _expect_eq(actual: Variant, expected: Variant, description: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected %s, got %s)" % [description, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, description)
 
 
 func _expect_near(actual: float, expected: float, tolerance: float, description: String) -> void:
-	_assertions += 1
-	if absf(actual - expected) > tolerance:
-		_failures.append("%s (expected %.2f±%.2f, got %.2f)" % [description, expected, tolerance, actual])
+	_harness.expect_near(actual, expected, tolerance, description)
 
 
 func _finish() -> void:
-	if _failures.is_empty():
-		print("TASK 57 FULL ROOM TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("TASK 57 FULL ROOM TESTS FAILED: %d failures / %d assertions" % [_failures.size(), _assertions])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 57 FULL ROOM TESTS"))

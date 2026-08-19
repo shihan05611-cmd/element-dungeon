@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://combat/delivery/projectile_delivery.gd" id="1_projectile"]
+[ext_resource type="Texture2D" path="res://assets/world/projectiles/boss_plain_bolt_v1.png" id="2_texture"]
+
+[sub_resource type="CircleShape2D" id="ProjectileShape"]
+radius = 13.0
+
+[node name="BossPlainBolt" type="Node2D"]
+z_index = 6
+script = ExtResource("1_projectile")
+projectile_shape = SubResource("ProjectileShape")
+speed = 280.0
+max_distance = 980.0
+hurtbox_collision_mask = 16
+blocking_collision_mask = 4
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 0
+texture = ExtResource("2_texture")
+scale = Vector2(2.0, 2.0)

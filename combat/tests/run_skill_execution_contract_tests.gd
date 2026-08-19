@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const RECORDING_DELIVERY: PackedScene = preload("res://combat/tests/recording_skill_delivery.tscn")
 const SWEEP_PROFILE: ProjectileSweepProfile2D = preload(
 	"res://resources/combat/element_projectile_sweep_profile.tres"
@@ -89,9 +91,7 @@ class Rig:
 			host.free()
 
 
-var _failures: Array[String] = []
-var _tests: int = 0
-var _assertions: int = 0
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -116,29 +116,11 @@ func _run_all() -> void:
 	_run("reclaim_prepared_transaction_commits_once", _test_reclaim_prepared_transaction_commits_once)
 	_run("runtime_catalog_validates_typed_definitions", _test_runtime_catalog_validates_typed_definitions)
 
-	if _failures.is_empty():
-		print("TASK 14 EXECUTION TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("TASK 14 EXECUTION TESTS FAILED: %d/%d tests, %d assertions" % [
-			_failures.size(),
-			_tests,
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 14 EXECUTION TESTS"))
 
 
 func _run(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if _failures.size() == before:
-		print("PASS: " + test_name)
-	else:
-		for index in range(before, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, callable)
 
 
 func _test_damage_multiplier_contract() -> void:
@@ -472,14 +454,12 @@ func _reclaim_skill() -> SkillDefinition:
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (expected=%s, actual=%s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)
 
 
 func _expect_float(actual: float, expected: float, message: String) -> void:
-	_expect(is_equal_approx(actual, expected), "%s (expected=%s, actual=%s)" % [message, expected, actual])
+	_harness.expect_float(actual, expected, message)

@@ -1,14 +1,14 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const COHORT_SIZE: int = 512
 const FIRST_ROOM_ID: StringName = &"combat_01_entry"
 const FOUR_POOL_OWNED_ID: StringName = &"burning"
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _distribution: Dictionary = {}
 
 
@@ -193,32 +193,17 @@ func _string_key_dictionary(source: Dictionary) -> Dictionary:
 
 
 func _run_test(name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if before == _failures.size():
-		print("PASS task42_" + name)
+	await _harness.run_test(name, callable)
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)
 
 
 func _expect_eq(actual: Variant, expected: Variant, description: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected %s, got %s)" % [description, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, description)
 
 
 func _finish() -> void:
 	print("TASK42_COHORT_DISTRIBUTION: " + JSON.stringify(_distribution))
-	if _failures.is_empty():
-		print("TASK 42 REWARD ECONOMY TUNING TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("TASK 42 REWARD ECONOMY TUNING TESTS FAILED: %d failures / %d assertions" % [_failures.size(), _assertions])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 42 REWARD ECONOMY TUNING TESTS"))

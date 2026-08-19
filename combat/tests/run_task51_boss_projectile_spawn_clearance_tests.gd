@@ -1,15 +1,21 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const BOSS_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_06_final_boss.tres")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
 const PROJECTILE_RADIUS := 13.0
 const PROJECTILE_VISIBLE_BOTTOM := 15.04
-const PROJECTILE_SPEED := 255.0
+## Task 61 retires the single shared boss_arc_projectile_profile.tres in
+## favor of one EnemyProjectileProfile per Boss form; the real room's Boss
+## now starts in the "ember" form, whose profile fires at 320 (not the old
+## placeholder's 255) with a 62px spawn offset (not 58px). Collision radius,
+## masks, and ground-clearance geometry are unchanged.
+const PROJECTILE_SPEED := 320.0
+const PROJECTILE_SPAWN_OFFSET := 62.0
 const GROUND_SUPPORT_TOP := 692.0
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -55,6 +61,16 @@ func _create_boss_context() -> Dictionary:
 	room.activate()
 	var boss := room.enemies[0] as CombatEnemy
 	boss.set("_boss_projectile_cooldown", 9999.0)
+	# Task 61's real room Boss starts in the "ember" form, whose profile
+	# fires a 3-way spread (§3.7 "三连火弹散射"). This clearance test is
+	# about single-shot spawn/aim/ground-clearance geometry, not spread fan
+	# behavior (covered independently by task59's spread_count test and
+	# task61's own ranged-telegraph test), so it pins a single-shot copy of
+	# the same profile instead of asserting against a fan of 3 directions.
+	var single_shot_profile: EnemyProjectileProfile = boss.ranged_projectile_profile.duplicate()
+	single_shot_profile.spread_count = 1
+	single_shot_profile.spread_angle_degrees = 0.0
+	boss.ranged_projectile_profile = single_shot_profile
 
 	var player := PLAYER_SCENE.instantiate() as PlayerCharacter
 	player.global_position = Vector2(500.0, 660.0)
@@ -82,7 +98,7 @@ func _verify_spawn(context: Dictionary, direction_x: float, support_top: float, 
 	var created: Array[Node] = []
 	boss.delivery_created.connect(func(delivery: Node) -> void: created.append(delivery), CONNECT_ONE_SHOT)
 	var fired_before := boss.boss_projectiles_fired
-	boss.call("_spawn_boss_projectile")
+	_fire_immediate_shot(boss)
 	_expect_eq(created.size(), 1, "%s %s shot creates exactly one delivery" % [support_name, _direction_name(direction_x)])
 	_expect_eq(boss.boss_projectiles_fired, fired_before + 1, "%s %s shot increments the counter once" % [support_name, _direction_name(direction_x)])
 	if created.is_empty():
@@ -93,9 +109,9 @@ func _verify_spawn(context: Dictionary, direction_x: float, support_top: float, 
 	_expect(shape != null and is_equal_approx(shape.radius, PROJECTILE_RADIUS), "%s %s shot keeps radius 13" % [support_name, _direction_name(direction_x)])
 	_expect_eq(projectile.blocking_collision_mask, 4, "%s %s shot keeps blocker mask 4" % [support_name, _direction_name(direction_x)])
 	_expect_eq(projectile.hurtbox_collision_mask, 16, "%s %s shot keeps hurtbox mask 16" % [support_name, _direction_name(direction_x)])
-	_expect(is_equal_approx(projectile.speed, PROJECTILE_SPEED), "%s %s shot keeps speed 255" % [support_name, _direction_name(direction_x)])
+	_expect(is_equal_approx(projectile.speed, PROJECTILE_SPEED), "%s %s shot keeps speed 320 (Task 61 ember-form profile)" % [support_name, _direction_name(direction_x)])
 	_expect(is_equal_approx(projectile.direction.x, direction_x) and is_zero_approx(projectile.direction.y), "%s %s shot preserves horizontal direction" % [support_name, _direction_name(direction_x)])
-	_expect(absf(projectile.global_position.x - (boss.global_position.x + direction_x * 58.0)) <= 0.01, "%s %s shot keeps horizontal spawn offset 58" % [support_name, _direction_name(direction_x)])
+	_expect(absf(projectile.global_position.x - (boss.global_position.x + direction_x * PROJECTILE_SPAWN_OFFSET)) <= 0.01, "%s %s shot keeps horizontal spawn offset 62 (Task 61 ember-form profile)" % [support_name, _direction_name(direction_x)])
 
 	var center_before := projectile.global_position
 	var blocker_hits := _blocker_overlaps(projectile)
@@ -126,6 +142,19 @@ func _verify_spawn(context: Dictionary, direction_x: float, support_top: float, 
 	_expect(events[&"finish_reason"] == DeliveryBase.FINISH_HIT or events[&"finish_reason"] == DeliveryBase.FINISH_BLOCKED, "%s %s shot ends through the normal hit/block lifecycle" % [support_name, _direction_name(direction_x)])
 	_expect_eq(events[&"finish_count"], 1, "%s %s shot finishes exactly once" % [support_name, _direction_name(direction_x)])
 	projectile.free()
+
+
+## Task 61 retires scripts/enemy.gd's terminal_enemy-gated
+## _spawn_boss_projectile() direct-call entry point (now owned entirely by
+## BossTideEmber's own _physics_process()). Reproduces the same
+## deterministic "fire now, no telegraph wait" behavior directly against the
+## still-generic _resolve_accurate_direction()/_apply_facing()/
+## _launch_ranged_projectile() methods shared with TidalSentry.
+func _fire_immediate_shot(boss: CombatEnemy) -> void:
+	var profile := boss.ranged_projectile_profile
+	var direction: Vector2 = boss.call("_resolve_accurate_direction", profile, boss.player.global_position)
+	boss.call("_apply_facing", direction)
+	boss.call("_launch_ranged_projectile", profile, direction, &"boss_arc")
 
 
 func _blocker_overlaps(projectile: ProjectileDelivery) -> Array[Dictionary]:
@@ -159,31 +188,16 @@ func _direction_name(direction_x: float) -> String:
 
 
 func _run_async_test(name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await callable.call()
-	if before == _failures.size():
-		print("PASS task51_" + name)
+	await _harness.run_test(name, callable)
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)
 
 
 func _expect_eq(actual: Variant, expected: Variant, description: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected %s, got %s)" % [description, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, description)
 
 
 func _finish() -> void:
-	if _failures.is_empty():
-		print("TASK 51 BOSS PROJECTILE SPAWN CLEARANCE TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("TASK 51 BOSS PROJECTILE SPAWN CLEARANCE TESTS FAILED: %d failures / %d assertions" % [_failures.size(), _assertions])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 51 BOSS PROJECTILE SPAWN CLEARANCE TESTS"))

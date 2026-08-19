@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const ROOM_SCENE: PackedScene = preload("res://scenes/test_room.tscn")
 const CATALOG: RunContentCatalog = preload(
 	"res://resources/content/run_content_catalog.tres"
@@ -11,9 +13,7 @@ const PROJECTILE_FRAMES: SpriteFrames = preload(
 	"res://resources/animations/element_projectile_frames.tres"
 )
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _room: Node2D
 var _player: PlayerCharacter
 var _enemy: CombatEnemy
@@ -57,20 +57,7 @@ func _run() -> void:
 	if is_instance_valid(_room):
 		_room.queue_free()
 	await process_frame
-	if _failures.is_empty():
-		print("TASK 18 SKILL VFX RUNTIME TESTS PASSED: %d tests, %d assertions" % [
-			_tests,
-			_assertions,
-		])
-		quit(0)
-	else:
-		printerr("TASK 18 SKILL VFX RUNTIME TESTS FAILED: %d failures / %d assertions" % [
-			_failures.size(),
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 18 SKILL VFX RUNTIME TESTS"))
 
 
 func _test_catalog_assets_and_pure_scenes() -> void:
@@ -121,7 +108,7 @@ func _test_catalog_assets_and_pure_scenes() -> void:
 	)
 	root.add_child(base_fury)
 	_expect(base_fury.play_burst(Vector2.ZERO, 96.0, ElementIds.WATER), "Fury accepts the frozen base radius")
-	_expect(is_equal_approx(base_fury.scale.x, 2.25), "Fury base radius 96 scales to 144 visual diameter")
+	_expect(is_equal_approx(base_fury.scale.x, 3.6), "Fury base radius 96 scales to 144 visual diameter")
 	base_fury.free()
 	var slash := CATALOG.content_for(&"element_slash")
 	_expect(
@@ -202,7 +189,7 @@ func _test_fury_authoritative_signal_and_lock() -> void:
 	_expect(first != null, "Fury signal creates the task-15 115.2-radius presentation")
 	_expect(
 		first != null
-		and is_equal_approx(first.scale.x, 2.7)
+		and is_equal_approx(first.scale.x, 4.32)
 		and first.locked_element_id == ElementIds.WATER,
 		"Fury task-15 scale and cast element remain locked"
 	)
@@ -217,7 +204,7 @@ func _test_fury_authoritative_signal_and_lock() -> void:
 	_expect(second != null, "Fury signal creates the 192-radius presentation")
 	_expect(
 		second != null
-		and is_equal_approx(second.scale.x, 4.5)
+		and is_equal_approx(second.scale.x, 7.2)
 		and second.locked_element_id == ElementIds.FIRE,
 		"Fury 192 scale and fire lock match the authoritative cast"
 	)
@@ -438,22 +425,12 @@ func _host_enemy_id(enemy: CombatEnemy) -> StringName:
 
 
 func _run_test(test_name: String, test_callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	test_callable.call()
-	if _failures.size() == before:
-		print("PASS ", test_name)
+	await _harness.run_test(test_name, test_callable)
 
 
 func _run_async_test(test_name: String, test_callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await test_callable.call()
-	if _failures.size() == before:
-		print("PASS ", test_name)
+	await _harness.run_test(test_name, test_callable)
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)

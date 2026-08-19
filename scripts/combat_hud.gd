@@ -48,6 +48,7 @@ var debug_result: Label
 var motion_state: Label
 var help_panel: PanelContainer
 var run_overlay
+var boss_panel: PanelContainer
 
 var _player: PlayerCharacter
 var _target: CombatEnemy
@@ -82,6 +83,12 @@ var _element_tween: Tween
 var _debug_elapsed: float = 0.0
 var _last_event_text: String = "等待战斗结果"
 var _pending_auto_change: ElementChangeResult
+var _boss_target: BossTideEmber
+var _boss_health_bar: ProgressBar
+var _boss_health_value: Label
+var _boss_form_label: Label
+var _boss_counter_bar: ProgressBar
+var _boss_counter_label: Label
 
 
 func _enter_tree() -> void:
@@ -139,6 +146,7 @@ func configure(
 	_refresh_target_elements()
 	_refresh_skill_status()
 	_refresh_debug()
+	_bind_boss_panel(_target)
 
 
 func rebind_target(target: CombatEnemy) -> void:
@@ -151,6 +159,7 @@ func rebind_target(target: CombatEnemy) -> void:
 	_connect_once(_target_carrier.elements_changed, _on_target_elements_changed)
 	_refresh_target_elements()
 	_refresh_debug()
+	_bind_boss_panel(_target)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -355,6 +364,59 @@ func _show_reject_feedback(result: CastAttemptResult) -> void:
 
 func _on_target_health_changed(_current: int, _maximum: int, _delta: int) -> void:
 	_refresh_debug()
+	_refresh_boss_health()
+
+
+## Task 61 §3.9: Boss health bar + form + counter progress. Purely additive
+## -- non-Boss targets (_target not a BossTideEmber) leave boss_panel hidden
+## and every existing HUD path (debug panel, target element text, etc.)
+## behaves exactly as before.
+func _bind_boss_panel(target: CombatEnemy) -> void:
+	if boss_panel == null:
+		return
+	var boss := target as BossTideEmber
+	_boss_target = boss
+	boss_panel.visible = boss != null
+	if boss == null:
+		return
+	if not boss.form_changed.is_connected(_on_boss_form_changed):
+		boss.form_changed.connect(_on_boss_form_changed)
+	if not boss.counter_progress_changed.is_connected(_on_boss_counter_progress_changed):
+		boss.counter_progress_changed.connect(_on_boss_counter_progress_changed)
+	_on_boss_form_changed(boss.current_form_id, boss.current_form.display_name)
+	_on_boss_counter_progress_changed(boss.counter_hits, boss.tuning.counter_hit_threshold)
+	_refresh_boss_health()
+
+
+func _on_boss_form_changed(form_id: StringName, display_name: String) -> void:
+	if _boss_form_label == null:
+		return
+	_boss_form_label.text = "形态：%s" % display_name
+	var color := UI.NEUTRAL
+	if form_id == &"ember":
+		color = _element_color(ElementIds.FIRE)
+	elif form_id == &"tide":
+		color = _element_color(ElementIds.WATER)
+	_boss_form_label.add_theme_color_override(&"font_color", color)
+
+
+func _on_boss_counter_progress_changed(hits: int, threshold: int) -> void:
+	if _boss_counter_bar == null:
+		return
+	_boss_counter_bar.max_value = maxi(1, threshold)
+	_boss_counter_bar.value = hits
+	_boss_counter_label.text = "克制进度 %d / %d" % [hits, threshold]
+
+
+func _refresh_boss_health() -> void:
+	if _boss_target == null or _boss_health_bar == null or not is_instance_valid(_boss_target):
+		return
+	var damage := _boss_target.damage_receiver
+	if damage == null:
+		return
+	_boss_health_bar.max_value = damage.maximum_health
+	_boss_health_bar.value = damage.current_health
+	_boss_health_value.text = "%3d / %3d" % [damage.current_health, damage.maximum_health]
 
 
 func _on_target_elements_changed(_current: ElementSnapshot, _water_delta: int, _fire_delta: int) -> void:
@@ -376,6 +438,10 @@ func _on_result_observed(result: CombatResult, receiver: CombatReceiver) -> void
 			result.water_delta,
 			result.fire_delta,
 		]
+		if result.mitigation_applied:
+			_show_feedback("同元素免伤 · 伤害大幅降低（%d）" % result.final_damage, &"mitigated")
+		elif result.reaction_triggered:
+			_show_feedback("反元素增伤 · ×%.1f（%d）" % [result.reaction_multiplier, result.final_damage], &"reaction")
 	else:
 		var target_name := String(receiver.target_team_id) if receiver != null else "unknown"
 		_last_event_text = "命中拒绝：%s / %s\n目标：%s" % [String(result.reject_code), String(result.reject_detail), target_name]
@@ -779,6 +845,8 @@ func _tone_color(tone: StringName) -> Color:
 		&"busy": return UI.BUSY
 		&"passive": return UI.WARNING
 		&"success": return UI.SUCCESS
+		&"mitigated": return UI.WARNING
+		&"reaction": return UI.SUCCESS
 		_: return UI.TEXT
 
 
@@ -839,6 +907,7 @@ func _build_ui() -> void:
 	_build_skill_panel(root_control)
 	_build_passive_panel(root_control)
 	_build_compatibility_slots(root_control)
+	_build_boss_panel(root_control)
 	_build_target_panel(root_control)
 	_build_feedback_panel(root_control)
 	_build_help_panel(root_control)
@@ -1195,6 +1264,73 @@ func _build_hud_slot(slot_id: StringName) -> PanelContainer:
 	meta.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	box.add_child(meta)
 	return panel
+
+
+## Task 61 §3.9: centered top-of-screen strip, anchored/scaled with the
+## logical 1152x648 canvas like every other panel here -- never raw physical
+## window coordinates. Hidden until a BossTideEmber target binds.
+func _build_boss_panel(parent: Control) -> void:
+	var panel := PanelContainer.new()
+	panel.name = "BossPanel"
+	panel.visible = false
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	panel.position = Vector2(-260, 16)
+	panel.size = Vector2(520, 90)
+	panel.add_theme_stylebox_override(&"panel", UI.panel(Color(0.035, 0.045, 0.075, 0.94), UI.BORDER_FOCUS, 8, 2))
+	parent.add_child(panel)
+	var margin := _margin("Margin", 14, 10)
+	panel.add_child(margin)
+	var box := VBoxContainer.new()
+	box.name = "Box"
+	box.add_theme_constant_override(&"separation", 4)
+	margin.add_child(box)
+	var title_row := HBoxContainer.new()
+	title_row.name = "TitleRow"
+	box.add_child(title_row)
+	var name_label := _make_label("Name", "熔汐之王", 16, UI.TEXT)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_row.add_child(name_label)
+	var form_label := _make_label("Form", "形态：熔炽", 14, UI.FIRE)
+	title_row.add_child(form_label)
+	var health_row := HBoxContainer.new()
+	health_row.name = "HealthRow"
+	health_row.add_theme_constant_override(&"separation", 8)
+	box.add_child(health_row)
+	var health_bar := ProgressBar.new()
+	health_bar.name = "HealthBar"
+	health_bar.custom_minimum_size = Vector2(380, 18)
+	health_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	health_bar.show_percentage = false
+	health_bar.add_theme_stylebox_override(&"background", UI.flat_panel(Color("070b13"), UI.BORDER, 3, 1))
+	health_bar.add_theme_stylebox_override(&"fill", UI.flat_panel(Color("dc4658"), Color("dc4658"), 3, 0))
+	health_row.add_child(health_bar)
+	var health_value := _make_label("HealthValue", "280 / 280", 12, UI.TEXT)
+	health_value.custom_minimum_size.x = 90
+	health_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	health_row.add_child(health_value)
+	var counter_row := HBoxContainer.new()
+	counter_row.name = "CounterRow"
+	counter_row.add_theme_constant_override(&"separation", 8)
+	box.add_child(counter_row)
+	var counter_bar := ProgressBar.new()
+	counter_bar.name = "CounterBar"
+	counter_bar.custom_minimum_size = Vector2(380, 10)
+	counter_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	counter_bar.show_percentage = false
+	counter_bar.add_theme_stylebox_override(&"background", UI.flat_panel(Color("070b13"), UI.BORDER, 3, 1))
+	counter_bar.add_theme_stylebox_override(&"fill", UI.flat_panel(UI.WATER, UI.WATER, 3, 0))
+	counter_row.add_child(counter_bar)
+	var counter_label := _make_label("CounterLabel", "克制进度 0 / 15", 12, UI.TEXT_MUTED)
+	counter_label.custom_minimum_size.x = 90
+	counter_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	counter_row.add_child(counter_label)
+	boss_panel = panel
+	_boss_health_bar = health_bar
+	_boss_health_value = health_value
+	_boss_form_label = form_label
+	_boss_counter_bar = counter_bar
+	_boss_counter_label = counter_label
 
 
 func _build_target_panel(parent: Control) -> void:

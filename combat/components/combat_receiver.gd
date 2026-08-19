@@ -120,6 +120,7 @@ func _build_plan(
 ) -> CombatPlan:
 	var plan := CombatPlan.new(request)
 	var reaction_multiplier := 1.0
+	var mitigation_factor := 1.0
 
 	if carrier != null:
 		var carrier_snapshot := carrier.snapshot()
@@ -131,12 +132,14 @@ func _build_plan(
 		)
 		plan.element_status = plan.element_resolution.status
 		reaction_multiplier = plan.element_resolution.reaction_multiplier
+		mitigation_factor = _resolve_same_element_mitigation(carrier, carrier_snapshot, request.payload)
 
 	if damage != null:
 		plan.damage_resolution = DamageResolver.resolve(
 			request.payload.offensive_damage,
 			reaction_multiplier,
-			damage.defense_flat
+			damage.defense_flat,
+			mitigation_factor
 		)
 		plan.health_before = damage.current_health
 		plan.maximum_health = damage.maximum_health
@@ -146,6 +149,35 @@ func _build_plan(
 			plan.damage_status = CombatStatus.SubResult.APPLIED
 
 	return plan
+
+
+## Task 61 §3.6 wiring. Same-element mitigation must be computed in
+## DamageResolver, but DamageResolver is a stateless pure function that never
+## sees a target node or a pre-commit element snapshot -- only this function
+## has both, at the exact point reaction_multiplier is already being read out
+## of the (also pure) WaterFireResolver result. A target opts in by setting
+## the engine-native Node metadata key "same_element_mitigation_factor"
+## (no change to ElementCarrier's script, no effect on any carrier that does
+## not set it -- i.e. every non-Boss entity in the game is untouched).
+## Mitigation applies only when the incoming element already had a non-zero
+## PRE-COMMIT amount on this exact carrier: that is the definition of "the
+## target was already wearing this element as armor" (a same-element hit),
+## as opposed to a first-time attachment onto an empty/NONE-form carrier.
+static func _resolve_same_element_mitigation(
+		carrier: ElementCarrier,
+		carrier_snapshot: ElementSnapshot,
+		payload: RuntimeAttackPayload
+) -> float:
+	if not carrier.has_meta(&"same_element_mitigation_factor"):
+		return 1.0
+	if payload == null or not ElementIds.is_combat_element(payload.element_id):
+		return 1.0
+	if carrier_snapshot == null or carrier_snapshot.get_amount(payload.element_id) <= 0:
+		return 1.0
+	var factor: float = carrier.get_meta(&"same_element_mitigation_factor")
+	if not is_finite(factor) or factor <= 0.0 or factor > 1.0:
+		return 1.0
+	return factor
 
 
 func _can_commit(

@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const RUN_GAME: PackedScene = preload("res://scenes/run/run_game.tscn")
 const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
@@ -31,9 +33,7 @@ const FORMAL_ASSETS := {
 	},
 }
 
-var _tests := 0
-var _assertions := 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _hit_sequence := 58_000_000
 
 
@@ -409,45 +409,24 @@ func _runtime_old_asset_references(path: String) -> Array[String]:
 
 
 func _run_test(name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if before == _failures.size():
-		print("PASS task58_" + name)
+	await _harness.run_test(name, callable)
 
 
 func _run_async_test(name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await callable.call()
-	if before == _failures.size():
-		print("PASS task58_" + name)
+	await _harness.run_test(name, callable)
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)
 
 
 func _expect_eq(actual: Variant, expected: Variant, description: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected %s, got %s)" % [description, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, description)
 
 
 func _expect_near(actual: float, expected: float, tolerance: float, description: String) -> void:
-	_assertions += 1
-	if absf(actual - expected) > tolerance:
-		_failures.append("%s (expected %.3f +/- %.3f, got %.3f)" % [description, expected, tolerance, actual])
+	_harness.expect_near(actual, expected, tolerance, description)
 
 
 func _finish() -> void:
-	if _failures.is_empty():
-		print("TASK 58 FORMAL INTERACTABLES CROWN SENTRY TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("TASK 58 FORMAL INTERACTABLES CROWN SENTRY TESTS FAILED: %d failures / %d assertions" % [_failures.size(), _assertions])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 58 FORMAL INTERACTABLES CROWN SENTRY TESTS"))

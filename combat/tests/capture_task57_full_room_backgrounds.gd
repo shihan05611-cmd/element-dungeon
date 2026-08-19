@@ -76,7 +76,9 @@ func _run() -> void:
 	boss.player = _coordinator.player
 	var first_delivery: Array[Node] = []
 	boss.delivery_created.connect(func(delivery: Node) -> void: first_delivery.append(delivery), CONNECT_ONE_SHOT)
-	boss.call("_spawn_boss_projectile")
+	var boss_direction: Vector2 = boss.call("_resolve_accurate_direction", boss.ranged_projectile_profile, boss.player.global_position)
+	boss.call("_apply_facing", boss_direction)
+	boss.call("_launch_ranged_projectile", boss.ranged_projectile_profile, boss_direction, &"boss_arc")
 	await physics_frame
 	_assert(first_delivery.size() == 1 and boss.boss_projectiles_fired >= 1, "Boss evidence proves a live main-ground projectile")
 	_assert(await _wait_until(func() -> bool:
@@ -84,7 +86,9 @@ func _run() -> void:
 	, 360, true), "Boss projectile completes its normal main-ground lifecycle")
 	await create_timer(1.2).timeout
 	_coordinator.player.global_position = boss.global_position + Vector2(-320, 0)
-	boss.call("_spawn_boss_projectile")
+	var second_boss_direction: Vector2 = boss.call("_resolve_accurate_direction", boss.ranged_projectile_profile, boss.player.global_position)
+	boss.call("_apply_facing", second_boss_direction)
+	boss.call("_launch_ranged_projectile", boss.ranged_projectile_profile, second_boss_direction, &"boss_arc")
 	await physics_frame
 	await _settle()
 	await _save("task57_06_boss_main_ground_no_dais_1920x1080.png")

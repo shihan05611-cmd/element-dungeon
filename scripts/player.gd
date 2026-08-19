@@ -19,6 +19,8 @@ const DODGE_DISTANCE_IN_BODY_WIDTHS := 5.0
 const PLAYER_BODY_COLLISION_LAYER := 1
 const ENEMY_BODY_COLLISION_LAYER := 2
 const WORLD_BLOCKER_COLLISION_LAYER := 3
+const PLAYER_HURTBOX_COLLISION_LAYER := 5
+const GLOBAL_INSTAKILL_SKILL_ID: StringName = &"global_instakill"
 const ELEMENT_BEAM_DELIVERY_SCRIPT := preload(
 	"res://combat/delivery/element_beam_delivery.gd"
 )
@@ -36,6 +38,7 @@ const ELEMENT_BEAM_DELIVERY_SCRIPT := preload(
 @onready var skill_executor: SkillExecutor = $SkillExecutor
 @onready var skill_controller: SkillController = $SkillController
 @onready var body_collision: CollisionShape2D = $BodyCollision
+@onready var combat_hurtbox: Area2D = $CombatHurtbox
 
 var facing: float = 1.0
 var hurt_time: float = 0.0
@@ -65,6 +68,11 @@ var _dodge_saved_sprite_modulate := Color.WHITE
 var _dodge_has_saved_visual: bool = false
 var _dodge_saved_velocity := Vector2.ZERO
 var _dodge_has_saved_velocity: bool = false
+var _dodge_saved_hurtbox_collision_layer: int = 0
+var _dodge_has_saved_hurtbox_collision_layer: bool = false
+
+static var _last_global_instakill_cast_id: int = 3_000_000_000
+
 
 func _ready() -> void:
 	add_to_group(&"player")
@@ -105,6 +113,10 @@ func _notification(what: int) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if defeated:
+		return
+	if event.is_action_pressed(&"global_instakill"):
+		release_global_instakill()
+		get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed(&"dodge"):
 		_try_start_dodge()
@@ -250,6 +262,93 @@ func release_channel_for_slot(slot_id: StringName) -> bool:
 	)
 
 
+func release_global_instakill() -> int:
+	var candidates := get_tree().get_nodes_in_group(&"enemies")
+	var instakill_damage := 0.0
+	for node: Node in candidates:
+		var enemy := node as CombatEnemy
+		if not _is_live_instakill_target(enemy):
+			continue
+		instakill_damage = maxf(
+			instakill_damage,
+			float(enemy.damage_receiver.current_health) + enemy.damage_receiver.defense_flat + 1.0
+		)
+	if instakill_damage <= 0.0:
+		return 0
+
+	_last_global_instakill_cast_id += 1
+	var stats := CombatStatSnapshot.new(
+		instakill_damage / CombatStatSnapshot.BASE_ATTACK,
+		0.0
+	)
+	var cast_snapshot := CastSnapshot.new(
+		_last_global_instakill_cast_id,
+		GLOBAL_INSTAKILL_SKILL_ID,
+		get_instance_id(),
+		get_instance_id(),
+		&"player",
+		ElementIds.NONE,
+		stats
+	)
+	var payload := RuntimeAttackPayload.from_locked_stats(
+		stats,
+		1.0,
+		ElementIds.NONE,
+		0,
+		PackedStringArray(["global_instakill"])
+	)
+	var defeated_count := 0
+	var hit_index := 0
+	# A room may reveal its reinforcement wave synchronously when the initial
+	# wave dies. Re-scan the captured room nodes so one T press clears both.
+	for _pass: int in range(candidates.size() + 1):
+		var pass_defeated := 0
+		for node: Node in candidates:
+			var enemy := node as CombatEnemy
+			if not _is_active_instakill_target(enemy):
+				continue
+			var direction := enemy.global_position - global_position
+			if direction.is_zero_approx():
+				direction = Vector2.RIGHT
+			else:
+				direction = direction.normalized()
+			var request := HitRequest.new(
+				cast_snapshot,
+				payload,
+				_last_global_instakill_cast_id,
+				hit_index,
+				enemy.global_position,
+				direction
+			)
+			hit_index += 1
+			var result := enemy.combat_receiver.receive_hit(request)
+			if result != null and result.accepted and enemy.defeated:
+				defeated_count += 1
+				pass_defeated += 1
+		if pass_defeated == 0:
+			break
+	return defeated_count
+
+
+func _is_live_instakill_target(enemy: CombatEnemy) -> bool:
+	return (
+		enemy != null
+		and is_instance_valid(enemy)
+		and not enemy.is_queued_for_deletion()
+		and not enemy.defeated
+		and enemy.damage_receiver != null
+		and enemy.combat_receiver != null
+	)
+
+
+func _is_active_instakill_target(enemy: CombatEnemy) -> bool:
+	return (
+		_is_live_instakill_target(enemy)
+		and enemy.is_visible_in_tree()
+		and enemy.combat_receiver.accepting_hits
+	)
+
+
 func publish_basic_attack_commit(
 		result: CombatResult,
 		target_id: StringName,
@@ -365,7 +464,6 @@ func _try_start_dodge() -> bool:
 		or defeated
 		or hurt_time > 0.0
 		or _dodge_cooldown_remaining > 0.0
-		or not is_on_floor()
 		or skill_executor == null
 		or skill_executor.current_phase != SkillExecutor.Phase.IDLE
 	):
@@ -397,6 +495,10 @@ func _try_start_dodge() -> bool:
 	set_collision_layer_value(PLAYER_BODY_COLLISION_LAYER, false)
 	set_collision_mask_value(ENEMY_BODY_COLLISION_LAYER, false)
 	set_collision_mask_value(WORLD_BLOCKER_COLLISION_LAYER, true)
+	if combat_hurtbox != null:
+		_dodge_saved_hurtbox_collision_layer = combat_hurtbox.collision_layer
+		_dodge_has_saved_hurtbox_collision_layer = true
+		combat_hurtbox.set_collision_layer_value(PLAYER_HURTBOX_COLLISION_LAYER, false)
 	_start_dodge_visual()
 	return true
 
@@ -439,6 +541,10 @@ func _finish_dodge(start_cooldown: bool = true, resume_presentation: bool = true
 	if _dodge_has_saved_velocity:
 		velocity = _dodge_saved_velocity
 		_dodge_has_saved_velocity = false
+	if _dodge_has_saved_hurtbox_collision_layer:
+		if combat_hurtbox != null:
+			combat_hurtbox.collision_layer = _dodge_saved_hurtbox_collision_layer
+		_dodge_has_saved_hurtbox_collision_layer = false
 	if was_dodging and start_cooldown:
 		_dodge_cooldown_remaining = DODGE_COOLDOWN
 	if was_dodging and resume_presentation and is_inside_tree():

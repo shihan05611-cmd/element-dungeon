@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 
 class RecordingOwnerPort:
 	extends PassiveOwnerPort
@@ -46,9 +48,7 @@ class RecordingTargetPort:
 		return true
 
 
-var _failures: Array[String] = []
-var _tests: int = 0
-var _assertions: int = 0
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -63,26 +63,11 @@ func _run_all() -> void:
 	_run("passive_runtime_lifecycle", _test_passive_runtime_lifecycle)
 	_run("formal_stat_passive_resources", _test_formal_stat_passive_resources)
 
-	if _failures.is_empty():
-		print("TASK 14 PASSIVE TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("TASK 14 PASSIVE TESTS FAILED: %d/%d tests, %d assertions" % [
-			_failures.size(),
-			_tests,
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 14 PASSIVE TESTS"))
 
 
 func _run(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if _failures.size() == before:
-		print("PASS: " + test_name)
+	await _harness.run_test(test_name, callable)
 
 
 func _test_burning_exact_tick_and_fire_layers() -> void:
@@ -264,18 +249,12 @@ func _test_formal_stat_passive_resources() -> void:
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected=%s, actual=%s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)
 
 
 func _expect_float(actual: float, expected: float, message: String) -> void:
-	_assertions += 1
-	if not is_equal_approx(actual, expected):
-		_failures.append("%s (expected=%s, actual=%s)" % [message, str(expected), str(actual)])
+	_harness.expect_float(actual, expected, message)

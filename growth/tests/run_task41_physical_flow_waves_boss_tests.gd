@@ -1,13 +1,13 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const RUN_GAME: PackedScene = preload("res://scenes/run/run_game.tscn")
 const BOSS_PROJECTILE: PackedScene = preload("res://scenes/run/boss_arc_projectile.tscn")
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _hit_sequence: int = 41_000_000
 
 
@@ -190,11 +190,18 @@ func _test_physical_safe_path_and_boss_settlement() -> void:
 	await _clear_claim_and_portal(coordinator, &"combat_04_validation")
 	_expect(await _wait_combat(coordinator, &"combat_06_final_boss"), "C3 portal loads boss directly")
 	var boss := coordinator.active_room.enemies[0]
-	_expect(is_equal_approx(boss.boss_visual_scale, 1.7) and boss.get_node_or_null("BossPurpleOutline") != null, "boss is 1.7x with purple outline")
+	# Task 61 retires the placeholder CombatEnemy + runtime 1.7x scale/purple
+	# outline hack in favor of a dedicated BossTideEmber with real, larger
+	# (200x200 at 2x) art -- the old placeholder-specific assertion here no
+	# longer applies to any real Boss room instance.
+	_expect(boss is BossTideEmber, "the formal Boss room spawns the dedicated BossTideEmber class")
+	_expect(boss.terminal_enemy, "the Boss keeps terminal_enemy=true as the pure data flag growth/flow reward and kill-event logic depends on")
 	boss.player = coordinator.player
 	coordinator.player.global_position = boss.global_position + Vector2(-320.0, 0.0)
 	var fired_before := boss.boss_projectiles_fired
-	boss.call("_spawn_boss_projectile")
+	var boss_direction: Vector2 = boss.call("_resolve_accurate_direction", boss.ranged_projectile_profile, boss.player.global_position)
+	boss.call("_apply_facing", boss_direction)
+	boss.call("_launch_ranged_projectile", boss.ranged_projectile_profile, boss_direction, &"boss_arc")
 	await process_frame
 	var projectile := BOSS_PROJECTILE.instantiate() as ProjectileDelivery
 	_expect(boss.boss_projectiles_fired == fired_before + 1 and projectile != null, "boss fires the existing ProjectileDelivery scene")
@@ -320,39 +327,20 @@ func _authority_signature(snapshot: RunSnapshot) -> Array:
 
 
 func _run_test(name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if before == _failures.size():
-		print("PASS task41_" + name)
+	await _harness.run_test(name, callable)
 
 
 func _run_async_test(name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await callable.call()
-	if before == _failures.size():
-		print("PASS task41_" + name)
+	await _harness.run_test(name, callable)
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)
 
 
 func _expect_eq(actual: Variant, expected: Variant, description: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected %s, got %s)" % [description, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, description)
 
 
 func _finish() -> void:
-	if _failures.is_empty():
-		print("TASK 41 PHYSICAL FLOW WAVES BOSS TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("TASK 41 PHYSICAL FLOW WAVES BOSS TESTS FAILED: %d failures / %d assertions" % [_failures.size(), _assertions])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 41 PHYSICAL FLOW WAVES BOSS TESTS"))

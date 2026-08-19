@@ -1,11 +1,11 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 ## Dependency-free headless test entry point:
 ## Godot --headless --path <project> --script res://combat/tests/run_combat_tests.gd
 
-var _failures: Array[String] = []
-var _assertions: int = 0
-var _tests: int = 0
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -37,39 +37,23 @@ func _initialize() -> void:
 	_run("queued_target_is_rejected", _test_queued_target_is_rejected)
 	_run("shared_resources_do_not_share_runtime_state", _test_shared_resources_do_not_share_runtime_state)
 
-	if _failures.is_empty():
-		print("COMBAT TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("COMBAT TESTS FAILED: %d/%d tests, %d assertions" % [_failures.size(), _tests, _assertions])
-		for failure in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("COMBAT TESTS"))
 
 
 func _run(test_name: String, test_callable: Callable) -> void:
-	_tests += 1
-	var failure_count := _failures.size()
-	test_callable.call()
-	if _failures.size() == failure_count:
-		print("PASS " + test_name)
-	else:
-		for index in range(failure_count, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, test_callable)
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (expected %s, got %s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)
 
 
 func _expect_float(actual: float, expected: float, message: String) -> void:
-	_expect(is_equal_approx(actual, expected), "%s (expected %s, got %s)" % [message, expected, actual])
+	_harness.expect_float(actual, expected, message)
 
 
 func _payload(element_id: StringName, amount: int, damage: float = 10.0) -> RuntimeAttackPayload:

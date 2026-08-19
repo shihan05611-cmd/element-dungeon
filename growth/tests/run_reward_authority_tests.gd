@@ -1,23 +1,17 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 ## Regression coverage for untrusted RoomRewardContext bypass attempts.
 
-var _failures: Array[String] = []
-var _assertions: int = 0
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
 	_test_first_room_hint_cannot_bypass_three_skill_rule()
 	_test_selected_relic_route_rejects_skill_request()
 	_test_pure_generator_rejects_authoritative_route_mismatch()
-	if _failures.is_empty():
-		print("REWARD AUTHORITY TESTS PASSED: 3 tests, %d assertions" % _assertions)
-		quit(0)
-	else:
-		printerr("REWARD AUTHORITY TESTS FAILED: %d failures, %d assertions" % [_failures.size(), _assertions])
-		for failure in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("REWARD AUTHORITY TESTS", 3))
 
 
 func _test_first_room_hint_cannot_bypass_three_skill_rule() -> void:
@@ -115,12 +109,8 @@ func _make_relic_catalog() -> Array[RelicDefinition]:
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected=%s, actual=%s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)

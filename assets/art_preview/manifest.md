@@ -1,13 +1,13 @@
 # 美术试制资产清单
 
-状态：宝箱、传送门与潮汐地牢瓦片视觉母版已冻结采纳；仍未接入游戏。场景图保持 PREVIEW ONLY。
+状态：宝箱、传送门母版保持冻结采纳；地图/瓦片方向已被用户退回，仅作历史追溯，禁止作为运行地图或新任务实现输入。场景图保持 REJECTED PREVIEW ONLY。
 
 | 文件 | 尺寸 | 模式 | 用途 | SHA-256 |
 |---|---:|---|---|---|
 | `world_objects/chest_states_v2.png` | 1448×1086 | RGBA | **FINAL SELECTED MASTER**；关闭/开启宝箱母版 | `DF6934951CA303FC8144237C8B157BC8DF517B772F4ECBE58ECDF3D2F9517DA9` |
 | `world_objects/portal_states_v2.png` | 1448×1086 | RGBA | **FINAL SELECTED MASTER**；锁定/激活传送门母版 | `8E6E6D190B4D1967CF407C7FC64D8DE12083E668656FF7ED1291A554F6990F40` |
-| `tiles/dungeon_tileset_v1.png` | 1254×1254 | RGBA | **FINAL SELECTED VISUAL MASTER**；4×4 地牢瓦片视觉母版，待精确整理为32×32 atlas | `44508C796CD7D4D4D5DE7F181F84A51F382C7E208604103033268E659EE7E8D6` |
-| `scene_preview/tidal_dungeon_room_v1.png` | 1672×941 | RGB | 与现有水形态主角、敌人共同展示的房间预览 | `D772F1D3E19E75F0FC21C3C3516D736E3A282942036048FD672FC3ADAC307D65` |
+| `tiles/dungeon_tileset_v1.png` | 1254×1254 | RGBA | **HISTORICAL REFERENCE ONLY**；不得整理、恢复或接入 TileSet | `44508C796CD7D4D4D5DE7F181F84A51F382C7E208604103033268E659EE7E8D6` |
+| `scene_preview/tidal_dungeon_room_v1.png` | 1672×941 | RGB | **REJECTED PREVIEW ONLY**；不得作为地图构图或运行资产 | `D772F1D3E19E75F0FC21C3C3516D736E3A282942036048FD672FC3ADAC307D65` |
 
 ## 设计改进摘要
 
@@ -35,12 +35,12 @@
 
 ## 重要限制
 
-宝箱、传送门和瓦片视觉方向已经正式选定，但母版仍不是可直接接线的运行资产：
+宝箱、传送门视觉方向保持选定；瓦片和地图预览已被用户后续决定退回：
 
 - 宝箱和传送门尚未切成独立状态图，也未压到推荐逻辑尺寸；正式生产规格见 `docs/art/宝箱与传送门正式采纳交接清单.md`；
-- 瓦片图展示 4×4 内容集合，但单格边界尚未通过精确 32×32 切片与无缝拼接测试；正式结构见 `docs/art/潮汐地牢_TileSet美术交付合同.md`；
+- 瓦片图和历史合同仅用于追溯；不得再创建 32×32 atlas、TileSet 或 TileMapLayer；
 - 接触阴影目前包含在概念主体中，正式版需要根据地面层级决定是否拆层；
 - 场景预览是风格合成图，不代表实际游戏截图、碰撞尺寸或最终房间布局；
 - 未修改任何正式 PNG、场景、脚本、资源或项目设置。
 
-确认方向后，下一阶段应在 Aseprite 等像素工具中完成目标尺寸重绘、逐帧对齐、瓦片边界清理和 Godot 冷副本导入验证。
+地图下一阶段等待用户亲自绘制的房间构图草案；在收到并重新对齐前，不创建任何地图运行资产或工程任务。

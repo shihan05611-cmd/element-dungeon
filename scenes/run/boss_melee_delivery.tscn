@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://combat/delivery/delayed_area_delivery.gd" id="1_delayed"]
+
+[sub_resource type="RectangleShape2D" id="MeleeShape"]
+size = Vector2(100, 70)
+
+[node name="BossMeleeDelivery" type="Node2D"]
+script = ExtResource("1_delayed")
+hit_shape = SubResource("MeleeShape")
+hurtbox_collision_mask = 16
+query_offset = Vector2(50, 0)
+trigger_delay = 0.4
+active_duration = 0.14

@@ -75,13 +75,19 @@ func _run() -> void:
 	root.size = Vector2i(2560, 1440)
 	room = _coordinator.active_room
 	var boss := room.enemies[0]
-	assert(is_equal_approx(boss.boss_visual_scale, 1.7) and boss.get_node_or_null("BossPurpleOutline") != null)
+	# Task 61 retires the placeholder CombatEnemy + runtime 1.7x scale/purple
+	# outline hack in favor of a dedicated BossTideEmber with real, larger
+	# (200x200 at 2x) art; the old placeholder-specific assertion no longer
+	# applies to any real Boss room instance.
+	assert(boss is BossTideEmber)
 	boss.ai_enabled = false
 	await _wait_frames(90)
 	await _capture("task41_07_boss_purple_outline_2560x1440.png", Vector2i(2560, 1440))
 	boss.player = _coordinator.player
 	_coordinator.player.global_position = boss.global_position + Vector2(-320.0, 0.0)
-	boss.call("_spawn_boss_projectile")
+	var boss_direction: Vector2 = boss.call("_resolve_accurate_direction", boss.ranged_projectile_profile, boss.player.global_position)
+	boss.call("_apply_facing", boss_direction)
+	boss.call("_launch_ranged_projectile", boss.ranged_projectile_profile, boss_direction, &"boss_arc")
 	await process_frame
 	assert(boss.boss_projectiles_fired >= 1 and _first_projectile() != null)
 	await _capture("task41_08_boss_low_projectile_jump_path_2560x1440.png", Vector2i(2560, 1440))

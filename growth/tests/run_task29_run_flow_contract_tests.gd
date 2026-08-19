@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const FLOW: RunFlowDefinition = preload(
 	"res://resources/run/flows/prototype_five_stage_demo.tres"
 )
@@ -7,9 +9,7 @@ const CATALOG: RunContentCatalog = preload(
 	"res://resources/content/run_content_catalog.tres"
 )
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _command_sequence: int = 0
 var _room_instance_sequence: int = 1000
 
@@ -22,31 +22,11 @@ func _initialize() -> void:
 	_run("scene_transition_failure_atomic", _test_scene_transition_failure_atomic)
 	_run("death_and_repeated_result_are_terminal", _test_death_and_repeated_result_are_terminal)
 
-	if _failures.is_empty():
-		print("TASK 29 RUN FLOW CONTRACT TESTS PASSED: %d tests, %d assertions" % [
-			_tests,
-			_assertions,
-		])
-		quit(0)
-	else:
-		printerr("TASK 29 RUN FLOW CONTRACT TESTS FAILED: %d failures / %d assertions" % [
-			_failures.size(),
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 29 RUN FLOW CONTRACT TESTS"))
 
 
 func _run(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if _failures.size() == before:
-		print("PASS task29_" + test_name)
-	else:
-		for index: int in range(before, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, callable)
 
 
 func _test_flow_graph_and_route_targets() -> void:
@@ -309,12 +289,8 @@ func _next_command(prefix: StringName) -> StringName:
 
 
 func _expect(condition: bool, description: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(description)
+	_harness.expect(condition, description)
 
 
 func _expect_eq(actual: Variant, expected: Variant, description: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected %s, got %s)" % [description, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, description)

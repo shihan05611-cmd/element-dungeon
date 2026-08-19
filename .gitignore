@@ -6,3 +6,4 @@
 .workbuddy/
 __pycache__/
 *.py[cod]
+tmp/

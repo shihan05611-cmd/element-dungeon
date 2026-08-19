@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const RECORDING_DELIVERY: PackedScene = preload("res://combat/tests/recording_skill_delivery.tscn")
 
 
@@ -42,9 +44,7 @@ class Rig:
 			host.free()
 
 
-var _failures: Array[String] = []
-var _assertions: int = 0
-var _tests: int = 0
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -81,29 +81,11 @@ func _run_all() -> void:
 	_run("cast_started_reentry_is_busy", _test_cast_started_reentry_is_busy)
 	_run("large_delta_spawns_once_and_finishes", _test_large_delta_spawns_once_and_finishes)
 
-	if _failures.is_empty():
-		print("AGENT B SKILL TESTS PASSED: %d tests, %d assertions" % [_tests, _assertions])
-		quit(0)
-	else:
-		printerr("AGENT B SKILL TESTS FAILED: %d/%d tests, %d assertions" % [
-			_failures.size(),
-			_tests,
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("AGENT B SKILL TESTS"))
 
 
 func _run(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if _failures.size() == before:
-		print("PASS: " + test_name)
-	else:
-		for index in range(before, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, callable)
 
 
 func _test_static_skill_dimensions() -> void:
@@ -798,12 +780,8 @@ func _unique_count(values: Array[StringName]) -> int:
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_assertions += 1
-	if actual != expected:
-		_failures.append("%s (expected=%s, actual=%s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)

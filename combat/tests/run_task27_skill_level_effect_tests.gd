@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const ROOM_SCENE: PackedScene = preload("res://scenes/test_room.tscn")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 
@@ -18,9 +20,7 @@ class MutableEffectPort:
 		return effects.get(skill_id, ActiveSkillLevelEffectSnapshot.neutral(skill_id))
 
 
-var _tests: int = 0
-var _assertions: int = 0
-var _failures: Array[String] = []
+var _harness := TestHarness.new()
 var _room: Node2D
 var _player: PlayerCharacter
 var _enemy: CombatEnemy
@@ -61,20 +61,7 @@ func _run() -> void:
 	if is_instance_valid(_room):
 		_room.queue_free()
 	await process_frame
-	if _failures.is_empty():
-		print("TASK 27 SKILL LEVEL EFFECT TESTS PASSED: %d tests, %d assertions" % [
-			_tests,
-			_assertions,
-		])
-		quit(0)
-	else:
-		printerr("TASK 27 SKILL LEVEL EFFECT TESTS FAILED: %d failures / %d assertions" % [
-			_failures.size(),
-			_assertions,
-		])
-		for failure: String in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 27 SKILL LEVEL EFFECT TESTS"))
 
 
 func _test_missing_port_and_unconfigured_content_are_neutral() -> void:
@@ -331,32 +318,16 @@ func _reset_cast() -> void:
 
 
 func _run_test(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	callable.call()
-	if _failures.size() == before:
-		print("PASS: " + test_name)
-	else:
-		for index: int in range(before, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, callable)
 
 
 func _run_async_test(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await callable.call()
-	if _failures.size() == before:
-		print("PASS: " + test_name)
-	else:
-		for index: int in range(before, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, callable)
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (actual=%s expected=%s)" % [message, str(actual), str(expected)])
+	_harness.expect_eq(actual, expected, message)

@@ -1,5 +1,7 @@
 extends SceneTree
 
+const TestHarness := preload("res://combat/tests/test_harness.gd")
+
 const PROFILE: ProjectileSweepProfile2D = preload(
 	"res://resources/combat/element_projectile_sweep_profile.tres"
 )
@@ -139,9 +141,7 @@ class FuryRig:
 			detached_parent.free()
 
 
-var _failures: Array[String] = []
-var _tests: int = 0
-var _assertions: int = 0
+var _harness := TestHarness.new()
 
 
 func _initialize() -> void:
@@ -161,32 +161,11 @@ func _run_all() -> void:
 	await _run_test("ordinary_projectile_friend_signal_and_cleanup_semantics", _test_projectile_legacy_semantics)
 	await _run_test("real_fury_hits_once_without_flight_node", _test_real_fury_transaction)
 
-	if _failures.is_empty():
-		print("TASK 34 PROJECTILE CAST TRANSACTION TESTS PASSED: %d tests, %d assertions" % [
-			_tests,
-			_assertions,
-		])
-		quit(0)
-	else:
-		printerr("TASK 34 PROJECTILE CAST TRANSACTION TESTS FAILED: %d/%d tests, %d assertions" % [
-			_failures.size(),
-			_tests,
-			_assertions,
-		])
-		for failure in _failures:
-			printerr("  - " + failure)
-		quit(1)
+	quit(_harness.report("TASK 34 PROJECTILE CAST TRANSACTION TESTS"))
 
 
 func _run_test(test_name: String, callable: Callable) -> void:
-	_tests += 1
-	var before := _failures.size()
-	await callable.call()
-	if _failures.size() == before:
-		print("PASS " + test_name)
-	else:
-		for index in range(before, _failures.size()):
-			_failures[index] = test_name + ": " + _failures[index]
+	await _harness.run_test(test_name, callable)
 
 
 func _test_fake_enemy_commits_once_at_locked_impact() -> void:
@@ -774,14 +753,12 @@ func _payload() -> RuntimeAttackPayload:
 
 
 func _expect(condition: bool, message: String) -> void:
-	_assertions += 1
-	if not condition:
-		_failures.append(message)
+	_harness.expect(condition, message)
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:
-	_expect(actual == expected, "%s (expected %s, got %s)" % [message, str(expected), str(actual)])
+	_harness.expect_eq(actual, expected, message)
 
 
 func _expect_float(actual: float, expected: float, message: String) -> void:
-	_expect(is_equal_approx(actual, expected), "%s (expected %.6f, got %.6f)" % [message, expected, actual])
+	_harness.expect_float(actual, expected, message)
