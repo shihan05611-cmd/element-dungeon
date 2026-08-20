@@ -1,0 +1,205 @@
+{
+  "frame_0": {
+    "bbox": [
+      42,
+      42,
+      62,
+      57
+    ],
+    "out_of_crop_box": false,
+    "opaque_px_total": 189,
+    "partial_alpha_px_total": 0,
+    "opaque_px_outside_crop_box": 0
+  },
+  "frame_1": {
+    "bbox": [
+      42,
+      41,
+      62,
+      57
+    ],
+    "out_of_crop_box": false,
+    "opaque_px_total": 200,
+    "partial_alpha_px_total": 0,
+    "opaque_px_outside_crop_box": 0
+  },
+  "frame_2": {
+    "bbox": [
+      42,
+      41,
+      62,
+      57
+    ],
+    "out_of_crop_box": false,
+    "opaque_px_total": 199,
+    "partial_alpha_px_total": 0,
+    "opaque_px_outside_crop_box": 0
+  },
+  "frame_3": {
+    "bbox": [
+      42,
+      41,
+      62,
+      57
+    ],
+    "out_of_crop_box": false,
+    "opaque_px_total": 207,
+    "partial_alpha_px_total": 0,
+    "opaque_px_outside_crop_box": 0
+  },
+  "frame_4": {
+    "bbox": [
+      42,
+      41,
+      62,
+      57
+    ],
+    "out_of_crop_box": false,
+    "opaque_px_total": 207,
+    "partial_alpha_px_total": 0,
+    "opaque_px_outside_crop_box": 0
+  },
+  "frame_5": {
+    "bbox": [
+      39,
+      41,
+      81,
+      58
+    ],
+    "out_of_crop_box": true,
+    "opaque_px_total": 371,
+    "partial_alpha_px_total": 0,
+    "opaque_px_outside_crop_box": 41,
+    "overflow_px": {
+      "left": 0,
+      "top": 0,
+      "right": 7,
+      "bottom": 0
+    },
+    "overflow_sample_colors": [
+      [
+        74,
+        42,
+        [
+          244,
+          237,
+          234
+        ]
+      ],
+      [
+        75,
+        42,
+        [
+          244,
+          237,
+          234
+        ]
+      ],
+      [
+        74,
+        43,
+        [
+          244,
+          237,
+          234
+        ]
+      ],
+      [
+        74,
+        44,
+        [
+          244,
+          237,
+          234
+        ]
+      ],
+      [
+        75,
+        44,
+        [
+          244,
+          237,
+          234
+        ]
+      ],
+      [
+        76,
+        44,
+        [
+          244,
+          237,
+          234
+        ]
+      ],
+      [
+        77,
+        44,
+        [
+          183,
+          165,
+          155
+        ]
+      ],
+      [
+        74,
+        45,
+        [
+          244,
+          237,
+          234
+        ]
+      ],
+      [
+        75,
+        45,
+        [
+          244,
+          237,
+          234
+        ]
+      ],
+      [
+        76,
+        45,
+        [
+          183,
+          165,
+          155
+        ]
+      ]
+    ]
+  },
+  "frame_6": {
+    "bbox": [
+      40,
+      42,
+      73,
+      58
+    ],
+    "out_of_crop_box": false,
+    "opaque_px_total": 256,
+    "partial_alpha_px_total": 0,
+    "opaque_px_outside_crop_box": 0
+  },
+  "frame_7": {
+    "bbox": [
+      40,
+      43,
+      63,
+      58
+    ],
+    "out_of_crop_box": false,
+    "opaque_px_total": 198,
+    "partial_alpha_px_total": 0,
+    "opaque_px_outside_crop_box": 0
+  },
+  "_crop_box": [
+    38,
+    30,
+    74,
+    60
+  ],
+  "_source_file": "Blood Monster_A_Attack02.png",
+  "_source_sha256": "623d1e94e071cca1850e517fffde213bb3da3e83a5d55e3bda1626a3046e2caa",
+  "_note": "frame 5 overflows CROP_BOX on the right by up to 7px with solid opaque effect pixels (partial_alpha_px_total==0 for that frame, i.e. not anti-alias fringe) -- see overflow_sample_colors and opaque_px_outside_crop_box."
+}

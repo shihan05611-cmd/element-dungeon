@@ -11,6 +11,9 @@
 [ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_attack_v2.png" id="9_tide_attack"]
 [ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_hurt_v2.png" id="10_hurt"]
 [ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_death_v2.png" id="11_death"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_cast_v1.png" id="12_plain_cast"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_cast_v1.png" id="13_ember_cast"]
+[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_cast_v1.png" id="14_tide_cast"]
 
 [sub_resource type="AtlasTexture" id="boss_plain_idle_v2_0"]
 atlas = ExtResource("1_plain_idle")
@@ -308,6 +311,102 @@ region = Rect2(400, 0, 200, 200)
 atlas = ExtResource("11_death")
 region = Rect2(600, 0, 200, 200)
 
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_0"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_1"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_2"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_3"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_4"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(800, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_5"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(1000, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_6"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(1200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_7"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(1400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_0"]
+atlas = ExtResource("13_ember_cast")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_1"]
+atlas = ExtResource("13_ember_cast")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_2"]
+atlas = ExtResource("13_ember_cast")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_3"]
+atlas = ExtResource("13_ember_cast")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_4"]
+atlas = ExtResource("13_ember_cast")
+region = Rect2(800, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_5"]
+atlas = ExtResource("13_ember_cast")
+region = Rect2(1000, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_6"]
+atlas = ExtResource("13_ember_cast")
+region = Rect2(1200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_7"]
+atlas = ExtResource("13_ember_cast")
+region = Rect2(1400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_0"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_1"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_2"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_3"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_4"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(800, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_5"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(1000, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_6"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(1200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_7"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(1400, 0, 200, 200)
+
 [resource]
 animations = [{
 "frames": [{
@@ -586,4 +685,112 @@ animations = [{
 "loop": false,
 "name": &"death",
 "speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_0")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_1")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_2")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_3")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_4")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_5")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_6")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_7")
+}],
+"loop": false,
+"name": &"plain_cast",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_0")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_1")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_2")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_3")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_4")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_5")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_6")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_7")
+}],
+"loop": false,
+"name": &"ember_cast",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_0")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_1")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_2")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_3")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_4")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_5")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_6")
+},
+{
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_7")
+}],
+"loop": false,
+"name": &"tide_cast",
+"speed": 10.0
 }]

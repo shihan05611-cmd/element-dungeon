@@ -1,0 +1,7 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS reclaim_uses_visible_world_rectangle
+PASS reclaim_full_and_atomic_rejection
+PASS reaction_energy_formal_host_wiring
+TASK 38 RECLAIM REACTION ENERGY TESTS PASSED: 3 tests, 38 assertions

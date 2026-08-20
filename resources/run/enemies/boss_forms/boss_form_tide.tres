@@ -22,3 +22,4 @@ summon_scene = ExtResource("3_sentry")
 summon_max_alive = 2
 summon_count_per_cast = 2
 summon_cooldown = 16.0
+summon_telegraph_duration = 0.9

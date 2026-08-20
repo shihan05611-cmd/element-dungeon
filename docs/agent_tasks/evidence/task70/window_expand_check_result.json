@@ -1,0 +1,57 @@
+{
+  "boss_plain_idle_v2.png": {
+    "new_sha256": "e391f0b8e86f99617eb078f1010c1147c166b500a045411be32a11902a1373db",
+    "committed_sha256": "e391f0b8e86f99617eb078f1010c1147c166b500a045411be32a11902a1373db",
+    "match": true
+  },
+  "boss_ember_idle_v2.png": {
+    "new_sha256": "9d7967d47be12ccccef2df2b381a6e30a57c25e0ce9424951256cd8c6e9ac34b",
+    "committed_sha256": "9d7967d47be12ccccef2df2b381a6e30a57c25e0ce9424951256cd8c6e9ac34b",
+    "match": true
+  },
+  "boss_tide_idle_v2.png": {
+    "new_sha256": "27d0b4a959202cae419e8ce4568fb6ed8a884cb9e6282900cf23d2e0290db04f",
+    "committed_sha256": "27d0b4a959202cae419e8ce4568fb6ed8a884cb9e6282900cf23d2e0290db04f",
+    "match": true
+  },
+  "boss_plain_walk_v2.png": {
+    "new_sha256": "3318366e5a96ee8ed664c26caea82f5a5f52e699f0d5d545c35b62cf38e30c62",
+    "committed_sha256": "3318366e5a96ee8ed664c26caea82f5a5f52e699f0d5d545c35b62cf38e30c62",
+    "match": true
+  },
+  "boss_ember_walk_v2.png": {
+    "new_sha256": "449802b528b63bfbc8bd353f5b5280278f19aacaac4c619b17aa7c04e49798eb",
+    "committed_sha256": "449802b528b63bfbc8bd353f5b5280278f19aacaac4c619b17aa7c04e49798eb",
+    "match": true
+  },
+  "boss_tide_walk_v2.png": {
+    "new_sha256": "6b5836c810e7b99e3064e25086e7404377bdd266791b09db8f45b641b0a11c46",
+    "committed_sha256": "6b5836c810e7b99e3064e25086e7404377bdd266791b09db8f45b641b0a11c46",
+    "match": true
+  },
+  "boss_plain_attack_v2.png": {
+    "new_sha256": "9cd75fee98f1d6d95c3bd54ea8ee3ff1c136c3f5be9006f062b9e0baac6ecba2",
+    "committed_sha256": "9cd75fee98f1d6d95c3bd54ea8ee3ff1c136c3f5be9006f062b9e0baac6ecba2",
+    "match": true
+  },
+  "boss_ember_attack_v2.png": {
+    "new_sha256": "13a585bfdb65cce73880cba0633b1a981731e558a99463fa69f80d005cb3bda9",
+    "committed_sha256": "13a585bfdb65cce73880cba0633b1a981731e558a99463fa69f80d005cb3bda9",
+    "match": true
+  },
+  "boss_tide_attack_v2.png": {
+    "new_sha256": "473c057354194fdb219bfde0db0a4224cd0f4cdcf6f6b979b4a4d02e20a09c7c",
+    "committed_sha256": "473c057354194fdb219bfde0db0a4224cd0f4cdcf6f6b979b4a4d02e20a09c7c",
+    "match": true
+  },
+  "boss_hurt_v2.png": {
+    "new_sha256": "66fd4fa1400dc2e8a4afdf9ab89c8bcf3ada5aaf22c8069304c2ccbec4cb17d8",
+    "committed_sha256": "66fd4fa1400dc2e8a4afdf9ab89c8bcf3ada5aaf22c8069304c2ccbec4cb17d8",
+    "match": true
+  },
+  "boss_death_v2.png": {
+    "new_sha256": "ed83a1847456e2f3c777b0322607326b8cce8ed81c463606624e175f397613db",
+    "committed_sha256": "ed83a1847456e2f3c777b0322607326b8cce8ed81c463606624e175f397613db",
+    "match": true
+  }
+}

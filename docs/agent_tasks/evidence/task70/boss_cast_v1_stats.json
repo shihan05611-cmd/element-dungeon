@@ -1,0 +1,68 @@
+{
+  "boss_plain_cast_v1.png": {
+    "size": [
+      1600,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "889a6063adddce4b09b58fd6b58f27e542011985c19255e46a5decaa71f2d717",
+    "bytes": 3339,
+    "frame_count": 8,
+    "frame_logical_size": [
+      200,
+      200
+    ],
+    "alpha_bbox": [
+      44,
+      94,
+      1528,
+      173
+    ],
+    "partial_alpha_px": 1680,
+    "opaque_coverage": 0.09135
+  },
+  "boss_ember_cast_v1.png": {
+    "size": [
+      1600,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "15ce725c33713be9e3f6d8e41db9e1300e8f6e2d988736f15678c75ff4204e4b",
+    "bytes": 3623,
+    "frame_count": 8,
+    "frame_logical_size": [
+      200,
+      200
+    ],
+    "alpha_bbox": [
+      44,
+      94,
+      1528,
+      173
+    ],
+    "partial_alpha_px": 1680,
+    "opaque_coverage": 0.09135
+  },
+  "boss_tide_cast_v1.png": {
+    "size": [
+      1600,
+      200
+    ],
+    "mode": "RGBA",
+    "sha256": "07e337a19b1e92bfb53e375011c086bab72905e76242b1e298bfd66195a472a5",
+    "bytes": 4930,
+    "frame_count": 8,
+    "frame_logical_size": [
+      200,
+      200
+    ],
+    "alpha_bbox": [
+      43,
+      93,
+      1529,
+      173
+    ],
+    "partial_alpha_px": 5232,
+    "opaque_coverage": 0.091328
+  }
+}

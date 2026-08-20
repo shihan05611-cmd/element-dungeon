@@ -20,3 +20,4 @@ melee_cooldown_close_range_scale = 0.6
 summon_max_alive = 0
 summon_count_per_cast = 1
 summon_cooldown = 12.0
+summon_telegraph_duration = 0.9

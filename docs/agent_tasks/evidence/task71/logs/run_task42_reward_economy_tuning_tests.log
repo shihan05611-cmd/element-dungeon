@@ -1,0 +1,8 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS formal_cohort_repeatability_and_distribution
+PASS empty_pool_and_transaction_guards
+PASS frozen_reward_and_room_economy
+TASK42_COHORT_DISTRIBUTION: {"active_candidate_skill_counts":{"element_reclaim":169,"elemental_fury":165,"elemental_laser":178},"cohort_size":512,"dust_count":0,"dust_percent":0.0,"skill_count":512,"skill_percent":100.0}
+TASK 42 REWARD ECONOMY TUNING TESTS PASSED: 3 tests, 2206 assertions

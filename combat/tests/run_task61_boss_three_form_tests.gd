@@ -352,11 +352,19 @@ func _test_summon_cap_and_death_cleanup() -> void:
 	var ctx := await _make_boss(&"tide")
 	var boss: BossTideEmber = ctx[&"boss"]
 	var player: PlayerCharacter = ctx[&"player"]
+	# Task 71 C5 made summoning telegraphed: _start_summon() now only opens the
+	# warning window and the instantiate() happens when that window closes, so
+	# the cap has to be read AFTER the window has been driven to completion.
+	# Reading it straight after the call would make every assertion below
+	# trivially true against a count of zero.
 	boss._start_summon(boss.tide_form)
+	await _resolve_summon_window(boss)
 	_expect(boss._alive_summon_count() <= boss.tide_form.summon_max_alive, "summon count never exceeds summon_max_alive after one cast")
 	var count_after_first := boss._alive_summon_count()
+	_expect(count_after_first > 0, "the first cast actually produced summons (guards this test against going vacuous)")
 	boss._summon_cooldown_remaining = 0.0
 	boss._start_summon(boss.tide_form)
+	await _resolve_summon_window(boss)
 	_expect(boss._alive_summon_count() <= boss.tide_form.summon_max_alive, "a second cast still respects the cap (no more slots were free)")
 	_expect_eq(boss._alive_summon_count(), count_after_first, "no new summon spawns once the cap is already reached")
 	# Lethal hit -> death_candidate -> defeated; summons are independent
@@ -446,6 +454,22 @@ func _make_boss(form_id: StringName, ai_enabled: bool = false) -> Dictionary:
 	for i in 3:
 		await physics_frame
 	return {&"world": world, &"boss": boss, &"player": player}
+
+
+## Drives a pending Task 71 summon telegraph to the frame the summons are
+## actually instantiated. The Boss advances that window from its own
+## _physics_process, which is gated on ai_enabled, so ai is toggled on just
+## for the pump; while attack_time is running the Boss's physics takes the
+## early-return branch and cannot start any other action, so this does not
+## introduce AI-dependent behaviour into the fixture.
+func _resolve_summon_window(boss: BossTideEmber) -> void:
+	var previous_ai := boss.ai_enabled
+	boss.ai_enabled = true
+	var guard := 0
+	while boss._summon_pending_form != null and guard < 240:
+		await physics_frame
+		guard += 1
+	boss.ai_enabled = previous_ai
 
 
 func _destroy(ctx: Dictionary) -> void:

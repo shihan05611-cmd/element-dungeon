@@ -1,0 +1,21 @@
+{
+  "method": "4-connectivity flood fill on the RGBA alpha channel of each *_static_v1.png (1 frame, no anti-aliasing / no partial-alpha pixels in any of the three icons). connected_components = number of disjoint opaque blobs. enclosed_holes = number of transparent regions that do NOT touch the 32x32 canvas border (i.e. fully surrounded by opaque pixels) -- a topological hole in the silhouette.",
+  "results": {
+    "telegraph_alert_static_v1.png": {
+      "connected_components": 2,
+      "enclosed_holes": 0,
+      "shape": "1 vertical bar (exclamation stem) + 1 small rounded dot, disjoint"
+    },
+    "telegraph_melee_static_v1.png": {
+      "connected_components": 2,
+      "enclosed_holes": 0,
+      "shape": "1 inverted (point-down) triangle + 1 upright (point-up) triangle, disjoint, facing tips across a narrow gap -- category-different from alert's bar+dot even though component count matches"
+    },
+    "telegraph_summon_static_v1.png": {
+      "connected_components": 1,
+      "enclosed_holes": 1,
+      "shape": "1 six-point ring/star blob with a fully enclosed transparent hole in the center -- the only one of the three icons with a hole, and the only one with a single connected component"
+    }
+  },
+  "conclusion": "All three icons differ in silhouette topology and/or basic shape category (rectangle+circle vs opposing triangles vs holed ring), independent of color. Verified by direct flood-fill computation, not visual judgement alone."
+}

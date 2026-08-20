@@ -38,6 +38,16 @@ extends Resource
 ## segment lengths straight off the SpriteFrames using this index, so the
 ## number never appears as a literal in code.
 @export_range(0, 63, 1) var melee_attack_impact_frame_index: int = 4
+## Task 71 §2 C1: 0-based index of the launch frame inside the Boss's ranged
+## cast animation, as declared by the Task 70 manifest
+## (assets/world/enemies/tide_ember_sovereign/manifest_v2.md §9.5: frames 0..4
+## are the windup, frame 5 is the launch, frames 6..7 the recovery). Global
+## for the same reason melee_attack_impact_frame_index is: the three forms
+## share one cast sheet timing, and the manifest proves the effect-pixel
+## rhythm is identical across plain/ember/tide. BossTideEmber derives the
+## windup and recovery segment lengths from the SpriteFrames using this
+## index, so the number never appears as a literal in code.
+@export_range(0, 63, 1) var ranged_cast_launch_frame_index: int = 5
 
 
 func validation_error() -> StringName:
@@ -61,6 +71,8 @@ func validation_error() -> StringName:
 		return &"invalid_poise_break_stun_duration"
 	if melee_attack_impact_frame_index < 0:
 		return &"invalid_melee_attack_impact_frame_index"
+	if ranged_cast_launch_frame_index < 0:
+		return &"invalid_ranged_cast_launch_frame_index"
 	return &""
 
 

@@ -1,0 +1,20 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS compact_hud_state_contract
+PASS expanded_resolution_programmatic_matrix
+SCRIPT ERROR: Invalid access to property or key 'pressed' on a base object of type 'Nil'.
+   at: _test_formal_drag_click_and_authority_recovery (res://combat/tests/run_task40_drag_compact_hud_tests.gd:132)
+   GDScript backtrace (most recent call first):
+       [0] _test_formal_drag_click_and_authority_recovery (res://combat/tests/run_task40_drag_compact_hud_tests.gd:132)
+       [1] _finish_current_room (res://combat/tests/run_task40_drag_compact_hud_tests.gd:270)
+TASK 40 DRAG COMPACT HUD TESTS FAILED: 9/4 tests, 75 assertions
+  - formal_drag_click_and_authority_recovery: formal shop is visible
+  - formal_drag_click_and_authority_recovery: first shop can buy a passive for illegal-direction coverage
+  - formal_slot_swap_single_commit: owned auto-equipped active card drops from A2 into A3 (expected elemental_laser, got elemental_fury)
+  - formal_slot_swap_single_commit: active card drag clears automatic A2
+  - formal_slot_swap_single_commit: card drop commits exactly once (expected 22, got 21)
+  - formal_slot_swap_single_commit: slot swap moves the target skill back to the source (expected element_bolt, got elemental_fury)
+  - formal_slot_swap_single_commit: slot swap moves the dragged skill into the target (expected elemental_laser, got element_bolt)
+  - formal_slot_swap_single_commit: one slot-to-slot drop creates one authority revision (expected 22, got 21)
+  - formal_slot_swap_single_commit: slot swap has concise success feedback

@@ -1,21 +1,132 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://combat/presentation/enemy_telegraph_indicator.gd" id="1_indicator"]
+[ext_resource type="Texture2D" path="res://assets/world/ui_world/telegraph/telegraph_alert_v1.png" id="2_ranged"]
+[ext_resource type="Texture2D" path="res://assets/world/ui_world/telegraph/telegraph_alert_static_v1.png" id="3_ranged_static"]
+[ext_resource type="Texture2D" path="res://assets/world/ui_world/telegraph/telegraph_melee_v1.png" id="4_melee"]
+[ext_resource type="Texture2D" path="res://assets/world/ui_world/telegraph/telegraph_melee_static_v1.png" id="5_melee_static"]
+[ext_resource type="Texture2D" path="res://assets/world/ui_world/telegraph/telegraph_summon_v1.png" id="6_summon"]
+[ext_resource type="Texture2D" path="res://assets/world/ui_world/telegraph/telegraph_summon_static_v1.png" id="7_summon_static"]
+
+[sub_resource type="AtlasTexture" id="ranged_0"]
+atlas = ExtResource("2_ranged")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="ranged_1"]
+atlas = ExtResource("2_ranged")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="ranged_2"]
+atlas = ExtResource("2_ranged")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="melee_0"]
+atlas = ExtResource("4_melee")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="melee_1"]
+atlas = ExtResource("4_melee")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="melee_2"]
+atlas = ExtResource("4_melee")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="summon_0"]
+atlas = ExtResource("6_summon")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="summon_1"]
+atlas = ExtResource("6_summon")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="summon_2"]
+atlas = ExtResource("6_summon")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="TelegraphIcons"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("ranged_0")
+},
+{
+"duration": 1.0,
+"texture": SubResource("ranged_1")
+},
+{
+"duration": 1.0,
+"texture": SubResource("ranged_2")
+}],
+"loop": true,
+"name": &"ranged",
+"speed": 9.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_ranged_static")
+}],
+"loop": false,
+"name": &"ranged_static",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("melee_0")
+},
+{
+"duration": 1.0,
+"texture": SubResource("melee_1")
+},
+{
+"duration": 1.0,
+"texture": SubResource("melee_2")
+}],
+"loop": true,
+"name": &"melee",
+"speed": 9.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_melee_static")
+}],
+"loop": false,
+"name": &"melee_static",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("summon_0")
+},
+{
+"duration": 1.0,
+"texture": SubResource("summon_1")
+},
+{
+"duration": 1.0,
+"texture": SubResource("summon_2")
+}],
+"loop": true,
+"name": &"summon",
+"speed": 9.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_summon_static")
+}],
+"loop": false,
+"name": &"summon_static",
+"speed": 1.0
+}]
 
 [node name="EnemyTelegraphIndicator" type="Node2D"]
 position = Vector2(0, -110)
 z_index = 10
 script = ExtResource("1_indicator")
 
-[node name="Mark" type="Label" parent="."]
-offset_left = -22.0
-offset_top = -34.0
-offset_right = 22.0
-offset_bottom = 8.0
-theme_override_colors/font_color = Color(1, 0.85, 0.15, 1)
-theme_override_colors/font_outline_color = Color(0.12, 0.07, 0, 1)
-theme_override_constants/outline_size = 7
-theme_override_font_sizes/font_size = 40
-text = "!"
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="Mark" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(0, -14)
+scale = Vector2(2, 2)
+sprite_frames = SubResource("TelegraphIcons")
+animation = &"ranged"

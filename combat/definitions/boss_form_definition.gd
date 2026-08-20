@@ -42,6 +42,13 @@ extends Resource
 @export_range(0, 8, 1) var summon_max_alive: int = 0
 @export_range(1, 8, 1) var summon_count_per_cast: int = 1
 @export_range(0.001, 120.0, 0.001, "or_greater") var summon_cooldown: float = 12.0
+## Task 71 §2 C5: length of the summon telegraph window. The summoned scenes
+## are only instantiated once this window elapses, so the player gets a real
+## "rush the Boss and break its poise" decision instead of an instant spawn.
+## Deliberately far longer than melee_telegraph_duration (0.4) -- a summon is
+## a strategic beat, not a reflex test. 0.0 is a legal value and restores the
+## pre-Task-71 instant behavior.
+@export_range(0.0, 10.0, 0.001, "or_greater") var summon_telegraph_duration: float = 0.9
 
 
 func validation_error() -> StringName:
@@ -77,6 +84,8 @@ func validation_error() -> StringName:
 		return &"missing_summon_scene"
 	if not is_finite(summon_cooldown) or summon_cooldown <= 0.0:
 		return &"invalid_summon_cooldown"
+	if not is_finite(summon_telegraph_duration) or summon_telegraph_duration < 0.0:
+		return &"invalid_summon_telegraph_duration"
 	return &""
 
 

@@ -1,0 +1,74 @@
+{
+  "telegraph_melee_v1.png": {
+    "size": [
+      96,
+      32
+    ],
+    "mode": "RGBA",
+    "sha256": "c1d5f63c0eedd1038ad2c3f0abc6ee2a61826880b3dc312b89a7f9a47c68679c",
+    "bytes": 378,
+    "alpha_bbox": [
+      10,
+      2,
+      86,
+      29
+    ],
+    "partial_alpha_px": 0,
+    "opaque_px": 432,
+    "opaque_coverage": 0.140625
+  },
+  "telegraph_melee_static_v1.png": {
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "sha256": "bd77386ba21cfaba09b85d9f1d922be7cf5224528fb6bb26a666575c5937f3cd",
+    "bytes": 237,
+    "alpha_bbox": [
+      10,
+      3,
+      22,
+      29
+    ],
+    "partial_alpha_px": 0,
+    "opaque_px": 144,
+    "opaque_coverage": 0.140625
+  },
+  "telegraph_summon_v1.png": {
+    "size": [
+      96,
+      32
+    ],
+    "mode": "RGBA",
+    "sha256": "939bfd39c12346b27e656a048942f5eff06e92196ddf20fe644a50716c6bd20a",
+    "bytes": 501,
+    "alpha_bbox": [
+      4,
+      2,
+      92,
+      29
+    ],
+    "partial_alpha_px": 0,
+    "opaque_px": 762,
+    "opaque_coverage": 0.248047
+  },
+  "telegraph_summon_static_v1.png": {
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "sha256": "a2ccf069a642fb8ea6b230e424570275c0e505394c115eb2bcfad8d986058212",
+    "bytes": 309,
+    "alpha_bbox": [
+      4,
+      3,
+      28,
+      29
+    ],
+    "partial_alpha_px": 0,
+    "opaque_px": 254,
+    "opaque_coverage": 0.248047
+  }
+}

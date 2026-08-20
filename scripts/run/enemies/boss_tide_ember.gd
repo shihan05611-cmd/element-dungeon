@@ -22,6 +22,10 @@ const BOSS_MELEE_SCENE: PackedScene = preload("res://scenes/run/boss_melee_deliv
 const MELEE_ACTIVE_DURATION := 0.14
 const MELEE_RECOVERY_DURATION := 0.22
 const TRANSITION_MOVE_DAMP := 560.0
+## Task 71 C4: full period of the melee range box's alpha pulse. Suppressed
+## entirely under reduced motion (static outline instead).
+const MELEE_RANGE_BLINK_PERIOD := 0.32
+const MELEE_RANGE_BLINK_MIN_ALPHA := 0.45
 
 @export var ember_form: BossFormDefinition = preload("res://resources/run/enemies/boss_forms/boss_form_ember.tres")
 @export var tide_form: BossFormDefinition = preload("res://resources/run/enemies/boss_forms/boss_form_tide.tres")
@@ -50,6 +54,15 @@ var _layer_regen_timer: float = 0.0
 var _transition_invulnerable_time: float = 0.0
 var _active_deliveries: Array[WeakRef] = []
 var _active_summons: Array[WeakRef] = []
+## Task 71 C5: the form whose summon is currently telegraphing, plus the time
+## left in that window. Non-null means "instantiate() has NOT happened yet".
+var _summon_pending_form: BossFormDefinition = null
+var _summon_telegraph_remaining: float = 0.0
+var _melee_range_blink_time: float = 0.0
+
+@onready var _melee_range_telegraph: Node2D = $MeleeRangeTelegraph
+@onready var _melee_range_fill: Polygon2D = $MeleeRangeTelegraph/Fill
+@onready var _melee_range_outline: Line2D = $MeleeRangeTelegraph/Outline
 
 
 func _ready() -> void:
@@ -73,6 +86,7 @@ func _ready() -> void:
 	current_form_id = starting_form_id
 	ranged_projectile_profile = current_form.ranged_projectile_profile
 	_play_pose(&"idle")
+	_hide_melee_range_telegraph()
 	_choose_patrol_target()
 	_body_collision_layer = collision_layer
 	_body_collision_mask = collision_mask
@@ -156,6 +170,8 @@ func _physics_process(delta: float) -> void:
 	if attack_time > 0.0:
 		attack_time = maxf(0.0, attack_time - delta)
 		velocity.x = 0.0
+		_advance_summon_telegraph(delta)
+		_advance_melee_range_telegraph(delta)
 		if telegraph_indicator != null:
 			telegraph_indicator.advance(delta)
 		move_and_slide()
@@ -280,6 +296,7 @@ func _begin_form_transition(next_form_id: StringName) -> void:
 	combat_receiver.invulnerable = true
 	_transition_invulnerable_time = tuning.form_transition_invulnerable_duration
 	_clear_active_deliveries()
+	_cancel_pending_summon(false)
 	_cancel_ranged_attack_telegraph()
 	attack_time = 0.0
 	if telegraph_indicator != null:
@@ -341,31 +358,36 @@ func _play_pose(pose: StringName) -> void:
 	sprite.play(_animation_name(pose))
 
 
-func _play_attack_from_frame(frame_index: int, speed_scale_value: float) -> void:
-	sprite.speed_scale = speed_scale_value
-	sprite.play(_animation_name(&"attack"))
-	var frame_count := _attack_frame_count()
+## Restarts one of the current form's clips at an exact frame. Restarting
+## explicitly matters because AnimatedSprite2D keeps its position when play()
+## is called on the already-current, already-finished non-looping clip.
+## Task 71 C1 dropped the speed_scale argument entirely: nothing stretches a
+## clip any more, so speed_scale is pinned to 1.0 on every entry point.
+func _play_clip_from_frame(pose: StringName, frame_index: int) -> void:
+	sprite.speed_scale = 1.0
+	sprite.play(_animation_name(pose))
+	var frame_count := _clip_frame_count(pose)
 	if frame_count <= 0:
 		return
 	sprite.set_frame_and_progress(clampi(frame_index, 0, frame_count - 1), 0.0)
 
 
-func _attack_frame_count() -> int:
+func _clip_frame_count(pose: StringName) -> int:
 	var frames := sprite.sprite_frames
-	var animation_name := _animation_name(&"attack")
+	var animation_name := _animation_name(pose)
 	if frames == null or not frames.has_animation(animation_name):
 		return 0
 	return frames.get_frame_count(animation_name)
 
 
-## Wall-clock length of the attack clip's frames [from_index, to_index), read
-## straight off the SpriteFrames (per-frame duration multiplier / animation
-## fps). Task 69 forbids restating the tempo as literals in code, so every
-## timing the Boss needs is derived from the authored resource plus the single
-## configured impact-frame index.
-func _attack_segment_duration(from_index: int, to_index: int) -> float:
+## Wall-clock length of a clip's frames [from_index, to_index), read straight
+## off the SpriteFrames (per-frame duration multiplier / animation fps). Task
+## 69 forbids restating the tempo as literals in code, so every timing the
+## Boss needs is derived from the authored resource plus the single configured
+## impact / launch frame index.
+func _clip_segment_duration(pose: StringName, from_index: int, to_index: int) -> float:
 	var frames := sprite.sprite_frames
-	var animation_name := _animation_name(&"attack")
+	var animation_name := _animation_name(pose)
 	if frames == null or not frames.has_animation(animation_name):
 		return 0.0
 	var speed := frames.get_animation_speed(animation_name)
@@ -378,56 +400,58 @@ func _attack_segment_duration(from_index: int, to_index: int) -> float:
 	return total
 
 
-## Frames 0 .. impact-1. Must equal the current form's
-## melee_telegraph_duration -- asserted by run_task69_*.
+## Frames 0 .. impact-1 of the melee attack clip. Must equal the current
+## form's melee_telegraph_duration -- asserted by run_task69_*.
 func attack_windup_duration() -> float:
-	return _attack_segment_duration(0, tuning.melee_attack_impact_frame_index)
+	return _clip_segment_duration(&"attack", 0, tuning.melee_attack_impact_frame_index)
 
 
-## Frames impact .. last. Doubles as the post-launch hold for a ranged shot so
-## the impact pose is actually readable instead of being overwritten by walk
-## on the very next physics tick.
+## Frames impact .. last of the melee attack clip.
 func attack_recovery_duration() -> float:
-	return _attack_segment_duration(tuning.melee_attack_impact_frame_index, _attack_frame_count())
+	return _clip_segment_duration(&"attack", tuning.melee_attack_impact_frame_index, _clip_frame_count(&"attack"))
 
 
-## Task 69 §2.5: the base ranged cycle never touched the sprite, so the Boss
-## spent the whole 0.4~0.5s windup marching in place in its walk clip. The
-## attack clip's windup segment is reused as the charge-up, time-scaled so its
-## impact frame arrives exactly when the projectile spawns even though the
-## three forms telegraph for 0.4 / 0.45 / 0.5s against one 0.4s authored
-## windup (scale 0.8~1.0 -- a mild slow-down, never a skip).
+## Task 71 C1: frames 0 .. launch-1 of the ranged cast clip. Authored to a
+## single fixed length that all three bolt profiles' telegraph_duration now
+## match, so the launch frame lands on the spawn frame without any speed_scale
+## stretching.
+func cast_windup_duration() -> float:
+	return _clip_segment_duration(&"cast", 0, tuning.ranged_cast_launch_frame_index)
+
+
+## Frames launch .. last of the ranged cast clip. Doubles as the post-launch
+## hold so the launch pose is actually readable instead of being overwritten
+## by walk on the very next physics tick.
+func cast_recovery_duration() -> float:
+	return _clip_segment_duration(&"cast", tuning.ranged_cast_launch_frame_index, _clip_frame_count(&"cast"))
+
+
+## Task 71 C1: the ranged windup plays the dedicated `{form}_cast` clip (Task
+## 70 asset) instead of borrowing the melee attack clip. Task 69 had to
+## stretch the borrowed clip with speed_scale 0.889/0.800/1.000 because the
+## three forms telegraphed for 0.4/0.45/0.5s against one 0.4s authored windup;
+## the cast clip is instead authored to one fixed windup length and all three
+## bolt profiles now declare the same telegraph_duration, so nothing is
+## stretched and speed_scale stays 1.0 for the whole cycle. The telegraph type
+## is left at its RANGED default -- CombatEnemy.start(duration) already does
+## the right thing, which is exactly what keeps regular enemies untouched.
 func _begin_ranged_attack_telegraph(profile: EnemyProjectileProfile, cast_source: StringName) -> void:
 	var was_active := _telegraph_active
 	super(profile, cast_source)
 	if not _telegraph_active or was_active:
 		return
-	var windup := attack_windup_duration()
-	var scale := 1.0
-	if windup > 0.0 and profile != null and profile.telegraph_duration > 0.0:
-		scale = windup / profile.telegraph_duration
-	_play_attack_from_frame(0, scale)
+	_play_clip_from_frame(&"cast", 0)
 
 
 func _launch_ranged_projectile(profile: EnemyProjectileProfile, direction: Vector2, cast_source: StringName) -> void:
 	var fired_before := boss_projectiles_fired
 	super(profile, direction, cast_source)
 	if boss_projectiles_fired == fired_before:
-		# Nothing actually spawned (dead, invalid profile, no player): make
-		# sure a stretched windup never leaks its speed_scale onward.
+		# Nothing actually spawned (dead, invalid profile, no player).
 		sprite.speed_scale = 1.0
 		return
-	_play_attack_from_frame(tuning.melee_attack_impact_frame_index, 1.0)
-	attack_time = maxf(attack_time, attack_recovery_duration())
-
-
-## Keeps the stretched ranged-windup speed_scale from surviving a cancel
-## (poise break, hurt, form transition, death) that the base class performs.
-func _cancel_ranged_attack_telegraph() -> void:
-	var was_active := _telegraph_active
-	super()
-	if was_active:
-		sprite.speed_scale = 1.0
+	_play_clip_from_frame(&"cast", tuning.ranged_cast_launch_frame_index)
+	attack_time = maxf(attack_time, cast_recovery_duration())
 
 
 func _start_melee_attack(form: BossFormDefinition) -> void:
@@ -442,11 +466,11 @@ func _start_melee_attack(form: BossFormDefinition) -> void:
 	# live. Restarting explicitly at frame 0 matters because AnimatedSprite2D
 	# keeps its position when play() is called on the already-current, already
 	# finished non-looping clip.
-	_play_attack_from_frame(0, 1.0)
+	_play_clip_from_frame(&"attack", 0)
 	attack_cooldown = form.attack_cooldown
 	attack_time = maxf(form.melee_telegraph_duration, 0.05) + MELEE_ACTIVE_DURATION + MELEE_RECOVERY_DURATION
 	if telegraph_indicator != null and form.melee_telegraph_duration > 0.0:
-		telegraph_indicator.start(form.melee_telegraph_duration)
+		telegraph_indicator.start(form.melee_telegraph_duration, EnemyTelegraphIndicator.TelegraphType.MELEE)
 	_spawn_melee_delayed_delivery(form)
 
 
@@ -465,7 +489,10 @@ func _spawn_melee_delayed_delivery(form: BossFormDefinition) -> void:
 	delivery.trigger_delay = maxf(form.melee_telegraph_duration, 0.0)
 	delivery.active_duration = MELEE_ACTIVE_DURATION
 	delivery.hurtbox_collision_mask = 16
-	delivery.query_offset = Vector2(50.0, 0.0)
+	# Task 71 C4: query_offset is NOT restated here any more. It comes from
+	# boss_melee_delivery.tscn (Vector2(50, 0)) together with hit_shape, and
+	# the ground telegraph below is derived from the very same instance, so
+	# there is exactly one source of truth for "where the swing lands".
 	var cast_snapshot := CastSnapshot.new(
 		_allocate_enemy_cast_id(),
 		StringName("boss_%s_melee" % current_form_id),
@@ -488,6 +515,86 @@ func _spawn_melee_delayed_delivery(form: BossFormDefinition) -> void:
 		return
 	get_tree().current_scene.add_child(delivery)
 	delivery_created.emit(delivery)
+	_show_melee_range_telegraph(delivery)
+
+
+## Task 71 C4: draws the ground box for the swing that is about to land.
+## Every number comes off the DelayedAreaDelivery instance that was just
+## configured (its own hit_shape, query_offset, query_rotation and locked
+## direction) and is combined with exactly the formula
+## MeleeDelivery._build_query_transform() uses to place the physics query --
+## no second, hand-written copy of the 100x70 / (50, 0) values exists in this
+## script, so the box cannot drift out of sync with the real hitbox.
+## The node is top_level, pinned to the delivery's own frozen world origin, so
+## it does not follow the Boss if the Boss is displaced mid-windup.
+func _show_melee_range_telegraph(delivery: DelayedAreaDelivery) -> void:
+	if _melee_range_telegraph == null or delivery == null:
+		return
+	var rectangle := delivery.hit_shape as RectangleShape2D
+	if rectangle == null:
+		_hide_melee_range_telegraph()
+		return
+	var facing_angle := delivery.direction.angle()
+	var query_transform := Transform2D(
+		facing_angle + delivery.query_rotation,
+		delivery.query_offset.rotated(facing_angle)
+	)
+	var half := rectangle.size * 0.5
+	var corners := PackedVector2Array([
+		query_transform * Vector2(-half.x, -half.y),
+		query_transform * Vector2(half.x, -half.y),
+		query_transform * Vector2(half.x, half.y),
+		query_transform * Vector2(-half.x, half.y),
+	])
+	_melee_range_fill.polygon = corners
+	_melee_range_outline.points = corners
+	_melee_range_telegraph.global_position = delivery.global_position
+	_melee_range_telegraph.global_rotation = 0.0
+	_melee_range_telegraph.modulate = Color(1.0, 1.0, 1.0, 1.0)
+	# Reduced motion: static outline only, no fill pulse (Task 71 C4).
+	_melee_range_fill.visible = not _reduced_motion_enabled()
+	_melee_range_blink_time = 0.0
+	_melee_range_telegraph.visible = true
+	# The box must vanish the moment the hitbox goes live, so it is bound to
+	# the delivery's own phase transition rather than to a second timer that
+	# could drift. tree_exited covers every cancellation path that frees the
+	# delivery (form switch, death, _clear_active_deliveries).
+	if not delivery.delayed_triggered.is_connected(_on_melee_delivery_triggered):
+		delivery.delayed_triggered.connect(_on_melee_delivery_triggered)
+	if not delivery.tree_exited.is_connected(_hide_melee_range_telegraph):
+		delivery.tree_exited.connect(_hide_melee_range_telegraph)
+
+
+func _on_melee_delivery_triggered(_cast_id: int, _delivery_id: int) -> void:
+	_hide_melee_range_telegraph()
+
+
+func _hide_melee_range_telegraph() -> void:
+	if _melee_range_telegraph == null:
+		return
+	_melee_range_telegraph.visible = false
+	_melee_range_telegraph.modulate = Color(1.0, 1.0, 1.0, 1.0)
+	_melee_range_blink_time = 0.0
+
+
+## Reduced motion suppresses the pulse entirely (static outline); otherwise
+## the box breathes between MELEE_RANGE_BLINK_MIN_ALPHA and full opacity.
+func _advance_melee_range_telegraph(delta: float) -> void:
+	if _melee_range_telegraph == null or not _melee_range_telegraph.visible:
+		return
+	if _reduced_motion_enabled():
+		_melee_range_telegraph.modulate.a = 1.0
+		return
+	_melee_range_blink_time += delta
+	var phase := sin(_melee_range_blink_time * TAU / MELEE_RANGE_BLINK_PERIOD) * 0.5 + 0.5
+	_melee_range_telegraph.modulate.a = lerpf(MELEE_RANGE_BLINK_MIN_ALPHA, 1.0, phase)
+
+
+## Single source for the accessibility flag: CombatEnemy already mirrors the
+## real HUD toggle onto the telegraph indicator, so the Boss reads it back
+## from there instead of wiring a second listener.
+func _reduced_motion_enabled() -> bool:
+	return telegraph_indicator != null and telegraph_indicator.reduced_motion
 
 
 func _alive_summon_count() -> int:
@@ -499,10 +606,64 @@ func _alive_summon_count() -> int:
 	return count
 
 
+## Task 71 C5: opening a summon no longer spawns anything. It starts a
+## telegraph window (summon_telegraph_duration, configured per form) during
+## which the Boss plays the cast windup and shows the SUMMON warning icon;
+## only when the window closes does _resolve_summon() instantiate. The cast
+## clip is reused rather than the attack clip because a summon reads as a
+## spell, and because it is the same clip the ranged cycle uses -- one
+## "channeling" vocabulary instead of two.
 func _start_summon(form: BossFormDefinition) -> void:
 	_summon_cooldown_remaining = form.summon_cooldown
-	attack_time = 0.5
-	_play_attack_from_frame(0, 1.0)
+	_play_clip_from_frame(&"cast", 0)
+	var window := maxf(form.summon_telegraph_duration, 0.0)
+	if window <= 0.0:
+		# A form that opts out of the telegraph keeps the pre-Task-71 timing.
+		attack_time = maxf(cast_recovery_duration(), 0.05)
+		_play_clip_from_frame(&"cast", tuning.ranged_cast_launch_frame_index)
+		_resolve_summon(form)
+		return
+	_summon_pending_form = form
+	_summon_telegraph_remaining = window
+	attack_time = window + cast_recovery_duration()
+	if telegraph_indicator != null:
+		telegraph_indicator.start(window, EnemyTelegraphIndicator.TelegraphType.SUMMON)
+
+
+## Drives the pending window from the attack_time branch of _physics_process.
+func _advance_summon_telegraph(delta: float) -> void:
+	if _summon_pending_form == null:
+		return
+	_summon_telegraph_remaining -= delta
+	if _summon_telegraph_remaining > 0.0:
+		return
+	var form := _summon_pending_form
+	_summon_pending_form = null
+	_summon_telegraph_remaining = 0.0
+	_play_clip_from_frame(&"cast", tuning.ranged_cast_launch_frame_index)
+	_resolve_summon(form)
+
+
+## §2 C5 interrupt rule, deliberately conservative: only a poise break (a
+## mechanic Task 61 already owns and which this task must not alter) aborts a
+## pending summon, and when it does the cooldown is refunded -- the Boss never
+## got its cast off, so locking it out of summoning for another full cooldown
+## would punish it twice. Ordinary hits do not interrupt, exactly as the Task
+## 61 poise design intends. No new interrupt mechanism is introduced.
+func _cancel_pending_summon(refund_cooldown: bool) -> void:
+	if _summon_pending_form == null:
+		return
+	_summon_pending_form = null
+	_summon_telegraph_remaining = 0.0
+	if refund_cooldown:
+		_summon_cooldown_remaining = 0.0
+	if telegraph_indicator != null:
+		telegraph_indicator.cancel()
+
+
+func _resolve_summon(form: BossFormDefinition) -> void:
+	if defeated or form == null:
+		return
 	var slots_free := form.summon_max_alive - _alive_summon_count()
 	var to_spawn := mini(form.summon_count_per_cast, slots_free)
 	for index: int in to_spawn:
@@ -516,6 +677,17 @@ func _start_summon(form: BossFormDefinition) -> void:
 		summon.global_position = global_position + Vector2(offset_x, -20.0)
 		get_tree().current_scene.add_child(summon)
 		_active_summons.append(weakref(summon))
+
+
+## Task 71 C5: a poise break is the one interrupt allowed to abort a pending
+## summon. CombatEnemy._on_poise_hit() already zeroes attack_time and cancels
+## the indicator when the break fires; the break is detected here by
+## poise_stun_time going from zero to positive inside super().
+func _on_poise_hit() -> void:
+	var stun_before := poise_stun_time
+	super()
+	if poise_stun_time > stun_before:
+		_cancel_pending_summon(true)
 
 
 func _on_delivery_created(delivery: Node) -> void:
@@ -532,12 +704,17 @@ func _clear_active_deliveries() -> void:
 		if node != null and is_instance_valid(node) and not (node as Node).is_queued_for_deletion():
 			(node as Node).queue_free()
 	_active_deliveries.clear()
+	# Task 71 C4: the ground box lives and dies with the delivery it was
+	# derived from, so every path that clears deliveries (form switch, death)
+	# clears the box in the same breath.
+	_hide_melee_range_telegraph()
 
 
 func _on_death_candidate(_result: CombatResult) -> void:
 	if defeated:
 		return
 	defeated = true
+	_cancel_pending_summon(false)
 	_cancel_ranged_attack_telegraph()
 	_clear_active_deliveries()
 	attack_time = 0.0

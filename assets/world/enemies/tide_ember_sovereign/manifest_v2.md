@@ -8,6 +8,8 @@
 
 沿用不变的管线常量：`CANVAS=200`、`CROP_BOX=(38,30,74,60)`、`SCALE=4`（整数最近邻）、`PASTE_XY=(28,50)`、三张调色板重映射表（`PLAIN_MAP`/`EMBER_MAP`/`TIDE_MAP`）、`add_ember_cracks`/`add_tide_drips`/`add_contact_shadow`（`baseline_y=170`）。
 
+> **Task70 追记**：本节记录的 `CROP_BOX=(38,30,74,60)` / `PASTE_XY=(28,50)` 是本文件（idle/walk/attack/hurt/death 五套 `v2` 资产）的原值，**未被修改，本节以下内容原样保留、历史准确**。Task70 新增的 `boss_{plain,ember,tide}_cast_v1.png` 使用了对称扩大后的窗口 `CROP_BOX=(31,30,81,60)` / `PASTE_XY=(0,50)`——完整推导、逐像素等价性证明与生成细节见 **§9**。两套参数在共享的源坐标范围内逐像素等价（§9.2 已验证），因此 cast 与本节五套动作在运行时切换不会跳变。
+
 ## 1. §2.3 共用裁切窗口复核结论：**未越界，`CROP_BOX` 保持不变**
 
 对 6 个源动作精灵表（`_Idle`/`_Walk`/`_Attack01`/`_Hurt`/`_Death`）的**全部 30 帧**逐帧计算 alpha bbox（源 100×100 坐标系），与 `CROP_BOX=(38,30,74,60)` 逐帧比对，完整数据见 `docs/agent_tasks/evidence/task68/bbox_report.json`。
@@ -84,3 +86,118 @@ hurt / death 沿用 Task60 策略，为三形态共享的中性版本（普通�
 ## 8. 用途与边界
 
 美术资产不定义碰撞、AI、状态机切换或战斗数值；`.tscn`/`.tres`/`.gd`/`project.godot`/`.import` 的工程接线由 Task69 负责，本任务未做任何此类改动（全库扫描 `boss_.*_v2\.` 在这些文件类型中 0 命中）。`v1` 单帧资产原样保留，退役时机由 Task69 决定。
+
+---
+
+## 9. Task70 追加段落：cast 动作 —— **已解除 BLOCKED，已产出**（中枢裁决扩窗）
+
+Task70 要求以 `Blood Monster_A_Attack02.png` 为源，产出 `boss_{plain,ember,tide}_cast_v1.png`。首次执行时按原 `CROP_BOX=(38,30,74,60)` 窗口复核发现 frame 5 越界，依任务书字面指示冻结为 `BLOCKED` 并上报（§9.1，原始记录保留不改，供追溯）。中枢随后裁决：任务书「不得单独为 cast 扩窗」的禁令只在改变左边界/`PASTE_XY` 导致画布内角色偏移时成立，**对称扩窗不产生这个问题**，并给出新参数 `CROP_BOX=(31,30,81,60)` / `PASTE_XY=(0,50)`。本任务对该裁决做了独立复核（§9.2 数学复核 + §9.3 逐像素回归门禁），复核通过后按新参数产出了三张 cast sheet（§9.4）。**最终状态：已产出，非 BLOCKED。**
+
+### 9.1 §2.3 首次窗口复核结论（原始记录，已被 §9.2~§9.4 的中枢裁决覆盖，保留供追溯）：越界，触发冻结条件
+
+脚本：`docs/agent_tasks/evidence/task70/check_cast_window_attack02.py`（独立于 telegraph 生成脚本，只读源目录，不写任何 `assets/world/enemies/tide_ember_sovereign/` 下的文件）。复核逻辑与 Task68 的 `alpha_stats`/bbox 计算方法完全一致：对 `Blood Monster_A_Attack02.png` 的 8 帧逐帧计算源坐标系（100×100）下的 alpha bbox，并与 `CROP_BOX=(38,30,74,60)` 逐帧比对；结果落盘于 `docs/agent_tasks/evidence/task70/bbox_report_attack02.json` 与标注图 `attack02_frame_annotation_cropbox_overlay.png`。
+
+`Blood Monster_A_Attack02.png` 字节数 1949、SHA-256 `623d1e94e071cca1850e517fffde213bb3da3e83a5d55e3bda1626a3046e2caa`，与 `LICENSE_PROVENANCE.md` 记录的 `623D1E94E071CCA1850E517FFFDE213BB3DA3E83A5D55E3BDA1626A3046E2CAA`（大小写不敏感）完全一致，源目录未被本任务修改。
+
+逐帧结果（完整数据见 `bbox_report_attack02.json`）：
+
+| 帧 | bbox（源坐标系） | 越界 | 说明 |
+|---:|---|---|---|
+| 0 | (42,42,62,57) | 否 | |
+| 1 | (42,41,62,57) | 否 | |
+| 2 | (42,41,62,57) | 否 | |
+| 3 | (42,41,62,57) | 否 | |
+| 4 | (42,41,62,57) | 否 | |
+| **5** | **(39,41,81,58)** | **是** | 右边越界 **7px**（`CROP_BOX` 右边界 x=74，本帧不透明像素最右延伸到 x=80） |
+| 6 | (40,42,73,58) | 否 | |
+| 7 | (40,43,63,58) | 否 | |
+
+frame 5 越界不是反走样边缘噪声：越界区域内 41 个像素全部是 `alpha=255` 的完全不透明像素（该源精灵表本身无半透明反走样，全部 8 帧 partial-alpha 像素数均为 0），采样颜色为 `(244,237,234)` / `(183,165,155)` 等浅色实心像素簇，是动作本身的一个连贯几何形状（视觉核验见 `docs/agent_tasks/evidence/task70/attack02_frame_annotation_cropbox_overlay.png`：frame 5 在角色右侧出现一个越出既定窗口的大幅度白色尖状延伸，frame 6 收缩为贴近身体的小簇残留，frame 7 完全消失——这与「特效出现→单调衰减」的判据吻合，很可能正是这套动作里「法术/攻击效果延伸到最大」的那一帧，但因超出共用裁切窗口而无法直接采用）。
+
+**判定：触发任务书 §2.3 与升级触发条款——`Blood Monster_A_Attack02` 的动作幅度超出任务 68 固定的共用裁切窗口。** 按任务书「若越界，不得单独为 cast 扩窗——那会让 cast 与已提交的 idle/walk/attack 错位」的明确指示，本任务未扩窗、未裁剪掉越界内容强行塞入窗口、未生成 `boss_{plain,ember,tide}_cast_v1.png`，冻结为 **BLOCKED**，交由中枢决定是否对全部动作（idle/walk/attack/hurt/death/cast）统一扩窗重导。
+
+### 9.2 中枢裁决的独立数学复核
+
+中枢给出的新参数：`CROP_BOX: (38,30,74,60) → (31,30,81,60)`（左右各对称扩 7px）、`PASTE_XY: (28,50) → (0,50)`，`CANVAS`/`SCALE`/`baseline_y`/三张调色板/装饰函数全部不变。对其推导逐条独立复算（未盲信）：
+
+1. **窗口中心不变**：旧窗口宽 36，中心 `x=(38+74)/2=56`；新窗口宽 50，中心 `x=(31+81)/2=56`。中心一致，复算成立。
+2. **画布坐标映射对旧窗口范围内的任意点保持不变**：`src_to_canvas(sx) = PASTE_XY[0] + (sx - CROP_BOX[0]) * SCALE`。取旧窗口边界内任意采样点独立验证——`sx=38`：旧 `28+(38-38)*4=28`，新 `0+(38-31)*4=28`；`sx=40`：旧 `36`，新 `36`；`sx=56`（中心）：旧 `100`，新 `100`；`sx=74`：旧 `172`，新 `172`。四个采样点新旧映射逐一相等，复算成立（完整代码见下方 §9.3 门禁脚本注释区，独立于中枢给出的手算）。
+3. **新窗口宽 `50*4=200`，恰好填满 200 画布，且左右对称**：确认成立，避免了「只扩右边界导致角色在画布内偏移、`flip_h` 时产生横跳」的问题。
+4. **`add_ember_cracks`/`add_tide_drips` 的坐标换算只依赖 `CROP_BOX[0]`/`[1]`（左上角）与 `PASTE_XY`**：核对 `gen_boss_v2.py` 源码确认属实，`src_to_canvas()` 未使用 `CROP_BOX` 的右/下边界，因此扩右边界不影响这两个装饰函数的坐标计算。
+5. **左扩到 31 不会引入新的角色像素**：Task68 记录的 30 帧 bbox 并集左边界是 `x=40`，本任务复核的 cast frame 5 左边界是 `x=39`（见 §9.1 表），均 `> 31`，扩出来的 `[31,38)` 区间在全部 36 帧（30 旧 + 8 cast 中除 frame5 特效外）里都是透明区，不会把无关像素带入画布。
+
+结论：中枢的数学推导逐条复算成立，予以采信。**但推导正确不等于生成结果一定不变**（`build_sheet` 内部还有 `remap`/`add_contact_shadow` 等依赖实际像素分布的步骤），因此仍执行了 §9.3 的强制回归门禁，而不是仅凭数学推导就直接采用。
+
+### 9.3 前置门禁：11 张已提交 v2 sheet 逐像素回归复核 —— **全部一致，门禁通过**
+
+脚本：`docs/agent_tasks/evidence/task70/gen_boss_window_expand_check.py`（`gen_boss_v2.py` 的参数替换版，仅改 `CROP_BOX`/`PASTE_XY` 两个常量，其余管线代码逐字复制）。用新窗口参数重新生成全部 11 张 `boss_{plain,ember,tide}_{idle,walk,attack}_v2.png` + `boss_hurt_v2.png` + `boss_death_v2.png`，输出到 `docs/agent_tasks/evidence/task70/window_expand_check/`（**未覆盖 `assets/` 下任何已提交文件**），逐一与当前已提交版本做 SHA-256 比对。
+
+结果（完整数据 `docs/agent_tasks/evidence/task70/window_expand_check_result.json`）：
+
+| 文件 | 新窗口 SHA-256 | 已提交 SHA-256 | 一致 |
+|---|---|---|---|
+| `boss_plain_idle_v2.png` | `e391f0b8...373db` | `e391f0b8...373db` | ✅ |
+| `boss_ember_idle_v2.png` | `9d7967d4...ac34b` | `9d7967d4...ac34b` | ✅ |
+| `boss_tide_idle_v2.png` | `27d0b4a9...db04f` | `27d0b4a9...db04f` | ✅ |
+| `boss_plain_walk_v2.png` | `3318366e...e30c62` | `3318366e...e30c62` | ✅ |
+| `boss_ember_walk_v2.png` | `449802b5...798eb` | `449802b5...798eb` | ✅ |
+| `boss_tide_walk_v2.png` | `6b5836c8...b0a11c46` | `6b5836c8...b0a11c46` | ✅ |
+| `boss_plain_attack_v2.png` | `9cd75fee...c136c3f5be9006f062b9e0baac6ecba2` | 同左 | ✅ |
+| `boss_ember_attack_v2.png` | `13a585bf...0005cb3bda9` | 同左 | ✅ |
+| `boss_tide_attack_v2.png` | `473c0573...02e20a09c7c` | 同左 | ✅ |
+| `boss_hurt_v2.png` | `66fd4fa1...ec4cb17d8` | 同左 | ✅ |
+| `boss_death_v2.png` | `ed83a184...f397613db` | 同左 | ✅ |
+
+**11/11 完全一致，字节级 SHA-256 相同（非仅视觉相似）。** 这不只是复核了坐标映射公式，而是端到端跑了一遍包含 `remap`/`add_ember_cracks`/`add_tide_drips`/`add_contact_shadow` 在内的完整生成管线并比对最终产物，因此 §9.2 数学推导的"生成结果不变"这一关键前提得到了实证，不是假设。门禁通过，予以继续产出 cast sheet。（若门禁失败，本任务的既定处理是立即停止、报告差异，不做参数调整硬凑——门禁脚本本身也保留在 evidence 目录供复算。）
+
+### 9.4 cast sheet 最终产出
+
+脚本：`docs/agent_tasks/evidence/task70/gen_boss_cast_v1.py`（`gen_boss_v2.py` 的 cast-only 版本，`CROP_BOX=(31,30,81,60)`、`PASTE_XY=(0,50)`，其余管线常量、三张调色板、装饰函数逐字复用）。
+
+| 文件 | 尺寸 | 帧数 | SHA-256 | Alpha bbox | Partial-alpha px | Opaque coverage |
+|---|---|---:|---|---|---:|---:|
+| `boss_plain_cast_v1.png` | 1600×200 | 8 | `889a6063adddce4b09b58fd6b58f27e542011985c19255e46a5decaa71f2d717` | (44,94,1528,173) | 1680 | 0.09135 |
+| `boss_ember_cast_v1.png` | 1600×200 | 8 | `15ce725c33713be9e3f6d8e41db9e1300e8f6e2d988736f15678c75ff4204e4b` | (44,94,1528,173) | 1680 | 0.09135 |
+| `boss_tide_cast_v1.png` | 1600×200 | 8 | `07e337a19b1e92bfb53e375011c086bab72905e76242b1e298bfd66195a472a5` | (43,93,1529,173) | 5232 | 0.091328 |
+
+完整统计见 `docs/agent_tasks/evidence/task70/boss_cast_v1_stats.json`。三形态的整体 bbox 与既有 idle/walk/attack 系列（`(44,~,1528,173)` 量级）在同一数量级，角色在画布内的位置未发生系统性偏移，与 §9.3 门禁的"扩窗不改变现有像素位置"结论一致。
+
+两个源专属特效色 `(244,237,234)`/`(183,165,155)`（frame 5/6 独有，不在任何调色板映射表的 key 里，因此原样透传，三形态显示为同一浅色特效，不因形态改色）不影响本节结论——特效像素本身也落在扩大后的窗口内，被正常裁入画布，不再被裁掉。
+
+### 9.5 §2.4 发射帧索引标注（Task71 接口契约）
+
+对 `Blood Monster_A_Attack02.png` 8 帧做逐帧颜色直方图（源坐标系，未经调色板重映射），发现 `(244,237,234)` 与 `(183,165,155)` 两种颜色**只出现在 frame 5、frame 6**，在 frame 0~4、frame 7 中出现次数均为 0，且不属于该角色与 idle/walk/attack01 共用的标准 8 色本体/高光调色板（`SRC_BLACK`/`SRC_MAIN`/`SRC_DARK`/`SRC_STRIPE`/`SRC_HI_A`/`SRC_HI_B`/`SRC_OUTLINE2`/`SRC_HI_C`，这 8 色在 frame 0~7 全部帧中均有出现）——即这两种颜色是本动作独有的「特效/能量」像素，不是角色肢体本体的一部分。
+
+逐帧统计（源坐标系，100×100，`docs/agent_tasks/evidence/task70/gen_cast_evidence.py` 在渲染后的 200×200 成品 sheet 上重新计数，数值按 `SCALE=4` 呈 16 倍关系，验证管线一致）：
+
+| 帧 | 源坐标系特效像素数 | 成品 sheet（200×200）特效像素数 |
+|---:|---:|---:|
+| 0 | 0 | 0 |
+| 1 | 0 | 0 |
+| 2 | 0 | 0 |
+| 3 | 0 | 0 |
+| 4 | 0 | 0 |
+| **5** | **193** | **3088** |
+| 6 | 58 | 928 |
+| 7 | 0 | 0 |
+
+节奏为「0,0,0,0,0 → 193（首次完整出现，全序列峰值） → 58（单调衰减到峰值的 30%） → 0（完全消失）」——与「特效首次完整出现 → 单调淡出」的判据完全吻合。视觉核验：`docs/agent_tasks/evidence/task70/cast_launch_frame_annotation.png`（8 帧标注图，frame 5 用红框标出并标注 `effect_px=3088 <- LAUNCH`），frame 5 在角色右前方出现一团朝右延展的浅色能量/冲击效果，frame 6 收缩为贴身的小簇残留，frame 7 完全消失。
+
+**发射帧索引（launch frame index，0-based）：5。**
+
+- 建议前摇段：`0 → 4`（5 帧，发射帧-1 为止，蓄势/引导动作）。
+- 发射帧：`5`（能量/法术脱手）。
+- 建议收招段：`6 → 7`（2 帧，发射帧+1 到末帧，余韵回收）。
+- 判据显式使用的是「特效像素出现与单调衰减节奏」的量化统计，未使用「排除特效后肢体最右延伸」的方法（该方法在 Task68 验收中已被判定不可靠并撤下）。
+- 该发射帧索引对三形态（plain/ember/tide）通用：三者共用同一源帧序列、同一裁切/贴入几何，特效色不在任何调色板映射表中因而三形态显示一致，仅调色板/装饰不同，姿态与特效时序完全一致。
+
+### 9.6 跨动作锚点基线一致性证据
+
+- `docs/agent_tasks/evidence/task70/cross_action_anchor_overlay_cast_vs_idle_walk_attack.png`：取 `boss_plain_idle_v2.png`（红）/`boss_plain_walk_v2.png`（绿）/`boss_plain_attack_v2.png`（蓝）/`boss_plain_cast_v1.png`（琥珀）四者的 frame 0（均为静止起始姿态）做半透明色彩叠加。四色几乎完全混合为单一橄榄色色块，接地阴影条在四者中位置完全重合，边缘仅有因四个动作起始姿态细微差异导致的少量色彩分离（预期内，不是基线漂移）。证明 cast 与已提交的 idle/walk/attack 在扩窗后共享同一画布锚点与基线。
+- `docs/agent_tasks/evidence/task70/anchor_overlay_plain_cast_internal_8frame.png`：`boss_plain_cast_v1.png` 全部 8 帧半透明叠加（同 Task68 `anchor_overlay_plain_attack.png` 的方法），躯干核心与接地阴影条完全重合，仅四肢/特效随动作合理散开，证明 cast 内部帧间无基线漂移。
+
+### 9.7 影响范围确认
+
+- `boss_{plain,ember,tide}_cast_v1.png` 是本任务在 `assets/world/enemies/tide_ember_sovereign/` 下新增的唯一三个文件；已提交的 11 个 `v2` 文件字节未发生任何变化（§9.3 已逐一核对 SHA-256，且本任务从未对 `assets/` 下的既有文件执行写操作）。
+- `CROP_BOX`/`PASTE_XY` 的「新值」只在 `gen_boss_cast_v1.py`（cast 专用脚本）中生效；`gen_boss_v2.py`（Task68 原脚本）未被修改，仍记录旧值，因为旧值对已交付的 idle/walk/attack/hurt/death 而言仍是准确的生成参数（§9.3 证明的是「两套参数对这些已有帧产物等价」，不是「脚本被替换」）。
+- 若未来（如 Task71 之后）需要再新增其他动作，应直接使用扩大后的窗口 `(31,30,81,60)`/`(0,50)` 而非旧窗口，因为新窗口是旧窗口的严格超集且已证明等价，没有理由再收窄。

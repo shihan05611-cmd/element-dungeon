@@ -1,0 +1,12 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS new_field_validation_branches
+PASS form_resources_declare_new_fields
+PASS close_range_blocks_new_ranged_telegraph
+PASS active_telegraph_survives_point_blank
+PASS ranged_cooldown_drains_while_gated
+PASS close_range_melee_cooldown_scale
+PASS animation_frame_counts_match_manifest
+PASS attack_windup_aligns_with_telegraph_and_delivery
+TASK 69 BOSS TIMING AND STANDOFF TESTS PASSED: 8 tests, 342 assertions
