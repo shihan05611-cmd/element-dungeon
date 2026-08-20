@@ -1,0 +1,24 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS formal_catalog_and_feature_modes
+PASS active_prices_levels_and_effect_whitelist
+PASS four_passives_are_level_free_purchase_content
+PASS five_stage_demo_has_fixed_sequence
+PASS boss_is_stronger_and_awards_zero_dream_dust
+PASS three_build_budgets_are_feasible
+PASS seventy_percent_refund_has_no_arbitrage
+PASS fourteen_product_scenarios_have_static_domain_coverage
+TASK 31 CONTENT BALANCE TESTS FAILED: 12/9 tests, 273 assertions
+  - demo_rooms_have_reachable_scenes_and_spawns: combat_01_entry/entry_guard_b spawn x stays inside its arena
+  - demo_rooms_have_reachable_scenes_and_spawns: combat_01_entry/entry_guard_b spawn y stays above walkable geometry
+  - demo_rooms_have_reachable_scenes_and_spawns: combat_02_swarm/swarm_left spawn x stays inside its arena
+  - demo_rooms_have_reachable_scenes_and_spawns: combat_02_swarm/swarm_left spawn y stays above walkable geometry
+  - demo_rooms_have_reachable_scenes_and_spawns: combat_02_swarm/swarm_right spawn y stays above walkable geometry
+  - demo_rooms_have_reachable_scenes_and_spawns: combat_02_swarm/swarm_center spawn x stays inside its arena
+  - demo_rooms_have_reachable_scenes_and_spawns: combat_02_swarm/swarm_center spawn y stays above walkable geometry
+  - demo_rooms_have_reachable_scenes_and_spawns: combat_04_validation/validation_right spawn x stays inside its arena
+  - demo_rooms_have_reachable_scenes_and_spawns: combat_04_validation/validation_right spawn y stays above walkable geometry
+  - demo_rooms_have_reachable_scenes_and_spawns: combat_04_validation/validation_center spawn y stays above walkable geometry
+  - demo_rooms_have_reachable_scenes_and_spawns: combat_06_final_boss/final_boss_placeholder spawn y stays above walkable geometry
+  - demo_rooms_have_reachable_scenes_and_spawns: demo combat set references flat and boss templates (expected 2, got 3)

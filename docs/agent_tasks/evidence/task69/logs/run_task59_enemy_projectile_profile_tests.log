@@ -1,0 +1,14 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS validation_error_branches
+PASS equivalence_horizontal_zero_telegraph
+PASS diagonal_direction_and_angle_limit
+PASS zero_vector_falls_back_to_facing
+PASS diagonal_spawn_clears_world_blocker
+PASS telegraph_timing_lock_and_stillness
+PASS death_during_telegraph_cancels
+PASS cancel_telegraph_on_hurt_both_branches
+PASS spread_count_symmetric_independent
+PASS sprite_rotation_matches_direction
+TASK 59 ENEMY PROJECTILE PROFILE TESTS PASSED: 10 tests, 116 assertions

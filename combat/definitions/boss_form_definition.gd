@@ -22,6 +22,20 @@ extends Resource
 @export_range(1.0, 1000000.0, 0.001, "or_greater") var melee_range: float = 84.0
 @export_range(0.001, 60.0, 0.001, "or_greater") var attack_cooldown: float = 2.4
 
+## Task 69 §2.3 ranged stand-off ring. While the player's horizontal distance
+## is below this, the Boss stops OPENING new ranged telegraphs (an already
+## active one always plays out, and the ranged cooldown keeps draining --
+## see BossTideEmber._physics_process). Default 130px sits above both the
+## player's 78px basic-attack reach and the Boss's own 100px melee hitbox,
+## so "in your face" is unambiguously melee territory.
+@export_range(0.0, 1000000.0, 0.001, "or_greater") var ranged_minimum_distance: float = 130.0
+## Task 69 §2.4: multiplier applied to the effective melee cooldown while the
+## player is inside ranged_minimum_distance (attack_cooldown drains at
+## delta / scale). Smaller == recovers faster; 0.6 turns the ember form's
+## 2.4s into ~1.44s so gating ranged fire at point-blank cannot leave the
+## Boss with no move at all. Deliberately a scale, never a reset.
+@export_range(0.001, 1.0, 0.001) var melee_cooldown_close_range_scale: float = 0.6
+
 ## Optional summon move (potentially recruits TidalSentry for the water
 ## form). summon_max_alive == 0 disables summoning for this form.
 @export var summon_scene: PackedScene
@@ -51,6 +65,14 @@ func validation_error() -> StringName:
 		return &"invalid_melee_range"
 	if not is_finite(attack_cooldown) or attack_cooldown <= 0.0:
 		return &"invalid_attack_cooldown"
+	if not is_finite(ranged_minimum_distance) or ranged_minimum_distance < 0.0:
+		return &"invalid_ranged_minimum_distance"
+	if (
+		not is_finite(melee_cooldown_close_range_scale)
+		or melee_cooldown_close_range_scale <= 0.0
+		or melee_cooldown_close_range_scale > 1.0
+	):
+		return &"invalid_melee_cooldown_close_range_scale"
 	if summon_max_alive > 0 and summon_scene == null:
 		return &"missing_summon_scene"
 	if not is_finite(summon_cooldown) or summon_cooldown <= 0.0:

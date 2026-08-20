@@ -13,3 +13,4 @@ same_element_mitigation_factor = 0.25
 form_transition_invulnerable_duration = 0.6
 poise_hit_threshold = 6
 poise_break_stun_duration = 1.75
+melee_attack_impact_frame_index = 4

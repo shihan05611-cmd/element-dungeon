@@ -28,6 +28,16 @@ extends Resource
 @export_range(1, 999999, 1) var poise_hit_threshold: int = 6
 ## Length of the stagger window once poise breaks (§3.8, "1.5~2.0s").
 @export_range(0.1, 30.0, 0.001, "or_greater") var poise_break_stun_duration: float = 1.75
+## Task 69 §2.2: 0-based index of the impact frame inside the Boss's attack
+## animation, as declared by the Task 68 v2 sheet manifest
+## (assets/world/enemies/tide_ember_sovereign/manifest_v2.md §2: frames 0..3
+## are the windup, frame 4 is the impact, frames 5..7 the recovery). Global
+## rather than per-form because all three forms share one attack sheet
+## timing -- form differences ride on melee_damage / melee_range /
+## attack_cooldown instead. BossTideEmber reads the windup and recovery
+## segment lengths straight off the SpriteFrames using this index, so the
+## number never appears as a literal in code.
+@export_range(0, 63, 1) var melee_attack_impact_frame_index: int = 4
 
 
 func validation_error() -> StringName:
@@ -49,6 +59,8 @@ func validation_error() -> StringName:
 		return &"invalid_poise_hit_threshold"
 	if not is_finite(poise_break_stun_duration) or poise_break_stun_duration <= 0.0:
 		return &"invalid_poise_break_stun_duration"
+	if melee_attack_impact_frame_index < 0:
+		return &"invalid_melee_attack_impact_frame_index"
 	return &""
 
 

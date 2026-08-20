@@ -72,7 +72,7 @@ func _ready() -> void:
 	element_carrier.set_meta(&"same_element_mitigation_factor", tuning.same_element_mitigation_factor)
 	current_form_id = starting_form_id
 	ranged_projectile_profile = current_form.ranged_projectile_profile
-	sprite.play(_animation_name(&"idle"))
+	_play_pose(&"idle")
 	_choose_patrol_target()
 	_body_collision_layer = collision_layer
 	_body_collision_mask = collision_mask
@@ -132,10 +132,24 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, 0.0, TRANSITION_MOVE_DAMP * delta)
 		move_and_slide()
 		if poise_stun_time <= 0.0:
-			sprite.play(_animation_name(&"idle"))
+			_play_pose(&"idle")
 		return
 
-	attack_cooldown = maxf(attack_cooldown - delta, 0.0)
+	var form := current_form
+	var horizontal_distance := absf(global_position.x - player.global_position.x)
+	var vertical_distance := absf(global_position.y - player.global_position.y)
+	# Task 69 §2.3/§2.4: one distance test drives both the ranged stand-off
+	# gate below and the accelerated melee recovery here. Inside the ring the
+	# Boss has no ranged option left, so its melee cooldown drains at
+	# delta / melee_cooldown_close_range_scale instead of delta -- an ember
+	# form's 2.4s becomes ~1.44s. Deliberately a scaled drain rather than a
+	# reset: a reset would turn point-blank into back-to-back melee, which is
+	# worse than the bug being fixed.
+	var in_close_range := horizontal_distance < form.ranged_minimum_distance
+	var cooldown_step := delta
+	if in_close_range:
+		cooldown_step = delta / form.melee_cooldown_close_range_scale
+	attack_cooldown = maxf(attack_cooldown - cooldown_step, 0.0)
 	_summon_cooldown_remaining = maxf(_summon_cooldown_remaining - delta, 0.0)
 	prompt.visible = false
 
@@ -146,12 +160,8 @@ func _physics_process(delta: float) -> void:
 			telegraph_indicator.advance(delta)
 		move_and_slide()
 		if attack_time <= 0.0:
-			sprite.play(_animation_name(&"idle"))
+			_play_pose(&"idle")
 		return
-
-	var horizontal_distance := absf(global_position.x - player.global_position.x)
-	var vertical_distance := absf(global_position.y - player.global_position.y)
-	var form := current_form
 
 	if not _telegraph_active and horizontal_distance <= form.melee_range and vertical_distance < 90.0 and attack_cooldown <= 0.0:
 		_start_melee_attack(form)
@@ -166,10 +176,24 @@ func _physics_process(delta: float) -> void:
 		_start_summon(form)
 		return
 
-	_advance_ranged_attack_cycle(delta, form.ranged_projectile_profile, StringName("boss_%s" % current_form_id))
-	if _telegraph_active:
-		move_and_slide()
-		return
+	# Task 69 §2.3: the ranged cycle is gated on distance, but only at the
+	# "open a NEW telegraph" boundary -- an already-active telegraph is always
+	# driven to completion, otherwise dashing into the Boss mid-windup would
+	# be a free, cost-less cancel and the ! indicator would strobe on every
+	# in/out step. Whenever the gate does suppress the cycle, the ranged
+	# cooldown is drained by hand for exactly the same delta the base class
+	# would have consumed, so backing out of the ring is punished immediately
+	# instead of granting a free reload. Done here rather than inside
+	# CombatEnemy._advance_ranged_attack_cycle() because TidalSentry shares
+	# that method and must keep its current behavior verbatim.
+	if _telegraph_active or not in_close_range:
+		_advance_ranged_attack_cycle(delta, form.ranged_projectile_profile, StringName("boss_%s" % current_form_id))
+		if _telegraph_active or attack_time > 0.0:
+			velocity.x = 0.0
+			move_and_slide()
+			return
+	else:
+		_boss_projectile_cooldown = maxf(0.0, _boss_projectile_cooldown - delta)
 
 	var target_x := patrol_target_x
 	var speed := WALK_SPEED
@@ -185,13 +209,11 @@ func _physics_process(delta: float) -> void:
 	if direction_x != 0.0:
 		facing = direction_x
 		sprite.flip_h = facing < 0.0
-		var walk_anim := _animation_name(&"walk")
-		if sprite.animation != walk_anim:
-			sprite.play(walk_anim)
+		if sprite.animation != _animation_name(&"walk"):
+			_play_pose(&"walk")
 	else:
-		var idle_anim := _animation_name(&"idle")
-		if sprite.animation != idle_anim:
-			sprite.play(idle_anim)
+		if sprite.animation != _animation_name(&"idle"):
+			_play_pose(&"idle")
 	move_and_slide()
 
 
@@ -271,7 +293,7 @@ func _begin_form_transition(next_form_id: StringName) -> void:
 	switch_history.append(next_form_id)
 	if next_form_id == &"plain":
 		entered_plain_form = true
-	sprite.play(_animation_name(&"idle"))
+	_play_pose(&"idle")
 	form_changed.emit(next_form_id, next_form.display_name)
 
 
@@ -311,12 +333,116 @@ func _animation_name(pose: StringName) -> StringName:
 	return StringName("%s_%s" % [current_form_id, pose])
 
 
+## Every non-attack pose goes through here so speed_scale can never be left
+## behind by the ranged windup (which stretches the attack clip to fit the
+## profile's telegraph -- see _begin_ranged_attack_telegraph).
+func _play_pose(pose: StringName) -> void:
+	sprite.speed_scale = 1.0
+	sprite.play(_animation_name(pose))
+
+
+func _play_attack_from_frame(frame_index: int, speed_scale_value: float) -> void:
+	sprite.speed_scale = speed_scale_value
+	sprite.play(_animation_name(&"attack"))
+	var frame_count := _attack_frame_count()
+	if frame_count <= 0:
+		return
+	sprite.set_frame_and_progress(clampi(frame_index, 0, frame_count - 1), 0.0)
+
+
+func _attack_frame_count() -> int:
+	var frames := sprite.sprite_frames
+	var animation_name := _animation_name(&"attack")
+	if frames == null or not frames.has_animation(animation_name):
+		return 0
+	return frames.get_frame_count(animation_name)
+
+
+## Wall-clock length of the attack clip's frames [from_index, to_index), read
+## straight off the SpriteFrames (per-frame duration multiplier / animation
+## fps). Task 69 forbids restating the tempo as literals in code, so every
+## timing the Boss needs is derived from the authored resource plus the single
+## configured impact-frame index.
+func _attack_segment_duration(from_index: int, to_index: int) -> float:
+	var frames := sprite.sprite_frames
+	var animation_name := _animation_name(&"attack")
+	if frames == null or not frames.has_animation(animation_name):
+		return 0.0
+	var speed := frames.get_animation_speed(animation_name)
+	if speed <= 0.0:
+		return 0.0
+	var frame_count := frames.get_frame_count(animation_name)
+	var total := 0.0
+	for index: int in range(maxi(from_index, 0), mini(to_index, frame_count)):
+		total += frames.get_frame_duration(animation_name, index) / speed
+	return total
+
+
+## Frames 0 .. impact-1. Must equal the current form's
+## melee_telegraph_duration -- asserted by run_task69_*.
+func attack_windup_duration() -> float:
+	return _attack_segment_duration(0, tuning.melee_attack_impact_frame_index)
+
+
+## Frames impact .. last. Doubles as the post-launch hold for a ranged shot so
+## the impact pose is actually readable instead of being overwritten by walk
+## on the very next physics tick.
+func attack_recovery_duration() -> float:
+	return _attack_segment_duration(tuning.melee_attack_impact_frame_index, _attack_frame_count())
+
+
+## Task 69 §2.5: the base ranged cycle never touched the sprite, so the Boss
+## spent the whole 0.4~0.5s windup marching in place in its walk clip. The
+## attack clip's windup segment is reused as the charge-up, time-scaled so its
+## impact frame arrives exactly when the projectile spawns even though the
+## three forms telegraph for 0.4 / 0.45 / 0.5s against one 0.4s authored
+## windup (scale 0.8~1.0 -- a mild slow-down, never a skip).
+func _begin_ranged_attack_telegraph(profile: EnemyProjectileProfile, cast_source: StringName) -> void:
+	var was_active := _telegraph_active
+	super(profile, cast_source)
+	if not _telegraph_active or was_active:
+		return
+	var windup := attack_windup_duration()
+	var scale := 1.0
+	if windup > 0.0 and profile != null and profile.telegraph_duration > 0.0:
+		scale = windup / profile.telegraph_duration
+	_play_attack_from_frame(0, scale)
+
+
+func _launch_ranged_projectile(profile: EnemyProjectileProfile, direction: Vector2, cast_source: StringName) -> void:
+	var fired_before := boss_projectiles_fired
+	super(profile, direction, cast_source)
+	if boss_projectiles_fired == fired_before:
+		# Nothing actually spawned (dead, invalid profile, no player): make
+		# sure a stretched windup never leaks its speed_scale onward.
+		sprite.speed_scale = 1.0
+		return
+	_play_attack_from_frame(tuning.melee_attack_impact_frame_index, 1.0)
+	attack_time = maxf(attack_time, attack_recovery_duration())
+
+
+## Keeps the stretched ranged-windup speed_scale from surviving a cancel
+## (poise break, hurt, form transition, death) that the base class performs.
+func _cancel_ranged_attack_telegraph() -> void:
+	var was_active := _telegraph_active
+	super()
+	if was_active:
+		sprite.speed_scale = 1.0
+
+
 func _start_melee_attack(form: BossFormDefinition) -> void:
 	facing = signf(player.global_position.x - global_position.x)
 	if is_zero_approx(facing):
 		facing = 1.0
 	sprite.flip_h = facing < 0.0
-	sprite.play(_animation_name(&"attack"))
+	# Task 69 §2.2: the swing starts on animation frame 0 at exactly the same
+	# instant the ! indicator and the DelayedAreaDelivery's WAITING phase
+	# start, so the animation's windup segment (frames 0 .. impact-1) IS the
+	# telegraph window and the impact frame lands on the frame the hitbox goes
+	# live. Restarting explicitly at frame 0 matters because AnimatedSprite2D
+	# keeps its position when play() is called on the already-current, already
+	# finished non-looping clip.
+	_play_attack_from_frame(0, 1.0)
 	attack_cooldown = form.attack_cooldown
 	attack_time = maxf(form.melee_telegraph_duration, 0.05) + MELEE_ACTIVE_DURATION + MELEE_RECOVERY_DURATION
 	if telegraph_indicator != null and form.melee_telegraph_duration > 0.0:
@@ -376,7 +502,7 @@ func _alive_summon_count() -> int:
 func _start_summon(form: BossFormDefinition) -> void:
 	_summon_cooldown_remaining = form.summon_cooldown
 	attack_time = 0.5
-	sprite.play(_animation_name(&"attack"))
+	_play_attack_from_frame(0, 1.0)
 	var slots_free := form.summon_max_alive - _alive_summon_count()
 	var to_spawn := mini(form.summon_count_per_cast, slots_free)
 	for index: int in to_spawn:
@@ -423,7 +549,7 @@ func _on_death_candidate(_result: CombatResult) -> void:
 	element_carrier.clear_all()
 	prompt.visible = true
 	prompt.text = "已击败 · R 重置"
-	sprite.play(&"death")
+	_play_pose(&"death")
 	enemy_defeated.emit()
 	if _formal_run_spawn:
 		call_deferred("queue_free")
