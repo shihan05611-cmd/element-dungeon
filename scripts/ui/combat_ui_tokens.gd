@@ -32,39 +32,48 @@ const GAP_SM := 8
 const GAP_MD := 12
 const TOUCH_MINIMUM := 44
 
+# Fusion Pixel 12px has a crisp native raster at 12px.  The three compact
+# roles deliberately share that size; hierarchy comes from placement, panel
+# treatment, and semantic color instead of fractional vector-font steps.
+const FONT_CAPTION := 12
+const FONT_BODY := 12
+const FONT_EMPHASIS := 12
+const FONT_TITLE := 24
+
 
 static func panel(
 	background: Color = SURFACE,
 	border: Color = BORDER,
-	radius: int = 8,
+	radius: int = 0,
 	border_width: int = 2
 ) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = background
 	style.border_color = border
 	style.set_border_width_all(border_width)
-	style.set_corner_radius_all(radius)
-	style.shadow_color = Color(0.0, 0.0, 0.0, 0.42)
-	style.shadow_size = 5
+	style.set_corner_radius_all(2 if radius > 0 else 0)
+	# A soft vector shadow conflicts with the hard-edged pixel language.  The
+	# Theme uses integer border/inner strokes for separation instead.
+	style.shadow_size = 0
 	return style
 
 
 static func flat_panel(
 	background: Color = SURFACE_RAISED,
 	border: Color = BORDER,
-	radius: int = 6,
+	radius: int = 0,
 	border_width: int = 1
 ) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = background
 	style.border_color = border
 	style.set_border_width_all(border_width)
-	style.set_corner_radius_all(radius)
+	style.set_corner_radius_all(2 if radius > 0 else 0)
 	return style
 
 
 static func button_style(background: Color, border: Color) -> StyleBoxFlat:
-	var style := flat_panel(background, border, 6, 1)
+	var style := flat_panel(background, border, 2, 1)
 	style.content_margin_left = 12.0
 	style.content_margin_right = 12.0
 	style.content_margin_top = 8.0
@@ -72,7 +81,7 @@ static func button_style(background: Color, border: Color) -> StyleBoxFlat:
 	return style
 
 
-static func focus_style(border: Color = BORDER_FOCUS, radius: int = 7) -> StyleBoxFlat:
+static func focus_style(border: Color = BORDER_FOCUS, radius: int = 2) -> StyleBoxFlat:
 	var style := flat_panel(Color(0.0, 0.0, 0.0, 0.0), border, radius, 3)
 	style.expand_margin_left = 2.0
 	style.expand_margin_top = 2.0

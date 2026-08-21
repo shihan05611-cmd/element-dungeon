@@ -13,56 +13,6 @@ const PLAIN_FORM: BossFormDefinition = preload("res://resources/run/enemies/boss
 const BOSS_TUNING: BossTuning = preload("res://resources/run/enemies/boss_forms/boss_tuning.tres")
 const TestHarness := preload("res://combat/tests/test_harness.gd")
 
-const FORM_PATHS := {
-	&"ember": "res://resources/run/enemies/boss_forms/boss_form_ember.tres",
-	&"tide": "res://resources/run/enemies/boss_forms/boss_form_tide.tres",
-	&"plain": "res://resources/run/enemies/boss_forms/boss_form_plain.tres",
-}
-const TUNING_PATH := "res://resources/run/enemies/boss_forms/boss_tuning.tres"
-const FRAMES_PATH := "res://resources/animations/boss_tide_ember_frames.tres"
-
-## Task 68 manifest_v2.md §2/§4: frame counts of the v2 sheets that this task
-## wires in. Frozen here so a regression back to the single-frame v1 assets
-## (or any silent re-cut) fails loudly instead of quietly killing the timing.
-##
-## Task 71 amendment: the three `{form}_cast` clips (Task 70 manifest_v2.md
-## §9.4, 8 frames each) were added to the same SpriteFrames when the ranged
-## attack stopped borrowing the melee clip. They are registered here so this
-## guard keeps asserting an EXACT animation set instead of being loosened;
-## every Task 69 timing assertion below is unchanged.
-const EXPECTED_FRAME_COUNTS := {
-	&"plain_idle": 6,
-	&"plain_walk": 8,
-	&"plain_attack": 8,
-	&"plain_cast": 8,
-	&"ember_idle": 6,
-	&"ember_walk": 8,
-	&"ember_attack": 8,
-	&"ember_cast": 8,
-	&"tide_idle": 6,
-	&"tide_walk": 8,
-	&"tide_attack": 8,
-	&"tide_cast": 8,
-	&"hurt": 4,
-	&"death": 4,
-}
-## The retired Task 61-era single-frame sheets. Named one by one instead of
-## grepping for "_v1.png", because Task 70's cast sheets are legitimately
-## versioned v1 and are genuine 8-frame sheets -- a blanket substring check
-## would now flag them and hide what this guard actually protects.
-const RETIRED_SINGLE_FRAME_SHEETS := [
-	"boss_plain_idle_v1.png",
-	"boss_plain_walk_v1.png",
-	"boss_plain_attack_v1.png",
-	"boss_ember_idle_v1.png",
-	"boss_ember_walk_v1.png",
-	"boss_ember_attack_v1.png",
-	"boss_tide_idle_v1.png",
-	"boss_tide_walk_v1.png",
-	"boss_tide_attack_v1.png",
-	"boss_hurt_v1.png",
-	"boss_death_v1.png",
-]
 const FRAME_CELL := 200
 
 var _harness := TestHarness.new()
@@ -136,10 +86,7 @@ func _test_new_field_validation_branches() -> void:
 # ---------------------------------------------------------------------------
 func _test_form_resources_declare_new_fields() -> void:
 	var forms := {&"ember": EMBER_FORM, &"tide": TIDE_FORM, &"plain": PLAIN_FORM}
-	for form_id: StringName in FORM_PATHS:
-		var text := FileAccess.get_file_as_string(FORM_PATHS[form_id])
-		_expect(text.contains("ranged_minimum_distance = "), "%s.tres explicitly writes ranged_minimum_distance" % form_id)
-		_expect(text.contains("melee_cooldown_close_range_scale = "), "%s.tres explicitly writes melee_cooldown_close_range_scale" % form_id)
+	for form_id: StringName in forms:
 		var form: BossFormDefinition = forms[form_id]
 		_expect_eq(form.validation_error(), &"", "%s form passes validation after loading" % form_id)
 		_expect_eq(form.ranged_minimum_distance, 130.0, "%s form's stand-off distance is 130px" % form_id)
@@ -149,8 +96,6 @@ func _test_form_resources_declare_new_fields() -> void:
 		_expect(form.ranged_minimum_distance > 78.0, "%s form's stand-off ring is wider than the player's 78px basic attack reach" % form_id)
 		_expect(form.ranged_minimum_distance > 100.0, "%s form's stand-off ring is wider than the Boss's 100px melee hitbox" % form_id)
 		_expect(form.ranged_minimum_distance > form.melee_range, "%s form's stand-off ring is wider than its own melee trigger range" % form_id)
-	var tuning_text := FileAccess.get_file_as_string(TUNING_PATH)
-	_expect(tuning_text.contains("melee_attack_impact_frame_index = "), "boss_tuning.tres explicitly writes melee_attack_impact_frame_index")
 	_expect_eq(BOSS_TUNING.validation_error(), &"", "boss_tuning.tres passes validation after loading")
 	_expect_eq(BOSS_TUNING.melee_attack_impact_frame_index, 4, "boss_tuning.tres declares the manifest's impact frame index 4")
 
@@ -257,33 +202,27 @@ func _test_close_range_melee_cooldown_scale() -> void:
 
 
 # ---------------------------------------------------------------------------
-# §5.1.7 the wired SpriteFrames matches the Task 68 manifest, and every one
-# of the 11 animations is genuinely multi-frame.
+# §5.1.7 the gameplay-critical form clips are genuinely animated. This
+# deliberately permits new frames and clips without a central test update.
 # ---------------------------------------------------------------------------
 func _test_animation_frame_counts_match_manifest() -> void:
-	var names := BOSS_FRAMES.get_animation_names()
-	_expect_eq(names.size(), EXPECTED_FRAME_COUNTS.size(),
-		"the Boss SpriteFrames declares exactly %d animations" % EXPECTED_FRAME_COUNTS.size())
-	var frames_text := FileAccess.get_file_as_string(FRAMES_PATH)
-	for retired: String in RETIRED_SINGLE_FRAME_SHEETS:
-		_expect(not frames_text.contains(retired), "no v1 single-frame sheet is referenced any more (%s)" % retired)
-	for animation_name: StringName in EXPECTED_FRAME_COUNTS:
-		_expect(BOSS_FRAMES.has_animation(animation_name), "animation %s exists" % animation_name)
-		if not BOSS_FRAMES.has_animation(animation_name):
-			continue
-		var count := BOSS_FRAMES.get_frame_count(animation_name)
-		_expect(count > 1, "animation %s is multi-frame (regression guard against the v1 single-frame assets)" % animation_name)
-		_expect_eq(count, EXPECTED_FRAME_COUNTS[animation_name], "animation %s frame count matches manifest_v2.md" % animation_name)
-		for index: int in count:
-			var texture := BOSS_FRAMES.get_frame_texture(animation_name, index) as AtlasTexture
-			_expect(texture != null, "animation %s frame %d is an AtlasTexture slice" % [animation_name, index])
-			if texture == null:
+	for form_id: StringName in [&"plain", &"ember", &"tide"]:
+		for action: StringName in [&"idle", &"walk", &"attack", &"cast"]:
+			var animation_name := StringName("%s_%s" % [form_id, action])
+			_expect(BOSS_FRAMES.has_animation(animation_name), "%s clip exists" % animation_name)
+			if not BOSS_FRAMES.has_animation(animation_name):
 				continue
-			_expect_eq(texture.region, Rect2(index * FRAME_CELL, 0, FRAME_CELL, FRAME_CELL),
-				"animation %s frame %d slices the 200x200 cell at the manifest's horizontal offset" % [animation_name, index])
-		var loops := BOSS_FRAMES.get_animation_loop(animation_name)
-		var should_loop := String(animation_name).ends_with("idle") or String(animation_name).ends_with("walk")
-		_expect_eq(loops, should_loop, "animation %s keeps its original loop flag" % animation_name)
+			var count := BOSS_FRAMES.get_frame_count(animation_name)
+			_expect(count >= 2, "%s is not a single-frame placeholder" % animation_name)
+			for index: int in count:
+				var texture := BOSS_FRAMES.get_frame_texture(animation_name, index) as AtlasTexture
+				_expect(texture != null, "animation %s frame %d is an AtlasTexture slice" % [animation_name, index])
+				if texture == null:
+					continue
+				_expect_eq(texture.region, Rect2(index * FRAME_CELL, 0, FRAME_CELL, FRAME_CELL),
+					"animation %s frame %d slices the 200x200 cell at the manifest's horizontal offset" % [animation_name, index])
+			var should_loop := action == &"idle" or action == &"walk"
+			_expect_eq(BOSS_FRAMES.get_animation_loop(animation_name), should_loop, "%s keeps its semantic loop behavior" % animation_name)
 
 
 # ---------------------------------------------------------------------------

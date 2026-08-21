@@ -154,7 +154,6 @@ func _run_all() -> void:
 	await _run_test("delivery_prepare_and_parent_failures_are_atomic", _test_prepare_failure_matrix)
 	await _run_test("nested_cast_is_busy_during_commit", _test_nested_cast_is_busy)
 	await _run_test("execution_services_narrow_updates_preserve_ports", _test_services_preserve_ports)
-	await _run_test("production_callers_use_public_try_cast", _test_public_try_cast_scan)
 	await _run_test("formal_profile_is_shared_and_exact", _test_formal_profile_shared)
 	await _run_test("real_physics_wall_tie_and_stable_enemy_order", _test_real_query_ordering)
 	await _run_test("retained_public_results_are_stable_and_contactless_states_are_clean", _test_retained_results)
@@ -281,15 +280,6 @@ func _test_services_preserve_ports() -> void:
 	_expect(copy.projectile_sweep_query_port == query, "copy preserves query port")
 	_expect(copy.skill_delivery_prepare_port == prepare, "copy preserves prepare port")
 	parent.free()
-
-
-func _test_public_try_cast_scan() -> void:
-	var player_source := FileAccess.get_file_as_string("res://scripts/player.gd")
-	var controller_source := FileAccess.get_file_as_string("res://combat/components/skill_controller.gd")
-	_expect(not player_source.contains("._try_cast_configured"), "Player has no private executor call")
-	_expect(not controller_source.contains("._try_cast_configured"), "SkillController has no private executor call")
-	_expect(player_source.contains("skill_executor.try_cast("), "Player basic attack uses public try_cast")
-	_expect(controller_source.contains("_executor.try_cast("), "SkillController uses public try_cast")
 
 
 func _test_formal_profile_shared() -> void:

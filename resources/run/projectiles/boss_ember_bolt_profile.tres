@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="EnemyProjectileProfile" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyProjectileProfile" format=3 uid="uid://cdhbmd6oweokm"]
 
-[ext_resource type="Script" path="res://combat/definitions/enemy_projectile_profile.gd" id="1_profile"]
+[ext_resource type="Script" uid="uid://c5fxhvd706xn7" path="res://combat/definitions/enemy_projectile_profile.gd" id="1_profile"]
 [ext_resource type="PackedScene" path="res://scenes/run/boss_ember_bolt.tscn" id="2_scene"]
 
 [resource]
@@ -11,11 +11,8 @@ max_distance = 980.0
 damage = 10.0
 element_id = &"fire"
 element_amount = 1
-hurtbox_collision_mask = 16
-blocking_collision_mask = 4
 telegraph_duration = 0.5
 aim_mode = 1
-aim_angle_limit_degrees = 60.0
 spread_count = 3
 spread_angle_degrees = 26.0
 spawn_offset_distance = 62.0

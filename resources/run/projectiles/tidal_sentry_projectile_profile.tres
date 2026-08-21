@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="EnemyProjectileProfile" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyProjectileProfile" format=3 uid="uid://chamsqe1su5xe"]
 
-[ext_resource type="Script" path="res://combat/definitions/enemy_projectile_profile.gd" id="1_profile"]
+[ext_resource type="Script" uid="uid://c5fxhvd706xn7" path="res://combat/definitions/enemy_projectile_profile.gd" id="1_profile"]
 [ext_resource type="PackedScene" path="res://scenes/run/tidal_sentry_bolt.tscn" id="2_scene"]
 
 [resource]
@@ -8,18 +8,7 @@ script = ExtResource("1_profile")
 projectile_scene = ExtResource("2_scene")
 speed = 255.0
 max_distance = 980.0
-damage = 8.0
-element_id = &"none"
-element_amount = 0
-hurtbox_collision_mask = 16
-blocking_collision_mask = 4
 telegraph_duration = 0.4
 aim_mode = 1
-aim_angle_limit_degrees = 60.0
-spread_count = 1
-spread_angle_degrees = 0.0
-spawn_offset_distance = 58.0
 texture_forward_offset_degrees = 0.0
-attack_interval = 1.9
-cancel_telegraph_on_hurt = true
 presentation_tags = PackedStringArray("tidal_sentry_projectile")

@@ -1,17 +1,6 @@
-[gd_resource type="Resource" script_class="BossTuning" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="BossTuning" format=3 uid="uid://cghcaee35iry4"]
 
-[ext_resource type="Script" path="res://combat/definitions/boss_tuning.gd" id="1_tuning"]
+[ext_resource type="Script" uid="uid://cw0xnp4rxfqg" path="res://combat/definitions/boss_tuning.gd" id="1_tuning"]
 
 [resource]
 script = ExtResource("1_tuning")
-counter_hit_threshold = 15
-attach_layers_on_switch = 5
-attach_layer_regen_interval = 3.0
-attach_layer_cap = 10
-alternation_switch_cap = 2
-same_element_mitigation_factor = 0.25
-form_transition_invulnerable_duration = 0.6
-poise_hit_threshold = 6
-poise_break_stun_duration = 1.75
-melee_attack_impact_frame_index = 4
-ranged_cast_launch_frame_index = 5

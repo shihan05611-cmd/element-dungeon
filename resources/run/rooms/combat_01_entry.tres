@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="CombatRoomDefinition" format=3 uid="uid://c4frt4jey5s74"]
 
-[ext_resource type="Script" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
-[ext_resource type="Script" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
+[ext_resource type="Script" uid="uid://147bp5lbfphl" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
+[ext_resource type="Script" uid="uid://kkg62e2wet7j" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
 [ext_resource type="PackedScene" path="res://scenes/run/rooms/room_arena_flat.tscn" id="3_template"]
 [ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="4_enemy"]
 
@@ -19,7 +19,6 @@ enemy_scene = ExtResource("4_enemy")
 enemy_id = &"entry_guard_b"
 local_position = Vector2(1000, 584)
 maximum_health = 70
-dream_dust_reward = 0
 
 [resource]
 script = ExtResource("1_room")
@@ -30,7 +29,6 @@ encounter_label = "双近战"
 environment_label = "开阔平地"
 room_scene = ExtResource("3_template")
 enemy_spawns = Array[ExtResource("2_spawn")]([SubResource("SpawnEntry"), SubResource("SpawnEntryB")])
-reinforcement_delay_seconds = 12.0
 completion_dream_dust = 100
 single_wave = true
 guaranteed_active_skill_reward = true

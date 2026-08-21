@@ -1,0 +1,12 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS font_import_keeps_pixel_edges
+PASS pixel_type_scale_is_tokenized
+PASS static_hud_panels_use_theme_variations
+TASK73 COMPAT active_1 rect=[P: (208.0, 526.0), S: (160.0, 131.0)] minimum=(160.0, 112.0)
+TASK73 COMPAT active_2 rect=[P: (392.0, 526.0), S: (160.0, 131.0)] minimum=(160.0, 112.0)
+TASK73 COMPAT active_3 rect=[P: (576.0, 526.0), S: (160.0, 131.0)] minimum=(160.0, 112.0)
+TASK73 COMPAT passive_1 rect=[P: (760.0, 526.0), S: (160.0, 131.0)] minimum=(160.0, 112.0)
+PASS task72_and_task74_geometry_is_preserved
+TASK 73 PIXEL FONT AND HUD THEME TESTS PASSED: 4 tests, 33 assertions

@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="SkillDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://dbwc7c1ylmw44"]
 
-[ext_resource type="Script" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
-[ext_resource type="Script" path="res://combat/passives/unending_passive_effect_definition.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://b2p5xuomj0hba" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" uid="uid://4o1wfm65vnrb" path="res://combat/passives/unending_passive_effect_definition.gd" id="2_effect"]
 
 [sub_resource type="Resource" id="UnendingEffect"]
 script = ExtResource("2_effect")
-health_per_layer = 1
 
 [resource]
 script = ExtResource("1_skill")

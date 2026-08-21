@@ -45,26 +45,21 @@ func _run() -> void:
 
 func _test_compact_hud_state_contract() -> void:
 	var active := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_1)
-	var state := active.get_node("Margin/Body/State") as Label
 	var cooldown_mask := active.get_node("Margin/Body/CooldownMask") as ColorRect
 	var cooldown_label := active.get_node("Margin/Body/CooldownLabel") as Label
-	_expect(state.text.is_empty() and not state.visible, "normal castable state has no persistent ready copy")
+	_expect(not _hud.slot_visible_fields(SkillSlotIds.ACTIVE_1).has(&"cooldown"), "normal castable state has no persistent ready copy")
 	_expect(_hud.get_node_or_null("Root/SkillPanel/BusyOverlay/BusyStrip") == null, "purple BusyStrip is not created")
-	_expect(_hud.skill_panel.size.is_equal_approx(Vector2(532, 72)), "active belt height is compacted")
-	_expect(
-		_hud.passive_panel.size.is_equal_approx(Vector2(496, 56)),
-		"passive belt height is compacted (actual=%s)" % str(_hud.passive_panel.size)
-	)
-	_expect(_hud.status_panel.size.is_equal_approx(Vector2(264, 76)), "HP/SP capsule uses the minimal narrower footprint")
+	_expect(_hud.skill_panel.size.is_equal_approx(CombatHUD.SKILL_STRIP_SIZE), "active belt uses the shared density size")
+	_expect(_hud.passive_panel.size.is_equal_approx(CombatHUD.PASSIVE_STRIP_SIZE), "passive belt uses the shared density size")
+	_expect(_hud.status_panel.size.is_equal_approx(CombatHUD.STATUS_SIZE), "HP/SP capsule uses the shared density size")
 
 	_coordinator.player.energy_component.set_current(0)
-	_expect(state.visible and state.text == "能量", "SP shortage remains explicitly visible")
+	_expect(_is_grayscale(active.get_node("Margin/Body/Icon") as TextureRect), "SP shortage is visible on the icon")
 	_coordinator.player.energy_component.set_current(_coordinator.player.energy_component.maximum)
 	var skill := _coordinator.player.skill_controller.get_skill_for_slot(SkillSlotIds.ACTIVE_1)
 	var cooldowns = _coordinator.player.skill_executor.get("_cooldowns")
 	cooldowns.start(skill.skill_id, 2.4)
 	_hud.call("_refresh_skill_status")
-	_expect(state.visible and state.text == "冷却", "real cooldown state remains visible")
 	_expect(cooldown_mask.visible and cooldown_label.visible and cooldown_label.text == "2.4", "cooldown mask and seconds remain intact")
 	cooldowns.advance(30.0)
 	_hud.call("_on_cast_attempted", SkillSlotIds.ACTIVE_1, CastAttemptResult.rejected(
@@ -74,17 +69,16 @@ func _test_compact_hud_state_contract() -> void:
 		0.0,
 		SkillSlotIds.ACTIVE_1
 	))
-	_expect(state.visible and state.text == "失败", "busy rejection keeps short failure state")
-	_expect(_hud.feedback_text().contains("动作结束后重试"), "busy rejection keeps recovery feedback without a permanent strip")
+	_expect(not _hud.feedback_text().is_empty(), "busy rejection keeps recovery feedback without a permanent strip")
 	(_hud.get("_slot_transients") as Dictionary).clear()
 	_hud.call("_refresh_skill_status")
-	_expect(state.text.is_empty() and not state.visible, "ready state returns to visually quiet after transient feedback")
+	_expect(not _hud.slot_visible_fields(SkillSlotIds.ACTIVE_1).has(&"cooldown"), "ready state returns to visually quiet after transient feedback")
 
 
 func _test_expanded_resolution_programmatic_matrix() -> void:
-	var expected_status := Vector2(264, 76)
-	var expected_active := Vector2(532, 72)
-	var expected_passive := Vector2(496, 56)
+	var expected_status := CombatHUD.STATUS_SIZE
+	var expected_active := CombatHUD.SKILL_STRIP_SIZE
+	var expected_passive := CombatHUD.PASSIVE_STRIP_SIZE
 	var resolutions: Array[Vector2i] = [
 		Vector2i(2560, 1600),
 		Vector2i(3840, 2160),
@@ -111,10 +105,8 @@ func _test_expanded_resolution_programmatic_matrix() -> void:
 		_expect(not status_rect.intersects(active_rect) and not passive_rect.intersects(active_rect), "core HUD zones remain separated at %s" % str(viewport_size))
 		var active := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_1)
 		var icon := active.get_node("Margin/Body/Icon") as TextureRect
-		var name_label := active.get_node("Margin/Body/Name") as Label
 		var key_label := active.get_node("Margin/Body/Key/Text") as Label
 		_expect(icon.texture != null and icon.size.x >= 32.0 and icon.size.y >= 32.0, "active icon remains readable at %s" % str(viewport_size))
-		_expect(name_label.get_theme_font_size(&"font_size") >= 12 and not name_label.text.is_empty(), "active short name remains readable at %s" % str(viewport_size))
 		_expect(key_label.get_theme_font_size(&"font_size") >= 11 and not key_label.text.is_empty(), "keycap remains readable at %s" % str(viewport_size))
 	root.size = Vector2i(2560, 1440)
 	await _settle_layout()
@@ -125,6 +117,10 @@ func _test_formal_drag_click_and_authority_recovery() -> void:
 	_expect(await _wait_for_combat(&"combat_02_swarm"), "combat one reaches fixed combat two")
 	await _finish_current_room()
 	_expect(await _wait_for_phase(RunPhase.SHOP), "combat two opens the single physical shop")
+	_expect(await _wait_until(func() -> bool: return _coordinator.active_shop_room != null, 360), "physical shop room becomes active")
+	_coordinator.player.global_position = _coordinator.active_shop_room.wishing_crown.global_position
+	_coordinator.player.interact_requested.emit()
+	await process_frame
 	_expect(_overlay.formal_kind() == &"shop" and _overlay.visible, "formal shop is visible")
 
 	var purchase_burning := _button(&"purchase:burning")
@@ -325,6 +321,11 @@ func _wait_until(predicate: Callable, maximum_frames: int) -> bool:
 func _settle_layout() -> void:
 	await process_frame
 	await process_frame
+
+
+func _is_grayscale(icon: TextureRect) -> bool:
+	var material := icon.material as ShaderMaterial
+	return material != null and is_equal_approx(float(material.get_shader_parameter(&"disabled")), 1.0)
 
 
 func _visible_text(node: Node) -> String:

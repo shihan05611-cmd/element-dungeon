@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="SkillContentDefinition" load_steps=12 format=3]
+[gd_resource type="Resource" script_class="SkillContentDefinition" format=3 uid="uid://5fcopp0ux367"]
 
-[ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="1_content"]
-[ext_resource type="Resource" path="res://resources/skills/elemental_laser.tres" id="2_gameplay"]
+[ext_resource type="Script" uid="uid://e8y3mjta6es4" path="res://combat/content/skill_content_definition.gd" id="1_content"]
+[ext_resource type="Resource" uid="uid://cw6oskgmcwbil" path="res://resources/skills/elemental_laser.tres" id="2_gameplay"]
 [ext_resource type="PackedScene" path="res://combat/delivery/element_beam_delivery.tscn" id="3_delivery"]
-[ext_resource type="Texture2D" path="res://assets/generated/vfx/elemental_laser/icon.png" id="4_icon"]
+[ext_resource type="Texture2D" uid="uid://dny7r773w4csr" path="res://assets/generated/vfx/elemental_laser/icon.png" id="4_icon"]
 [ext_resource type="PackedScene" path="res://scenes/vfx/elemental_laser_presentation.tscn" id="5_presentation"]
-[ext_resource type="Script" path="res://growth/definitions/active_skill_level_definition.gd" id="6_level"]
-[ext_resource type="Script" path="res://growth/definitions/active_skill_progression_definition.gd" id="7_progression"]
+[ext_resource type="Script" uid="uid://bpnewnpqlqkgf" path="res://growth/definitions/active_skill_level_definition.gd" id="6_level"]
+[ext_resource type="Script" uid="uid://c4ecxy37334v7" path="res://growth/definitions/active_skill_progression_definition.gd" id="7_progression"]
 
 [sub_resource type="Resource" id="Resource_laser_lv1"]
 script = ExtResource("6_level")

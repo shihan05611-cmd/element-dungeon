@@ -1,23 +1,7 @@
-[gd_resource type="SpriteFrames" load_steps=11 format=3]
+[gd_resource type="SpriteFrames" format=3 uid="uid://csk7falm260yj"]
 
-[ext_resource type="Texture2D" path="res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png" id="1_water"]
-[ext_resource type="Texture2D" path="res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png" id="2_fire"]
-
-[sub_resource type="AtlasTexture" id="water_0"]
-atlas = ExtResource("1_water")
-region = Rect2(0, 0, 384, 160)
-
-[sub_resource type="AtlasTexture" id="water_1"]
-atlas = ExtResource("1_water")
-region = Rect2(384, 0, 384, 160)
-
-[sub_resource type="AtlasTexture" id="water_2"]
-atlas = ExtResource("1_water")
-region = Rect2(768, 0, 384, 160)
-
-[sub_resource type="AtlasTexture" id="water_3"]
-atlas = ExtResource("1_water")
-region = Rect2(1152, 0, 384, 160)
+[ext_resource type="Texture2D" uid="uid://dj86n6pf2egkb" path="res://assets/generated/vfx/element_bolt/projectile_water_no_jitter_spritesheet.png" id="1_water"]
+[ext_resource type="Texture2D" uid="uid://cp3y0c4uqn4ck" path="res://assets/generated/vfx/element_bolt/projectile_fire_no_jitter_spritesheet.png" id="2_fire"]
 
 [sub_resource type="AtlasTexture" id="fire_0"]
 atlas = ExtResource("2_fire")
@@ -35,6 +19,22 @@ region = Rect2(768, 0, 384, 160)
 atlas = ExtResource("2_fire")
 region = Rect2(1152, 0, 384, 160)
 
+[sub_resource type="AtlasTexture" id="water_0"]
+atlas = ExtResource("1_water")
+region = Rect2(0, 0, 384, 160)
+
+[sub_resource type="AtlasTexture" id="water_1"]
+atlas = ExtResource("1_water")
+region = Rect2(384, 0, 384, 160)
+
+[sub_resource type="AtlasTexture" id="water_2"]
+atlas = ExtResource("1_water")
+region = Rect2(768, 0, 384, 160)
+
+[sub_resource type="AtlasTexture" id="water_3"]
+atlas = ExtResource("1_water")
+region = Rect2(1152, 0, 384, 160)
+
 [resource]
 animations = [{
 "frames": [{
@@ -50,7 +50,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("fire_3")
 }],
-"loop": true,
+"loop": 1,
 "name": &"fire",
 "speed": 12.5
 }, {
@@ -67,7 +67,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("water_3")
 }],
-"loop": true,
+"loop": 1,
 "name": &"water",
 "speed": 12.5
 }]

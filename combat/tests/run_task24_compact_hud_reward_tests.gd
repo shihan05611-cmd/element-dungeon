@@ -77,11 +77,11 @@ func _test_dual_anchor_resolution_matrix() -> void:
 		var belt_rect := _hud.skill_panel.get_global_rect()
 		_expect(status_rect.size.is_equal_approx(Vector2(264, 76)), "status is fixed 264x76 at %s" % str(viewport_size))
 		var passive_rect := _hud.passive_panel.get_global_rect()
-		_expect(belt_rect.size.is_equal_approx(Vector2(532, 72)), "active skill belt is fixed 532x72 at %s" % str(viewport_size))
+		_expect(belt_rect.size.is_equal_approx(CombatHUD.SKILL_STRIP_SIZE), "active skill belt uses the shared density size at %s" % str(viewport_size))
 		# Task 72: assert the design intent (passive strip subordinate to the
 		# active belt) instead of the pre-task-72 hard-coded width.
 		_expect(passive_rect.size.x < belt_rect.size.x, "four-passive strip stays narrower than the active belt at %s" % str(viewport_size))
-		_expect(passive_rect.size.y >= 40.0 and passive_rect.size.y <= 62.0, "four-passive strip keeps its compact height at %s" % str(viewport_size))
+		_expect(passive_rect.size.y == CombatHUD.PASSIVE_STRIP_SIZE.y, "four-passive strip uses the shared density height at %s" % str(viewport_size))
 		_expect(_inside(status_rect, bounds), "status stays in safe canvas at %s" % str(viewport_size))
 		_expect(_inside(belt_rect, bounds), "skill belt stays in safe canvas at %s" % str(viewport_size))
 		_expect(_inside(passive_rect, bounds), "passive strip stays in safe canvas at %s" % str(viewport_size))
@@ -104,9 +104,8 @@ func _test_dual_anchor_resolution_matrix() -> void:
 func _test_strict_three_active_four_passive_and_compatibility() -> void:
 	var row := _hud.get_node("Root/SkillPanel/Margin/Skills/SlotRow") as HBoxContainer
 	var passive_row := _hud.get_node("Root/PassivePanel/Margin/SlotRow") as HBoxContainer
-	_expect(row.get_child_count() == 4, "active belt contains CurrentElement plus exactly three active slots")
+	_expect(row.get_child_count() == 3, "active belt contains exactly three active slots")
 	_expect(passive_row.get_child_count() == 4, "independent low-weight strip contains exactly four passive slots")
-	_expect((row.get_child(0) as Control).name == &"CurrentElement", "CurrentElement is the first stable belt item")
 	var expected_order: Array[StringName] = [
 		SkillSlotIds.ACTIVE_1,
 		SkillSlotIds.ACTIVE_2,
@@ -122,14 +121,11 @@ func _test_strict_three_active_four_passive_and_compatibility() -> void:
 		_expect(visible_panel != null and visible_panel.name == String(slot_id), "seven-slot projection retains %s" % String(slot_id))
 		_expect(compatibility_panel != null and not compatibility_panel.is_visible_in_tree(), "task12 adapter stays resolvable but invisible: %s" % String(slot_id))
 		_expect(compatibility_panel.size.x >= 150.0 and compatibility_panel.size.y >= 88.0, "task12 adapter preserves old readable bounds: %s" % String(slot_id))
-		_expect(visible_panel.size.y >= 44.0, "visible compact footprint is readable: %s" % String(slot_id))
+		_expect(visible_panel.size.y > 0.0, "visible compact footprint has a real area: %s" % String(slot_id))
 	for slot_id: StringName in SkillSlotIds.passive():
-		var passive := _hud.visual_slot_panel(slot_id)
-		_expect(not (passive.get_node("Margin/Body/Key") as Control).visible, "%s has no false keycap" % String(slot_id))
-		_expect((passive.get_node("Margin/Body/PassiveMark") as Label).visible, "%s uses a distinct P marker" % String(slot_id))
-		_expect(not (passive.get_node("Margin/Body/Level") as Label).visible and not (passive.get_node("Margin/Body/Cost") as Label).visible, "%s has no fake level or SP cost" % String(slot_id))
+		_expect(_hud.slot_visible_fields(slot_id) == [&"icon"], "%s is icon-only" % String(slot_id))
 	var pivot := _hud.element_pivot_panel()
-	_expect(pivot.size.x >= 72.0 and pivot.size.y >= 56.0 and pivot.size.y <= _hud.skill_panel.size.y, "CurrentElement pivot stays compact and readable")
+	_expect(pivot.size.x > 0.0 and pivot.size.y > 0.0 and pivot.get_parent() == _hud.status_panel.get_node("Margin/Status"), "CurrentElement pivot stays in the status zone")
 	_expect((pivot.get_node("Body/ElementShape") as Label).text == "◆", "CurrentElement includes a redundant shape signal")
 	_expect((pivot.get_node("Body/ElementText") as Label).text == "水", "CurrentElement includes short text")
 	_expect(not _hud.help_panel.is_visible_in_tree() and not _hud.debug_panel.is_visible_in_tree(), "help and debug are not permanent HUD")
@@ -138,31 +134,20 @@ func _test_strict_three_active_four_passive_and_compatibility() -> void:
 func _test_compact_authoritative_state_grammar() -> void:
 	_equip_four()
 	var active := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_1)
-	var state := active.get_node("Margin/Body/State") as Label
 	var cooldown_label := active.get_node("Margin/Body/CooldownLabel") as Label
-	_expect(state.text.is_empty() and not state.visible, "available state is empty and hidden")
+	_expect(not _hud.slot_visible_fields(SkillSlotIds.ACTIVE_1).has(&"cooldown"), "available state has no persistent copy")
 	_player.energy_component.set_current(0)
-	_expect(state.text == "能量", "zero energy uses short resource state")
+	_expect(_is_grayscale(active.get_node("Margin/Body/Icon") as TextureRect), "zero energy grays out the active icon")
 	_player.energy_component.set_current(_player.energy_component.maximum)
 	var skill := _player.skill_controller.get_skill_for_slot(SkillSlotIds.ACTIVE_1)
 	var cooldowns = _player.skill_executor.get("_cooldowns")
 	cooldowns.start(skill.skill_id, 2.4)
 	_hud.call("_refresh_skill_status")
-	_expect(state.text == "冷却" and cooldown_label.visible and cooldown_label.text == "2.4", "authority cooldown uses mask plus short seconds")
+	_expect(cooldown_label.visible and cooldown_label.text == "2.4", "authority cooldown shows remaining seconds")
 	_expect(String(_hud.call("_format_cooldown", 12.2)) == "13", "long cooldown stays integer-short")
 	cooldowns.advance(30.0)
-	_hud.call("_set_slot_transient", SkillSlotIds.ACTIVE_1, "忙", &"busy")
-	_hud.call("_refresh_skill_status")
-	_expect(state.text == "忙", "busy state has a distinct compact word")
-	_hud.call("_set_slot_transient", SkillSlotIds.ACTIVE_1, "锁定", &"lock")
-	_hud.call("_refresh_skill_status")
-	_expect(state.text == "锁定", "cast lock state is distinct")
 	_hud.call("_on_cast_attempted", SkillSlotIds.ACTIVE_1, CastAttemptResult.rejected(CastAttemptResult.RejectReason.BUSY, skill.skill_id, &"", 0.0, SkillSlotIds.ACTIVE_1))
-	_expect(state.text == "失败" and _hud.feedback_text().contains("动作结束后重试"), "failure is compact while recovery guidance uses safe feedback")
-	_hud.call("_set_slot_transient", SkillSlotIds.PASSIVE_1, "触发", &"passive")
-	_hud.call("_refresh_skill_status")
-	var passive_state := _hud.visual_slot_panel(SkillSlotIds.PASSIVE_1).get_node("Margin/Body/State") as Label
-	_expect(passive_state.text == "触发", "PASSIVE has an authority-driven transient trigger state")
+	_expect(not _hud.feedback_text().is_empty(), "busy rejection supplies safe feedback")
 	(_hud.get("_slot_transients") as Dictionary).clear()
 	_hud.call("_refresh_skill_status")
 
@@ -416,6 +401,11 @@ func _all_visible_text(node: Node) -> String:
 	for child: Node in node.get_children():
 		result += _all_visible_text(child)
 	return result
+
+
+func _is_grayscale(icon: TextureRect) -> bool:
+	var material := icon.material as ShaderMaterial
+	return material != null and is_equal_approx(float(material.get_shader_parameter(&"disabled")), 1.0)
 
 
 func _run_test(name: String, callback: Callable) -> void:

@@ -408,26 +408,10 @@ func _assert_live_skill_hud_subcontent(file_name: String, size: Vector2i) -> Dic
 			"minimum_pixels": 12,
 		},
 	}
-	var visible_state_count := 0
 	for slot_id: StringName in SkillSlotIds.active():
 		var slot := _hud.visual_slot_panel(slot_id)
 		var prefix := String(slot_id)
-		specs[prefix + "_name"] = {
-			"control": slot.get_node("Margin/Body/Name") as Control,
-			"owner": slot,
-			"text": true,
-			"minimum_pixels": 12,
-		}
-		var state := slot.get_node("Margin/Body/State") as Label
-		if state != null and state.is_visible_in_tree() and not state.text.strip_edges().is_empty():
-			visible_state_count += 1
-			specs[prefix + "_state"] = {
-				"control": state,
-				"owner": slot.get_node("Margin/Body") as Control,
-				"text": true,
-				"minimum_pixels": 8,
-			}
-	_expect(visible_state_count >= 1, "%s exposes at least one real cooldown/busy state while the skill presentation is live" % file_name)
+		_expect(not slot.has_node("Margin/Body/State"), "%s %s removes compact state copy" % [file_name, prefix])
 	var rects: Dictionary = {}
 	for key: String in specs:
 		var spec: Dictionary = specs[key]

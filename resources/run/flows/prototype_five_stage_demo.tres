@@ -1,16 +1,16 @@
-[gd_resource type="Resource" script_class="RunFlowDefinition" load_steps=13 format=3]
+[gd_resource type="Resource" script_class="RunFlowDefinition" format=3 uid="uid://c41rutiww0be7"]
 
-[ext_resource type="Script" path="res://growth/flow/run_flow_definition.gd" id="1_flow"]
-[ext_resource type="Script" path="res://growth/flow/run_node_definition.gd" id="2_node"]
-[ext_resource type="Resource" path="res://resources/run/rooms/combat_01_entry.tres" id="3_c1"]
-[ext_resource type="Resource" path="res://resources/run/rooms/combat_02_swarm.tres" id="4_c2"]
-[ext_resource type="Resource" path="res://resources/run/rooms/combat_04_validation.tres" id="5_c3"]
-[ext_resource type="Resource" path="res://resources/run/rooms/combat_06_final_boss.tres" id="6_boss"]
+[ext_resource type="Script" uid="uid://cr1si6ym7myqn" path="res://growth/flow/run_flow_definition.gd" id="1_flow"]
+[ext_resource type="Script" uid="uid://chwsjuafekhrc" path="res://growth/flow/run_node_definition.gd" id="2_node"]
+[ext_resource type="Script" uid="uid://bhq375rc65eth" path="res://growth/flow/route_branch_definition.gd" id="2_siafd"]
+[ext_resource type="Resource" uid="uid://c4frt4jey5s74" path="res://resources/run/rooms/combat_01_entry.tres" id="3_c1"]
+[ext_resource type="Resource" uid="uid://dhvwj61xpuxbd" path="res://resources/run/rooms/combat_02_swarm.tres" id="4_c2"]
+[ext_resource type="Resource" uid="uid://benb4libn3yuc" path="res://resources/run/rooms/combat_04_validation.tres" id="5_c3"]
+[ext_resource type="Resource" uid="uid://bd1yp1sy3jvuu" path="res://resources/run/rooms/combat_06_final_boss.tres" id="6_boss"]
 
 [sub_resource type="Resource" id="Entry"]
 script = ExtResource("2_node")
 node_id = &"run_entry"
-kind = 0
 next_node_id = &"combat_01_entry"
 
 [sub_resource type="Resource" id="Combat1"]
@@ -55,6 +55,4 @@ kind = 5
 [resource]
 script = ExtResource("1_flow")
 flow_id = &"prototype_five_stage_demo"
-entry_node_id = &"run_entry"
-result_node_id = &"run_result"
 nodes = Array[ExtResource("2_node")]([SubResource("Entry"), SubResource("Combat1"), SubResource("Combat2"), SubResource("Shop"), SubResource("Combat3"), SubResource("Boss"), SubResource("Result")])

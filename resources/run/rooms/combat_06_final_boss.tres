@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="CombatRoomDefinition" format=3 uid="uid://bd1yp1sy3jvuu"]
 
-[ext_resource type="Script" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
-[ext_resource type="Script" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
+[ext_resource type="Script" uid="uid://147bp5lbfphl" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
+[ext_resource type="Script" uid="uid://kkg62e2wet7j" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
 [ext_resource type="PackedScene" path="res://scenes/run/rooms/room_arena_boss.tscn" id="3_template"]
 [ext_resource type="PackedScene" path="res://scenes/run/enemies/boss_tide_ember.tscn" id="4_enemy"]
 
@@ -12,7 +12,6 @@ enemy_id = &"final_boss_placeholder"
 local_position = Vector2(920, 660)
 maximum_health = 280
 defense_flat = 3.0
-dream_dust_reward = 0
 
 [resource]
 script = ExtResource("1_room")
@@ -23,5 +22,4 @@ encounter_label = "强化占位首领"
 environment_label = "封闭首领场"
 room_scene = ExtResource("3_template")
 enemy_spawns = Array[ExtResource("2_spawn")]([SubResource("SpawnBoss")])
-completion_dream_dust = 0
 final_boss = true

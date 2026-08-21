@@ -1,7 +1,7 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://cj20uo7hx5wey"]
 
-[ext_resource type="Script" path="res://scripts/run/run_room_instance.gd" id="1_room"]
-[ext_resource type="Texture2D" path="res://assets/world/rooms/tidal_dungeon/full_rooms/tidal_battle_room_01_full_v1.png" id="2_background"]
+[ext_resource type="Script" uid="uid://bdj5bk2uve2da" path="res://scripts/run/run_room_instance.gd" id="1_room"]
+[ext_resource type="Texture2D" uid="uid://clq5esfd2cgcv" path="res://assets/world/rooms/tidal_dungeon/full_rooms/tidal_battle_room_01_full_v1.png" id="2_background"]
 
 [sub_resource type="RectangleShape2D" id="GroundShape"]
 size = Vector2(1536, 256)
@@ -10,107 +10,107 @@ size = Vector2(1536, 256)
 size = Vector2(64, 1024)
 
 [sub_resource type="RectangleShape2D" id="LeftPlatformShape"]
-size = Vector2(204, 16)
+size = Vector2(264, 16)
 
 [sub_resource type="RectangleShape2D" id="CenterPlatformShape"]
-size = Vector2(138, 16)
+size = Vector2(193, 16)
 
 [sub_resource type="RectangleShape2D" id="RightPlatformShape"]
-size = Vector2(202, 16)
+size = Vector2(266, 16)
 
-[node name="RoomArenaFlat" type="Node2D"]
+[node name="RoomArenaFlat" type="Node2D" unique_id=1312193913]
 script = ExtResource("1_room")
 template_id = &"arena_tidal_battle_01"
 template_display_name = "潮汐回廊"
 
-[node name="DarkBacking" type="Polygon2D" parent="."]
+[node name="DarkBacking" type="Polygon2D" parent="." unique_id=1668679765]
 z_index = -2
-polygon = PackedVector2Array(0, -16, 1536, -16, 1536, 848, 0, 848)
 color = Color(0.008, 0.018, 0.032, 1)
+polygon = PackedVector2Array(0, -16, 1536, -16, 1536, 848, 0, 848)
 
-[node name="FullRoomBackground" type="Sprite2D" parent="."]
+[node name="FullRoomBackground" type="Sprite2D" parent="." unique_id=1112746295]
 z_index = -1
-position = Vector2(768, 416)
 texture_filter = 1
+position = Vector2(768, 416)
 texture = ExtResource("2_background")
 
-[node name="Ground" type="StaticBody2D" parent="."]
+[node name="Ground" type="StaticBody2D" parent="." unique_id=1148369599]
 collision_layer = 4
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground" unique_id=1086262414]
 position = Vector2(768, 758)
 shape = SubResource("GroundShape")
 
-[node name="LeftWall" type="StaticBody2D" parent="."]
+[node name="LeftWall" type="StaticBody2D" parent="." unique_id=119503153]
 collision_layer = 4
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall" unique_id=303823962]
 position = Vector2(-32, 416)
 shape = SubResource("WallShape")
 
-[node name="RightWall" type="StaticBody2D" parent="."]
+[node name="RightWall" type="StaticBody2D" parent="." unique_id=716080604]
 collision_layer = 4
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall" unique_id=2058974084]
 position = Vector2(1568, 416)
 shape = SubResource("WallShape")
 
-[node name="LeftPlatform" type="StaticBody2D" parent="."]
+[node name="LeftPlatform" type="StaticBody2D" parent="." unique_id=921826006]
 collision_layer = 4
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftPlatform"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftPlatform" unique_id=2135648321]
 position = Vector2(329, 427)
 shape = SubResource("LeftPlatformShape")
 one_way_collision = true
 
-[node name="CenterPlatform" type="StaticBody2D" parent="." groups=["task57_required_platform"]]
+[node name="CenterPlatform" type="StaticBody2D" parent="." unique_id=296234081 groups=["task57_required_platform"]]
 collision_layer = 4
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CenterPlatform"]
-position = Vector2(768, 523)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CenterPlatform" unique_id=2049629276]
+position = Vector2(768.5, 523)
 shape = SubResource("CenterPlatformShape")
 one_way_collision = true
 
-[node name="RightPlatform" type="StaticBody2D" parent="."]
+[node name="RightPlatform" type="StaticBody2D" parent="." unique_id=563174154]
 collision_layer = 4
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RightPlatform"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightPlatform" unique_id=167884415]
 position = Vector2(1207, 427)
 shape = SubResource("RightPlatformShape")
 one_way_collision = true
 
-[node name="PlayerSpawn" type="Marker2D" parent="."]
+[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=1285912044]
 position = Vector2(610, 584)
 
-[node name="InitialEnemySpawns" type="Node2D" parent="."]
+[node name="InitialEnemySpawns" type="Node2D" parent="." unique_id=1433458067]
 
-[node name="Spawn1" type="Marker2D" parent="InitialEnemySpawns"]
+[node name="Spawn1" type="Marker2D" parent="InitialEnemySpawns" unique_id=1127556059]
 position = Vector2(740, 469)
 
-[node name="Spawn2" type="Marker2D" parent="InitialEnemySpawns"]
+[node name="Spawn2" type="Marker2D" parent="InitialEnemySpawns" unique_id=1463155481]
 position = Vector2(1000, 584)
 
-[node name="Spawn3" type="Marker2D" parent="InitialEnemySpawns"]
+[node name="Spawn3" type="Marker2D" parent="InitialEnemySpawns" unique_id=93154132]
 position = Vector2(420, 584)
 
-[node name="ReinforcementSpawns" type="Node2D" parent="."]
+[node name="ReinforcementSpawns" type="Node2D" parent="." unique_id=221979130]
 
-[node name="Spawn1" type="Marker2D" parent="ReinforcementSpawns"]
+[node name="Spawn1" type="Marker2D" parent="ReinforcementSpawns" unique_id=1059653171]
 position = Vector2(520, 584)
 
-[node name="Spawn2" type="Marker2D" parent="ReinforcementSpawns"]
+[node name="Spawn2" type="Marker2D" parent="ReinforcementSpawns" unique_id=735807837]
 position = Vector2(1200, 584)
 
-[node name="RewardChestSpawn" type="Marker2D" parent="."]
+[node name="RewardChestSpawn" type="Marker2D" parent="." unique_id=398774424]
 position = Vector2(760, 591)
 
-[node name="RoutePortalSpawn" type="Marker2D" parent="."]
+[node name="RoutePortalSpawn" type="Marker2D" parent="." unique_id=883387534]
 position = Vector2(1400, 544)
 
-[node name="EnemyContainer" type="Node2D" parent="."]
+[node name="EnemyContainer" type="Node2D" parent="." unique_id=882779722]

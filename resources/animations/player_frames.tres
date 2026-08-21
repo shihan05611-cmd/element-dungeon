@@ -170,130 +170,6 @@ region = Rect2(800, 0, 80, 64)
 atlas = ExtResource("8_fire_walk")
 region = Rect2(880, 0, 80, 64)
 
-[sub_resource type="AtlasTexture" id="water_attack_0"]
-atlas = ExtResource("10_water_attack")
-region = Rect2(0, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_attack_1"]
-atlas = ExtResource("10_water_attack")
-region = Rect2(80, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_attack_2"]
-atlas = ExtResource("10_water_attack")
-region = Rect2(160, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_attack_3"]
-atlas = ExtResource("10_water_attack")
-region = Rect2(240, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_attack_4"]
-atlas = ExtResource("10_water_attack")
-region = Rect2(320, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_attack_5"]
-atlas = ExtResource("10_water_attack")
-region = Rect2(400, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_attack_6"]
-atlas = ExtResource("10_water_attack")
-region = Rect2(480, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_attack_7"]
-atlas = ExtResource("10_water_attack")
-region = Rect2(560, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_idle_0"]
-atlas = ExtResource("11_water_idle")
-region = Rect2(0, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_idle_1"]
-atlas = ExtResource("11_water_idle")
-region = Rect2(80, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_idle_2"]
-atlas = ExtResource("11_water_idle")
-region = Rect2(160, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_idle_3"]
-atlas = ExtResource("11_water_idle")
-region = Rect2(240, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_idle_4"]
-atlas = ExtResource("11_water_idle")
-region = Rect2(320, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_idle_5"]
-atlas = ExtResource("11_water_idle")
-region = Rect2(400, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_idle_6"]
-atlas = ExtResource("11_water_idle")
-region = Rect2(480, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_idle_7"]
-atlas = ExtResource("11_water_idle")
-region = Rect2(560, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_0"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(0, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_1"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(80, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_2"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(160, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_3"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(240, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_4"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(320, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_5"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(400, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_6"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(480, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_7"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(560, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_8"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(640, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_9"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(720, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_10"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(800, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_walk_11"]
-atlas = ExtResource("12_water_walk")
-region = Rect2(880, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_jump_0"]
-atlas = ExtResource("13_water_jump")
-region = Rect2(0, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_jump_1"]
-atlas = ExtResource("13_water_jump")
-region = Rect2(80, 0, 80, 64)
-
-[sub_resource type="AtlasTexture" id="water_jump_2"]
-atlas = ExtResource("13_water_jump")
-region = Rect2(160, 0, 80, 64)
-
 [sub_resource type="AtlasTexture" id="hurt_0"]
 atlas = ExtResource("2_hurt")
 region = Rect2(0, 0, 80, 64)
@@ -400,6 +276,130 @@ region = Rect2(800, 0, 80, 64)
 
 [sub_resource type="AtlasTexture" id="walk_11"]
 atlas = ExtResource("4_walk")
+region = Rect2(880, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_attack_0"]
+atlas = ExtResource("10_water_attack")
+region = Rect2(0, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_attack_1"]
+atlas = ExtResource("10_water_attack")
+region = Rect2(80, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_attack_2"]
+atlas = ExtResource("10_water_attack")
+region = Rect2(160, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_attack_3"]
+atlas = ExtResource("10_water_attack")
+region = Rect2(240, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_attack_4"]
+atlas = ExtResource("10_water_attack")
+region = Rect2(320, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_attack_5"]
+atlas = ExtResource("10_water_attack")
+region = Rect2(400, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_attack_6"]
+atlas = ExtResource("10_water_attack")
+region = Rect2(480, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_attack_7"]
+atlas = ExtResource("10_water_attack")
+region = Rect2(560, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_idle_0"]
+atlas = ExtResource("11_water_idle")
+region = Rect2(0, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_idle_1"]
+atlas = ExtResource("11_water_idle")
+region = Rect2(80, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_idle_2"]
+atlas = ExtResource("11_water_idle")
+region = Rect2(160, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_idle_3"]
+atlas = ExtResource("11_water_idle")
+region = Rect2(240, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_idle_4"]
+atlas = ExtResource("11_water_idle")
+region = Rect2(320, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_idle_5"]
+atlas = ExtResource("11_water_idle")
+region = Rect2(400, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_idle_6"]
+atlas = ExtResource("11_water_idle")
+region = Rect2(480, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_idle_7"]
+atlas = ExtResource("11_water_idle")
+region = Rect2(560, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_jump_0"]
+atlas = ExtResource("13_water_jump")
+region = Rect2(0, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_jump_1"]
+atlas = ExtResource("13_water_jump")
+region = Rect2(80, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_jump_2"]
+atlas = ExtResource("13_water_jump")
+region = Rect2(160, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_0"]
+atlas = ExtResource("12_water_walk")
+region = Rect2(0, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_1"]
+atlas = ExtResource("12_water_walk")
+region = Rect2(80, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_2"]
+atlas = ExtResource("12_water_walk")
+region = Rect2(160, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_3"]
+atlas = ExtResource("12_water_walk")
+region = Rect2(240, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_4"]
+atlas = ExtResource("12_water_walk")
+region = Rect2(320, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_5"]
+atlas = ExtResource("12_water_walk")
+region = Rect2(400, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_6"]
+atlas = ExtResource("12_water_walk")
+region = Rect2(480, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_7"]
+atlas = ExtResource("12_water_walk")
+region = Rect2(560, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_8"]
+atlas = ExtResource("12_water_walk")
+region = Rect2(640, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_9"]
+atlas = ExtResource("12_water_walk")
+region = Rect2(720, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_10"]
+atlas = ExtResource("12_water_walk")
+region = Rect2(800, 0, 80, 64)
+
+[sub_resource type="AtlasTexture" id="water_walk_11"]
+atlas = ExtResource("12_water_walk")
 region = Rect2(880, 0, 80, 64)
 
 [resource]
@@ -548,6 +548,107 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("hurt_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("hurt_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("hurt_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("hurt_3")
+}],
+"loop": 0,
+"name": &"hurt",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("idle_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_7")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("jump_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("jump_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("jump_2")
+}],
+"loop": 0,
+"name": &"jump",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("walk_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_7")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_8")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_9")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_10")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_11")
+}],
+"loop": 1,
+"name": &"walk",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("water_attack_0")
 }, {
 "duration": 1.0,
@@ -657,106 +758,5 @@ animations = [{
 }],
 "loop": 1,
 "name": &"water_walk",
-"speed": 12.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("hurt_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("hurt_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("hurt_2")
-}, {
-"duration": 1.0,
-"texture": SubResource("hurt_3")
-}],
-"loop": 0,
-"name": &"hurt",
-"speed": 12.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("idle_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("idle_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("idle_2")
-}, {
-"duration": 1.0,
-"texture": SubResource("idle_3")
-}, {
-"duration": 1.0,
-"texture": SubResource("idle_4")
-}, {
-"duration": 1.0,
-"texture": SubResource("idle_5")
-}, {
-"duration": 1.0,
-"texture": SubResource("idle_6")
-}, {
-"duration": 1.0,
-"texture": SubResource("idle_7")
-}],
-"loop": 1,
-"name": &"idle",
-"speed": 8.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("jump_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("jump_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("jump_2")
-}],
-"loop": 0,
-"name": &"jump",
-"speed": 6.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("walk_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("walk_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("walk_2")
-}, {
-"duration": 1.0,
-"texture": SubResource("walk_3")
-}, {
-"duration": 1.0,
-"texture": SubResource("walk_4")
-}, {
-"duration": 1.0,
-"texture": SubResource("walk_5")
-}, {
-"duration": 1.0,
-"texture": SubResource("walk_6")
-}, {
-"duration": 1.0,
-"texture": SubResource("walk_7")
-}, {
-"duration": 1.0,
-"texture": SubResource("walk_8")
-}, {
-"duration": 1.0,
-"texture": SubResource("walk_9")
-}, {
-"duration": 1.0,
-"texture": SubResource("walk_10")
-}, {
-"duration": 1.0,
-"texture": SubResource("walk_11")
-}],
-"loop": 1,
-"name": &"walk",
 "speed": 12.0
 }]

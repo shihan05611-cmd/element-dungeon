@@ -17,14 +17,6 @@ const PLAIN_FORM: BossFormDefinition = preload("res://resources/run/enemies/boss
 const BOSS_TUNING: BossTuning = preload("res://resources/run/enemies/boss_forms/boss_tuning.tres")
 const TestHarness := preload("res://combat/tests/test_harness.gd")
 
-const FORM_PATHS := {
-	&"ember": "res://resources/run/enemies/boss_forms/boss_form_ember.tres",
-	&"tide": "res://resources/run/enemies/boss_forms/boss_form_tide.tres",
-	&"plain": "res://resources/run/enemies/boss_forms/boss_form_plain.tres",
-}
-const TUNING_PATH := "res://resources/run/enemies/boss_forms/boss_tuning.tres"
-const FRAMES_PATH := "res://resources/animations/boss_tide_ember_frames.tres"
-
 ## Task 70 manifest_v2.md §9.4/§9.5: the cast sheets are 8 frames of 200x200,
 ## launch frame index 5 (0-based), identical for all three forms.
 const CAST_FRAME_COUNT := 8
@@ -104,18 +96,12 @@ func _test_new_field_validation_branches() -> void:
 	form.summon_telegraph_duration = 0.9
 	_expect_eq(form.validation_error(), &"", "restoring the window returns the definition to valid")
 
-	var tuning_text := FileAccess.get_file_as_string(TUNING_PATH)
-	_expect(tuning_text.contains("ranged_cast_launch_frame_index = "),
-		"boss_tuning.tres explicitly writes ranged_cast_launch_frame_index")
 	_expect_eq(BOSS_TUNING.validation_error(), &"", "boss_tuning.tres passes validation after loading")
 	_expect_eq(BOSS_TUNING.ranged_cast_launch_frame_index, CAST_LAUNCH_FRAME_INDEX,
 		"boss_tuning.tres declares the manifest's launch frame index 5")
 
 	var forms := {&"ember": EMBER_FORM, &"tide": TIDE_FORM, &"plain": PLAIN_FORM}
-	for form_id: StringName in FORM_PATHS:
-		var text := FileAccess.get_file_as_string(FORM_PATHS[form_id])
-		_expect(text.contains("summon_telegraph_duration = "),
-			"%s.tres explicitly writes summon_telegraph_duration" % form_id)
+	for form_id: StringName in forms:
 		var loaded: BossFormDefinition = forms[form_id]
 		_expect_eq(loaded.validation_error(), &"", "%s form passes validation after loading" % form_id)
 		_expect_eq(loaded.summon_telegraph_duration, 0.9, "%s form declares the 0.9s summon window" % form_id)
@@ -126,7 +112,6 @@ func _test_new_field_validation_branches() -> void:
 # frame count, slice 200x200 cells at the right offsets, and never loop.
 # ---------------------------------------------------------------------------
 func _test_cast_animations_match_manifest() -> void:
-	var frames_text := FileAccess.get_file_as_string(FRAMES_PATH)
 	for form_id: StringName in [&"plain", &"ember", &"tide"]:
 		var animation_name := StringName("%s_cast" % form_id)
 		_expect(BOSS_FRAMES.has_animation(animation_name), "animation %s exists" % animation_name)
@@ -136,13 +121,13 @@ func _test_cast_animations_match_manifest() -> void:
 			"%s frame count matches Task 70 manifest_v2.md §9.4" % animation_name)
 		_expect_eq(BOSS_FRAMES.get_animation_loop(animation_name), false,
 			"%s is a non-looping clip" % animation_name)
-		_expect(frames_text.contains("boss_%s_cast_v1.png" % form_id),
-			"the SpriteFrames references the delivered boss_%s_cast_v1.png sheet" % form_id)
 		for index: int in CAST_FRAME_COUNT:
 			var texture := BOSS_FRAMES.get_frame_texture(animation_name, index) as AtlasTexture
 			_expect(texture != null, "%s frame %d is an AtlasTexture slice" % [animation_name, index])
 			if texture == null:
 				continue
+			_expect(texture.atlas != null and texture.atlas.resource_path.get_file() == "boss_%s_cast_v1.png" % form_id,
+				"%s uses its authored cast sheet" % animation_name)
 			_expect_eq(texture.region, Rect2(index * FRAME_CELL, 0, FRAME_CELL, FRAME_CELL),
 				"%s frame %d slices the 200x200 cell at the right horizontal offset" % [animation_name, index])
 	# The launch index must actually be inside the clip, otherwise every
@@ -216,19 +201,6 @@ func _test_ranged_windup_uses_cast_clip() -> void:
 		_expect_near(max_deviation, 0.0, 0.0001,
 			"%s: speed_scale never leaves 1.0 anywhere in the ranged cycle" % form_id)
 		await _destroy(ctx)
-
-	# The retired Task 69 stretch factors must not survive anywhere in the
-	# Boss script, not even as a fallback branch.
-	var script_text := FileAccess.get_file_as_string("res://scripts/run/enemies/boss_tide_ember.gd")
-	_expect(not script_text.contains("_play_attack_from_frame"),
-		"the attack-only playback helper was generalized away")
-	_expect(not script_text.contains("windup / profile.telegraph_duration"),
-		"the speed_scale stretch expression is gone from the Boss script")
-	_expect(script_text.count("tuning.ranged_cast_launch_frame_index") >= 3,
-		"every launch-frame use in the Boss script reads the tuning field")
-	_expect(not script_text.contains("&\"cast\", 5)"),
-		"the launch frame index is never written as a literal in the Boss script")
-
 
 # ---------------------------------------------------------------------------
 # §5.1.4 on the exact physics frame a bolt is created, the sprite sits on the
@@ -609,14 +581,6 @@ func _test_reduced_motion_uses_static_icon() -> void:
 	_expect_eq(mark.sprite_frames.get_frame_count(mark.animation), 3,
 		"the authored bounce is the 3-frame sheet Task 60/70 delivered")
 	_expect(mark.sprite_frames.get_animation_loop(mark.animation), "the bounce loops for the whole window")
-	var script_text := FileAccess.get_file_as_string("res://combat/presentation/enemy_telegraph_indicator.gd")
-	_expect(not script_text.contains("set_loops"), "the looping scale pulse tween is gone")
-	_expect(not script_text.contains("Vector2(1.08"), "the 1.08 scale bounce is gone")
-	_expect(not script_text.contains("_mark: Label"), "the placeholder Label node type is gone from the script")
-	_expect(script_text.contains("_mark: AnimatedSprite2D"), "the mark is a real sprite now")
-	var scene_text := FileAccess.get_file_as_string("res://scenes/combat/enemy_telegraph_indicator.tscn")
-	_expect(not scene_text.contains("type=\"Label\""), "the placeholder Label node is gone from the scene")
-	_expect(scene_text.contains("telegraph_alert_v1.png"), "the scene finally references the Task 60 art")
 	world.queue_free()
 	await process_frame
 

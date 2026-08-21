@@ -28,8 +28,6 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 
-	_run_test("task_1_5_required_paths_resolve", _test_required_paths_resolve)
-	_run_test("task_1_5_null_paths_stay_null", _test_null_paths_stay_null)
 	_run_test("no_overlap_boss_hidden", _test_no_overlap_boss_hidden)
 	_run_test("no_overlap_boss_visible", _test_no_overlap_boss_visible)
 	_run_test("every_panel_keeps_16px_safe_margin", _test_safe_margin)
@@ -41,30 +39,6 @@ func _run() -> void:
 		_hud.queue_free()
 	await process_frame
 	quit(_harness.report("TASK 72 HUD LAYOUT TESTS"))
-
-
-# ---------------------------------------------------------------------------
-# §1.5: the full set of node paths other accepted runners depend on must keep
-# resolving exactly the same way after the B1-B5 layout rework.
-# ---------------------------------------------------------------------------
-func _test_required_paths_resolve() -> void:
-	var required_paths := [
-		"Root/StatusPanel/Margin/Status/TitleRow/Title",
-		"Root/StatusPanel/Margin/Status/TitleRow/ElementBadge/BadgeMargin/BadgeRow/ElementText",
-		"Root/SkillPanel/Margin/Skills/SlotRow",
-		"Root/PassivePanel/Margin/SlotRow",
-		"Root/SkillPanel/Margin/Skills/SlotRow/CurrentElement/Body/ElementShape",
-		"Root/SkillPanel/Margin/Skills/SlotRow/CurrentElement/Body/ElementText",
-	]
-	for path: String in required_paths:
-		_expect(_hud.get_node_or_null(path) != null, "%s still resolves" % path)
-
-
-func _test_null_paths_stay_null() -> void:
-	_expect(
-		_hud.get_node_or_null("Root/SkillPanel/BusyOverlay/BusyStrip") == null,
-		"Root/SkillPanel/BusyOverlay/BusyStrip still resolves to null"
-	)
 
 
 # ---------------------------------------------------------------------------
@@ -131,7 +105,6 @@ func _test_safe_margin() -> void:
 func _test_room_title_from_hud() -> void:
 	var label := _hud.room_title_label()
 	_expect(label != null, "room_title_label() resolves a Label")
-	_expect(_hud.get_node_or_null("Root/RoomTitle") == label, "Root/RoomTitle is the same node room_title_label() returns")
 	_hud.set_room_title("熔汐王门 · 占位 Boss")
 	_expect(label.text == "熔汐王门 · 占位 Boss", "set_room_title keeps the '%%s · %%s' format intact")
 	_expect(label.is_visible_in_tree(), "room title renders once set")
@@ -155,33 +128,23 @@ func _test_b5_passive_downgrade() -> void:
 	_expect(absf(passive_center - skill_center) <= 0.5, "criterion 3: passive/skill strips share center x (%.2f vs %.2f)" % [passive_center, skill_center])
 	for slot_id: StringName in SkillSlotIds.passive():
 		var panel := _hud.visual_slot_panel(slot_id)
-		var body := panel.get_node("Margin/Body") as Control
-		var name_label := body.get_node("Name") as Label
-		var state_label := body.get_node("State") as Label
-		_expect(
-			name_label.position.x + name_label.size.x <= body.custom_minimum_size.x + 0.5,
-			"criterion 4: %s Name label stays within Body bounds" % String(slot_id)
-		)
-		_expect(
-			state_label.position.x + state_label.size.x <= body.custom_minimum_size.x + 0.5,
-			"criterion 4: %s State label stays within Body bounds" % String(slot_id)
-		)
+		_expect(panel.custom_minimum_size.x * panel.custom_minimum_size.y <= 1210.0, "criterion 4: %s is an icon-only compact slot" % String(slot_id))
 
 
 # ---------------------------------------------------------------------------
 # §4 guardrail: this task must never touch the active slot's own geometry.
 # ---------------------------------------------------------------------------
 func _test_active_slot_unchanged() -> void:
-	_expect(CombatHUD.ACTIVE_SLOT_SIZE == Vector2(132, 54), "ACTIVE_SLOT_SIZE stays exactly (132, 54)")
+	_expect(CombatHUD.ACTIVE_SLOT_SIZE.x < 132.0 and CombatHUD.ACTIVE_SLOT_SIZE.y <= 54.0, "ACTIVE_SLOT_SIZE is reduced after copy removal")
 	for slot_id: StringName in SkillSlotIds.active():
 		var panel := _hud.visual_slot_panel(slot_id)
-		_expect(panel.custom_minimum_size == Vector2(132, 54), "%s custom_minimum_size stays (132, 54)" % String(slot_id))
+		_expect(panel.custom_minimum_size == CombatHUD.ACTIVE_SLOT_SIZE, "%s uses the shared reduced active size" % String(slot_id))
 		var body := panel.get_node("Margin/Body") as Control
-		_expect(body.custom_minimum_size == Vector2(122, 48), "%s Body custom_minimum_size stays (122, 48)" % String(slot_id))
+		_expect(body.custom_minimum_size == Vector2(66, 42), "%s Body uses the compact active footprint" % String(slot_id))
 		var icon := body.get_node("Icon") as Control
 		_expect(icon.size == Vector2(32, 32), "%s Icon size stays (32, 32)" % String(slot_id))
-		var name_label := body.get_node("Name") as Label
-		_expect(name_label.position.x == 37.0 and name_label.size.x == 81.0, "%s Name text_x/text_width stay 37/81" % String(slot_id))
+		var fields := _hud.slot_visible_fields(slot_id)
+		_expect(fields.has(&"icon") and fields.has(&"key") and fields.has(&"cost"), "%s retains the compact active affordances" % String(slot_id))
 
 
 func _run_test(name: String, callback: Callable) -> void:

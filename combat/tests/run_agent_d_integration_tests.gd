@@ -56,7 +56,6 @@ func _test_scene_contracts() -> void:
 	var player_title := _hud.get_node("Root/StatusPanel/Margin/Status/TitleRow/Title") as Label
 	_expect(player_title.text == "法雅雅", "player panel displays Faya's name")
 	_expect(_hud.skill_panel.get_parent() == hud_root, "skill panel is a root-level HUD sibling")
-	_expect(_hud.get_node_or_null("Root/StatusPanel/Margin/Status/SkillTitle") == null, "player panel excludes skill controls")
 	_expect(_player.get_node_or_null("PrototypeSkillCaster") == null, "prototype caster detached")
 	_expect(_player.get_node_or_null("InteractionHitbox") == null, "legacy overlap hitbox removed")
 	_expect(_player.combat_receiver.get_damage_receiver() == _player.damage_receiver, "player receiver wired")
@@ -71,6 +70,8 @@ func _test_scene_contracts() -> void:
 	_expect(_player.water_definition.is_valid() and _player.fire_definition.is_valid(), "element definitions valid")
 	_expect(InputMap.has_action(&"cast_active_1") and InputMap.has_action(&"cast_active_2") and InputMap.has_action(&"cast_active_3") and InputMap.has_action(&"switch_element"), "shared active input actions registered")
 	_expect(ProjectSettings.get_setting("layer_names/2d_physics/layer_4") == "EnemyHurtbox", "collision layer names registered")
+	# One-time migration guard: remove once receive_interaction is no longer a
+	# relevant legacy compatibility risk.
 	var player_source := FileAccess.get_file_as_string("res://scripts/player.gd")
 	var enemy_source := FileAccess.get_file_as_string("res://scripts/enemy.gd")
 	_expect(not player_source.contains("receive_interaction"), "player legacy receiver path removed")

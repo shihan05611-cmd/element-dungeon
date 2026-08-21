@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="SkillDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://cr02grckwmvaa"]
 
-[ext_resource type="Script" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
-[ext_resource type="Script" path="res://combat/passives/reaction_energy_passive_effect_definition.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://b2p5xuomj0hba" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" uid="uid://c1bi8b2atwkmr" path="res://combat/passives/reaction_energy_passive_effect_definition.gd" id="2_effect"]
 
 [sub_resource type="Resource" id="ReactionEnergyEffect"]
 script = ExtResource("2_effect")
-energy_restore = 10
 
 [resource]
 script = ExtResource("1_skill")

@@ -3,6 +3,7 @@ extends CanvasLayer
 
 const UI := preload("res://scripts/ui/combat_ui_tokens.gd")
 const RUN_OVERLAY_SCRIPT := preload("res://scripts/ui/run_overlay_interface.gd")
+const COMBAT_HUD_THEME: Theme = preload("res://resources/ui/combat_hud.theme")
 
 signal reduced_motion_changed(enabled: bool)
 signal colorblind_mode_changed(enabled: bool)
@@ -10,19 +11,28 @@ signal colorblind_mode_changed(enabled: bool)
 const WARNING_RATE_LIMIT_MSEC := 450
 const SLOT_TRANSIENT_MSEC := 900
 const STATUS_SIZE := Vector2(264, 76)
-const SKILL_STRIP_SIZE := Vector2(532, 72)
-## Deliberately larger than the naive 4*96 + 3*GAP_SM + 2*GAP_SM = 424
-## hand-derivation: PanelContainer.set_size() clamps up to its own computed
-## minimum (children + each nested panel stylebox's border-driven content
-## margin), so the true floor here is 442 (100px per slot once its own
-## 2px border is included, +16 row margin +2 outer border). 448 keeps a
-## few px of headroom above that floor -- landing exactly on 442 risks a
-## sub-pixel float clamp -- while still satisfying B5 criterion 2 (<=452.2).
-const PASSIVE_STRIP_SIZE := Vector2(448, 56)
+const SKILL_STRIP_SIZE := Vector2(272, 64)
+## Four 34px icon slots, three 8px gaps, 8px horizontal margin, and borders.
+## Keep a small integer-pixel buffer above the layout minimum.
+const PASSIVE_STRIP_SIZE := Vector2(192, 42)
 const ELEMENT_PIVOT_SIZE := Vector2(72, 56)
-const ACTIVE_SLOT_SIZE := Vector2(132, 54)
-const PASSIVE_SLOT_SIZE := Vector2(96, 42)
+const ACTIVE_SLOT_SIZE := Vector2(72, 48)
+const PASSIVE_SLOT_SIZE := Vector2(34, 34)
 const ROOM_TITLE_SIZE := Vector2(280, 32)
+# Task 12's hidden compatibility adapter retains full policy copy. Fusion
+# Pixel's 12px proportional Chinese/English metrics make its widest active
+# card 226px after a viewport relayout, so the historic 184px stride overlaps.
+# This adapter is not the task 74 combat HUD; keep a 14px integer-pixel gap.
+const TASK12_COMPAT_SLOT_STEP := 240.0
+const SLOT_GRAYSCALE_SHADER := """
+shader_type canvas_item;
+uniform float disabled : hint_range(0.0, 1.0) = 0.0;
+void fragment() {
+	vec4 sampled = texture(TEXTURE, UV) * COLOR;
+	float luminance = dot(sampled.rgb, vec3(0.2126, 0.7152, 0.0722));
+	COLOR = vec4(mix(sampled.rgb, vec3(luminance), disabled), sampled.a);
+}
+"""
 const SLOT_ORDER: Array[StringName] = [
 	SkillSlotIds.ACTIVE_1,
 	SkillSlotIds.ACTIVE_2,
@@ -145,6 +155,9 @@ func configure(
 		_connect_once(_feedback.result_observed, _on_result_observed)
 	if _host != null and _host.runtime_loadout != null:
 		_connect_once(_host.runtime_loadout.loadout_replaced, _on_loadout_replaced)
+		# Skill upgrades change the authority snapshot without replacing a loadout.
+		# Keep the compact-slot hover metadata synchronized with that authority.
+		_connect_once(_host.session_snapshot_changed, _on_session_snapshot_changed)
 		run_overlay.configure(_host, formal_coordinator)
 		run_overlay.set_current_element(_player_element.current_element_id)
 		run_overlay.status_requested.connect(_on_overlay_status_requested)
@@ -227,6 +240,25 @@ func slot_panel(slot_id: StringName) -> PanelContainer:
 func visual_slot_panel(slot_id: StringName) -> PanelContainer:
 	var view: Dictionary = _slot_views.get(slot_id, {})
 	return view.get("panel") as PanelContainer
+
+
+## Stable semantic projection for HUD checks. Callers should use this instead
+## of depending on the scene-tree names of compact-slot subcontrols.
+func slot_visible_fields(slot_id: StringName) -> Array[StringName]:
+	var panel := visual_slot_panel(slot_id)
+	var fields: Array[StringName] = []
+	if panel == null:
+		return fields
+	for entry: Dictionary in [
+		{&"field": &"icon", &"path": "Margin/Body/Icon"},
+		{&"field": &"cooldown", &"path": "Margin/Body/CooldownLabel"},
+		{&"field": &"key", &"path": "Margin/Body/Key"},
+		{&"field": &"cost", &"path": "Margin/Body/Cost"},
+	]:
+		var control := panel.get_node_or_null(entry[&"path"]) as Control
+		if control != null and control.is_visible_in_tree():
+			fields.append(entry[&"field"])
+	return fields
 
 
 func element_pivot_panel() -> PanelContainer:
@@ -473,6 +505,10 @@ func _on_loadout_replaced(_previous: RuntimeLoadoutSnapshot, _current: RuntimeLo
 	_show_feedback("共享配装已提交 · 被动列表同步更新", &"success")
 
 
+func _on_session_snapshot_changed(_snapshot: RunSnapshot, _cause: StringName) -> void:
+	_refresh_skill_status()
+
+
 func _on_overlay_status_requested(message: String, tone: StringName) -> void:
 	if tone == &"error":
 		_show_feedback(message, &"error", 1.8)
@@ -547,90 +583,122 @@ func _refresh_slot_view(
 	skill: SkillDefinition,
 	compact: bool
 ) -> void:
-	var key_panel := view["key_panel"] as PanelContainer
-	var key_label := view["key"] as Label
-	var icon := view["icon"] as TextureRect
-	var policy := view["policy"] as Label
-	var state := view["state"] as Label
+	var key_panel := view.get("key_panel") as PanelContainer
+	var key_label := view.get("key") as Label
+	var icon := view.get("icon") as TextureRect
+	var policy := view.get("policy") as Label
+	var state := view.get("state") as Label
 	var is_passive_slot := SkillSlotIds.is_passive(slot_id)
 	var name_label := view.get("name") as Label
-	var level_label := view.get("level") as Label
 	var cost_label := view.get("cost") as Label
 	var meta := view.get("meta") as Label
 	var slot_label := view.get("slot") as Label
 	var cooldown_mask := view.get("cooldown_mask") as ColorRect
 	var cooldown_label := view.get("cooldown_label") as Label
-	var passive_mark := view.get("passive_mark") as Label
-	state.visible = true
+	if state != null:
+		state.visible = true
 	if slot_label != null:
 		slot_label.text = String(slot_id).to_upper()
 	if cooldown_mask != null:
 		cooldown_mask.visible = false
 	if cooldown_label != null:
 		cooldown_label.visible = false
-	if passive_mark != null:
-		passive_mark.visible = is_passive_slot
 	if skill == null:
 		icon.texture = null
+		_set_slot_icon_disabled(icon, true)
 		if name_label != null:
 			name_label.text = "空槽"
-		if level_label != null:
-			level_label.text = "—"
 		if cost_label != null:
 			cost_label.text = ""
-		policy.text = "—" if compact else "— 未装备 —"
-		state.text = "空" if compact else "未配置"
-		state.add_theme_color_override(&"font_color", UI.TEXT_DIM)
+		if policy != null:
+			policy.text = "—" if compact else "— 未装备 —"
+		if state != null:
+			state.text = "空" if compact else "未配置"
+			state.add_theme_color_override(&"font_color", UI.TEXT_DIM)
 		if meta != null:
 			meta.text = "共享槽位"
-		key_panel.visible = false
+		if key_panel != null:
+			key_panel.visible = false
+		(view["panel"] as Control).tooltip_text = "空槽"
 		return
 	var content := _catalog.content_for(skill.skill_id) if _catalog != null else null
 	icon.texture = content.icon if content != null else null
 	if name_label != null:
 		name_label.text = content.display_name if content != null else String(skill.skill_id)
-	if level_label != null:
-		level_label.text = "Lv.%d" % _skill_level(skill.skill_id)
 	if cost_label != null:
 		cost_label.text = "SP %d" % skill.energy_cost if skill.is_active_skill() else ""
-	(view["panel"] as Control).tooltip_text = "%s · %s" % [
-		content.display_name if content != null else String(skill.skill_id),
-		_skill_policy_badge(skill),
-	]
-	policy.text = _policy_glyph(skill) if compact else _skill_policy_badge(skill)
-	policy.add_theme_color_override(&"font_color", _policy_color(skill))
+	var display_name := content.display_name if content != null else String(skill.skill_id)
+	var element_mismatch := _is_element_mismatch(skill)
+	var tooltip := "%s · Lv.%d" % [display_name, _skill_level(skill.skill_id)]
+	if element_mismatch:
+		tooltip += " · 元素不匹配（需要%s）" % _element_short_label(skill.required_element_id)
+	(view["panel"] as Control).tooltip_text = tooltip
+	if policy != null:
+		policy.text = _policy_glyph(skill) if compact else _skill_policy_badge(skill)
+		policy.add_theme_color_override(&"font_color", _policy_color(skill))
 	var castable_here := skill.is_active_skill() and not is_passive_slot
 	var transient: Dictionary = _slot_transients.get(slot_id, {})
-	key_panel.visible = castable_here
-	key_label.text = _key_for_slot(slot_id)
+	if key_panel != null:
+		key_panel.visible = castable_here
+	if key_label != null:
+		key_label.text = _key_for_slot(slot_id)
 	if not castable_here:
-		if compact and not transient.is_empty():
+		_set_slot_icon_disabled(icon, false)
+		if state != null and compact and not transient.is_empty():
 			state.text = String(transient.get("text", "触发"))
 			state.add_theme_color_override(&"font_color", _tone_color(StringName(transient.get("tone", &"passive"))))
-		else:
+		elif state != null:
 			state.text = "生效" if skill.is_passive_skill() else ("锁" if compact else "不可释放")
 			state.add_theme_color_override(&"font_color", UI.WARNING)
 		if meta != null:
 			meta.text = "持续生效 · 无键帽/能量/冷却"
 		return
-	if compact and not transient.is_empty():
+	var remaining := _player_executor.get_cooldown_remaining(skill.skill_id)
+	_set_slot_icon_disabled(
+		icon,
+		element_mismatch
+			or _player_energy.current_energy < skill.energy_cost
+			or remaining > 0.0
+			or _player_executor.current_phase != SkillExecutor.Phase.IDLE
+	)
+	if state != null and compact and not transient.is_empty():
 		state.text = String(transient.get("text", "状态"))
 		state.add_theme_color_override(&"font_color", _tone_color(StringName(transient.get("tone", &"info"))))
-	else:
+	elif state != null:
 		state.text = _compact_availability_text(skill) if compact else _availability_text(skill)
 		state.add_theme_color_override(&"font_color", _availability_color(state.text))
-	state.visible = not state.text.is_empty()
-	var remaining := _player_executor.get_cooldown_remaining(skill.skill_id)
+		state.visible = not state.text.is_empty()
 	if compact and remaining > 0.0 and cooldown_mask != null and cooldown_label != null:
 		var ratio := clampf(remaining / maxf(skill.cooldown, remaining), 0.0, 1.0)
 		cooldown_mask.visible = true
-		cooldown_mask.position.y = 8.0 + 32.0 * (1.0 - ratio)
-		cooldown_mask.size = Vector2(32.0, 32.0 * ratio)
+		cooldown_mask.position.y = (1.0 if is_passive_slot else 5.0) + 32.0 * (1.0 - ratio)
+		cooldown_mask.size = Vector2(30.0 if is_passive_slot else 32.0, 32.0 * ratio)
 		cooldown_label.visible = true
 		cooldown_label.text = _format_cooldown(remaining)
 	if meta != null:
 		var cooldown_text := " · CD %.1fs" % skill.cooldown if skill.cooldown > 0.0 else " · 无冷却"
 		meta.text = "能量 ≥%d%s" % [skill.energy_cost, cooldown_text]
+
+
+func _is_element_mismatch(skill: SkillDefinition) -> bool:
+	return (
+		skill != null
+		and skill.element_policy == SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT
+		and _player_element != null
+		and _player_element.current_element_id != skill.required_element_id
+	)
+
+
+func _set_slot_icon_disabled(icon: TextureRect, disabled: bool) -> void:
+	if icon == null:
+		return
+	var material := icon.material as ShaderMaterial
+	if material != null:
+		material.set_shader_parameter(&"disabled", 1.0 if disabled else 0.0)
+	# Keep a modest opacity reduction in addition to the shader's actual
+	# desaturation. Cooldown mask/number and the hover reason remain non-hue
+	# state cues.
+	icon.self_modulate = Color(1.0, 1.0, 1.0, 0.72) if disabled else Color.WHITE
 
 
 func _skill_level(skill_id: StringName) -> int:
@@ -888,15 +956,15 @@ func _bind_ui_refs() -> void:
 	skill_panel = $Root/SkillPanel
 	passive_panel = $Root/PassivePanel
 	health_bar = $Root/StatusPanel/Margin/Status/HealthRow/HealthBar
-	health_value = $Root/StatusPanel/Margin/Status/HealthRow/HealthValue
+	health_value = $Root/StatusPanel/Margin/Status/HealthRow/HealthBar/HealthValue
 	low_health = $Root/StatusPanel/Margin/Status/LowHealth
 	energy_row = $Root/StatusPanel/Margin/Status/EnergyRow
 	energy_bar = $Root/StatusPanel/Margin/Status/EnergyRow/EnergyBar
-	energy_value = $Root/StatusPanel/Margin/Status/EnergyRow/EnergyValue
-	_element_pivot = $Root/SkillPanel/Margin/Skills/SlotRow/CurrentElement
-	_element_pivot_swatch = $Root/SkillPanel/Margin/Skills/SlotRow/CurrentElement/Body/ElementSwatch
-	_element_pivot_text = $Root/SkillPanel/Margin/Skills/SlotRow/CurrentElement/Body/ElementText
-	_element_pivot_shape = $Root/SkillPanel/Margin/Skills/SlotRow/CurrentElement/Body/ElementShape
+	energy_value = $Root/StatusPanel/Margin/Status/EnergyRow/EnergyBar/EnergyValue
+	_element_pivot = $Root/StatusPanel/Margin/Status/CurrentElement
+	_element_pivot_swatch = $Root/StatusPanel/Margin/Status/CurrentElement/Body/ElementSwatch
+	_element_pivot_text = $Root/StatusPanel/Margin/Status/CurrentElement/Body/ElementText
+	_element_pivot_shape = $Root/StatusPanel/Margin/Status/CurrentElement/Body/ElementShape
 	element_swatch = _element_pivot_swatch
 	element_text = _element_pivot_text
 	_legacy_element_swatch = $Root/StatusPanel/Margin/Status/TitleRow/ElementBadge/BadgeMargin/BadgeRow/ElementSwatch
@@ -922,6 +990,7 @@ func _build_ui() -> void:
 	root_control.name = "Root"
 	root_control.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root_control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root_control.theme = COMBAT_HUD_THEME
 	add_child(root_control)
 	_build_status_panel(root_control)
 	_build_room_title(root_control)
@@ -950,7 +1019,7 @@ func _build_status_panel(parent: Control) -> void:
 	panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	panel.position = Vector2(16, 16)
 	panel.size = STATUS_SIZE
-	panel.add_theme_stylebox_override(&"panel", UI.panel())
+	panel.theme_type_variation = &"HudPanel"
 	parent.add_child(panel)
 	var margin := _margin("Margin", 8, 8)
 	panel.add_child(margin)
@@ -965,12 +1034,12 @@ func _build_status_panel(parent: Control) -> void:
 	title_row.name = "TitleRow"
 	title_row.visible = false
 	status.add_child(title_row)
-	var legacy_title := _make_label("Title", "法雅雅", 18, UI.TEXT)
+	var legacy_title := _make_label("Title", "法雅雅", UI.FONT_EMPHASIS, UI.TEXT)
 	legacy_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_row.add_child(legacy_title)
 	var badge := PanelContainer.new()
 	badge.name = "ElementBadge"
-	badge.add_theme_stylebox_override(&"panel", UI.flat_panel())
+	badge.theme_type_variation = &"HudPanelSlot"
 	title_row.add_child(badge)
 	var badge_margin := _margin("BadgeMargin", UI.GAP_SM, UI.GAP_XS)
 	badge.add_child(badge_margin)
@@ -982,18 +1051,21 @@ func _build_status_panel(parent: Control) -> void:
 	swatch.name = "ElementSwatch"
 	swatch.custom_minimum_size = Vector2(12, 18)
 	badge_row.add_child(swatch)
-	var element_label := _make_label("ElementText", "水滴 水 · WATER", 12, UI.TEXT)
+	var element_label := _make_label("ElementText", "水滴 水 · WATER", UI.FONT_BODY, UI.TEXT)
 	element_label.custom_minimum_size.x = 110
 	badge_row.add_child(element_label)
 	var health := _bar_row("HealthRow", "HP", "HealthBar", "HealthValue", Color("dc4658"))
 	health.position = Vector2(0, 0)
-	health.size = Vector2(248, 26)
+	health.size = Vector2(172, 26)
 	status.add_child(health)
 	var energy := _bar_row("EnergyRow", "SP", "EnergyBar", "EnergyValue", Color("289dcf"))
 	energy.position = Vector2(0, 30)
-	energy.size = Vector2(248, 26)
+	energy.size = Vector2(172, 26)
 	status.add_child(energy)
-	var low := _make_label("LowHealth", "! HP", 11, UI.ERROR)
+	var pivot := _build_element_pivot()
+	pivot.position = Vector2(176, 0)
+	status.add_child(pivot)
+	var low := _make_label("LowHealth", "! HP", UI.FONT_CAPTION, UI.ERROR)
 	low.visible = false
 	low.position = Vector2(0, 1)
 	low.size = Vector2(30, 22)
@@ -1008,7 +1080,7 @@ func _build_status_panel(parent: Control) -> void:
 ## HUD's safe-margin grid, immediately below StatusPanel, so it renders at
 ## integer pixel size and shares one style across every room.
 func _build_room_title(parent: Control) -> void:
-	var label := _make_label("RoomTitle", "", 16, UI.TEXT)
+	var label := _make_label("RoomTitle", "", UI.FONT_TITLE, UI.TEXT)
 	label.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	label.position = Vector2(16, 100)
 	label.size = ROOM_TITLE_SIZE
@@ -1023,7 +1095,7 @@ func _bar_row(row_name: String, caption: String, bar_name: String, value_name: S
 	var row := HBoxContainer.new()
 	row.name = row_name
 	row.add_theme_constant_override(&"separation", UI.GAP_SM)
-	var label := _make_label("Label", caption, 13, UI.TEXT_MUTED)
+	var label := _make_label("Label", caption, UI.FONT_CAPTION, UI.TEXT_MUTED)
 	label.custom_minimum_size.x = 24
 	row.add_child(label)
 	var bar := ProgressBar.new()
@@ -1031,13 +1103,14 @@ func _bar_row(row_name: String, caption: String, bar_name: String, value_name: S
 	bar.custom_minimum_size = Vector2(132, 18)
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.show_percentage = false
-	bar.add_theme_stylebox_override(&"background", UI.flat_panel(Color("070b13"), UI.BORDER, 3, 1))
-	bar.add_theme_stylebox_override(&"fill", UI.flat_panel(fill, fill, 3, 0))
+	bar.theme_type_variation = &"HudBarHealth" if bar_name == "HealthBar" else &"HudBarEnergy"
 	row.add_child(bar)
-	var value := _make_label(value_name, "100 / 100", 12, UI.TEXT)
-	value.custom_minimum_size.x = 68
-	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	row.add_child(value)
+	var value := _make_label(value_name, "100 / 100", UI.FONT_BODY, UI.TEXT)
+	value.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	value.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.add_child(value)
 	return row
 
 
@@ -1045,17 +1118,12 @@ func _build_skill_panel(parent: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "SkillPanel"
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.position = Vector2(-266, -88)
+	panel.position = Vector2(-136, -80)
 	panel.size = SKILL_STRIP_SIZE
-	panel.add_theme_stylebox_override(&"panel", UI.panel(Color(0.035, 0.055, 0.09, 0.97)))
+	panel.theme_type_variation = &"HudPanelActive"
 	parent.add_child(panel)
-	# Task 72 §2 B4 deliberately leaves this margin off-token: vertical=6 is an
-	# exact fit -- SKILL_STRIP_SIZE.y (72) minus 2*6 leaves exactly 60px, which
-	# matches CurrentElement's real rendered height (its 56px body plus its own
-	# 2px stylebox border on each side). Rounding this up to GAP_SM (8) would
-	# shrink the interior below 60 and force PanelContainer to clamp SkillPanel
-	# taller than 72 -- reopening the "SkillPanel size 532x72 不变" and "active
-	# slot position unchanged" guarantees this task must not touch.
+	# The active belt now contains only A1-A3; its compact height still leaves
+	# an integer-pixel border and stable center-bottom safe margin.
 	var margin := _margin("Margin", 10, 6)
 	panel.add_child(margin)
 	var skills := VBoxContainer.new()
@@ -1067,10 +1135,9 @@ func _build_skill_panel(parent: Control) -> void:
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override(&"separation", UI.GAP_SM)
 	skills.add_child(row)
-	row.add_child(_build_element_pivot())
 	for slot_id: StringName in SkillSlotIds.active():
 		row.add_child(_build_compact_slot(slot_id))
-	var phase := _make_label("PhaseText", "动作阶段：IDLE", 11, UI.TEXT_DIM)
+	var phase := _make_label("PhaseText", "动作阶段：IDLE", UI.FONT_CAPTION, UI.TEXT_DIM)
 	phase.visible = false
 	skills.add_child(phase)
 
@@ -1084,15 +1151,12 @@ func _build_passive_panel(parent: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "PassivePanel"
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.position = Vector2(-224, -152)
+	panel.position = Vector2(-96, -130)
 	panel.size = PASSIVE_STRIP_SIZE
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_theme_stylebox_override(
-		&"panel",
-		UI.panel(Color(0.035, 0.045, 0.075, 0.92), UI.BORDER_PASSIVE, 8, 1)
-	)
+	panel.theme_type_variation = &"HudPanelPassive"
 	parent.add_child(panel)
-	var margin := _margin("Margin", UI.GAP_SM, UI.GAP_XS)
+	var margin := _margin("Margin", UI.GAP_XS, 2)
 	panel.add_child(margin)
 	var row := HBoxContainer.new()
 	row.name = "SlotRow"
@@ -1106,7 +1170,7 @@ func _build_element_pivot() -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.name = "CurrentElement"
 	panel.custom_minimum_size = ELEMENT_PIVOT_SIZE
-	panel.add_theme_stylebox_override(&"panel", UI.flat_panel(UI.SURFACE_SOFT, UI.BORDER_FOCUS, 7, 2))
+	panel.theme_type_variation = &"HudPanelEmphasis"
 	var body := Control.new()
 	body.name = "Body"
 	body.custom_minimum_size = Vector2(68, 52)
@@ -1117,21 +1181,16 @@ func _build_element_pivot() -> PanelContainer:
 	swatch.size = Vector2(4, 44)
 	swatch.color = UI.WATER
 	body.add_child(swatch)
-	var shape := _make_label("ElementShape", "◆", 20, UI.WATER)
+	var shape := _make_label("ElementShape", "◆", UI.FONT_EMPHASIS, UI.WATER)
 	shape.position = Vector2(7, 2)
 	shape.size = Vector2(24, 28)
 	shape.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	body.add_child(shape)
-	var text := _make_label("ElementText", "水", 18, UI.TEXT)
+	var text := _make_label("ElementText", "水", UI.FONT_EMPHASIS, UI.TEXT)
 	text.position = Vector2(31, 3)
 	text.size = Vector2(30, 26)
 	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	body.add_child(text)
-	var key := _make_label("Key", "E · 元素", 11, UI.TEXT_MUTED)
-	key.position = Vector2(7, 30)
-	key.size = Vector2(55, 20)
-	key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	body.add_child(key)
 	return panel
 
 
@@ -1140,100 +1199,71 @@ func _build_compact_slot(slot_id: StringName) -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.name = String(slot_id)
 	panel.custom_minimum_size = PASSIVE_SLOT_SIZE if passive else ACTIVE_SLOT_SIZE
-	panel.add_theme_stylebox_override(
-		&"panel",
-		UI.flat_panel(
-			UI.SURFACE_RAISED,
-			UI.BORDER_PASSIVE if passive else UI.BORDER,
-			10 if passive else 6,
-			2 if passive else 1
-		)
-	)
-	var margin := _margin("Margin", 4, 3)
+	panel.theme_type_variation = &"HudPanelPassiveSlot" if passive else &"HudPanelSlot"
+	var margin := _margin("Margin", 0 if passive else 2, 0 if passive else 2)
 	panel.add_child(margin)
 	var body := Control.new()
 	body.name = "Body"
-	body.custom_minimum_size = Vector2(88 if passive else 122, 36 if passive else 48)
+	body.custom_minimum_size = Vector2(32 if passive else 66, 32 if passive else 42)
 	margin.add_child(body)
 	var icon := TextureRect.new()
 	icon.name = "Icon"
-	icon.position = Vector2(2, 5 if passive else 8)
-	icon.size = Vector2(26 if passive else 32, 26 if passive else 32)
+	icon.position = Vector2(1 if passive else 2, 1 if passive else 5)
+	icon.size = Vector2(30 if passive else 32, 30 if passive else 32)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.material = _make_slot_icon_material()
 	body.add_child(icon)
 	var cooldown_mask := ColorRect.new()
 	cooldown_mask.name = "CooldownMask"
-	cooldown_mask.position = Vector2(2, 8)
-	cooldown_mask.size = Vector2(32, 32)
+	cooldown_mask.position = icon.position
+	cooldown_mask.size = icon.size
 	cooldown_mask.color = UI.COOLDOWN_SHADE
 	cooldown_mask.visible = false
 	cooldown_mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	body.add_child(cooldown_mask)
-	var cooldown_label := _make_label("CooldownLabel", "0.0", 13, UI.TEXT)
-	cooldown_label.position = Vector2(2, 13)
-	cooldown_label.size = Vector2(32, 22)
+	var cooldown_label := _make_label("CooldownLabel", "0.0", UI.FONT_CAPTION, UI.TEXT)
+	cooldown_label.position = icon.position
+	cooldown_label.size = icon.size
 	cooldown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cooldown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	cooldown_label.visible = false
 	body.add_child(cooldown_label)
-	var key_panel := PanelContainer.new()
-	key_panel.name = "Key"
-	key_panel.position = Vector2(0, 0)
-	key_panel.size = Vector2(20, 18)
-	key_panel.add_theme_stylebox_override(&"panel", UI.flat_panel(UI.SURFACE_SOFT, UI.BORDER_FOCUS, 4, 1))
-	body.add_child(key_panel)
-	var key := _make_label("Text", _key_for_slot(slot_id), 11, UI.TEXT)
-	key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	key.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	key_panel.add_child(key)
-	var passive_mark := _make_label("PassiveMark", "P", 12, UI.WARNING)
-	passive_mark.position = Vector2(0, 0)
-	passive_mark.size = Vector2(20, 18)
-	passive_mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	passive_mark.visible = passive
-	body.add_child(passive_mark)
-	var text_x := 32.0 if passive else 37.0
-	var text_width := 56.0 if passive else 81.0
-	var name_label := _make_label("Name", "空槽", 11 if passive else 12, UI.TEXT)
-	name_label.position = Vector2(text_x, 0)
-	name_label.size = Vector2(text_width, 17)
-	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	body.add_child(name_label)
-	var level := _make_label("Level", "—", 10, UI.TEXT_MUTED)
-	level.position = Vector2(text_x, 17)
-	level.size = Vector2(38, 14)
-	level.visible = not passive
-	body.add_child(level)
-	var cost := _make_label("Cost", "", 10, UI.WATER)
-	cost.position = Vector2(text_x + 40, 17)
-	cost.size = Vector2(44, 14)
-	cost.visible = not passive
-	body.add_child(cost)
-	var state := _make_label("State", "空", 12, UI.TEXT_DIM)
-	state.position = Vector2(text_x, 17 if passive else 31)
-	state.size = Vector2(text_width if passive else 42, 17)
-	body.add_child(state)
-	var policy := _make_label("Policy", "—", 11, UI.TEXT_DIM)
-	policy.position = Vector2(text_x + 43, 31)
-	policy.size = Vector2(40, 17)
-	policy.visible = not passive
-	body.add_child(policy)
-	_slot_views[slot_id] = {
+	var view := {
 		"panel": panel,
-		"key_panel": key_panel,
-		"key": key,
 		"icon": icon,
-		"name": name_label,
-		"level": level,
-		"cost": cost,
-		"policy": policy,
-		"state": state,
 		"cooldown_mask": cooldown_mask,
 		"cooldown_label": cooldown_label,
-		"passive_mark": passive_mark,
 	}
+	if not passive:
+		var key_panel := PanelContainer.new()
+		key_panel.name = "Key"
+		key_panel.position = Vector2(0, 0)
+		key_panel.size = Vector2(20, 18)
+		key_panel.theme_type_variation = &"HudPanelKey"
+		body.add_child(key_panel)
+		var key := _make_label("Text", _key_for_slot(slot_id), UI.FONT_CAPTION, UI.TEXT)
+		key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		key.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		key_panel.add_child(key)
+		var cost := _make_label("Cost", "", UI.FONT_CAPTION, UI.WATER)
+		cost.position = Vector2(36, 29)
+		cost.size = Vector2(28, 12)
+		cost.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		body.add_child(cost)
+		view["key_panel"] = key_panel
+		view["key"] = key
+		view["cost"] = cost
+	_slot_views[slot_id] = view
 	return panel
+
+
+func _make_slot_icon_material() -> ShaderMaterial:
+	var shader := Shader.new()
+	shader.code = SLOT_GRAYSCALE_SHADER
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	return material
 
 
 func _build_compatibility_slots(parent: Control) -> void:
@@ -1248,7 +1278,7 @@ func _build_compatibility_slots(parent: Control) -> void:
 	for index: int in SLOT_ORDER.size():
 		var slot_id: StringName = SLOT_ORDER[index]
 		var card := _build_hud_slot(slot_id)
-		card.position = Vector2(index * 184.0, 10)
+		card.position = Vector2(index * TASK12_COMPAT_SLOT_STEP, 10)
 		card.size = Vector2(160, 92)
 		adapter.add_child(card)
 		_compat_slot_views[slot_id] = {
@@ -1269,7 +1299,7 @@ func _build_hud_slot(slot_id: StringName) -> PanelContainer:
 	panel.name = String(slot_id)
 	panel.custom_minimum_size = Vector2(160, 92)
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	panel.add_theme_stylebox_override(&"panel", UI.flat_panel(UI.SURFACE_RAISED, UI.BORDER, 6, 1))
+	panel.theme_type_variation = &"HudPanelSlot"
 	var margin := _margin("Margin", UI.GAP_SM, UI.GAP_XS)
 	panel.add_child(margin)
 	var box := VBoxContainer.new()
@@ -1279,15 +1309,15 @@ func _build_hud_slot(slot_id: StringName) -> PanelContainer:
 	var top := HBoxContainer.new()
 	top.name = "Top"
 	box.add_child(top)
-	var slot := _make_label("Slot", String(slot_id).to_upper(), 10, UI.TEXT_MUTED)
+	var slot := _make_label("Slot", String(slot_id).to_upper(), UI.FONT_CAPTION, UI.TEXT_MUTED)
 	slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(slot)
 	var key_panel := PanelContainer.new()
 	key_panel.name = "Key"
 	key_panel.custom_minimum_size = Vector2(26, 22)
-	key_panel.add_theme_stylebox_override(&"panel", UI.flat_panel(UI.SURFACE_SOFT, UI.BORDER_FOCUS, 4, 1))
+	key_panel.theme_type_variation = &"HudPanelKey"
 	top.add_child(key_panel)
-	var key := _make_label("Text", "1", 12, UI.TEXT)
+	var key := _make_label("Text", "1", UI.FONT_CAPTION, UI.TEXT)
 	key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	key.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	key_panel.add_child(key)
@@ -1305,14 +1335,14 @@ func _build_hud_slot(slot_id: StringName) -> PanelContainer:
 	text_box.name = "Text"
 	text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_child(text_box)
-	var name_label := _make_label("Name", "空槽", 14, UI.TEXT)
+	var name_label := _make_label("Name", "空槽", UI.FONT_BODY, UI.TEXT)
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	text_box.add_child(name_label)
-	var policy := _make_label("Policy", "— 未装备 —", 10, UI.TEXT_DIM)
+	var policy := _make_label("Policy", "— 未装备 —", UI.FONT_CAPTION, UI.TEXT_DIM)
 	text_box.add_child(policy)
-	var state := _make_label("State", "未配置", 12, UI.TEXT_DIM)
+	var state := _make_label("State", "未配置", UI.FONT_BODY, UI.TEXT_DIM)
 	box.add_child(state)
-	var meta := _make_label("Meta", "共享槽位", 10, UI.TEXT_DIM)
+	var meta := _make_label("Meta", "共享槽位", UI.FONT_CAPTION, UI.TEXT_DIM)
 	meta.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	box.add_child(meta)
 	return panel
@@ -1329,7 +1359,7 @@ func _build_boss_panel(parent: Control) -> void:
 	panel.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	panel.position = Vector2(-260, 16)
 	panel.size = Vector2(520, 90)
-	panel.add_theme_stylebox_override(&"panel", UI.panel(Color(0.035, 0.045, 0.075, 0.94), UI.BORDER_FOCUS, 8, 2))
+	panel.theme_type_variation = &"HudPanelBoss"
 	parent.add_child(panel)
 	var margin := _margin("Margin", UI.GAP_MD, UI.GAP_SM)
 	panel.add_child(margin)
@@ -1340,10 +1370,10 @@ func _build_boss_panel(parent: Control) -> void:
 	var title_row := HBoxContainer.new()
 	title_row.name = "TitleRow"
 	box.add_child(title_row)
-	var name_label := _make_label("Name", "熔汐之王", 16, UI.TEXT)
+	var name_label := _make_label("Name", "熔汐之王", UI.FONT_EMPHASIS, UI.TEXT)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_row.add_child(name_label)
-	var form_label := _make_label("Form", "形态：熔炽", 14, UI.FIRE)
+	var form_label := _make_label("Form", "形态：熔炽", UI.FONT_EMPHASIS, UI.FIRE)
 	title_row.add_child(form_label)
 	var health_row := HBoxContainer.new()
 	health_row.name = "HealthRow"
@@ -1354,10 +1384,9 @@ func _build_boss_panel(parent: Control) -> void:
 	health_bar.custom_minimum_size = Vector2(380, 18)
 	health_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	health_bar.show_percentage = false
-	health_bar.add_theme_stylebox_override(&"background", UI.flat_panel(Color("070b13"), UI.BORDER, 3, 1))
-	health_bar.add_theme_stylebox_override(&"fill", UI.flat_panel(Color("dc4658"), Color("dc4658"), 3, 0))
+	health_bar.theme_type_variation = &"HudBarBoss"
 	health_row.add_child(health_bar)
-	var health_value := _make_label("HealthValue", "280 / 280", 12, UI.TEXT)
+	var health_value := _make_label("HealthValue", "280 / 280", UI.FONT_BODY, UI.TEXT)
 	health_value.custom_minimum_size.x = 90
 	health_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	health_row.add_child(health_value)
@@ -1370,10 +1399,9 @@ func _build_boss_panel(parent: Control) -> void:
 	counter_bar.custom_minimum_size = Vector2(380, 10)
 	counter_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	counter_bar.show_percentage = false
-	counter_bar.add_theme_stylebox_override(&"background", UI.flat_panel(Color("070b13"), UI.BORDER, 3, 1))
-	counter_bar.add_theme_stylebox_override(&"fill", UI.flat_panel(UI.WATER, UI.WATER, 3, 0))
+	counter_bar.theme_type_variation = &"HudBarCounter"
 	counter_row.add_child(counter_bar)
-	var counter_label := _make_label("CounterLabel", "克制进度 0 / 15", 12, UI.TEXT_MUTED)
+	var counter_label := _make_label("CounterLabel", "克制进度 0 / 15", UI.FONT_BODY, UI.TEXT_MUTED)
 	counter_label.custom_minimum_size.x = 90
 	counter_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	counter_row.add_child(counter_label)
@@ -1393,7 +1421,7 @@ func _build_target_panel(parent: Control) -> void:
 	panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	panel.position = Vector2(-260, 76)
 	panel.size = Vector2(240, 92)
-	panel.add_theme_stylebox_override(&"panel", UI.panel())
+	panel.theme_type_variation = &"HudPanel"
 	parent.add_child(panel)
 	var margin := _margin("Margin", UI.GAP_MD, UI.GAP_SM)
 	panel.add_child(margin)
@@ -1401,9 +1429,9 @@ func _build_target_panel(parent: Control) -> void:
 	box.name = "Box"
 	box.add_theme_constant_override(&"separation", 4)
 	margin.add_child(box)
-	box.add_child(_make_label("Title", "目标元素附着", 13, UI.TEXT_MUTED))
-	box.add_child(_make_label("Water", "水滴 WATER  ×0", 15, UI.TEXT_DIM))
-	box.add_child(_make_label("Fire", "火焰 FIRE   ×0", 15, UI.TEXT_DIM))
+	box.add_child(_make_label("Title", "目标元素附着", UI.FONT_CAPTION, UI.TEXT_MUTED))
+	box.add_child(_make_label("Water", "水滴 WATER  ×0", UI.FONT_BODY, UI.TEXT_DIM))
+	box.add_child(_make_label("Fire", "火焰 FIRE   ×0", UI.FONT_BODY, UI.TEXT_DIM))
 
 
 func _build_feedback_panel(parent: Control) -> void:
@@ -1416,11 +1444,11 @@ func _build_feedback_panel(parent: Control) -> void:
 	# the upper-right safe zone.
 	panel.position = Vector2(-180, 124)
 	panel.size = Vector2(360, 36)
-	panel.add_theme_stylebox_override(&"panel", UI.panel(UI.SURFACE_RAISED, UI.BORDER_FOCUS, 7, 1))
+	panel.theme_type_variation = &"HudPanelEmphasis"
 	parent.add_child(panel)
 	var margin := _margin("Margin", UI.GAP_SM, UI.GAP_XS)
 	panel.add_child(margin)
-	var text := _make_label("Text", "反馈", 14, UI.TEXT)
+	var text := _make_label("Text", "反馈", UI.FONT_EMPHASIS, UI.TEXT)
 	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	margin.add_child(text)
@@ -1433,9 +1461,9 @@ func _build_help_panel(parent: Control) -> void:
 	panel.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	panel.position = Vector2(-230, 62)
 	panel.size = Vector2(460, 36)
-	panel.add_theme_stylebox_override(&"panel", UI.flat_panel(Color(0.035, 0.055, 0.09, 0.92), UI.BORDER, 5, 1))
+	panel.theme_type_variation = &"HudPanelActive"
 	parent.add_child(panel)
-	var text := _make_label("Text", "A/D 移动 · 空格跳跃 · 1/2/3 技能 · E 切换 · L 配装 · F4 减少动态 · F5 色觉辅助", 11, UI.TEXT_MUTED)
+	var text := _make_label("Text", "A/D 移动 · 空格跳跃 · 1/2/3 技能 · E 切换 · L 配装 · F4 减少动态 · F5 色觉辅助", UI.FONT_CAPTION, UI.TEXT_MUTED)
 	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	panel.add_child(text)
@@ -1448,7 +1476,7 @@ func _build_debug_panel(parent: Control) -> void:
 	panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	panel.position = Vector2(-410, 180)
 	panel.size = Vector2(390, 270)
-	panel.add_theme_stylebox_override(&"panel", UI.panel(Color(0.02, 0.03, 0.05, 0.98), UI.WATER, 7, 2))
+	panel.theme_type_variation = &"HudPanelDebug"
 	parent.add_child(panel)
 	var margin := _margin("Margin", UI.GAP_MD, UI.GAP_MD)
 	panel.add_child(margin)
@@ -1456,15 +1484,15 @@ func _build_debug_panel(parent: Control) -> void:
 	box.name = "Debug"
 	box.add_theme_constant_override(&"separation", 8)
 	margin.add_child(box)
-	box.add_child(_make_label("Title", "战斗调试 · F3 隐藏", 17, UI.WATER))
-	box.add_child(_make_label("Skill", "技能：none", 12, UI.TEXT))
-	box.add_child(_make_label("Target", "目标", 12, UI.WARNING))
-	box.add_child(_make_label("ResultLabel", "最近提交结果", 11, UI.TEXT_MUTED))
-	var result := _make_label("Result", "等待战斗结果", 12, UI.TEXT)
+	box.add_child(_make_label("Title", "战斗调试 · F3 隐藏", UI.FONT_EMPHASIS, UI.WATER))
+	box.add_child(_make_label("Skill", "技能：none", UI.FONT_BODY, UI.TEXT))
+	box.add_child(_make_label("Target", "目标", UI.FONT_BODY, UI.WARNING))
+	box.add_child(_make_label("ResultLabel", "最近提交结果", UI.FONT_CAPTION, UI.TEXT_MUTED))
+	var result := _make_label("Result", "等待战斗结果", UI.FONT_BODY, UI.TEXT)
 	result.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(result)
-	box.add_child(_make_label("Motion", "动态：完整 · 色觉辅助：关", 11, UI.TEXT_MUTED))
+	box.add_child(_make_label("Motion", "动态：完整 · 色觉辅助：关", UI.FONT_CAPTION, UI.TEXT_MUTED))
 
 
 func _margin(node_name: String, horizontal: int, vertical: int) -> MarginContainer:

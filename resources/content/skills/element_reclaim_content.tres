@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="SkillContentDefinition" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="SkillContentDefinition" format=3 uid="uid://cf24dj7sftkdo"]
 
-[ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="1_content"]
-[ext_resource type="Resource" path="res://resources/skills/element_reclaim.tres" id="2_gameplay"]
-[ext_resource type="Texture2D" path="res://assets/generated/vfx/element_reclaim/icon.png" id="3_icon"]
+[ext_resource type="Script" uid="uid://e8y3mjta6es4" path="res://combat/content/skill_content_definition.gd" id="1_content"]
+[ext_resource type="Resource" uid="uid://dk8xg8i4sgo2p" path="res://resources/skills/element_reclaim.tres" id="2_gameplay"]
+[ext_resource type="Texture2D" uid="uid://bo0dgttxr3obk" path="res://assets/generated/vfx/element_reclaim/icon.png" id="3_icon"]
 [ext_resource type="PackedScene" path="res://scenes/vfx/element_reclaim_presentation.tscn" id="4_presentation"]
-[ext_resource type="Script" path="res://growth/definitions/active_skill_level_definition.gd" id="5_level"]
-[ext_resource type="Script" path="res://growth/definitions/active_skill_progression_definition.gd" id="6_progression"]
+[ext_resource type="Script" uid="uid://bpnewnpqlqkgf" path="res://growth/definitions/active_skill_level_definition.gd" id="5_level"]
+[ext_resource type="Script" uid="uid://c4ecxy37334v7" path="res://growth/definitions/active_skill_progression_definition.gd" id="6_progression"]
 
 [sub_resource type="Resource" id="Resource_reclaim_lv1"]
 script = ExtResource("5_level")

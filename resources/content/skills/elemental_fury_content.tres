@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="SkillContentDefinition" load_steps=12 format=3]
+[gd_resource type="Resource" script_class="SkillContentDefinition" format=3 uid="uid://b0ew7ovtj760y"]
 
-[ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="1_content"]
-[ext_resource type="Resource" path="res://resources/skills/elemental_fury.tres" id="2_gameplay"]
+[ext_resource type="Script" uid="uid://e8y3mjta6es4" path="res://combat/content/skill_content_definition.gd" id="1_content"]
+[ext_resource type="Resource" uid="uid://ppncho8j8blm" path="res://resources/skills/elemental_fury.tres" id="2_gameplay"]
 [ext_resource type="PackedScene" path="res://combat/delivery/element_rage_delivery.tscn" id="3_delivery"]
-[ext_resource type="Texture2D" path="res://assets/generated/vfx/elemental_fury/icon.png" id="4_icon"]
+[ext_resource type="Texture2D" uid="uid://c7rh5wiu0x2f3" path="res://assets/generated/vfx/elemental_fury/icon.png" id="4_icon"]
 [ext_resource type="PackedScene" path="res://scenes/vfx/elemental_fury_presentation.tscn" id="5_presentation"]
-[ext_resource type="Script" path="res://growth/definitions/active_skill_level_definition.gd" id="6_level"]
-[ext_resource type="Script" path="res://growth/definitions/active_skill_progression_definition.gd" id="7_progression"]
+[ext_resource type="Script" uid="uid://bpnewnpqlqkgf" path="res://growth/definitions/active_skill_level_definition.gd" id="6_level"]
+[ext_resource type="Script" uid="uid://c4ecxy37334v7" path="res://growth/definitions/active_skill_progression_definition.gd" id="7_progression"]
 
 [sub_resource type="Resource" id="Resource_fury_lv1"]
 script = ExtResource("6_level")

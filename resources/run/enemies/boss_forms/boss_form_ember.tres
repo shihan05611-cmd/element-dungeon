@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="BossFormDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="BossFormDefinition" format=3 uid="uid://g0lsglhglo6x"]
 
-[ext_resource type="Script" path="res://combat/definitions/boss_form_definition.gd" id="1_form"]
-[ext_resource type="Resource" path="res://resources/run/projectiles/boss_ember_bolt_profile.tres" id="2_profile"]
+[ext_resource type="Script" uid="uid://d3xckefxkcrph" path="res://combat/definitions/boss_form_definition.gd" id="1_form"]
+[ext_resource type="Resource" uid="uid://cdhbmd6oweokm" path="res://resources/run/projectiles/boss_ember_bolt_profile.tres" id="2_profile"]
 
 [resource]
 script = ExtResource("1_form")
@@ -9,15 +9,6 @@ form_id = &"ember"
 display_name = "熔炽"
 element_id = &"fire"
 countered_by = &"water"
-counts_any_combat_element = false
 ranged_projectile_profile = ExtResource("2_profile")
-melee_telegraph_duration = 0.4
 melee_damage = 15.0
 melee_range = 88.0
-attack_cooldown = 2.4
-ranged_minimum_distance = 130.0
-melee_cooldown_close_range_scale = 0.6
-summon_max_alive = 0
-summon_count_per_cast = 1
-summon_cooldown = 12.0
-summon_telegraph_duration = 0.9

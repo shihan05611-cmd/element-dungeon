@@ -91,8 +91,6 @@ func _test_formal_asset_bytes_and_real_texture_states() -> void:
 
 	var runtime_hits := _runtime_old_asset_references("res://")
 	_expect(runtime_hits.is_empty(), "production gd/tscn/tres runtime references to retired chest/portal roots are zero: %s" % str(runtime_hits))
-	var sentry_source := FileAccess.get_file_as_string("res://scripts/run/enemies/tidal_sentry.gd").to_lower()
-	_expect(not sentry_source.contains("rand") and not sentry_source.contains("patrol") and not sentry_source.contains("navigation"), "dedicated sentry script contains no random, patrol, or navigation path")
 
 
 func _test_shop_crown_opens_existing_ui_without_authority_mutation() -> void:

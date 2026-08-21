@@ -172,13 +172,9 @@ func _capture_combat(file_name: String, size: Vector2i) -> void:
 		var slot := _hud.visual_slot_panel(SkillSlotIds.passive()[index])
 		var content := CATALOG.content_for(PASSIVE_IDS[index])
 		var icon := slot.get_node("Margin/Body/Icon") as TextureRect
-		var name_label := slot.get_node("Margin/Body/Name") as Label
 		_expect(slot != null and slot.is_visible_in_tree(), "%s P%d is visible" % [file_name, index + 1])
 		_expect(icon != null and icon.is_visible_in_tree() and icon.texture == content.icon, "%s P%d renders the formal icon" % [file_name, index + 1])
-		_expect(name_label != null and name_label.is_visible_in_tree() and name_label.text == content.display_name, "%s P%d renders the formal name" % [file_name, index + 1])
-		_expect(not (slot.get_node("Margin/Body/Key") as Control).visible, "%s P%d has no fake key" % [file_name, index + 1])
-		_expect(not (slot.get_node("Margin/Body/Level") as Control).visible, "%s P%d has no fake level" % [file_name, index + 1])
-		_expect(not (slot.get_node("Margin/Body/Cost") as Control).visible, "%s P%d has no fake SP cost" % [file_name, index + 1])
+		_expect(_hud.slot_visible_fields(SkillSlotIds.passive()[index]) == [&"icon"], "%s P%d is icon-only" % [file_name, index + 1])
 		_expect(not (slot.get_node("Margin/Body/CooldownMask") as Control).visible, "%s P%d has no fake cooldown" % [file_name, index + 1])
 	await _store_capture(file_name, size, true)
 

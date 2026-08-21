@@ -124,9 +124,7 @@ func _capture_combat(file_name: String, size: Vector2i, room_id: StringName, ass
 	_expect(_inside(_hud.status_panel.get_global_rect(), size), "%s status capsule is in bounds" % file_name)
 	_expect(_inside(_hud.skill_panel.get_global_rect(), size), "%s active belt is in bounds" % file_name)
 	_expect(_inside(_hud.passive_panel.get_global_rect(), size), "%s passive belt is in bounds" % file_name)
-	_expect(_hud.get_node_or_null("Root/SkillPanel/BusyOverlay/BusyStrip") == null, "%s has no purple BusyStrip" % file_name)
-	var state := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_1).get_node("Margin/Body/State") as Label
-	_expect(state.text.is_empty() and not state.visible, "%s has no persistent ready copy" % file_name)
+	_expect(not _hud.slot_visible_fields(SkillSlotIds.ACTIVE_1).has(&"cooldown"), "%s active slot has no persistent availability copy" % file_name)
 	if assert_title_clear:
 		# Task 72 §2 B3: the room title moved into the HUD (Root/RoomTitle);
 		# read it from there instead of the world-space room node.

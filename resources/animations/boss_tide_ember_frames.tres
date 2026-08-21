@@ -1,106 +1,98 @@
-[gd_resource type="SpriteFrames" format=3]
+[gd_resource type="SpriteFrames" format=3 uid="uid://gx7jw4n63psp"]
 
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_idle_v2.png" id="1_plain_idle"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_walk_v2.png" id="2_plain_walk"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_attack_v2.png" id="3_plain_attack"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_idle_v2.png" id="4_ember_idle"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_walk_v2.png" id="5_ember_walk"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_attack_v2.png" id="6_ember_attack"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_idle_v2.png" id="7_tide_idle"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_walk_v2.png" id="8_tide_walk"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_attack_v2.png" id="9_tide_attack"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_hurt_v2.png" id="10_hurt"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_death_v2.png" id="11_death"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_cast_v1.png" id="12_plain_cast"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_cast_v1.png" id="13_ember_cast"]
-[ext_resource type="Texture2D" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_cast_v1.png" id="14_tide_cast"]
+[ext_resource type="Texture2D" uid="uid://y32cw3qrq1xn" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_idle_v2.png" id="1_plain_idle"]
+[ext_resource type="Texture2D" uid="uid://crk6ix7nug2t5" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_walk_v2.png" id="2_plain_walk"]
+[ext_resource type="Texture2D" uid="uid://o52j5v1hvpqb" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_attack_v2.png" id="3_plain_attack"]
+[ext_resource type="Texture2D" uid="uid://ce3rlb7xfxla2" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_idle_v2.png" id="4_ember_idle"]
+[ext_resource type="Texture2D" uid="uid://d3eqtvgcdlpr6" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_walk_v2.png" id="5_ember_walk"]
+[ext_resource type="Texture2D" uid="uid://cuplskqctwes6" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_attack_v2.png" id="6_ember_attack"]
+[ext_resource type="Texture2D" uid="uid://b24pdiscwqrmc" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_idle_v2.png" id="7_tide_idle"]
+[ext_resource type="Texture2D" uid="uid://hoetg4ga6ceu" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_walk_v2.png" id="8_tide_walk"]
+[ext_resource type="Texture2D" uid="uid://vhn4iuagxklw" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_attack_v2.png" id="9_tide_attack"]
+[ext_resource type="Texture2D" uid="uid://byfaw3syhnn6n" path="res://assets/world/enemies/tide_ember_sovereign/boss_hurt_v2.png" id="10_hurt"]
+[ext_resource type="Texture2D" uid="uid://c6dkqdhn4k6tv" path="res://assets/world/enemies/tide_ember_sovereign/boss_death_v2.png" id="11_death"]
+[ext_resource type="Texture2D" uid="uid://cd7aecbwxpk7c" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_cast_v1.png" id="12_plain_cast"]
+[ext_resource type="Texture2D" uid="uid://bt5jfqvv6yrr6" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_cast_v1.png" id="13_ember_cast"]
+[ext_resource type="Texture2D" uid="uid://ctsf258lcas3c" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_cast_v1.png" id="14_tide_cast"]
 
-[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_0"]
-atlas = ExtResource("1_plain_idle")
+[sub_resource type="AtlasTexture" id="boss_death_v2_0"]
+atlas = ExtResource("11_death")
 region = Rect2(0, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_1"]
-atlas = ExtResource("1_plain_idle")
+[sub_resource type="AtlasTexture" id="boss_death_v2_1"]
+atlas = ExtResource("11_death")
 region = Rect2(200, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_2"]
-atlas = ExtResource("1_plain_idle")
+[sub_resource type="AtlasTexture" id="boss_death_v2_2"]
+atlas = ExtResource("11_death")
 region = Rect2(400, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_3"]
-atlas = ExtResource("1_plain_idle")
+[sub_resource type="AtlasTexture" id="boss_death_v2_3"]
+atlas = ExtResource("11_death")
 region = Rect2(600, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_4"]
-atlas = ExtResource("1_plain_idle")
-region = Rect2(800, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_5"]
-atlas = ExtResource("1_plain_idle")
-region = Rect2(1000, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_0"]
-atlas = ExtResource("2_plain_walk")
+[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_0"]
+atlas = ExtResource("6_ember_attack")
 region = Rect2(0, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_1"]
-atlas = ExtResource("2_plain_walk")
+[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_1"]
+atlas = ExtResource("6_ember_attack")
 region = Rect2(200, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_2"]
-atlas = ExtResource("2_plain_walk")
+[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_2"]
+atlas = ExtResource("6_ember_attack")
 region = Rect2(400, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_3"]
-atlas = ExtResource("2_plain_walk")
+[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_3"]
+atlas = ExtResource("6_ember_attack")
 region = Rect2(600, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_4"]
-atlas = ExtResource("2_plain_walk")
+[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_4"]
+atlas = ExtResource("6_ember_attack")
 region = Rect2(800, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_5"]
-atlas = ExtResource("2_plain_walk")
+[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_5"]
+atlas = ExtResource("6_ember_attack")
 region = Rect2(1000, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_6"]
-atlas = ExtResource("2_plain_walk")
+[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_6"]
+atlas = ExtResource("6_ember_attack")
 region = Rect2(1200, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_7"]
-atlas = ExtResource("2_plain_walk")
+[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_7"]
+atlas = ExtResource("6_ember_attack")
 region = Rect2(1400, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_0"]
-atlas = ExtResource("3_plain_attack")
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_0"]
+atlas = ExtResource("13_ember_cast")
 region = Rect2(0, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_1"]
-atlas = ExtResource("3_plain_attack")
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_1"]
+atlas = ExtResource("13_ember_cast")
 region = Rect2(200, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_2"]
-atlas = ExtResource("3_plain_attack")
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_2"]
+atlas = ExtResource("13_ember_cast")
 region = Rect2(400, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_3"]
-atlas = ExtResource("3_plain_attack")
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_3"]
+atlas = ExtResource("13_ember_cast")
 region = Rect2(600, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_4"]
-atlas = ExtResource("3_plain_attack")
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_4"]
+atlas = ExtResource("13_ember_cast")
 region = Rect2(800, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_5"]
-atlas = ExtResource("3_plain_attack")
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_5"]
+atlas = ExtResource("13_ember_cast")
 region = Rect2(1000, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_6"]
-atlas = ExtResource("3_plain_attack")
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_6"]
+atlas = ExtResource("13_ember_cast")
 region = Rect2(1200, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_7"]
-atlas = ExtResource("3_plain_attack")
+[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_7"]
+atlas = ExtResource("13_ember_cast")
 region = Rect2(1400, 0, 200, 200)
 
 [sub_resource type="AtlasTexture" id="boss_ember_idle_v2_0"]
@@ -159,36 +151,204 @@ region = Rect2(1200, 0, 200, 200)
 atlas = ExtResource("5_ember_walk")
 region = Rect2(1400, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_0"]
-atlas = ExtResource("6_ember_attack")
+[sub_resource type="AtlasTexture" id="boss_hurt_v2_0"]
+atlas = ExtResource("10_hurt")
 region = Rect2(0, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_1"]
-atlas = ExtResource("6_ember_attack")
+[sub_resource type="AtlasTexture" id="boss_hurt_v2_1"]
+atlas = ExtResource("10_hurt")
 region = Rect2(200, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_2"]
-atlas = ExtResource("6_ember_attack")
+[sub_resource type="AtlasTexture" id="boss_hurt_v2_2"]
+atlas = ExtResource("10_hurt")
 region = Rect2(400, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_3"]
-atlas = ExtResource("6_ember_attack")
+[sub_resource type="AtlasTexture" id="boss_hurt_v2_3"]
+atlas = ExtResource("10_hurt")
 region = Rect2(600, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_4"]
-atlas = ExtResource("6_ember_attack")
+[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_0"]
+atlas = ExtResource("3_plain_attack")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_1"]
+atlas = ExtResource("3_plain_attack")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_2"]
+atlas = ExtResource("3_plain_attack")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_3"]
+atlas = ExtResource("3_plain_attack")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_4"]
+atlas = ExtResource("3_plain_attack")
 region = Rect2(800, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_5"]
-atlas = ExtResource("6_ember_attack")
+[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_5"]
+atlas = ExtResource("3_plain_attack")
 region = Rect2(1000, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_6"]
-atlas = ExtResource("6_ember_attack")
+[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_6"]
+atlas = ExtResource("3_plain_attack")
 region = Rect2(1200, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_ember_attack_v2_7"]
-atlas = ExtResource("6_ember_attack")
+[sub_resource type="AtlasTexture" id="boss_plain_attack_v2_7"]
+atlas = ExtResource("3_plain_attack")
+region = Rect2(1400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_0"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_1"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_2"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_3"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_4"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(800, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_5"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(1000, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_6"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(1200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_7"]
+atlas = ExtResource("12_plain_cast")
+region = Rect2(1400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_0"]
+atlas = ExtResource("1_plain_idle")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_1"]
+atlas = ExtResource("1_plain_idle")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_2"]
+atlas = ExtResource("1_plain_idle")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_3"]
+atlas = ExtResource("1_plain_idle")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_4"]
+atlas = ExtResource("1_plain_idle")
+region = Rect2(800, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_idle_v2_5"]
+atlas = ExtResource("1_plain_idle")
+region = Rect2(1000, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_0"]
+atlas = ExtResource("2_plain_walk")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_1"]
+atlas = ExtResource("2_plain_walk")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_2"]
+atlas = ExtResource("2_plain_walk")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_3"]
+atlas = ExtResource("2_plain_walk")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_4"]
+atlas = ExtResource("2_plain_walk")
+region = Rect2(800, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_5"]
+atlas = ExtResource("2_plain_walk")
+region = Rect2(1000, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_6"]
+atlas = ExtResource("2_plain_walk")
+region = Rect2(1200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_plain_walk_v2_7"]
+atlas = ExtResource("2_plain_walk")
+region = Rect2(1400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_0"]
+atlas = ExtResource("9_tide_attack")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_1"]
+atlas = ExtResource("9_tide_attack")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_2"]
+atlas = ExtResource("9_tide_attack")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_3"]
+atlas = ExtResource("9_tide_attack")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_4"]
+atlas = ExtResource("9_tide_attack")
+region = Rect2(800, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_5"]
+atlas = ExtResource("9_tide_attack")
+region = Rect2(1000, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_6"]
+atlas = ExtResource("9_tide_attack")
+region = Rect2(1200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_7"]
+atlas = ExtResource("9_tide_attack")
+region = Rect2(1400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_0"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_1"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_2"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_3"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_4"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(800, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_5"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(1000, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_6"]
+atlas = ExtResource("14_tide_cast")
+region = Rect2(1200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_7"]
+atlas = ExtResource("14_tide_cast")
 region = Rect2(1400, 0, 200, 200)
 
 [sub_resource type="AtlasTexture" id="boss_tide_idle_v2_0"]
@@ -247,247 +407,81 @@ region = Rect2(1200, 0, 200, 200)
 atlas = ExtResource("8_tide_walk")
 region = Rect2(1400, 0, 200, 200)
 
-[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_0"]
-atlas = ExtResource("9_tide_attack")
-region = Rect2(0, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_1"]
-atlas = ExtResource("9_tide_attack")
-region = Rect2(200, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_2"]
-atlas = ExtResource("9_tide_attack")
-region = Rect2(400, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_3"]
-atlas = ExtResource("9_tide_attack")
-region = Rect2(600, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_4"]
-atlas = ExtResource("9_tide_attack")
-region = Rect2(800, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_5"]
-atlas = ExtResource("9_tide_attack")
-region = Rect2(1000, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_6"]
-atlas = ExtResource("9_tide_attack")
-region = Rect2(1200, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_attack_v2_7"]
-atlas = ExtResource("9_tide_attack")
-region = Rect2(1400, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_hurt_v2_0"]
-atlas = ExtResource("10_hurt")
-region = Rect2(0, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_hurt_v2_1"]
-atlas = ExtResource("10_hurt")
-region = Rect2(200, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_hurt_v2_2"]
-atlas = ExtResource("10_hurt")
-region = Rect2(400, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_hurt_v2_3"]
-atlas = ExtResource("10_hurt")
-region = Rect2(600, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_death_v2_0"]
-atlas = ExtResource("11_death")
-region = Rect2(0, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_death_v2_1"]
-atlas = ExtResource("11_death")
-region = Rect2(200, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_death_v2_2"]
-atlas = ExtResource("11_death")
-region = Rect2(400, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_death_v2_3"]
-atlas = ExtResource("11_death")
-region = Rect2(600, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_0"]
-atlas = ExtResource("12_plain_cast")
-region = Rect2(0, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_1"]
-atlas = ExtResource("12_plain_cast")
-region = Rect2(200, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_2"]
-atlas = ExtResource("12_plain_cast")
-region = Rect2(400, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_3"]
-atlas = ExtResource("12_plain_cast")
-region = Rect2(600, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_4"]
-atlas = ExtResource("12_plain_cast")
-region = Rect2(800, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_5"]
-atlas = ExtResource("12_plain_cast")
-region = Rect2(1000, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_6"]
-atlas = ExtResource("12_plain_cast")
-region = Rect2(1200, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_plain_cast_v1_7"]
-atlas = ExtResource("12_plain_cast")
-region = Rect2(1400, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_0"]
-atlas = ExtResource("13_ember_cast")
-region = Rect2(0, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_1"]
-atlas = ExtResource("13_ember_cast")
-region = Rect2(200, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_2"]
-atlas = ExtResource("13_ember_cast")
-region = Rect2(400, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_3"]
-atlas = ExtResource("13_ember_cast")
-region = Rect2(600, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_4"]
-atlas = ExtResource("13_ember_cast")
-region = Rect2(800, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_5"]
-atlas = ExtResource("13_ember_cast")
-region = Rect2(1000, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_6"]
-atlas = ExtResource("13_ember_cast")
-region = Rect2(1200, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_ember_cast_v1_7"]
-atlas = ExtResource("13_ember_cast")
-region = Rect2(1400, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_0"]
-atlas = ExtResource("14_tide_cast")
-region = Rect2(0, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_1"]
-atlas = ExtResource("14_tide_cast")
-region = Rect2(200, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_2"]
-atlas = ExtResource("14_tide_cast")
-region = Rect2(400, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_3"]
-atlas = ExtResource("14_tide_cast")
-region = Rect2(600, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_4"]
-atlas = ExtResource("14_tide_cast")
-region = Rect2(800, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_5"]
-atlas = ExtResource("14_tide_cast")
-region = Rect2(1000, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_6"]
-atlas = ExtResource("14_tide_cast")
-region = Rect2(1200, 0, 200, 200)
-
-[sub_resource type="AtlasTexture" id="boss_tide_cast_v1_7"]
-atlas = ExtResource("14_tide_cast")
-region = Rect2(1400, 0, 200, 200)
-
 [resource]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("boss_plain_idle_v2_0")
+"texture": SubResource("boss_death_v2_0")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_plain_idle_v2_1")
+"texture": SubResource("boss_death_v2_1")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_plain_idle_v2_2")
+"texture": SubResource("boss_death_v2_2")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_plain_idle_v2_3")
-}, {
-"duration": 1.0,
-"texture": SubResource("boss_plain_idle_v2_4")
-}, {
-"duration": 1.0,
-"texture": SubResource("boss_plain_idle_v2_5")
+"texture": SubResource("boss_death_v2_3")
 }],
-"loop": true,
-"name": &"plain_idle",
-"speed": 8.0
+"loop": 0,
+"name": &"death",
+"speed": 6.0
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("boss_plain_walk_v2_0")
+"texture": SubResource("boss_ember_attack_v2_0")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_plain_walk_v2_1")
+"texture": SubResource("boss_ember_attack_v2_1")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_plain_walk_v2_2")
+"texture": SubResource("boss_ember_attack_v2_2")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_plain_walk_v2_3")
+"texture": SubResource("boss_ember_attack_v2_3")
 }, {
-"duration": 1.0,
-"texture": SubResource("boss_plain_walk_v2_4")
+"duration": 0.9,
+"texture": SubResource("boss_ember_attack_v2_4")
 }, {
-"duration": 1.0,
-"texture": SubResource("boss_plain_walk_v2_5")
+"duration": 0.9,
+"texture": SubResource("boss_ember_attack_v2_5")
 }, {
-"duration": 1.0,
-"texture": SubResource("boss_plain_walk_v2_6")
+"duration": 0.9,
+"texture": SubResource("boss_ember_attack_v2_6")
 }, {
-"duration": 1.0,
-"texture": SubResource("boss_plain_walk_v2_7")
+"duration": 0.9,
+"texture": SubResource("boss_ember_attack_v2_7")
 }],
-"loop": true,
-"name": &"plain_walk",
-"speed": 11.0
+"loop": 0,
+"name": &"ember_attack",
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("boss_plain_attack_v2_0")
+"texture": SubResource("boss_ember_cast_v1_0")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_plain_attack_v2_1")
+"texture": SubResource("boss_ember_cast_v1_1")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_plain_attack_v2_2")
+"texture": SubResource("boss_ember_cast_v1_2")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_plain_attack_v2_3")
+"texture": SubResource("boss_ember_cast_v1_3")
 }, {
-"duration": 0.9,
-"texture": SubResource("boss_plain_attack_v2_4")
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_4")
 }, {
-"duration": 0.9,
-"texture": SubResource("boss_plain_attack_v2_5")
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_5")
 }, {
-"duration": 0.9,
-"texture": SubResource("boss_plain_attack_v2_6")
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_6")
 }, {
-"duration": 0.9,
-"texture": SubResource("boss_plain_attack_v2_7")
+"duration": 1.0,
+"texture": SubResource("boss_ember_cast_v1_7")
 }],
-"loop": false,
-"name": &"plain_attack",
+"loop": 0,
+"name": &"ember_cast",
 "speed": 10.0
 }, {
 "frames": [{
@@ -509,7 +503,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("boss_ember_idle_v2_5")
 }],
-"loop": true,
+"loop": 1,
 "name": &"ember_idle",
 "speed": 8.0
 }, {
@@ -538,37 +532,193 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("boss_ember_walk_v2_7")
 }],
-"loop": true,
+"loop": 1,
 "name": &"ember_walk",
 "speed": 11.0
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("boss_ember_attack_v2_0")
+"texture": SubResource("boss_hurt_v2_0")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_ember_attack_v2_1")
+"texture": SubResource("boss_hurt_v2_1")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_ember_attack_v2_2")
+"texture": SubResource("boss_hurt_v2_2")
 }, {
 "duration": 1.0,
-"texture": SubResource("boss_ember_attack_v2_3")
-}, {
-"duration": 0.9,
-"texture": SubResource("boss_ember_attack_v2_4")
-}, {
-"duration": 0.9,
-"texture": SubResource("boss_ember_attack_v2_5")
-}, {
-"duration": 0.9,
-"texture": SubResource("boss_ember_attack_v2_6")
-}, {
-"duration": 0.9,
-"texture": SubResource("boss_ember_attack_v2_7")
+"texture": SubResource("boss_hurt_v2_3")
 }],
-"loop": false,
-"name": &"ember_attack",
+"loop": 0,
+"name": &"hurt",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_plain_attack_v2_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_attack_v2_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_attack_v2_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_attack_v2_3")
+}, {
+"duration": 0.9,
+"texture": SubResource("boss_plain_attack_v2_4")
+}, {
+"duration": 0.9,
+"texture": SubResource("boss_plain_attack_v2_5")
+}, {
+"duration": 0.9,
+"texture": SubResource("boss_plain_attack_v2_6")
+}, {
+"duration": 0.9,
+"texture": SubResource("boss_plain_attack_v2_7")
+}],
+"loop": 0,
+"name": &"plain_attack",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_cast_v1_7")
+}],
+"loop": 0,
+"name": &"plain_cast",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_plain_idle_v2_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_idle_v2_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_idle_v2_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_idle_v2_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_idle_v2_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_idle_v2_5")
+}],
+"loop": 1,
+"name": &"plain_idle",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_plain_walk_v2_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_walk_v2_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_walk_v2_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_walk_v2_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_walk_v2_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_walk_v2_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_walk_v2_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_plain_walk_v2_7")
+}],
+"loop": 1,
+"name": &"plain_walk",
+"speed": 11.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_tide_attack_v2_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_attack_v2_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_attack_v2_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_attack_v2_3")
+}, {
+"duration": 0.9,
+"texture": SubResource("boss_tide_attack_v2_4")
+}, {
+"duration": 0.9,
+"texture": SubResource("boss_tide_attack_v2_5")
+}, {
+"duration": 0.9,
+"texture": SubResource("boss_tide_attack_v2_6")
+}, {
+"duration": 0.9,
+"texture": SubResource("boss_tide_attack_v2_7")
+}],
+"loop": 0,
+"name": &"tide_attack",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_cast_v1_7")
+}],
+"loop": 0,
+"name": &"tide_cast",
 "speed": 10.0
 }, {
 "frames": [{
@@ -590,7 +740,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("boss_tide_idle_v2_5")
 }],
-"loop": true,
+"loop": 1,
 "name": &"tide_idle",
 "speed": 8.0
 }, {
@@ -619,178 +769,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("boss_tide_walk_v2_7")
 }],
-"loop": true,
+"loop": 1,
 "name": &"tide_walk",
 "speed": 11.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("boss_tide_attack_v2_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("boss_tide_attack_v2_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("boss_tide_attack_v2_2")
-}, {
-"duration": 1.0,
-"texture": SubResource("boss_tide_attack_v2_3")
-}, {
-"duration": 0.9,
-"texture": SubResource("boss_tide_attack_v2_4")
-}, {
-"duration": 0.9,
-"texture": SubResource("boss_tide_attack_v2_5")
-}, {
-"duration": 0.9,
-"texture": SubResource("boss_tide_attack_v2_6")
-}, {
-"duration": 0.9,
-"texture": SubResource("boss_tide_attack_v2_7")
-}],
-"loop": false,
-"name": &"tide_attack",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("boss_hurt_v2_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("boss_hurt_v2_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("boss_hurt_v2_2")
-}, {
-"duration": 1.0,
-"texture": SubResource("boss_hurt_v2_3")
-}],
-"loop": false,
-"name": &"hurt",
-"speed": 12.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("boss_death_v2_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("boss_death_v2_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("boss_death_v2_2")
-}, {
-"duration": 1.0,
-"texture": SubResource("boss_death_v2_3")
-}],
-"loop": false,
-"name": &"death",
-"speed": 6.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("boss_plain_cast_v1_0")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_plain_cast_v1_1")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_plain_cast_v1_2")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_plain_cast_v1_3")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_plain_cast_v1_4")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_plain_cast_v1_5")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_plain_cast_v1_6")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_plain_cast_v1_7")
-}],
-"loop": false,
-"name": &"plain_cast",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("boss_ember_cast_v1_0")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_ember_cast_v1_1")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_ember_cast_v1_2")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_ember_cast_v1_3")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_ember_cast_v1_4")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_ember_cast_v1_5")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_ember_cast_v1_6")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_ember_cast_v1_7")
-}],
-"loop": false,
-"name": &"ember_cast",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("boss_tide_cast_v1_0")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_tide_cast_v1_1")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_tide_cast_v1_2")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_tide_cast_v1_3")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_tide_cast_v1_4")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_tide_cast_v1_5")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_tide_cast_v1_6")
-},
-{
-"duration": 1.0,
-"texture": SubResource("boss_tide_cast_v1_7")
-}],
-"loop": false,
-"name": &"tide_cast",
-"speed": 10.0
 }]

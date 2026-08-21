@@ -1,12 +1,10 @@
-[gd_resource type="Resource" script_class="SkillDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://dv1tnwmfteylw"]
 
-[ext_resource type="Script" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
-[ext_resource type="Script" path="res://combat/passives/burning_passive_effect_definition.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://b2p5xuomj0hba" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" uid="uid://dbepir8c4nmae" path="res://combat/passives/burning_passive_effect_definition.gd" id="2_effect"]
 
 [sub_resource type="Resource" id="BurningEffect"]
 script = ExtResource("2_effect")
-tick_interval = 1.0
-damage_multiplier_per_layer = 0.05
 
 [resource]
 script = ExtResource("1_skill")

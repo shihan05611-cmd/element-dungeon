@@ -2,6 +2,7 @@ class_name RunOverlayInterface
 extends Control
 
 const UI := preload("res://scripts/ui/combat_ui_tokens.gd")
+const COMBAT_HUD_THEME: Theme = preload("res://resources/ui/combat_hud.theme")
 
 signal status_requested(message: String, tone: StringName)
 
@@ -74,6 +75,7 @@ var _formal_buttons: Dictionary = {}
 
 
 func _ready() -> void:
+	theme = COMBAT_HUD_THEME
 	_build()
 	_apply_responsive_layout()
 	visible = false
@@ -212,7 +214,7 @@ func show_reward(offer: RewardOffer) -> void:
 	_reward_confirm.custom_minimum_size = Vector2(176, 48)
 	_reward_confirm.focus_mode = Control.FOCUS_ALL
 	_reward_confirm.disabled = true
-	_reward_confirm.add_theme_font_size_override(&"font_size", 15)
+	_reward_confirm.add_theme_font_size_override(&"font_size", UI.FONT_EMPHASIS)
 	_reward_confirm.add_theme_stylebox_override(&"normal", UI.button_style(UI.SURFACE_RAISED, UI.BORDER))
 	_reward_confirm.add_theme_stylebox_override(&"hover", UI.button_style(UI.SURFACE_SOFT, UI.BORDER_FOCUS))
 	_reward_confirm.add_theme_stylebox_override(&"focus", UI.focus_style())
@@ -851,7 +853,7 @@ func _build_skill_card(content: SkillContentDefinition) -> Button:
 	]
 	card.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	card.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	card.add_theme_font_size_override(&"font_size", 12)
+	card.add_theme_font_size_override(&"font_size", UI.FONT_BODY)
 	card.add_theme_color_override(&"font_color", UI.TEXT)
 	card.add_theme_stylebox_override(
 		&"normal",
@@ -1343,9 +1345,19 @@ func _tone_color(tone: StringName) -> Color:
 func _label(text_value: String, font_size: int, color: Color) -> Label:
 	var label := Label.new()
 	label.text = text_value
-	label.add_theme_font_size_override(&"font_size", font_size)
+	# Overlay copy predates the compact HUD. Preserve its semantic request at
+	# call sites while rasterizing through the same four-token pixel scale.
+	label.add_theme_font_size_override(&"font_size", _pixel_font_size(font_size))
 	label.add_theme_color_override(&"font_color", color)
 	return label
+
+
+func _pixel_font_size(requested_size: int) -> int:
+	return UI.FONT_TITLE if requested_size >= 19 else (
+		UI.FONT_EMPHASIS if requested_size >= 15 else (
+			UI.FONT_BODY if requested_size >= 12 else UI.FONT_CAPTION
+		)
+	)
 
 
 func _separator() -> HSeparator:
@@ -2179,7 +2191,7 @@ func _show_formal_route(cause: StringName = &"") -> void:
 		card.name = "Route_%s" % _safe_node_id(option.option_id)
 		card.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		card.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		card.add_theme_font_size_override(&"font_size", 15)
+		card.add_theme_font_size_override(&"font_size", UI.FONT_EMPHASIS)
 		if selected:
 			card.add_theme_stylebox_override(&"normal", UI.button_style(UI.SURFACE_SOFT, UI.BORDER_FOCUS))
 		_formal_route_cards.append(card)
