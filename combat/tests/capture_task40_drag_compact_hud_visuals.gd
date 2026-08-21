@@ -128,7 +128,9 @@ func _capture_combat(file_name: String, size: Vector2i, room_id: StringName, ass
 	var state := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_1).get_node("Margin/Body/State") as Label
 	_expect(state.text.is_empty() and not state.visible, "%s has no persistent ready copy" % file_name)
 	if assert_title_clear:
-		var title := _coordinator.active_room.get_node_or_null("RoomTitle") as Label
+		# Task 72 §2 B3: the room title moved into the HUD (Root/RoomTitle);
+		# read it from there instead of the world-space room node.
+		var title := _hud.room_title_label()
 		_expect(title != null and title.visible and not title.text.is_empty(), "%s has a visible authoritative room title" % file_name)
 		if title != null:
 			var status_rect := _hud.status_panel.get_global_rect()

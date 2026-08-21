@@ -11,10 +11,18 @@ const WARNING_RATE_LIMIT_MSEC := 450
 const SLOT_TRANSIENT_MSEC := 900
 const STATUS_SIZE := Vector2(264, 76)
 const SKILL_STRIP_SIZE := Vector2(532, 72)
-const PASSIVE_STRIP_SIZE := Vector2(496, 56)
+## Deliberately larger than the naive 4*96 + 3*GAP_SM + 2*GAP_SM = 424
+## hand-derivation: PanelContainer.set_size() clamps up to its own computed
+## minimum (children + each nested panel stylebox's border-driven content
+## margin), so the true floor here is 442 (100px per slot once its own
+## 2px border is included, +16 row margin +2 outer border). 448 keeps a
+## few px of headroom above that floor -- landing exactly on 442 risks a
+## sub-pixel float clamp -- while still satisfying B5 criterion 2 (<=452.2).
+const PASSIVE_STRIP_SIZE := Vector2(448, 56)
 const ELEMENT_PIVOT_SIZE := Vector2(72, 56)
 const ACTIVE_SLOT_SIZE := Vector2(132, 54)
-const PASSIVE_SLOT_SIZE := Vector2(116, 42)
+const PASSIVE_SLOT_SIZE := Vector2(96, 42)
+const ROOM_TITLE_SIZE := Vector2(280, 32)
 const SLOT_ORDER: Array[StringName] = [
 	SkillSlotIds.ACTIVE_1,
 	SkillSlotIds.ACTIVE_2,
@@ -89,6 +97,7 @@ var _boss_health_value: Label
 var _boss_form_label: Label
 var _boss_counter_bar: ProgressBar
 var _boss_counter_label: Label
+var _room_title_label: Label
 
 
 func _enter_tree() -> void:
@@ -222,6 +231,17 @@ func visual_slot_panel(slot_id: StringName) -> PanelContainer:
 
 func element_pivot_panel() -> PanelContainer:
 	return _element_pivot
+
+
+## Task 72 §2 B3: public entry point so room instances push their title copy
+## into the HUD instead of owning a world-space Label of their own.
+func set_room_title(text: String) -> void:
+	if _room_title_label != null:
+		_room_title_label.text = text
+
+
+func room_title_label() -> Label:
+	return _room_title_label
 
 
 func has_visible_target_attachment_text() -> bool:
@@ -904,6 +924,7 @@ func _build_ui() -> void:
 	root_control.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root_control)
 	_build_status_panel(root_control)
+	_build_room_title(root_control)
 	_build_skill_panel(root_control)
 	_build_passive_panel(root_control)
 	_build_compatibility_slots(root_control)
@@ -924,8 +945,10 @@ func _build_ui() -> void:
 func _build_status_panel(parent: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "StatusPanel"
-	# Keep the compact capsule below the authoritative room-title band.
-	panel.position = Vector2(16, 168)
+	# Task 72 §2 B1: top-left safe-margin anchor. The room title now lives in
+	# its own HUD band directly below this capsule (see _build_room_title).
+	panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	panel.position = Vector2(16, 16)
 	panel.size = STATUS_SIZE
 	panel.add_theme_stylebox_override(&"panel", UI.panel())
 	parent.add_child(panel)
@@ -949,11 +972,11 @@ func _build_status_panel(parent: Control) -> void:
 	badge.name = "ElementBadge"
 	badge.add_theme_stylebox_override(&"panel", UI.flat_panel())
 	title_row.add_child(badge)
-	var badge_margin := _margin("BadgeMargin", 7, 4)
+	var badge_margin := _margin("BadgeMargin", UI.GAP_SM, UI.GAP_XS)
 	badge.add_child(badge_margin)
 	var badge_row := HBoxContainer.new()
 	badge_row.name = "BadgeRow"
-	badge_row.add_theme_constant_override(&"separation", 6)
+	badge_row.add_theme_constant_override(&"separation", UI.GAP_XS)
 	badge_margin.add_child(badge_row)
 	var swatch := ColorRect.new()
 	swatch.name = "ElementSwatch"
@@ -979,10 +1002,27 @@ func _build_status_panel(parent: Control) -> void:
 	status.add_child(low)
 
 
+## Task 72 §2 B3: the room title used to be a world-space Label owned by each
+## room scene, rendered through the static Camera2D (zoom 0.75) and therefore
+## blurry and inconsistently styled across rooms. It now lives directly in the
+## HUD's safe-margin grid, immediately below StatusPanel, so it renders at
+## integer pixel size and shares one style across every room.
+func _build_room_title(parent: Control) -> void:
+	var label := _make_label("RoomTitle", "", 16, UI.TEXT)
+	label.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	label.position = Vector2(16, 100)
+	label.size = ROOM_TITLE_SIZE
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.clip_text = true
+	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	parent.add_child(label)
+	_room_title_label = label
+
+
 func _bar_row(row_name: String, caption: String, bar_name: String, value_name: String, fill: Color) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.name = row_name
-	row.add_theme_constant_override(&"separation", 7)
+	row.add_theme_constant_override(&"separation", UI.GAP_SM)
 	var label := _make_label("Label", caption, 13, UI.TEXT_MUTED)
 	label.custom_minimum_size.x = 24
 	row.add_child(label)
@@ -1009,6 +1049,13 @@ func _build_skill_panel(parent: Control) -> void:
 	panel.size = SKILL_STRIP_SIZE
 	panel.add_theme_stylebox_override(&"panel", UI.panel(Color(0.035, 0.055, 0.09, 0.97)))
 	parent.add_child(panel)
+	# Task 72 §2 B4 deliberately leaves this margin off-token: vertical=6 is an
+	# exact fit -- SKILL_STRIP_SIZE.y (72) minus 2*6 leaves exactly 60px, which
+	# matches CurrentElement's real rendered height (its 56px body plus its own
+	# 2px stylebox border on each side). Rounding this up to GAP_SM (8) would
+	# shrink the interior below 60 and force PanelContainer to clamp SkillPanel
+	# taller than 72 -- reopening the "SkillPanel size 532x72 不变" and "active
+	# slot position unchanged" guarantees this task must not touch.
 	var margin := _margin("Margin", 10, 6)
 	panel.add_child(margin)
 	var skills := VBoxContainer.new()
@@ -1028,11 +1075,16 @@ func _build_skill_panel(parent: Control) -> void:
 	skills.add_child(phase)
 
 
+## Task 72 §2 B1/§0.1.1: moved from the top-right corner (where it overlapped
+## BossPanel by 196px) down to just above SkillPanel, forming one "loadout"
+## band. Both strips share the same CENTER_BOTTOM anchor and are centered on
+## the same x (position.x == -size.x / 2 for each), so §5.2's "shared center
+## x" assertion holds structurally rather than by coincidence.
 func _build_passive_panel(parent: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "PassivePanel"
-	panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	panel.position = Vector2(-512, 16)
+	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	panel.position = Vector2(-224, -152)
 	panel.size = PASSIVE_STRIP_SIZE
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_theme_stylebox_override(
@@ -1040,11 +1092,11 @@ func _build_passive_panel(parent: Control) -> void:
 		UI.panel(Color(0.035, 0.045, 0.075, 0.92), UI.BORDER_PASSIVE, 8, 1)
 	)
 	parent.add_child(panel)
-	var margin := _margin("Margin", 6, 4)
+	var margin := _margin("Margin", UI.GAP_SM, UI.GAP_XS)
 	panel.add_child(margin)
 	var row := HBoxContainer.new()
 	row.name = "SlotRow"
-	row.add_theme_constant_override(&"separation", 6)
+	row.add_theme_constant_override(&"separation", UI.GAP_SM)
 	margin.add_child(row)
 	for slot_id: StringName in SkillSlotIds.passive():
 		row.add_child(_build_compact_slot(slot_id))
@@ -1101,7 +1153,7 @@ func _build_compact_slot(slot_id: StringName) -> PanelContainer:
 	panel.add_child(margin)
 	var body := Control.new()
 	body.name = "Body"
-	body.custom_minimum_size = Vector2(104 if passive else 122, 36 if passive else 48)
+	body.custom_minimum_size = Vector2(88 if passive else 122, 36 if passive else 48)
 	margin.add_child(body)
 	var icon := TextureRect.new()
 	icon.name = "Icon"
@@ -1142,7 +1194,7 @@ func _build_compact_slot(slot_id: StringName) -> PanelContainer:
 	passive_mark.visible = passive
 	body.add_child(passive_mark)
 	var text_x := 32.0 if passive else 37.0
-	var text_width := 68.0 if passive else 81.0
+	var text_width := 56.0 if passive else 81.0
 	var name_label := _make_label("Name", "空槽", 11 if passive else 12, UI.TEXT)
 	name_label.position = Vector2(text_x, 0)
 	name_label.size = Vector2(text_width, 17)
@@ -1218,11 +1270,11 @@ func _build_hud_slot(slot_id: StringName) -> PanelContainer:
 	panel.custom_minimum_size = Vector2(160, 92)
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	panel.add_theme_stylebox_override(&"panel", UI.flat_panel(UI.SURFACE_RAISED, UI.BORDER, 6, 1))
-	var margin := _margin("Margin", 8, 6)
+	var margin := _margin("Margin", UI.GAP_SM, UI.GAP_XS)
 	panel.add_child(margin)
 	var box := VBoxContainer.new()
 	box.name = "Box"
-	box.add_theme_constant_override(&"separation", 2)
+	box.add_theme_constant_override(&"separation", UI.GAP_XS)
 	margin.add_child(box)
 	var top := HBoxContainer.new()
 	top.name = "Top"
@@ -1241,7 +1293,7 @@ func _build_hud_slot(slot_id: StringName) -> PanelContainer:
 	key_panel.add_child(key)
 	var content := HBoxContainer.new()
 	content.name = "Content"
-	content.add_theme_constant_override(&"separation", 6)
+	content.add_theme_constant_override(&"separation", UI.GAP_XS)
 	box.add_child(content)
 	var icon := TextureRect.new()
 	icon.name = "Icon"
@@ -1279,7 +1331,7 @@ func _build_boss_panel(parent: Control) -> void:
 	panel.size = Vector2(520, 90)
 	panel.add_theme_stylebox_override(&"panel", UI.panel(Color(0.035, 0.045, 0.075, 0.94), UI.BORDER_FOCUS, 8, 2))
 	parent.add_child(panel)
-	var margin := _margin("Margin", 14, 10)
+	var margin := _margin("Margin", UI.GAP_MD, UI.GAP_SM)
 	panel.add_child(margin)
 	var box := VBoxContainer.new()
 	box.name = "Box"
@@ -1343,7 +1395,7 @@ func _build_target_panel(parent: Control) -> void:
 	panel.size = Vector2(240, 92)
 	panel.add_theme_stylebox_override(&"panel", UI.panel())
 	parent.add_child(panel)
-	var margin := _margin("Margin", 12, 9)
+	var margin := _margin("Margin", UI.GAP_MD, UI.GAP_SM)
 	panel.add_child(margin)
 	var box := VBoxContainer.new()
 	box.name = "Box"
@@ -1366,7 +1418,7 @@ func _build_feedback_panel(parent: Control) -> void:
 	panel.size = Vector2(360, 36)
 	panel.add_theme_stylebox_override(&"panel", UI.panel(UI.SURFACE_RAISED, UI.BORDER_FOCUS, 7, 1))
 	parent.add_child(panel)
-	var margin := _margin("Margin", 10, 4)
+	var margin := _margin("Margin", UI.GAP_SM, UI.GAP_XS)
 	panel.add_child(margin)
 	var text := _make_label("Text", "反馈", 14, UI.TEXT)
 	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1398,7 +1450,7 @@ func _build_debug_panel(parent: Control) -> void:
 	panel.size = Vector2(390, 270)
 	panel.add_theme_stylebox_override(&"panel", UI.panel(Color(0.02, 0.03, 0.05, 0.98), UI.WATER, 7, 2))
 	parent.add_child(panel)
-	var margin := _margin("Margin", 14, 12)
+	var margin := _margin("Margin", UI.GAP_MD, UI.GAP_MD)
 	panel.add_child(margin)
 	var box := VBoxContainer.new()
 	box.name = "Debug"

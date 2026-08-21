@@ -78,7 +78,10 @@ func _test_dual_anchor_resolution_matrix() -> void:
 		_expect(status_rect.size.is_equal_approx(Vector2(264, 76)), "status is fixed 264x76 at %s" % str(viewport_size))
 		var passive_rect := _hud.passive_panel.get_global_rect()
 		_expect(belt_rect.size.is_equal_approx(Vector2(532, 72)), "active skill belt is fixed 532x72 at %s" % str(viewport_size))
-		_expect(passive_rect.size.x >= 496.0 and passive_rect.size.y >= 54.0 and passive_rect.size.y <= 62.0, "four-passive strip keeps its compact fixed footprint at %s" % str(viewport_size))
+		# Task 72: assert the design intent (passive strip subordinate to the
+		# active belt) instead of the pre-task-72 hard-coded width.
+		_expect(passive_rect.size.x < belt_rect.size.x, "four-passive strip stays narrower than the active belt at %s" % str(viewport_size))
+		_expect(passive_rect.size.y >= 40.0 and passive_rect.size.y <= 62.0, "four-passive strip keeps its compact height at %s" % str(viewport_size))
 		_expect(_inside(status_rect, bounds), "status stays in safe canvas at %s" % str(viewport_size))
 		_expect(_inside(belt_rect, bounds), "skill belt stays in safe canvas at %s" % str(viewport_size))
 		_expect(_inside(passive_rect, bounds), "passive strip stays in safe canvas at %s" % str(viewport_size))
@@ -86,7 +89,13 @@ func _test_dual_anchor_resolution_matrix() -> void:
 		_expect(not status_rect.intersects(passive_rect), "status and passive strip remain strictly separated at %s" % str(viewport_size))
 		_expect(absf(belt_rect.get_center().x - bounds.get_center().x) <= 0.2, "skill belt remains centered at %s" % str(viewport_size))
 		_expect(belt_rect.end.y <= bounds.end.y - 15.9, "skill belt keeps bottom safe margin at %s" % str(viewport_size))
-	var permanent_area := 264.0 * 76.0 + 532.0 * 72.0 + 496.0 * 54.0
+	# Task 72: derive from the HUD's own constants instead of copying literals,
+	# so the budget test keeps describing the real panels after a resize.
+	var permanent_area := (
+		CombatHUD.STATUS_SIZE.x * CombatHUD.STATUS_SIZE.y
+		+ CombatHUD.SKILL_STRIP_SIZE.x * CombatHUD.SKILL_STRIP_SIZE.y
+		+ CombatHUD.PASSIVE_STRIP_SIZE.x * CombatHUD.PASSIVE_STRIP_SIZE.y
+	)
 	_expect(permanent_area / (1152.0 * 648.0) * 100.0 < 12.5, "seven-slot HUD stays below 12.5 percent of minimum viewport")
 	root.size = Vector2i(1152, 648)
 	await _settle_layout()

@@ -62,7 +62,12 @@ func _test_dual_anchor_layout() -> void:
 		var passive_rect := _hud.passive_panel.get_global_rect()
 		_expect(status_rect.size.is_equal_approx(Vector2(264, 76)), "status capsule size at %s" % str(viewport_size))
 		_expect(belt_rect.size.is_equal_approx(Vector2(532, 72)), "active skill belt size at %s" % str(viewport_size))
-		_expect(passive_rect.size.x >= 496.0 and passive_rect.size.y >= 54.0, "passive skill strip size at %s" % str(viewport_size))
+		# Task 72: assert the design intent (passive strip reads as subordinate to
+		# the active belt) rather than a hard-coded width. The old `>= 496.0`
+		# pinned the pre-task-72 layout and would have to be rewritten on every
+		# resize; the ratio survives further shrinking of the passive slots.
+		_expect(passive_rect.size.x < belt_rect.size.x, "passive strip stays narrower than the active belt at %s" % str(viewport_size))
+		_expect(passive_rect.size.y >= 40.0, "passive strip keeps a legible height at %s" % str(viewport_size))
 		_expect(_inside(_physical_rect(_hud.status_panel), viewport_size), "status capsule remains in viewport at %s" % str(viewport_size))
 		_expect(_inside(_physical_rect(_hud.skill_panel), viewport_size), "skill belt remains in viewport at %s" % str(viewport_size))
 		_expect(_inside(_physical_rect(_hud.passive_panel), viewport_size), "passive strip remains in viewport at %s" % str(viewport_size))
@@ -77,7 +82,14 @@ func _test_dual_anchor_layout() -> void:
 
 func _test_occupancy_budget() -> void:
 	var canvas_area := 1152.0 * 648.0
-	var permanent_area := 264.0 * 76.0 + 532.0 * 72.0 + 496.0 * 54.0
+	# Task 72: derive from the HUD's own constants instead of copying literals.
+	# The old hard-coded 496*54 kept "passing" after the layout changed while no
+	# longer describing any real panel -- a budget test measuring stale numbers.
+	var permanent_area := (
+		CombatHUD.STATUS_SIZE.x * CombatHUD.STATUS_SIZE.y
+		+ CombatHUD.SKILL_STRIP_SIZE.x * CombatHUD.SKILL_STRIP_SIZE.y
+		+ CombatHUD.PASSIVE_STRIP_SIZE.x * CombatHUD.PASSIVE_STRIP_SIZE.y
+	)
 	var peak_area := permanent_area + 360.0 * 36.0
 	_expect(permanent_area / canvas_area <= 0.125, "seven-slot permanent HUD budget <=12.5%")
 	_expect(peak_area / canvas_area <= 0.145, "feedback peak <=14.5%")

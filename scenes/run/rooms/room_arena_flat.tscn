@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/run/run_room_instance.gd" id="1_room"]
 [ext_resource type="Texture2D" path="res://assets/world/rooms/tidal_dungeon/full_rooms/tidal_battle_room_01_full_v1.png" id="2_background"]
@@ -17,18 +17,6 @@ size = Vector2(138, 16)
 
 [sub_resource type="RectangleShape2D" id="RightPlatformShape"]
 size = Vector2(202, 16)
-
-[sub_resource type="StyleBoxFlat" id="TitleStyle"]
-bg_color = Color(0.025, 0.045, 0.075, 0.82)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.68, 0.78, 0.8)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
 
 [node name="RoomArenaFlat" type="Node2D"]
 script = ExtResource("1_room")
@@ -126,15 +114,3 @@ position = Vector2(760, 591)
 position = Vector2(1400, 544)
 
 [node name="EnemyContainer" type="Node2D" parent="."]
-
-[node name="RoomTitle" type="Label" parent="."]
-offset_left = 40.0
-offset_top = 42.0
-offset_right = 480.0
-offset_bottom = 84.0
-theme_override_colors/font_color = Color(0.77, 0.94, 1, 1)
-theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("TitleStyle")
-text = "潮汐回廊"
-horizontal_alignment = 1
-vertical_alignment = 1
