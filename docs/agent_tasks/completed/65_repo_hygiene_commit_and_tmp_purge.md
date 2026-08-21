@@ -102,8 +102,42 @@ Godot_v4.7.1-stable_win64_console.exe --headless --path . --script res://combat/
 
 ## 6. 交付（执行者填写）
 
-- 两个 commit 的 hash 与涵盖范围
-- 删除 `tmp/` 前后的磁盘占用
-- 基线 vs 改后的逐文件数字表（应只有 task58 一处变化）
-- 干净 clone 的验证结果
-- 发现但未做的事项
+### 两个 commit
+
+| # | hash | 范围 |
+| --- | --- | --- |
+| 1 | `2f7d214` | 全部非 `docs/` 改动：194 files changed, 6214 insertions(+), 1173 deletions(-)。含 Task59（`enemy_projectile_profile.gd`、telegraph 表现）、Task60（boss 弹体/telegraph 美术）、Task61（`boss_form_definition.gd`/`boss_tuning.gd`/`boss_tide_ember.gd`/`.tscn`/`.tres`）、Task62（`run_session.gd`/`run_rules_snapshot.gd`/`.gitignore`/共享测试 harness 与批量 runner）的全部产出，以及 16 个此前从未入库的源码文件与随之新增的 `.uid`。 |
+| 2 | `3184f4f` | 全部 `docs/` 改动：694 files changed, 9347 insertions(+), 4634 deletions(-)。含已完成任务文档（47/54/55/59/60/61/62）、待办任务书（61/63/64/65）、以及大量 evidence 目录下的 `.import` 副作用文件增删。 |
+
+### 删除 `tmp/` 前后磁盘占用
+
+- 删除前：`tmp/` 单独 **440M**（4 份项目冷副本 96M+70M+70M+93M、2 个 zip 各 55M、`profile-20260813-02` 的 Godot 缓存 4.2M、`profile-20260813-01` 与 `imagegen` 两个空目录）。
+- 删除后：`tmp/` 已不存在；整个工作区（含 `.git`）现为 **628M**（原先应为 440M + 628M ≈ 1068M 量级，删除后减少约 440M）。
+
+### 基线 vs 改后逐文件数字表
+
+删 `tmp/` 前用批量 runner 先存了一份基线（`TOTAL: 45 files, 5 failed`），删 `tmp/` 后重跑，**唯一变化是 `run_task58_formal_interactables_crown_sentry_tests`**：
+
+| 文件 | 删前 | 删后 |
+| --- | --- | --- |
+| run_task58_formal_interactables_crown_sentry_tests | 3/104/**1** | 3/104/**0** |
+| 其余 44 个文件 | 与删前逐一相同 | 与删前逐一相同 |
+| TOTAL | 45 files, **5 failed** | 45 files, **4 failed** |
+
+commit 完成后（H1+H2 都做完）再跑一遍批量 runner，结果与「删后」一致，`git status` 干净（0 条待处理）。
+
+### 干净 clone 验证结果
+
+用 `git clone` 到 `/c/tmp/task65_verify_clone`（本机临时目录，非工作区，已在验证后删除）做了一次真正的干净检出：
+
+1. 首次直接跑批量 runner：45/45 全部 `exit 1`，`Parse Error: Could not find type "RuntimeAttackPayload"...` 等——这是**任何** Godot 工程干净 clone 后的通用前提（`.godot/` 缓存被 `.gitignore` 排除，`class_name` 全局类表要先建一次），与本任务改动无关。
+2. 跑一次 `--headless --editor --quit --path .`（只在这个隔离的临时 clone 里执行，完成后整个目录已删除，未触碰真实工作区，不违反任务 62 定下的「不对当前工作树跑全项目扫描」的规则——那条规则针对的是已有未提交改动的工作树，这里是全新检出，没有可污染的 diff）建立导入/类缓存后，重跑批量 runner：**`TOTAL: 45 files, 4 failed`**，逐文件数字与本条目「删后」列完全一致，`run_task58_*` 为 `exit 0`。
+3. 结论：干净 clone 能拿到完整代码并跑通全部测试，新执行者不会再遇到「拿不到 Task59/61 代码」的问题。
+
+### 发现但未做的事项
+
+- 运行验证 clone 时误将 `git config --global core.longpaths true` 设成了全局配置（用于绕过 Windows 长路径导致的 checkout 失败），发现后已立即 `--unset` 撤销，未遗留在全局 git 配置里。记录在此供复盘。
+- `docs/agent_tasks/evidence/task42/csv/` 与 `task43/` 下混入了一批 Godot 自动生成的 `.translation` 二进制文件（例如 `log_marker_summary.Parse Error.translation`），是 Godot 把 evidence 目录里普通的 `.csv` 报表误判成翻译表后自动导入产生的历史遗留噪音（时间戳为 8 月 13 日，早于本任务），不是真正的证据内容。按 §0「不改任何一行功能代码」与「目的不是整理仓库」，本次原样收编进了 commit 2，未做清理判断；建议后续任务视情况评估是否清理或加 `.gitignore` 规则。
+- `.mcp.json` 内容仅为本机 `http://127.0.0.1:8000/mcp` 的本地 MCP 端点配置，未见凭据/密钥，随代码一并入库；如中枢认为这类本机开发配置不该入库，可在后续任务里单独剔除。
+- `tmp/` 的删除只处理了任务书列出的这 8 项内容（4 冷副本 + 2 zip + 1 缓存目录 + 2 空目录），未额外核查是否有新的孤本判断标准；若未来 `tmp/` 又积累出新内容，需要重新走一遍 §2 H1 的核实流程。
+- 未发现其他范围外问题；除 §5 明确排除的 task30/31/32/40 外没有新的失败项。
