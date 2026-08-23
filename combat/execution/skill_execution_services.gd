@@ -2,6 +2,7 @@ class_name SkillExecutionServices
 extends RefCounted
 
 var reclaim_port: ElementReclaimPort
+var ignition_port: RangeIgnitionPort
 var projectile_sweep_query_port: ProjectileSweepQueryPort2D
 var skill_delivery_prepare_port: SkillDeliveryPreparePort
 var _projectile_source_ref: WeakRef
@@ -21,6 +22,15 @@ func _init(
 
 func set_reclaim_port(port: ElementReclaimPort) -> void:
 	reclaim_port = port
+
+
+func set_ignition_port(port: RangeIgnitionPort) -> void:
+	ignition_port = port
+
+
+func clear_temporary_states(reason: StringName) -> void:
+	if ignition_port != null:
+		ignition_port.clear_status(reason)
 
 
 func set_projectile_sweep_query_port(port: ProjectileSweepQueryPort2D) -> void:
@@ -44,9 +54,11 @@ func projectile_source() -> Node2D:
 
 
 func copy_with_reclaim_port(port: ElementReclaimPort) -> SkillExecutionServices:
-	return SkillExecutionServices.new(
+	var copied := SkillExecutionServices.new(
 		port,
 		projectile_sweep_query_port,
 		skill_delivery_prepare_port,
 		projectile_source()
 	)
+	copied.ignition_port = ignition_port
+	return copied

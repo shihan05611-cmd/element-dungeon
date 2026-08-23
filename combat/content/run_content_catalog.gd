@@ -218,6 +218,12 @@ func _runtime_delivery_validation_error(content: SkillContentDefinition) -> Stri
 			if content.runtime_delivery_scene == null
 			else &"reclaim_has_runtime_delivery"
 		)
+	if execution is IgnitionExecution:
+		return (
+			&""
+			if content.runtime_delivery_scene == null
+			else &"ignition_has_runtime_delivery"
+		)
 	if content.runtime_delivery_scene == null:
 		return &"missing_runtime_delivery_scene"
 	if not content.runtime_delivery_scene.can_instantiate():

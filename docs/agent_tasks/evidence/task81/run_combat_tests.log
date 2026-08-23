@@ -1,0 +1,33 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+PASS resolver_water_into_empty
+PASS resolver_same_element_caps_at_ten
+PASS resolver_water_five_into_fire_two
+PASS resolver_water_two_into_fire_five
+PASS resolver_ten_into_ten
+PASS resolver_fire_water_symmetry
+PASS zero_element_has_no_ghost_remainder
+PASS invalid_contracts_are_rejected
+PASS neutral_cast_snapshot_is_valid
+PASS stat_dictionary_is_whitelisted_and_copied
+PASS payload_definition_resolves_cast_form
+PASS damage_pipeline_rounds_only_at_end
+PASS receiver_damage_and_element_commit
+PASS receiver_without_carrier_damages
+PASS receiver_without_damage_attaches_and_reacts
+PASS receiver_without_components_rejects
+PASS zero_final_damage_still_attaches
+PASS invulnerable_and_blocking_reject_everything
+PASS friendly_fire_rejects_everything
+PASS duplicate_identity_is_rejected
+PASS recent_hit_cache_is_bounded
+PASS signals_observe_fully_committed_state
+PASS signal_reentry_is_safely_rejected
+PASS lethal_hit_notifies_after_full_commit
+PASS queue_free_from_signal_finishes_notifications
+PASS queued_target_is_rejected
+PASS shared_resources_do_not_share_runtime_state
+COMBAT TESTS PASSED: 27 tests, 124 assertions
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)

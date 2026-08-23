@@ -133,7 +133,7 @@ func _defeat_current_room(coordinator: RunFlowCoordinator) -> void:
 	await process_frame
 	if room.room_definition.final_boss:
 		return
-	coordinator.player.global_position = room.portal.global_position
+	coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	coordinator.player.interact_requested.emit()
 	await process_frame
 

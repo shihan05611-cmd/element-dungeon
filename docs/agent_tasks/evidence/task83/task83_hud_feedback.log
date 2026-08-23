@@ -1,0 +1,19 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS formal_four_slot_hud_and_icons
+PASS responsive_fixed_layout
+PASS element_text_shape_and_colorblind
+PASS three_policy_and_future_element_preview
+PASS structured_failure_feedback
+PASS manual_lock_and_auto_feedback
+PASS passive_slot_rejects_active
+PASS zero_active_four_passive_warning
+PASS single_final_number_two_layer_reaction
+PASS actual_consumption_one_layer
+PASS reduced_motion_preserves_semantics
+PASS reward_to_shop_ui_wiring
+TASK 12 HUD LOADOUT FEEDBACK TESTS FAILED: 1/13 tests, 113 assertions
+  - active_slot_rejects_passive: rejected active slot stays empty

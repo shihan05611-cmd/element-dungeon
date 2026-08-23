@@ -75,7 +75,7 @@ func _test_dual_anchor_resolution_matrix() -> void:
 		var bounds := hud_root.get_global_rect()
 		var status_rect := _hud.status_panel.get_global_rect()
 		var belt_rect := _hud.skill_panel.get_global_rect()
-		_expect(status_rect.size.is_equal_approx(Vector2(264, 76)), "status is fixed 264x76 at %s" % str(viewport_size))
+		_expect(status_rect.size.is_equal_approx(CombatHUD.STATUS_SIZE), "status uses the shared HP/SP-only size at %s" % str(viewport_size))
 		var passive_rect := _hud.passive_panel.get_global_rect()
 		_expect(belt_rect.size.is_equal_approx(CombatHUD.SKILL_STRIP_SIZE), "active skill belt uses the shared density size at %s" % str(viewport_size))
 		# Task 72: assert the design intent (passive strip subordinate to the
@@ -124,10 +124,9 @@ func _test_strict_three_active_four_passive_and_compatibility() -> void:
 		_expect(visible_panel.size.y > 0.0, "visible compact footprint has a real area: %s" % String(slot_id))
 	for slot_id: StringName in SkillSlotIds.passive():
 		_expect(_hud.slot_visible_fields(slot_id) == [&"icon"], "%s is icon-only" % String(slot_id))
-	var pivot := _hud.element_pivot_panel()
-	_expect(pivot.size.x > 0.0 and pivot.size.y > 0.0 and pivot.get_parent() == _hud.status_panel.get_node("Margin/Status"), "CurrentElement pivot stays in the status zone")
-	_expect((pivot.get_node("Body/ElementShape") as Label).text == "◆", "CurrentElement includes a redundant shape signal")
-	_expect((pivot.get_node("Body/ElementText") as Label).text == "水", "CurrentElement includes short text")
+	var status := _hud.status_panel.get_node("Margin/Status") as Control
+	_expect(status.get_node_or_null("HealthRow/HealthBar/HealthValue") != null and status.get_node_or_null("EnergyRow/EnergyBar/EnergyValue") != null, "status panel retains both HP/SP value paths")
+	_expect(status.get_node_or_null("TitleRow") == null and status.get_node_or_null("CurrentElement") == null, "status panel has no title or element projection")
 	_expect(not _hud.help_panel.is_visible_in_tree() and not _hud.debug_panel.is_visible_in_tree(), "help and debug are not permanent HUD")
 
 
@@ -244,12 +243,9 @@ func _test_reward_long_copy_safe_footer() -> void:
 
 
 func _test_accessibility_modes() -> void:
-	var pivot := _hud.element_pivot_panel()
-	var normal_color := (pivot.get_node("Body/ElementSwatch") as ColorRect).color
 	_hud.set_colorblind_mode(true)
-	var assisted_color := (pivot.get_node("Body/ElementSwatch") as ColorRect).color
-	_expect(normal_color != assisted_color, "colorblind mode changes the element palette")
-	_expect((pivot.get_node("Body/ElementShape") as Label).text == "◆" and (pivot.get_node("Body/ElementText") as Label).text == "水", "colorblind element signal still includes shape and text")
+	var status := _hud.status_panel.get_node("Margin/Status") as Control
+	_expect(status.get_node_or_null("CurrentElement") == null and status.get_node_or_null("ElementBadge") == null, "accessibility mode does not recreate element UI in the status panel")
 	_hud.set_reduced_motion(true)
 	var feedback_panel := _hud.get_node("Root/FeedbackPanel") as Control
 	var before_position := feedback_panel.position

@@ -30,7 +30,8 @@ func _run() -> void:
 
 	_run_test("icon_only_passives_and_compact_actives", _test_slot_density)
 	_run_test("disabled_icons_keep_non_hue_cues", _test_disabled_icons)
-	_run_test("element_pivot_lives_in_status_panel", _test_element_pivot)
+	_run_test("status_panel_is_hp_sp_only", _test_status_panel)
+	_run_test("status_is_stable_across_element_change_and_low_health", _test_status_stability)
 	await _run_async_test("upgrade_refreshes_hover_level", _test_upgrade_refreshes_hover_level)
 
 	if is_instance_valid(_room):
@@ -68,14 +69,27 @@ func _test_disabled_icons() -> void:
 	_hud.call("_refresh_slot", SkillSlotIds.ACTIVE_1)
 
 
-func _test_element_pivot() -> void:
-	var pivot := _hud.element_pivot_panel()
-	_expect(pivot != null and pivot.get_parent().name == "Status", "element pivot is mounted in the status zone")
-	_expect(pivot.get_node_or_null("Body/ElementShape") != null and pivot.get_node_or_null("Body/ElementText") != null, "pivot keeps shape and text redundancy")
-	_expect(not pivot.has_node("Body/Key"), "pivot removes the fixed E-key copy")
+func _test_status_panel() -> void:
+	var status := _hud.get_node("Root/StatusPanel/Margin/Status") as Control
+	_expect(status.get_node_or_null("TitleRow") == null and status.get_node_or_null("CurrentElement") == null, "status panel has no legacy title or element UI")
 	var health_value := _hud.get_node("Root/StatusPanel/Margin/Status/HealthRow/HealthBar/HealthValue") as Label
 	var energy_value := _hud.get_node("Root/StatusPanel/Margin/Status/EnergyRow/EnergyBar/EnergyValue") as Label
-	_expect(health_value != null and energy_value != null, "HP/SP values are children of their bars")
+	_expect(health_value != null and energy_value != null and _hud.low_health != null, "HP/SP values and low-health feedback remain")
+
+
+func _test_status_stability() -> void:
+	var before := _hud.status_panel.get_global_rect()
+	var change := _player.request_element(ElementIds.FIRE)
+	_expect(change.accepted and _hud.status_panel.get_global_rect().is_equal_approx(before), "fire element change leaves the HP/SP status geometry unchanged")
+	var health := _player.damage_receiver
+	var original := health.current_health
+	_expect(health.replace_health_silent(20), "low-health fixture updates the player receiver")
+	health.notify_health_changed(20 - original)
+	_expect(_hud.low_health.visible and _hud.health_value.text.contains("20 /"), "low-health feedback and HP value still refresh in the HP/SP-only panel")
+	_expect(health.replace_health_silent(original), "low-health fixture restores the player receiver")
+	health.notify_health_changed(original - 20)
+	change = _player.request_element(ElementIds.WATER)
+	_expect(change.accepted and _hud.status_panel.get_global_rect().is_equal_approx(before), "water element change also leaves the HP/SP status geometry unchanged")
 
 
 func _test_upgrade_refreshes_hover_level() -> void:

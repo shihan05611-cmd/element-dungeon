@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <rect width="1600" height="900" fill="#070b12"/>
+  <style>
+    .t{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#f3f3f0}.h{font-size:34px;font-weight:700}.s{font-size:21px}.m{font-size:17px;fill:#aab4c3}.px{shape-rendering:crispEdges}.line{fill:none;stroke-width:4}.thin{fill:none;stroke-width:2}
+  </style>
+  <text class="t h" x="70" y="62">HUD 双元素主题拆解 · 仅概念，尚未实装</text>
+  <text class="t m" x="70" y="94">同一固定布局；差异仅在角型、微纹理、主题强调色与内嵌徽记</text>
+
+  <g class="px" transform="translate(70 135)">
+    <rect width="710" height="210" fill="#09131f" stroke="#425e77" stroke-width="4"/>
+    <path d="M0 30H12V16H28V4H70 M640 4H682V16H698V30H710" class="line" stroke="#2ea7e8"/>
+    <path d="M0 180H12V194H28V206H70 M640 206H682V194H698V180H710" class="line" stroke="#2ea7e8"/>
+    <path d="M32 90h84m18 0h56m20 0h120M378 90h94m20 0h164M32 132h46m20 0h136m24 0h74m20 0h120" class="thin" stroke="#17354a"/>
+    <path d="M26 105l18-25 18 25-18 25z" fill="#0d1b2a" stroke="#73d8ff" stroke-width="4"/>
+    <path d="M44 91c-11 13-12 18 0 27 12-9 11-14 0-27z" fill="#2ea7e8"/>
+    <text class="t h" x="86" y="62">水态 WATER</text>
+    <text class="t s" x="86" y="112">内收波阶 · 水平涟漪 · 水滴菱形徽记</text>
+    <text class="t m" x="86" y="156">去色后仍可由圆润轮廓与水平纹样识别</text>
+  </g>
+
+  <g class="px" transform="translate(820 135)">
+    <rect width="710" height="210" fill="#160d09" stroke="#74442d" stroke-width="4"/>
+    <path d="M0 34H16V18H24V4H76 M634 4H686V18H694V34H710" class="line" stroke="#f26a21"/>
+    <path d="M0 176H16V192H24V206H76 M634 206H686V192H694V176H710" class="line" stroke="#f26a21"/>
+    <path d="M38 150v-16m34 16v-26m38 26v-10m70 10v-22m40 22v-14m74 14v-28m42 28v-12m76 12v-20m38 20v-10m70 10v-24m42 24v-14" class="thin" stroke="#4a2518"/>
+    <path d="M26 105l18-25 18 25-18 25z" fill="#1d120d" stroke="#ffc857" stroke-width="4"/>
+    <path d="M44 119c-16-10-8-22-1-34 2 9 10 10 7 21 5-4 6-8 7-12 7 13 0 22-13 25z" fill="#f26a21"/>
+    <text class="t h" x="86" y="62">火态 FIRE</text>
+    <text class="t s" x="86" y="112">外扬焰阶 · 上升火星 · 分叉火苗徽记</text>
+    <text class="t m" x="86" y="156">去色后仍可由尖锐轮廓与上升纹样识别</text>
+  </g>
+
+  <text class="t h" x="70" y="414">功能色固定</text>
+  <g transform="translate(70 445)">
+    <g transform="translate(0 0)"><rect width="110" height="64" fill="#e3485c"/><text class="t s" x="128" y="40">HP  #E3485C</text></g>
+    <g transform="translate(300 0)"><rect width="110" height="64" fill="#2ea4d6"/><text class="t s" x="128" y="40">SP  #2EA4D6</text></g>
+    <g transform="translate(600 0)"><rect width="110" height="64" fill="#4fd49b"/><text class="t s" x="128" y="40">可用  #4FD49B</text></g>
+    <g transform="translate(930 0)"><rect width="110" height="64" fill="#ff7048"/><text class="t s" x="128" y="40">危险  #FF7048</text></g>
+  </g>
+
+  <text class="t h" x="70" y="585">九宫格实现意图（非资源）</text>
+  <g class="px" transform="translate(70 620)">
+    <g>
+      <rect width="260" height="180" fill="#0d1b2a" stroke="#425e77" stroke-width="4"/>
+      <path d="M0 40H20V20H40V0M220 0v20h20v20h20M0 140h20v20h20v20M220 180v-20h20v-20h20" class="line" stroke="#2ea7e8"/>
+      <path d="M86 0v180M174 0v180M0 60h260M0 120h260" class="thin" stroke="#26445b"/>
+      <text class="t s" x="80" y="101">WATER 3×3</text>
+    </g>
+    <g transform="translate(330 0)">
+      <rect width="260" height="180" fill="#1d120d" stroke="#74442d" stroke-width="4"/>
+      <path d="M0 44H24V24H34V0M226 0v24h10v20h24M0 136h24v20h10v24M226 180v-24h10v-20h24" class="line" stroke="#f26a21"/>
+      <path d="M86 0v180M174 0v180M0 60h260M0 120h260" class="thin" stroke="#4a2b1d"/>
+      <text class="t s" x="88" y="101">FIRE 3×3</text>
+    </g>
+    <g transform="translate(680 0)">
+      <text class="t s" x="0" y="28">公共切片约束</text>
+      <text class="t m" x="0" y="66">• 建议角块 16×16 px；边块仅单轴平铺</text>
+      <text class="t m" x="0" y="98">• 外暗影 2 px / 结构边 1 px / 内高光 1 px</text>
+      <text class="t m" x="0" y="130">• 徽记与边框相连，不形成独立元素卡片</text>
+      <text class="t m" x="0" y="162">• 水火切换时锚点、尺寸、文字基线全部不变</text>
+    </g>
+  </g>
+</svg>

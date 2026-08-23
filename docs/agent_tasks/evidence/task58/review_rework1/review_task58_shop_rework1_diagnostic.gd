@@ -115,7 +115,7 @@ func _finish_normal_room(coordinator: RunFlowCoordinator, wait_after_portal: boo
 	coordinator.player.global_position = room.chest.global_position
 	coordinator.player.interact_requested.emit()
 	await process_frame
-	coordinator.player.global_position = room.portal.global_position
+	coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	coordinator.player.interact_requested.emit()
 	if wait_after_portal:
 		await process_frame

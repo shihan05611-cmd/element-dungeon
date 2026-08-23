@@ -176,7 +176,7 @@ func _assert_combat_hud(file_name: String, size: Vector2i, accessibility: bool =
 	_expect(not _hud.has_visible_target_attachment_text(), "%s has no target attachment text" % file_name)
 	if accessibility:
 		_expect(_hud.colorblind_mode and _hud.reduced_motion, "%s accessibility flags are enabled" % file_name)
-		_expect(not (_hud.element_pivot_panel().get_node("Body/ElementShape") as Label).text.is_empty(), "%s preserves element shape" % file_name)
+		_expect(_hud.get_node_or_null("Root/StatusPanel/Margin/Status/CurrentElement") == null, "%s accessibility mode does not recreate element UI in status" % file_name)
 		var feedback := _hud.get("_feedback_panel") as Control
 		_expect(feedback != null and feedback.is_visible_in_tree(), "%s keeps the real accessibility feedback visible" % file_name)
 		if feedback != null:
@@ -369,7 +369,7 @@ func _store_live_skill_capture(
 
 func _assert_live_skill_hud_subcontent(file_name: String, size: Vector2i) -> Dictionary:
 	var health_row := _hud.status_panel.get_node("Margin/Status/HealthRow") as Control
-	var element_panel := _hud.element_pivot_panel()
+	var energy_row := _hud.status_panel.get_node("Margin/Status/EnergyRow") as Control
 	var specs := {
 		"hp_label": {
 			"control": health_row.get_node("Label") as Control,
@@ -389,23 +389,23 @@ func _assert_live_skill_hud_subcontent(file_name: String, size: Vector2i) -> Dic
 			"text": true,
 			"minimum_pixels": 20,
 		},
-		"element_swatch": {
-			"control": element_panel.get_node("Body/ElementSwatch") as Control,
-			"owner": element_panel,
+		"sp_label": {
+			"control": energy_row.get_node("Label") as Control,
+			"owner": _hud.status_panel,
+			"text": true,
+			"minimum_pixels": 5,
+		},
+		"sp_bar": {
+			"control": _hud.energy_bar as Control,
+			"owner": _hud.status_panel,
 			"text": false,
-			"minimum_pixels": 40,
+			"minimum_pixels": 200,
 		},
-		"element_shape": {
-			"control": element_panel.get_node("Body/ElementShape") as Control,
-			"owner": element_panel,
+		"sp_value": {
+			"control": _hud.energy_value as Control,
+			"owner": _hud.status_panel,
 			"text": true,
-			"minimum_pixels": 12,
-		},
-		"element_text": {
-			"control": element_panel.get_node("Body/ElementText") as Control,
-			"owner": element_panel,
-			"text": true,
-			"minimum_pixels": 12,
+			"minimum_pixels": 20,
 		},
 	}
 	for slot_id: StringName in SkillSlotIds.active():
@@ -432,10 +432,8 @@ func _assert_live_skill_hud_subcontent(file_name: String, size: Vector2i) -> Dic
 			_expect(_contains_rect(owner_rect, rect), "%s %s actual global rect stays inside owner %s" % [file_name, key, str(owner_rect)])
 		rects[key] = rect
 		rects[key + "_minimum_pixels"] = int(spec["minimum_pixels"])
-	var swatch := element_panel.get_node("Body/ElementSwatch") as ColorRect
-	var shape := element_panel.get_node("Body/ElementShape") as Label
-	_expect(swatch != null and swatch.color.a > 0.95 and maxf(swatch.color.r, maxf(swatch.color.g, swatch.color.b)) > 0.55, "%s CurrentElement keeps a visible semantic color swatch" % file_name)
-	_expect(shape != null and shape.get_theme_color(&"font_color").a > 0.95, "%s CurrentElement shape keeps its semantic color" % file_name)
+	_expect(_hud.get_node_or_null("Root/StatusPanel/Margin/Status/TitleRow") == null and _hud.get_node_or_null("Root/StatusPanel/Margin/Status/CurrentElement") == null, "%s status panel is limited to HP/SP rows" % file_name)
+	_expect(health_row.get_global_rect().position.x == energy_row.get_global_rect().position.x and health_row.get_global_rect().size.x == energy_row.get_global_rect().size.x, "%s HP/SP rows share stable geometry" % file_name)
 	_expect(_hud.layer >= 10 and _hud.transform.is_equal_approx(Transform2D.IDENTITY), "%s combat CanvasLayer keeps its formal layer and identity transform" % file_name)
 	return rects
 
@@ -766,20 +764,20 @@ func _defeat_current_room() -> void:
 	await process_frame
 	if room.room_definition.final_boss:
 		return
-	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	_coordinator.player.interact_requested.emit()
 	await process_frame
 
 
 func _leave_physical_shop() -> void:
 	var shop := _coordinator.active_shop_room
-	_expect(shop != null and shop.exit_portal != null, "single shop exposes its physical exit")
+	_expect(shop != null and shop.exit_transition != null, "single shop exposes its physical exit transition zone")
 	if shop == null:
 		return
 	if _overlay.visible:
 		_overlay.toggle_loadout()
 		await process_frame
-	_coordinator.player.global_position = shop.exit_portal.global_position
+	_coordinator.player.global_position = shop.to_global(shop.exit_transition_zone.get_center())
 	_coordinator.player.interact_requested.emit()
 	await process_frame
 

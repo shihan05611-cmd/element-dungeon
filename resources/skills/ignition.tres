@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillDefinition" format=3]
+
+[ext_resource type="Script" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" path="res://combat/execution/ignition_execution.gd" id="2_execution"]
+
+[sub_resource type="Resource" id="IgnitionExecution"]
+script = ExtResource("2_execution")
+
+[resource]
+script = ExtResource("1_skill")
+skill_id = &"ignition"
+element_policy = 0
+required_element_id = &"fire"
+cooldown = 8.0
+execution_definition = SubResource("IgnitionExecution")

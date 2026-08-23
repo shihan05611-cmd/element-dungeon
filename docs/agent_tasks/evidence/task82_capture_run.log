@@ -1,0 +1,50 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 591.74 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 2060
+
+SCRIPT ERROR: Parse Error: Could not find type "RangeIgnitionPort" in the current scope.
+   at: GDScript::reload (res://combat/execution/skill_execution_services.gd:5)
+SCRIPT ERROR: Parse Error: Could not find type "RangeIgnitionPort" in the current scope.
+   at: GDScript::reload (res://combat/execution/skill_execution_services.gd:27)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://combat/execution/skill_execution_definition.gd:0)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://combat/definitions/skill_definition.gd:0)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://combat/content/skill_content_definition.gd:0)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://combat/content/run_content_catalog.gd:0)
+ERROR: Failed to load script "res://combat/content/run_content_catalog.gd" with error "Compilation failed".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+SCRIPT ERROR: Invalid call. Nonexistent function 'new' in base 'GDScript'.
+   at: SkillExecutor.@implicit_new (res://combat/components/skill_executor.gd:87)
+   GDScript backtrace (most recent call first):
+       [0] @implicit_new (res://combat/components/skill_executor.gd:87)
+       [1] _run (res://combat/tests/capture_task82_toggle_skill_hud_visuals.gd:16)
+SCRIPT ERROR: Invalid call. Nonexistent function 'new' in base 'GDScript'.
+   at: PlayerCharacter.configure_run_runtime (res://scripts/player.gd:279)
+   GDScript backtrace (most recent call first):
+       [0] configure_run_runtime (res://scripts/player.gd:279)
+       [1] configure (res://scripts/run_session_host.gd:143)
+       [2] _ready (res://scripts/test_room.gd:20)
+       [3] _run (res://combat/tests/capture_task82_toggle_skill_hud_visuals.gd:17)
+ERROR: RunSessionHost configuration failed: player_runtime_configuration_failed
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://scripts/test_room.gd:26)
+       [1] _run (res://combat/tests/capture_task82_toggle_skill_hud_visuals.gd:17)
+SCRIPT ERROR: Invalid call. Nonexistent function 'new' in base 'GDScript'.
+   at: SkillExecutor.set_execution_reclaim_port (res://combat/components/skill_executor.gd:167)
+   GDScript backtrace (most recent call first):
+       [0] set_execution_reclaim_port (res://combat/components/skill_executor.gd:167)
+       [1] configure (res://scripts/vfx/skill_vfx_coordinator.gd:73)
+       [2] _ready (res://scripts/test_room.gd:27)
+       [3] _run (res://combat/tests/capture_task82_toggle_skill_hud_visuals.gd:17)
+ERROR: SkillVfxCoordinator configuration failed
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://scripts/test_room.gd:28)
+       [1] _run (res://combat/tests/capture_task82_toggle_skill_hud_visuals.gd:17)
+TASK 82 HUD VISUALS COMPLETE

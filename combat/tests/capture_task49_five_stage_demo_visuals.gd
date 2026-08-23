@@ -36,7 +36,7 @@ func _run() -> void:
 	_defeat_batch(first.initial_enemies)
 	await process_frame
 	_assert(first.room_is_cleared and first.reinforcement_enemies.is_empty(), "second initial defeat clears immediately with no reinforcement nodes")
-	_assert(first.chest.visible and first.portal.locked, "clear reveals the chest while keeping the portal locked")
+	_assert(first.chest.visible and first.route_transition.locked, "clear reveals the chest while keeping the route transition locked")
 	await _settle()
 	await _save("task49_02_first_room_immediate_clear_1920x1080.png")
 
@@ -48,12 +48,13 @@ func _run() -> void:
 	_assert(not gained.is_empty() and after_claim.skills.owns(gained), "first chest grants one previously unowned skill")
 	_assert(content != null and content.reward_pool, "first chest skill belongs to reward_pool")
 	_assert(content != null and content.gameplay_definition.is_active_skill(), "first chest skill is active, never passive")
-	_assert(first.chest.consumed and first.portal.enabled and not first.portal.locked, "active reward unlocks the first portal")
+	_assert(first.chest.consumed and first.route_transition.enabled and not first.route_transition.locked, "active reward unlocks the first route transition")
 	await _settle()
 	await _save("task49_03_first_chest_active_guarantee_1920x1080.png")
-	_interact_at(first.portal)
+	_coordinator.player.global_position = first.to_global(first.route_transition_zone.get_center())
+	_coordinator.player.interact_requested.emit()
 
-	_assert(await _wait_combat(&"combat_02_swarm"), "first portal reaches combat_02_swarm directly")
+	_assert(await _wait_combat(&"combat_02_swarm"), "first route transition reaches combat_02_swarm directly")
 	_visited.append(&"combat_02_swarm")
 	await _finish_normal_room()
 	_assert(await _wait_phase(RunPhase.SHOP), "second combat reaches the single shop")
@@ -104,19 +105,19 @@ func _finish_normal_room() -> void:
 	_assert(room.room_is_cleared, "%s clears through its formal enemy configuration" % String(room.room_id))
 	_interact_at(room.chest)
 	await process_frame
-	_assert(room.chest.consumed and room.portal != null and not room.portal.locked, "%s chest unlocks its portal" % String(room.room_id))
-	_interact_at(room.portal)
+	_assert(room.chest.consumed and room.route_transition != null and not room.route_transition.locked, "%s chest unlocks its route transition zone" % String(room.room_id))
+	_interact_at(room.route_transition)
 	await process_frame
 
 
 func _leave_shop() -> void:
 	var shop := _coordinator.active_shop_room
 	var overlay := _coordinator.combat_hud.run_overlay as RunOverlayInterface
-	_assert(shop != null and shop.exit_portal != null, "shop exposes one physical exit portal")
+	_assert(shop != null and shop.exit_transition != null, "shop exposes one physical exit transition zone")
 	if overlay.visible:
 		overlay.toggle_loadout()
 		await process_frame
-	_coordinator.player.global_position = shop.exit_portal.global_position
+	_coordinator.player.global_position = shop.to_global(shop.exit_transition_zone.get_center())
 	_coordinator.player.interact_requested.emit()
 	await process_frame
 
@@ -140,7 +141,8 @@ func _defeat_batch(enemies: Array[CombatEnemy]) -> void:
 
 
 func _interact_at(target: RunWorldInteractable) -> void:
-	_coordinator.player.global_position = target.global_position
+	var room := _coordinator.active_room
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center()) if room != null and target == room.route_transition else target.global_position
 	_coordinator.player.interact_requested.emit()
 
 

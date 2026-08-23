@@ -231,7 +231,9 @@ func _test_second_shop() -> void:
 
 func _test_room_rebuild() -> void:
 	_expect(await _wait_until(func() -> bool: return _coordinator.active_shop_room != null, 360), "physical shop room is active")
-	_coordinator.player.global_position = _coordinator.active_shop_room.exit_portal.global_position
+	_coordinator.player.global_position = _coordinator.active_shop_room.to_global(
+		_coordinator.active_shop_room.exit_transition_zone.get_center()
+	)
 	_coordinator.player.interact_requested.emit()
 	_expect(await _wait_for_room(&"combat_04_validation"), "formal RunGame activates combat four")
 	var runtime := _coordinator.host.runtime_loadout
@@ -335,7 +337,7 @@ func _finish_current_room() -> void:
 	await process_frame
 	if room.room_definition.final_boss:
 		return
-	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	_coordinator.player.interact_requested.emit()
 	await process_frame
 

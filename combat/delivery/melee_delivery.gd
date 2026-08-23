@@ -121,9 +121,11 @@ func _on_delivery_cleanup() -> void:
 
 func _build_query_transform() -> Transform2D:
 	var facing_angle := direction.angle()
-	var query_origin := global_position + query_offset.rotated(facing_angle)
-	return Transform2D(facing_angle + query_rotation, query_origin)
-
+	var range_multiplier := payload.melee_query_multiplier if payload != null else 1.0
+	var query_origin := global_position + (query_offset * range_multiplier).rotated(facing_angle)
+	return Transform2D(facing_angle + query_rotation, query_origin).scaled_local(
+		Vector2.ONE * range_multiplier
+	)
 
 
 

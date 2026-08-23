@@ -132,6 +132,9 @@ func _bind_player(player: PlayerCharacter) -> void:
 	var basic_attack_callback := Callable(self, "_on_basic_attack_committed")
 	if not player.basic_attack_committed.is_connected(basic_attack_callback):
 		player.basic_attack_committed.connect(basic_attack_callback)
+	var ignition_callback := Callable(self, "_on_ignition_reclaimed")
+	if not player.ignition_reclaimed.is_connected(ignition_callback):
+		player.ignition_reclaimed.connect(ignition_callback)
 	var defeated_callback := Callable(self, "_on_player_defeated")
 	if not player.player_defeated.is_connected(defeated_callback):
 		player.player_defeated.connect(defeated_callback)
@@ -266,6 +269,10 @@ func _on_reclaim_vfx_committed(event: ReclaimVfxEvent) -> void:
 		reclaim_playback_count += 1
 	else:
 		presentation.queue_free()
+
+
+func _on_ignition_reclaimed(event: ReclaimVfxEvent) -> void:
+	_on_reclaim_vfx_committed(event)
 
 
 func _on_loadout_replaced(

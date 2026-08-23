@@ -28,6 +28,10 @@ var element_amount: int:
 	get:
 		return _element_amount
 
+var melee_query_multiplier: float:
+	get:
+		return _melee_query_multiplier
+
 var presentation_tags: PackedStringArray:
 	get:
 		return _presentation_tags.duplicate()
@@ -42,6 +46,7 @@ var _fixed_damage_bonus: float
 var _offensive_damage: float
 var _element_id: StringName
 var _element_amount: int
+var _melee_query_multiplier: float = 1.0
 var _presentation_tags: PackedStringArray
 var _validation_error: StringName = &""
 
@@ -52,7 +57,8 @@ func _init(
 		p_element_id: StringName,
 		p_element_amount: int,
 		p_presentation_tags: PackedStringArray = PackedStringArray(),
-		p_validation_error: StringName = &""
+		p_validation_error: StringName = &"",
+		p_melee_query_multiplier: float = 1.0
 ) -> void:
 	_effective_attack = p_effective_attack
 	_damage_multiplier = (
@@ -64,6 +70,7 @@ func _init(
 	_offensive_damage = p_offensive_damage
 	_element_id = p_element_id
 	_element_amount = p_element_amount
+	_melee_query_multiplier = p_melee_query_multiplier
 	_presentation_tags = p_presentation_tags.duplicate()
 	_validation_error = p_validation_error
 	if _validation_error.is_empty():
@@ -79,7 +86,8 @@ static func invalid(error: StringName) -> RuntimeAttackPayload:
 		ElementIds.NONE,
 		0,
 		PackedStringArray(),
-		error
+		error,
+		1.0
 	)
 
 
@@ -91,7 +99,8 @@ static func from_locked_inputs(
 		p_element_id: StringName,
 		p_element_amount: int,
 		p_presentation_tags: PackedStringArray = PackedStringArray(),
-		p_validation_error: StringName = &""
+		p_validation_error: StringName = &"",
+		p_melee_query_multiplier: float = 1.0
 ) -> RuntimeAttackPayload:
 	var result := RuntimeAttackPayload.new(0.0, 0.0, ElementIds.NONE, 0)
 	result._effective_attack = p_effective_attack
@@ -100,6 +109,7 @@ static func from_locked_inputs(
 	result._offensive_damage = p_offensive_damage
 	result._element_id = p_element_id
 	result._element_amount = p_element_amount
+	result._melee_query_multiplier = p_melee_query_multiplier
 	result._presentation_tags = p_presentation_tags.duplicate()
 	result._validation_error = p_validation_error
 	if result._validation_error.is_empty():
@@ -112,7 +122,8 @@ static func from_locked_stats(
 		p_damage_multiplier: float,
 		p_element_id: StringName,
 		p_element_amount: int,
-		p_presentation_tags: PackedStringArray = PackedStringArray()
+		p_presentation_tags: PackedStringArray = PackedStringArray(),
+		p_melee_query_multiplier: float = 1.0
 ) -> RuntimeAttackPayload:
 	if stats == null or not stats.is_valid():
 		return invalid(&"invalid_stat_snapshot")
@@ -124,7 +135,9 @@ static func from_locked_stats(
 		damage,
 		p_element_id,
 		p_element_amount,
-		p_presentation_tags
+		p_presentation_tags,
+		&"",
+		p_melee_query_multiplier
 	)
 
 
@@ -148,6 +161,8 @@ func _validate_values() -> StringName:
 		return &"unknown_element_id"
 	if _element_amount < 0 or _element_amount > 10:
 		return &"invalid_element_amount"
+	if not is_finite(_melee_query_multiplier) or _melee_query_multiplier < 1.0:
+		return &"invalid_melee_query_multiplier"
 	if _element_id == ElementIds.NONE and _element_amount != 0:
 		return &"none_element_has_amount"
 	return &""

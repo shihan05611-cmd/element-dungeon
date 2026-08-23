@@ -82,6 +82,7 @@ func _process(_delta: float) -> void:
 
 func start(duration: float, kind: TelegraphType = TelegraphType.RANGED) -> bool:
 	if not is_finite(duration) or duration <= 0.0:
+		cancel()
 		return false
 	_telegraph_type = kind
 	_is_active = true
@@ -104,13 +105,13 @@ func advance(delta: float) -> void:
 
 
 func cancel() -> void:
-	if not _is_active:
-		return
+	var was_active := _is_active
 	_is_active = false
 	_time_remaining = 0.0
 	visible = false
 	_stop_animation()
-	telegraph_cancelled.emit()
+	if was_active:
+		telegraph_cancelled.emit()
 
 
 ## Explicit setter alternative to start()'s optional argument, for callers

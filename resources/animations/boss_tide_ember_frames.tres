@@ -14,6 +14,10 @@
 [ext_resource type="Texture2D" uid="uid://cd7aecbwxpk7c" path="res://assets/world/enemies/tide_ember_sovereign/boss_plain_cast_v1.png" id="12_plain_cast"]
 [ext_resource type="Texture2D" uid="uid://bt5jfqvv6yrr6" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_cast_v1.png" id="13_ember_cast"]
 [ext_resource type="Texture2D" uid="uid://ctsf258lcas3c" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_cast_v1.png" id="14_tide_cast"]
+[ext_resource type="Texture2D" uid="uid://nu0qlxdw00gg" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_hurt_v1.png" id="15_ember_hurt"]
+[ext_resource type="Texture2D" uid="uid://ccwpeo5ji5wbt" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_hurt_v1.png" id="16_tide_hurt"]
+[ext_resource type="Texture2D" uid="uid://dlv870hgx7ug1" path="res://assets/world/enemies/tide_ember_sovereign/boss_ember_death_v1.png" id="17_ember_death"]
+[ext_resource type="Texture2D" uid="uid://c0svkhbxkw0at" path="res://assets/world/enemies/tide_ember_sovereign/boss_tide_death_v1.png" id="18_tide_death"]
 
 [sub_resource type="AtlasTexture" id="boss_death_v2_0"]
 atlas = ExtResource("11_death")
@@ -94,6 +98,38 @@ region = Rect2(1200, 0, 200, 200)
 [sub_resource type="AtlasTexture" id="boss_ember_cast_v1_7"]
 atlas = ExtResource("13_ember_cast")
 region = Rect2(1400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_death_v1_0"]
+atlas = ExtResource("17_ember_death")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_death_v1_1"]
+atlas = ExtResource("17_ember_death")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_death_v1_2"]
+atlas = ExtResource("17_ember_death")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_death_v1_3"]
+atlas = ExtResource("17_ember_death")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_hurt_v1_0"]
+atlas = ExtResource("15_ember_hurt")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_hurt_v1_1"]
+atlas = ExtResource("15_ember_hurt")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_hurt_v1_2"]
+atlas = ExtResource("15_ember_hurt")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_ember_hurt_v1_3"]
+atlas = ExtResource("15_ember_hurt")
+region = Rect2(600, 0, 200, 200)
 
 [sub_resource type="AtlasTexture" id="boss_ember_idle_v2_0"]
 atlas = ExtResource("4_ember_idle")
@@ -351,6 +387,38 @@ region = Rect2(1200, 0, 200, 200)
 atlas = ExtResource("14_tide_cast")
 region = Rect2(1400, 0, 200, 200)
 
+[sub_resource type="AtlasTexture" id="boss_tide_death_v1_0"]
+atlas = ExtResource("18_tide_death")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_death_v1_1"]
+atlas = ExtResource("18_tide_death")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_death_v1_2"]
+atlas = ExtResource("18_tide_death")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_death_v1_3"]
+atlas = ExtResource("18_tide_death")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_hurt_v1_0"]
+atlas = ExtResource("16_tide_hurt")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_hurt_v1_1"]
+atlas = ExtResource("16_tide_hurt")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_hurt_v1_2"]
+atlas = ExtResource("16_tide_hurt")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="boss_tide_hurt_v1_3"]
+atlas = ExtResource("16_tide_hurt")
+region = Rect2(600, 0, 200, 200)
+
 [sub_resource type="AtlasTexture" id="boss_tide_idle_v2_0"]
 atlas = ExtResource("7_tide_idle")
 region = Rect2(0, 0, 200, 200)
@@ -483,6 +551,40 @@ animations = [{
 "loop": 0,
 "name": &"ember_cast",
 "speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_ember_death_v1_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_ember_death_v1_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_ember_death_v1_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_ember_death_v1_3")
+}],
+"loop": 0,
+"name": &"ember_death",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_ember_hurt_v1_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_ember_hurt_v1_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_ember_hurt_v1_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_ember_hurt_v1_3")
+}],
+"loop": 0,
+"name": &"ember_hurt",
+"speed": 12.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -720,6 +822,40 @@ animations = [{
 "loop": 0,
 "name": &"tide_cast",
 "speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_tide_death_v1_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_death_v1_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_death_v1_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_death_v1_3")
+}],
+"loop": 0,
+"name": &"tide_death",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("boss_tide_hurt_v1_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_hurt_v1_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_hurt_v1_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("boss_tide_hurt_v1_3")
+}],
+"loop": 0,
+"name": &"tide_hurt",
+"speed": 12.0
 }, {
 "frames": [{
 "duration": 1.0,

@@ -1672,14 +1672,14 @@ func _show_formal_shop(cause: StringName = &"") -> void:
 	_formal_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	footer.add_child(_formal_status)
 	var leave := _formal_action_button(
-		"前往出口传送门 · 按 F",
+		"前往右下角出口 · 按 F",
 		"leave_shop",
 		Callable(),
 		Vector2(176, 48),
 		true
 	)
 	leave.disabled = true
-	leave.tooltip_text = "正式流程只能通过商店房右侧世界传送门离开。"
+	leave.tooltip_text = "正式流程只能通过商店房右下角交互区离开。"
 	footer.add_child(leave)
 	_restore_formal_focus()
 

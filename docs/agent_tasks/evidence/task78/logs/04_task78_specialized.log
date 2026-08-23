@@ -1,0 +1,27 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+ERROR: Animation 'idle' doesn't exist.
+   at: get_frame_texture (scene/resources/sprite_frames.h:96)
+   GDScript backtrace (most recent call first):
+       [0] _test_boss_three_forms_keep_action_contract (res://combat/tests/run_task78_boss_elemental_art_passive_prompt_tests.gd:41)
+       [1] run_test (res://combat/tests/test_harness.gd:34)
+       [2] _run (res://combat/tests/run_task78_boss_elemental_art_passive_prompt_tests.gd:21)
+SCRIPT ERROR: Cannot call method 'get_image' on a null value.
+   at: _test_boss_three_forms_keep_action_contract (res://combat/tests/run_task78_boss_elemental_art_passive_prompt_tests.gd:41)
+   GDScript backtrace (most recent call first):
+       [0] _test_boss_three_forms_keep_action_contract (res://combat/tests/run_task78_boss_elemental_art_passive_prompt_tests.gd:41)
+       [1] run_test (res://combat/tests/test_harness.gd:34)
+       [2] _run (res://combat/tests/run_task78_boss_elemental_art_passive_prompt_tests.gd:21)
+PASS boss_hurt_and_death_keep_current_form
+PASS burning_is_lifecycle_sparks
+PASS passives_fit_visible_sprite_once
+PASS world_prompt_keycap_states_have_no_middle_dot
+TASK 78 BOSS ELEMENTAL ART PASSIVE PROMPT TESTS FAILED: 5/6 tests, 108 assertions
+  - boss_three_forms_keep_action_contract: idle exists
+  - boss_three_forms_keep_action_contract: walk exists
+  - boss_three_forms_keep_action_contract: attack exists
+  - boss_three_forms_keep_action_contract: cast exists
+  - melee_reuses_red_exclamation: melee warning reuses the exclamation alpha outline exactly

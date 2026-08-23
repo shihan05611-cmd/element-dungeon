@@ -139,18 +139,18 @@ func _finish_normal_room() -> void:
 	_assert(room.room_is_cleared, "%s clears through formal enemies" % String(room.room_id))
 	_interact_at(room.chest)
 	await process_frame
-	_assert(room.chest.consumed and room.portal != null and not room.portal.locked, "%s chest unlocks its portal" % String(room.room_id))
-	_interact_at(room.portal)
+	_assert(room.chest.consumed and room.route_transition != null and not room.route_transition.locked, "%s chest unlocks its route transition zone" % String(room.room_id))
+	_interact_at(room.route_transition)
 
 
 func _leave_shop() -> void:
 	var shop := _coordinator.active_shop_room
 	var overlay := _coordinator.combat_hud.run_overlay as RunOverlayInterface
-	_assert(shop != null and shop.exit_portal != null, "shop exposes its marker-aligned physical exit")
+	_assert(shop != null and shop.exit_transition != null, "shop exposes its room-local physical exit transition zone")
 	if overlay.visible:
 		overlay.toggle_loadout()
 		await process_frame
-	_coordinator.player.global_position = shop.exit_portal.global_position
+	_coordinator.player.global_position = shop.to_global(shop.exit_transition_zone.get_center())
 	_coordinator.player.interact_requested.emit()
 
 
@@ -166,7 +166,8 @@ func _defeat_batch(enemies: Array[CombatEnemy]) -> void:
 
 
 func _interact_at(target: RunWorldInteractable) -> void:
-	_coordinator.player.global_position = target.global_position
+	var room := _coordinator.active_room
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center()) if room != null and target == room.route_transition else target.global_position
 	_coordinator.player.interact_requested.emit()
 
 

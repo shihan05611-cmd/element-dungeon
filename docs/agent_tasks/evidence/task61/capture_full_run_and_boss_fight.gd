@@ -36,7 +36,7 @@ func _run() -> void:
 	assert(await _wait_phase(RunPhase.SHOP))
 	assert(await _wait_until(func() -> bool: return _coordinator.active_shop_room != null, 180))
 	var shop_room := _coordinator.active_shop_room
-	_coordinator.player.global_position = shop_room.exit_portal.global_position
+	_coordinator.player.global_position = shop_room.to_global(shop_room.exit_transition_zone.get_center())
 	_coordinator.player.interact_requested.emit()
 	assert(await _wait_combat(&"combat_04_validation"))
 	await _finish_normal_room()
@@ -150,7 +150,7 @@ func _run_boss_fight() -> void:
 	_hit(boss, ElementIds.NONE, 0, 99999.0)
 	assert(boss.defeated)
 	await _wait_frames(10)
-	assert(room.room_is_cleared and room.chest.visible and room.portal == null)
+	assert(room.room_is_cleared and room.chest.visible and room.route_transition == null)
 	await _capture("task61_10_settlement_chest_1920x1080.png", Vector2i(1920, 1080))
 	var balance_before := _coordinator.current_snapshot().economy.balance
 	_coordinator.player.global_position = room.chest.global_position
@@ -241,11 +241,11 @@ func _finish_normal_room() -> void:
 	if room.reinforcement_activated and not room.room_is_cleared:
 		_defeat_batch(room.reinforcement_enemies)
 		await process_frame
-	assert(room.room_is_cleared and room.portal.locked)
+	assert(room.room_is_cleared and room.route_transition.locked)
 	_interact_at(room.chest)
 	await process_frame
-	assert(room.chest.consumed and not room.portal.locked)
-	_interact_at(room.portal)
+	assert(room.chest.consumed and not room.route_transition.locked)
+	_interact_at(room.route_transition)
 	await process_frame
 
 
@@ -260,7 +260,8 @@ func _defeat_batch(enemies: Array[CombatEnemy]) -> void:
 
 
 func _interact_at(target: RunWorldInteractable) -> void:
-	_coordinator.player.global_position = target.global_position
+	var room := _coordinator.active_room
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center()) if room != null and target == room.route_transition else target.global_position
 	_coordinator.player.interact_requested.emit()
 
 

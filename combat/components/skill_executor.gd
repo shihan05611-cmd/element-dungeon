@@ -169,6 +169,11 @@ func set_execution_reclaim_port(port: ElementReclaimPort) -> bool:
 	return true
 
 
+func clear_temporary_execution_states(reason: StringName) -> void:
+	if _execution_services != null:
+		_execution_services.clear_temporary_states(reason)
+
+
 ## Callable contract: gate.call(skill: SkillDefinition) -> bool.
 func set_external_action_gate(gate: Callable) -> void:
 	_external_action_gate = gate

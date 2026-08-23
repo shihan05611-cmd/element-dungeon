@@ -53,8 +53,9 @@ func _run() -> void:
 func _test_scene_contracts() -> void:
 	_expect(_player != null and _target != null and _hud != null, "formal room nodes load")
 	var hud_root := _hud.get_node("Root")
-	var player_title := _hud.get_node("Root/StatusPanel/Margin/Status/TitleRow/Title") as Label
-	_expect(player_title.text == "法雅雅", "player panel displays Faya's name")
+	var status := _hud.get_node("Root/StatusPanel/Margin/Status") as Control
+	_expect(status.get_node_or_null("HealthRow/HealthBar/HealthValue") != null and status.get_node_or_null("EnergyRow/EnergyBar/EnergyValue") != null, "status panel exposes only the HP/SP value paths")
+	_expect(status.get_node_or_null("TitleRow") == null and status.get_node_or_null("CurrentElement") == null, "status panel has no legacy title or element projection")
 	_expect(_hud.skill_panel.get_parent() == hud_root, "skill panel is a root-level HUD sibling")
 	_expect(_player.get_node_or_null("PrototypeSkillCaster") == null, "prototype caster detached")
 	_expect(_player.get_node_or_null("InteractionHitbox") == null, "legacy overlap hitbox removed")

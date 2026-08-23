@@ -73,18 +73,17 @@ func _test_formal_scene_and_seven_slot_hud() -> void:
 func _test_combat_semantics_and_accessibility() -> void:
 	var hp_copy := _hud.health_value.text
 	var sp_copy := _hud.energy_value.text
-	var element_shape := (_hud.element_pivot_panel().get_node("Body/ElementShape") as Label).text
-	var element_copy := (_hud.element_pivot_panel().get_node("Body/ElementText") as Label).text
 	_expect(hp_copy.contains("/"), "HP exposes current and maximum")
 	_expect(sp_copy.contains("/"), "SP exposes current and maximum")
-	_expect(not element_shape.is_empty() and not element_copy.is_empty(), "CurrentElement uses shape plus short text")
+	var status := _hud.status_panel.get_node("Margin/Status") as Control
+	_expect(status.get_node_or_null("TitleRow") == null and status.get_node_or_null("CurrentElement") == null, "status panel contains no title or element projection")
 	var active := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_1)
 	_expect(_hud.slot_visible_fields(SkillSlotIds.ACTIVE_1).has(&"cost"), "A1 exposes its SP cost")
 	_expect(not _hud.slot_visible_fields(SkillSlotIds.ACTIVE_1).has(&"cooldown"), "A1 does not show cooldown copy while ready")
 	_hud.set_colorblind_mode(true)
 	_hud.set_reduced_motion(true)
 	_expect(_hud.colorblind_mode and _hud.reduced_motion, "colorblind and reduced-motion modes are independently enabled")
-	_expect(not (_hud.element_pivot_panel().get_node("Body/ElementShape") as Label).text.is_empty(), "colorblind mode preserves element shape")
+	_expect(status.get_node_or_null("CurrentElement") == null, "colorblind mode does not restore element UI in the status panel")
 	_hud.set_colorblind_mode(false)
 	_hud.set_reduced_motion(false)
 	_expect(not _visible_text(_hud).is_empty(), "combat HUD keeps visible semantic copy")
@@ -192,7 +191,9 @@ func _test_middle_shop_levels_max_and_second_passive() -> void:
 	_expect_eq(_coordinator.current_snapshot().loadout.get_skill_id(SkillSlotIds.PASSIVE_2), &"unending", "P2 immediate equip is authoritative")
 	_expect_eq(_coordinator.current_snapshot().loadout.entries.size(), 7, "shop preserves exact seven-slot mapping")
 	_expect(await _wait_until(func() -> bool: return _coordinator.active_shop_room != null, 360), "physical shop room is active")
-	_coordinator.player.global_position = _coordinator.active_shop_room.exit_portal.global_position
+	_coordinator.player.global_position = _coordinator.active_shop_room.to_global(
+		_coordinator.active_shop_room.exit_transition_zone.get_center()
+	)
 	_coordinator.player.interact_requested.emit()
 	_expect(await _wait_for_combat(&"combat_04_validation"), "physical shop exit loads combat four")
 
@@ -325,7 +326,7 @@ func _finish_current_room() -> void:
 	await process_frame
 	if room.room_definition.final_boss:
 		return
-	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	_coordinator.player.interact_requested.emit()
 	await process_frame
 

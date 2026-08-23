@@ -73,7 +73,7 @@ func _test_first_room_is_immediate_single_wave() -> void:
 	_expect(not room.room_is_cleared and _clear_events == 0, "one surviving initial enemy keeps the room active")
 	_defeat(room.initial_enemies[1])
 	_expect(room.room_is_cleared and _clear_events == 1, "second defeat clears in the same callback")
-	_expect(room.chest.visible and room.portal.visible, "immediate clear reveals the chest and portal")
+	_expect(room.chest.visible and room.route_transition.visible, "immediate clear reveals the chest and route transition zone")
 	await process_frame
 	_expect_eq(_clear_events, 1, "no delayed reinforcement or duplicate clear follows")
 	room.queue_free()

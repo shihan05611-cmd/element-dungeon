@@ -71,7 +71,17 @@ func _test_dormant_reinforcement_and_clear_gate() -> void:
 		_defeat(enemy)
 	await process_frame
 	_expect(room.room_is_cleared and room.chest.visible, "both waves defeated reveal chest once")
-	_expect(room.portal.visible and room.portal.locked, "clear reveals a portal locked by chest")
+	var route_zone := room.route_transition
+	var zone_center := room.to_global(room.route_transition_zone.get_center())
+	var zone_outside := room.to_global(room.route_transition_zone.position - Vector2(32.0, 0.0))
+	_expect(route_zone != null and route_zone.visible and route_zone.locked, "clear reveals a chest-locked route transition zone")
+	_expect(route_zone.sprite == null and route_zone.interaction_region == room.route_transition_zone, "route transition has no portal art and uses the room-local configured rectangle")
+	_expect(room.interaction_target_at(zone_center) == null, "locked route transition rejects interaction from inside the zone")
+	room.apply_chest_reward("test reward")
+	_expect(room.interaction_target_at(zone_center) == route_zone, "unlocked route transition accepts interaction inside the zone")
+	_expect(room.interaction_target_at(zone_outside) == null, "route transition rejects interaction outside the configured rectangle")
+	route_zone.mark_consumed("test consumed")
+	_expect(room.interaction_target_at(zone_center) == null, "consumed route transition cannot submit a second interaction")
 	room.queue_free()
 	await process_frame
 	var timer_room := definition.room_scene.instantiate() as RunRoomInstance
@@ -129,9 +139,9 @@ func _test_physical_safe_path_and_boss_settlement() -> void:
 	root.add_child(coordinator)
 	current_scene = coordinator
 	_expect(await _wait_combat(coordinator, &"combat_01_entry"), "RunGame starts in C1")
-	await _clear_claim_and_portal(coordinator, &"combat_01_entry")
+	await _clear_claim_and_transition(coordinator, &"combat_01_entry")
 	_expect(await _wait_combat(coordinator, &"combat_02_swarm"), "safe C2 room loads")
-	await _clear_claim_and_portal(coordinator, &"combat_02_swarm")
+	await _clear_claim_and_transition(coordinator, &"combat_02_swarm")
 	_expect(await _wait_phase(coordinator, RunPhase.SHOP), "C2 portal reaches one shop")
 	_expect(await _wait_until(func() -> bool: return coordinator.active_shop_room != null, 180), "physical shop replaces C2")
 	var overlay := coordinator.combat_hud.run_overlay as RunOverlayInterface
@@ -175,19 +185,26 @@ func _test_physical_safe_path_and_boss_settlement() -> void:
 	_expect_eq(_authority_signature(coordinator.current_snapshot()), shop_before, "close/reopen/close preserves the complete authority signature")
 	var start_x := coordinator.player.global_position.x
 	Input.action_press(&"move_right")
-	var reached_portal := false
+	var reached_exit_zone := false
 	for _frame: int in 360:
 		await physics_frame
-		if shop_room.exit_portal.can_interact(coordinator.player.global_position):
-			reached_portal = true
+		if shop_room.exit_transition.can_interact(coordinator.player.global_position):
+			reached_exit_zone = true
 			break
 	Input.action_release(&"move_right")
-	_expect(reached_portal and coordinator.player.global_position.x > start_x + 300.0, "real move_right physics carries the player from spawn to the exit portal")
-	_expect(shop_room.visible and coordinator.player.visible and shop_room.exit_portal.visible and shop_room.exit_portal.prompt.visible, "hidden overlay reveals shop room, player, portal, and F prompt")
-	_expect(shop_room.exit_portal.prompt.text == "F · 离开商店", "world exit shows the exact F leave-shop prompt")
+	var shop_zone_center := shop_room.to_global(shop_room.exit_transition_zone.get_center())
+	var shop_zone_outside := shop_room.to_global(shop_room.exit_transition_zone.position - Vector2(32.0, 0.0))
+	_expect(shop_room.exit_transition.sprite == null and shop_room.exit_transition.interaction_region == shop_room.exit_transition_zone, "shop exit has no portal art and uses its room-local configured rectangle")
+	_expect(shop_room.interaction_target_at(shop_zone_center) == shop_room.exit_transition, "shop exit accepts interaction inside its configured rectangle")
+	_expect(shop_room.interaction_target_at(shop_zone_outside) == null, "shop exit rejects interaction outside its configured rectangle")
+	_expect(reached_exit_zone and coordinator.player.global_position.x > start_x + 300.0, "real move_right physics carries the player from spawn to the right-bottom exit zone")
+	_expect(shop_room.visible and coordinator.player.visible and shop_room.exit_transition.visible and shop_room.exit_transition.prompt.visible, "hidden overlay reveals shop room, player, exit zone, and F prompt")
+	_expect(shop_room.exit_transition.prompt.text == "F · 离开商店", "world exit zone shows the exact F leave-shop prompt")
 	await _press_interact()
-	_expect(await _wait_combat(coordinator, &"combat_04_validation"), "shop exit portal calls existing leave transaction")
-	await _clear_claim_and_portal(coordinator, &"combat_04_validation")
+	await _press_interact()
+	_expect_eq(shop_commands.count(&"leave_shop"), 1, "consumed shop exit submits the leave transaction exactly once")
+	_expect(await _wait_combat(coordinator, &"combat_04_validation"), "shop exit zone calls existing leave transaction")
+	await _clear_claim_and_transition(coordinator, &"combat_04_validation")
 	_expect(await _wait_combat(coordinator, &"combat_06_final_boss"), "C3 portal loads boss directly")
 	var boss := coordinator.active_room.enemies[0]
 	# Task 61 retires the placeholder CombatEnemy + runtime 1.7x scale/purple
@@ -219,7 +236,7 @@ func _test_physical_safe_path_and_boss_settlement() -> void:
 	await physics_frame
 	_expect(_projectile_count(coordinator) <= projectiles_at_death, "released boss creates no new projectile after death")
 	_expect_eq(fired_at_death, fired_before + 1, "boss projectile counter freezes at the death boundary")
-	_expect(coordinator.active_room.room_is_cleared and coordinator.active_room.portal == null, "boss clear reveals settlement chest without portal")
+	_expect(coordinator.active_room.room_is_cleared and coordinator.active_room.route_transition == null, "boss clear reveals settlement chest without a route transition zone")
 	var before_boss_chest := coordinator.current_snapshot()
 	coordinator.player.global_position = coordinator.active_room.chest.global_position
 	coordinator.player.interact_requested.emit()
@@ -233,7 +250,7 @@ func _test_physical_safe_path_and_boss_settlement() -> void:
 	await process_frame
 
 
-func _clear_claim_and_portal(coordinator: RunFlowCoordinator, expected_room: StringName) -> void:
+func _clear_claim_and_transition(coordinator: RunFlowCoordinator, expected_room: StringName) -> void:
 	var room := coordinator.active_room
 	_expect(room != null and room.room_id == expected_room, "%s is the active physical room" % String(expected_room))
 	for enemy: CombatEnemy in room.initial_enemies:
@@ -247,8 +264,8 @@ func _clear_claim_and_portal(coordinator: RunFlowCoordinator, expected_room: Str
 	coordinator.player.global_position = room.chest.global_position
 	coordinator.player.interact_requested.emit()
 	await process_frame
-	_expect(room.chest.consumed and not room.portal.locked, "chest opens once and unlocks portal")
-	coordinator.player.global_position = room.portal.global_position
+	_expect(room.chest.consumed and not room.route_transition.locked, "chest opens once and unlocks route transition zone")
+	coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	coordinator.player.interact_requested.emit()
 	await process_frame
 

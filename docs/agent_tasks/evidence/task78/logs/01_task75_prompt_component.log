@@ -1,0 +1,31 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+SCRIPT ERROR: Parse Error: Could not find type "WorldInteractionPrompt" in the current scope.
+   at: GDScript::reload (res://scripts/run/run_world_interactable.gd:90)
+SCRIPT ERROR: Parse Error: Could not find type "WorldInteractionPrompt" in the current scope.
+   at: GDScript::reload (res://scripts/run/run_world_interactable.gd:91)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "world_prompt" variable because the value doesn't have a set type.
+   at: GDScript::reload (res://scripts/run/run_world_interactable.gd:91)
+SCRIPT ERROR: Parse Error: Identifier "WorldInteractionPrompt" not declared in the current scope.
+   at: GDScript::reload (res://scripts/run/run_world_interactable.gd:93)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "state" variable because the value doesn't have a set type.
+   at: GDScript::reload (res://scripts/run/run_world_interactable.gd:93)
+SCRIPT ERROR: Parse Error: Identifier "WorldInteractionPrompt" not declared in the current scope.
+   at: GDScript::reload (res://scripts/run/run_world_interactable.gd:95)
+SCRIPT ERROR: Parse Error: Identifier "WorldInteractionPrompt" not declared in the current scope.
+   at: GDScript::reload (res://scripts/run/run_world_interactable.gd:97)
+SCRIPT ERROR: Parse Error: Identifier "WorldInteractionPrompt" not declared in the current scope.
+   at: GDScript::reload (res://scripts/run/run_world_interactable.gd:99)
+ERROR: Failed to load script "res://scripts/run/run_world_interactable.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+SCRIPT ERROR: Invalid call. Nonexistent function 'set_interaction_region' in base 'Nil'.
+   at: _test_world_prompt_font_outline_and_motion_are_scoped (res://combat/tests/run_task75_world_prompt_font_and_motion_tests.gd:24)
+   GDScript backtrace (most recent call first):
+       [0] _test_world_prompt_font_outline_and_motion_are_scoped (res://combat/tests/run_task75_world_prompt_font_and_motion_tests.gd:24)
+       [1] run_test (res://combat/tests/test_harness.gd:34)
+       [2] _run (res://combat/tests/run_task75_world_prompt_font_and_motion_tests.gd:17)
+PASS world_prompt_font_outline_and_motion_are_scoped
+TASK 75 WORLD PROMPT FONT AND MOTION TESTS PASSED: 1 tests, 0 assertions

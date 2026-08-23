@@ -6,11 +6,10 @@ const RUN_GAME: PackedScene = preload("res://scenes/run/run_game.tscn")
 const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
 const CHEST_SCENE: PackedScene = preload("res://scenes/run/interactables/run_reward_chest.tscn")
-const PORTAL_SCENE: PackedScene = preload("res://scenes/run/interactables/run_route_portal.tscn")
+const TRANSITION_ZONE_SCENE: PackedScene = preload("res://scenes/run/interactables/run_transition_zone.tscn")
 const CROWN_SCENE: PackedScene = preload("res://scenes/run/interactables/run_wishing_crown.tscn")
 
 const OLD_CHEST_ROOT := "assets/generated/vfx/" + "run_reward_chest"
-const OLD_PORTAL_ROOT := "assets/generated/vfx/" + "run_route_portal"
 
 const FORMAL_ASSETS := {
 	"res://assets/world/interactables/run_reward_chest/chest_closed_v2.png": {
@@ -18,12 +17,6 @@ const FORMAL_ASSETS := {
 	},
 	"res://assets/world/interactables/run_reward_chest/chest_open_v2.png": {
 		"size": Vector2i(80, 72), "sha": "cbc4344454b8d0d969545046a53a1b037cdb354091a4d526b5009285e0f74d68", "bbox": Rect2i(6, 3, 68, 68),
-	},
-	"res://assets/world/interactables/run_route_portal/portal_locked_v2.png": {
-		"size": Vector2i(64, 96), "sha": "b9cffeac3d5037feb793072e6a8317a01a8d2422a230ed9671fc5a59acc30ffd", "bbox": Rect2i(6, 5, 51, 88),
-	},
-	"res://assets/world/interactables/run_route_portal/portal_active_v2.png": {
-		"size": Vector2i(64, 96), "sha": "0eddaa9c484fedb119c31da6e081141549fcd4297e7823151c4a2bd330a7c2ea", "bbox": Rect2i(6, 5, 52, 88),
 	},
 	"res://assets/art_preview/world_objects/wishing_crown_v1.png": {
 		"size": Vector2i(160, 128), "sha": "3cc3557eaa97349116a7ef5251abd0586aebd9f3e3bb283b89585c5e76fd7095", "bbox": Rect2i(8, 9, 144, 109),
@@ -72,15 +65,14 @@ func _test_formal_asset_bytes_and_real_texture_states() -> void:
 	_expect_near(_sprite_visible_bottom(chest.sprite, FORMAL_ASSETS[closed_path]["bbox"]), 39.0, 0.01, "chest bottom-center offset matches authored room markers")
 	chest.queue_free()
 
-	var portal := PORTAL_SCENE.instantiate() as RunWorldInteractable
-	root.add_child(portal)
-	var locked_path := portal.sprite.texture.resource_path
-	portal.set_locked(false)
-	_expect_eq(locked_path, "res://assets/world/interactables/run_route_portal/portal_locked_v2.png", "portal starts on the formal locked image")
-	_expect_eq(portal.sprite.texture.resource_path, "res://assets/world/interactables/run_route_portal/portal_active_v2.png", "unlock switches to the real active image")
-	_expect(locked_path != portal.sprite.texture.resource_path, "portal state is a real texture change")
-	_expect_near(_sprite_visible_bottom(portal.sprite, FORMAL_ASSETS[locked_path]["bbox"]), 87.0, 0.01, "portal bottom-center offset matches authored room markers")
-	portal.queue_free()
+	var transition := TRANSITION_ZONE_SCENE.instantiate() as RunWorldInteractable
+	transition.set_interaction_region(Rect2(1240, 520, 240, 180))
+	root.add_child(transition)
+	_expect(transition.sprite == null and transition.locked, "route transition starts locked without portal art")
+	_expect(not transition.can_interact(transition.to_global(transition.interaction_region.get_center())), "locked transition rejects its local rectangle")
+	transition.set_locked(false)
+	_expect(transition.can_interact(transition.to_global(transition.interaction_region.get_center())), "unlocked transition accepts its local rectangle")
+	transition.queue_free()
 
 	var crown := CROWN_SCENE.instantiate() as RunWorldInteractable
 	root.add_child(crown)
@@ -90,7 +82,7 @@ func _test_formal_asset_bytes_and_real_texture_states() -> void:
 	crown.queue_free()
 
 	var runtime_hits := _runtime_old_asset_references("res://")
-	_expect(runtime_hits.is_empty(), "production gd/tscn/tres runtime references to retired chest/portal roots are zero: %s" % str(runtime_hits))
+	_expect(runtime_hits.is_empty(), "production gd/tscn/tres runtime references to the retired chest root are zero: %s" % str(runtime_hits))
 
 
 func _test_shop_crown_opens_existing_ui_without_authority_mutation() -> void:
@@ -131,8 +123,7 @@ func _test_shop_crown_opens_existing_ui_without_authority_mutation() -> void:
 	_expect_eq(overlay.formal_shop_draft_instance_id(), 0, "SHOP snapshot opens no ShopDraft before crown F")
 	_expect_eq(shop.wishing_crown.position, (shop.get_node("WishingCrownSpawn") as Marker2D).position, "crown consumes the authored shop marker")
 	_expect_near(shop.wishing_crown.position.y + 1.0, 585.0, 1.0, "crown visible bottom sits on the center pedestal")
-	_expect_eq(shop.exit_portal.sprite.texture.resource_path, "res://assets/world/interactables/run_route_portal/portal_active_v2.png", "shop exit uses the formal active portal image")
-	_expect_near(shop.exit_portal.position.y + 87.0, 640.0, 1.0, "shop exit portal is grounded within one world pixel")
+	_expect(shop.exit_transition.sprite == null and shop.exit_transition.interaction_region == shop.exit_transition_zone, "shop exit is a no-art room-local transition rectangle")
 
 	var commands: Array[StringName] = []
 	coordinator.ui_command_result.connect(func(command: StringName, _result: RunCommandResult) -> void: commands.append(command))
@@ -200,7 +191,7 @@ func _test_shop_crown_opens_existing_ui_without_authority_mutation() -> void:
 		close_button = overlay.formal_control(&"close_shop_panel") as Button
 		close_button.pressed.emit()
 	await process_frame
-	coordinator.player.global_position = shop.exit_portal.global_position
+	coordinator.player.global_position = shop.to_global(shop.exit_transition_zone.get_center())
 	await _press_interact_input()
 	_expect(await _wait_combat(coordinator, &"combat_04_validation"), "active world exit still uses the existing leave-shop transaction")
 	coordinator.queue_free()
@@ -289,7 +280,7 @@ func _finish_normal_room(coordinator: RunFlowCoordinator, wait_after_portal: boo
 	coordinator.player.global_position = room.chest.global_position
 	coordinator.player.interact_requested.emit()
 	await process_frame
-	coordinator.player.global_position = room.portal.global_position
+	coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	coordinator.player.interact_requested.emit()
 	if wait_after_portal:
 		await process_frame
@@ -399,7 +390,7 @@ func _runtime_old_asset_references(path: String) -> Array[String]:
 			hits.append_array(_runtime_old_asset_references(child))
 		elif entry.get_extension() in ["gd", "tscn", "tres", "res", "gdshader"]:
 			var text := FileAccess.get_file_as_string(child)
-			if text.contains(OLD_CHEST_ROOT) or text.contains(OLD_PORTAL_ROOT):
+			if text.contains(OLD_CHEST_ROOT):
 				hits.append(child)
 		entry = directory.get_next()
 	directory.list_dir_end()

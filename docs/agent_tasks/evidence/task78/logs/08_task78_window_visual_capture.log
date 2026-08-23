@@ -1,0 +1,8 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 591.74 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 2060
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+CAPTURED: res://docs/agent_tasks/evidence/task78/screenshots/task78_01_three_forms_all_actions_1920x1080.png
+CAPTURED: res://docs/agent_tasks/evidence/task78/screenshots/task78_02_passives_enemy_and_boss_1920x1080.png
+CAPTURED: res://docs/agent_tasks/evidence/task78/screenshots/task78_03_melee_warning_and_prompt_states_1920x1080.png
+Task78 visual capture: 3 images, 0 failures

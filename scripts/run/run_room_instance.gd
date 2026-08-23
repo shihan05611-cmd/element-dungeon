@@ -4,11 +4,12 @@ extends Node2D
 signal room_cleared(room_id: StringName, room_instance_id: int)
 
 const CHEST_SCENE: PackedScene = preload("res://scenes/run/interactables/run_reward_chest.tscn")
-const PORTAL_SCENE: PackedScene = preload("res://scenes/run/interactables/run_route_portal.tscn")
+const TRANSITION_ZONE_SCENE: PackedScene = preload("res://scenes/run/interactables/run_transition_zone.tscn")
 const CHEST_OPEN_TEXTURE: Texture2D = preload("res://assets/world/interactables/run_reward_chest/chest_open_v2.png")
 
 @export var template_id: StringName = &""
 @export var template_display_name: String = ""
+@export var route_transition_zone: Rect2 = Rect2()
 
 var room_id: StringName:
 	get:
@@ -42,9 +43,9 @@ var chest: RunWorldInteractable:
 	get:
 		return _chest
 
-var portal: RunWorldInteractable:
+var route_transition: RunWorldInteractable:
 	get:
-		return _portal
+		return _route_transition
 
 var configured: bool:
 	get:
@@ -68,7 +69,7 @@ var _clear_emitted: bool = false
 var _reinforcement_activated: bool = false
 var _active_elapsed: float = 0.0
 var _chest: RunWorldInteractable
-var _portal: RunWorldInteractable
+var _route_transition: RunWorldInteractable
 
 
 func configure(definition: CombatRoomDefinition) -> bool:
@@ -157,8 +158,8 @@ func all_enemies_defeated() -> bool:
 func interaction_target_at(player_position: Vector2) -> RunWorldInteractable:
 	if _chest != null and _chest.can_interact(player_position):
 		return _chest
-	if _portal != null and _portal.can_interact(player_position):
-		return _portal
+	if _route_transition != null and _route_transition.can_interact(player_position):
+		return _route_transition
 	return null
 
 
@@ -166,8 +167,8 @@ func apply_chest_reward(reward_copy: String) -> void:
 	if _chest == null or _chest.consumed:
 		return
 	_chest.open_chest(CHEST_OPEN_TEXTURE, reward_copy)
-	if _portal != null:
-		_portal.set_locked(false)
+	if _route_transition != null:
+		_route_transition.set_locked(false)
 
 
 func open_settlement_chest() -> void:
@@ -233,20 +234,19 @@ func _create_interactables() -> void:
 	_chest.set_enabled(false)
 	container.add_child(_chest)
 	if not _definition.final_boss:
-		_portal = PORTAL_SCENE.instantiate() as RunWorldInteractable
-		_portal.position = (get_node("RoutePortalSpawn") as Marker2D).position
-		_portal.visible = false
-		_portal.set_enabled(false)
-		container.add_child(_portal)
+		_route_transition = TRANSITION_ZONE_SCENE.instantiate() as RunWorldInteractable
+		_route_transition.set_interaction_region(route_transition_zone)
+		_route_transition.visible = false
+		_route_transition.set_enabled(false)
+		container.add_child(_route_transition)
 
 
 func _validate_authored_markers(definition: CombatRoomDefinition) -> bool:
 	var chest_marker := get_node_or_null("RewardChestSpawn") as Marker2D
 	if chest_marker == null:
 		return _fail(&"room_template_missing_reward_chest_spawn")
-	var portal_marker := get_node_or_null("RoutePortalSpawn") as Marker2D
-	if not definition.final_boss and portal_marker == null:
-		return _fail(&"room_template_missing_route_portal_spawn")
+	if not definition.final_boss and (route_transition_zone.size.x <= 0.0 or route_transition_zone.size.y <= 0.0):
+		return _fail(&"room_template_missing_route_transition_zone")
 	for index: int in definition.enemy_spawns.size():
 		if _spawn_marker("InitialEnemySpawns", index) == null:
 			return _fail(&"room_template_missing_initial_enemy_spawn")
@@ -267,10 +267,10 @@ func _reveal_clear_interactables() -> void:
 	if _definition.final_boss:
 		_chest.prompt_text = "开启结算宝箱"
 		_chest.call("_refresh_prompt")
-	elif _portal != null:
-		_portal.visible = true
-		_portal.set_enabled(true)
-		_portal.set_locked(true, "先开启宝箱")
+	elif _route_transition != null:
+		_route_transition.visible = true
+		_route_transition.set_enabled(true)
+		_route_transition.set_locked(true, "先开启宝箱")
 
 
 func _fail(detail: StringName) -> bool:

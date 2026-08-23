@@ -188,6 +188,8 @@ func clear_buffered_element_request() -> void:
 
 func on_owner_died() -> void:
 	clear_buffered_element_request()
+	if _executor != null:
+		_executor.clear_temporary_execution_states(&"death")
 	if _runtime_loadout != null:
 		_runtime_loadout.on_owner_died()
 
@@ -200,12 +202,16 @@ func on_owner_respawned() -> void:
 
 func on_floor_changed() -> void:
 	clear_buffered_element_request()
+	if _executor != null:
+		_executor.clear_temporary_execution_states(&"room_changed")
 	if _runtime_loadout != null:
 		_runtime_loadout.on_floor_changed()
 
 
 func on_run_reloaded() -> void:
 	clear_buffered_element_request()
+	if _executor != null:
+		_executor.clear_temporary_execution_states(&"run_reloaded")
 	if _runtime_loadout != null:
 		_runtime_loadout.on_run_reloaded()
 	if _current_element_controller != null:

@@ -345,7 +345,10 @@ func _replace_element_amount(element_id: StringName, amount: int, before: Elemen
 
 
 func _animation_name(pose: StringName) -> StringName:
-	if pose == &"hurt" or pose == &"death":
+	# The legacy hurt/death sheets are authored in the neutral/plain palette.
+	# Elemental forms have dedicated reaction clips; only a genuinely plain
+	# form may select the neutral aliases.
+	if current_form_id == &"plain" and (pose == &"hurt" or pose == &"death"):
 		return pose
 	return StringName("%s_%s" % [current_form_id, pose])
 
@@ -687,6 +690,8 @@ func _on_poise_hit() -> void:
 	var stun_before := poise_stun_time
 	super()
 	if poise_stun_time > stun_before:
+		_play_pose(&"hurt")
+		_clear_active_deliveries()
 		_cancel_pending_summon(true)
 
 

@@ -64,7 +64,9 @@ func _run() -> void:
 	var purchase_two := coordinator.purchase_first_affordable_skill()
 	_expect(purchase_two.accepted, "single shop completes an authoritative purchase")
 	_expect(await _wait_until(func() -> bool: return coordinator.active_shop_room != null, 360), "single physical shop room becomes active")
-	coordinator.player.global_position = coordinator.active_shop_room.exit_portal.global_position
+	coordinator.player.global_position = coordinator.active_shop_room.to_global(
+		coordinator.active_shop_room.exit_transition_zone.get_center()
+	)
 	coordinator.player.interact_requested.emit()
 	_expect(await _wait_for_room(coordinator, &"combat_04_validation"), "middle shop loads combat four")
 	_record_room(coordinator, scene_paths, room_instances)
@@ -121,8 +123,8 @@ func _finish_current_room(coordinator: RunFlowCoordinator) -> void:
 	await process_frame
 	if room.room_definition.final_boss:
 		return
-	_expect(room.chest.consumed and not room.portal.locked, "typed chest result unlocks the physical portal")
-	coordinator.player.global_position = room.portal.global_position
+	_expect(room.chest.consumed and not room.route_transition.locked, "typed chest result unlocks the physical route transition zone")
+	coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	coordinator.player.interact_requested.emit()
 	await process_frame
 

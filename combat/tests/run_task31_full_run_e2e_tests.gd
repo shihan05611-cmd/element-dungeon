@@ -374,11 +374,11 @@ func _defeat_current_room() -> void:
 	_expect(chest.consumed, "the nearby player opens the room chest once")
 	if room.room_id == &"combat_06_final_boss":
 		return
-	var portal: RunWorldInteractable = room.portal
-	_expect(portal != null and portal.enabled and not portal.locked, "opened chest unlocks the room exit portal")
-	if portal == null:
+	var transition: RunWorldInteractable = room.route_transition
+	_expect(transition != null and transition.enabled and not transition.locked, "opened chest unlocks the room exit transition zone")
+	if transition == null:
 		return
-	_coordinator.player.global_position = portal.global_position
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	_coordinator.player.interact_requested.emit()
 	await process_frame
 
@@ -415,8 +415,8 @@ func _room_enemy_dust(room: RunRoomInstance) -> int:
 
 func _leave_physical_shop() -> void:
 	var shop_room := _coordinator.active_shop_room
-	_expect(shop_room != null and shop_room.exit_portal != null, "single shop exposes one physical exit portal")
-	if shop_room == null or shop_room.exit_portal == null:
+	_expect(shop_room != null and shop_room.exit_transition != null, "single shop exposes one physical exit transition zone")
+	if shop_room == null or shop_room.exit_transition == null:
 		return
 	var authority_before := _authority_signature(_coordinator.current_snapshot())
 	var start_position := _coordinator.player.global_position
@@ -429,16 +429,16 @@ func _leave_physical_shop() -> void:
 	_expect(not _overlay.visible, "L toggle closes the formal shop panel before world traversal")
 	_expect_eq(_authority_signature(_coordinator.current_snapshot()), authority_before, "closing the shop panel mutates no authority")
 	Input.action_press(&"move_right")
-	var reached_portal := false
+	var reached_exit_zone := false
 	for _frame: int in 360:
 		await physics_frame
-		if shop_room.exit_portal.can_interact(_coordinator.player.global_position):
-			reached_portal = true
+		if shop_room.exit_transition.can_interact(_coordinator.player.global_position):
+			reached_exit_zone = true
 			break
 	Input.action_release(&"move_right")
-	_expect(reached_portal, "real move_right physics reaches the shop exit interaction range")
+	_expect(reached_exit_zone, "real move_right physics reaches the shop exit interaction zone")
 	_expect(_coordinator.player.global_position.x > start_position.x + 300.0, "shop traversal records substantial physical player displacement")
-	_expect(not _overlay.visible and shop_room.visible and shop_room.exit_portal.prompt.visible, "world shop and F prompt remain visible at the portal")
+	_expect(not _overlay.visible and shop_room.visible and shop_room.exit_transition.prompt.visible, "world shop and F prompt remain visible at the exit zone")
 	await _press_interact_input()
 	await process_frame
 

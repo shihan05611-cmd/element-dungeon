@@ -96,13 +96,13 @@ func _run() -> void:
 
 func _test_formal_catalog_shape() -> void:
 	_expect(CATALOG != null and CATALOG.validation_error().is_empty(), "formal catalog validates")
-	_expect(CATALOG.gameplay_definitions().size() == 10, "catalog registers nine obtainable skills plus basic attack")
-	_expect(CATALOG.obtainable_contents().size() == 9, "catalog exposes nine obtainable contents")
+	_expect(CATALOG.gameplay_definitions().size() == 11, "catalog registers ignition beside the prior obtainable skills and basic attack")
+	_expect(CATALOG.obtainable_contents().size() == 10, "catalog exposes the ignition demo content without adding a reward")
 	_expect(CATALOG.reward_definitions().size() == 5, "catalog projects five chest rewards")
-	_expect(CATALOG.initial_owned_skill_ids() == [&"element_bolt"], "element bolt is the only initial owned skill")
+	_expect(CATALOG.initial_owned_skill_ids() == [&"element_bolt", &"ignition"], "element bolt and ignition are initially owned")
 	var initial := CATALOG.default_loadout_snapshot()
 	_expect(initial.get_skill_id(SkillSlotIds.ACTIVE_1) == &"element_bolt", "element bolt defaults to active one")
-	_expect(initial.get_skill_id(SkillSlotIds.ACTIVE_2).is_empty(), "active two defaults empty")
+	_expect(initial.get_skill_id(SkillSlotIds.ACTIVE_2) == &"ignition", "ignition defaults to active two")
 	_expect(initial.get_skill_id(SkillSlotIds.ACTIVE_3).is_empty(), "active three defaults empty")
 	_expect(SkillSlotIds.passive().all(func(slot_id: StringName) -> bool:
 		return initial.get_skill_id(slot_id).is_empty()
@@ -152,6 +152,8 @@ func _test_formal_catalog_shape() -> void:
 			_expect(content.icon != null and content.presentation_scene == null, "element bolt uses its stable icon and existing projectile presentation")
 		elif content.skill_id in [&"passive_vitality", &"passive_energy", &"passive_reaction_energy"]:
 			_expect(content.icon != null and content.presentation_scene == null, "stat passive uses an icon without fake world presentation: %s" % String(content.skill_id))
+		elif content.skill_id == &"ignition":
+			_expect(content.icon == null and content.presentation_scene == null and content.runtime_delivery_scene == null, "ignition reuses existing presentation without adding an icon or delivery")
 		else:
 			_expect(content.icon != null and content.presentation_scene != null, "approved task-17 presentation fields are connected: %s" % String(content.skill_id))
 
@@ -284,7 +286,8 @@ func _test_five_skill_growth_loadout_loop() -> void:
 func _test_formal_host_projection() -> void:
 	_expect(_host.content_catalog == CATALOG, "formal host consumes the single catalog resource")
 	_expect(_host.runtime_loadout.snapshot().get_skill_id(SkillSlotIds.ACTIVE_1) == &"element_bolt", "formal host applies catalog default loadout")
-	_expect(_host.run_session.snapshot().skills.owned_skill_ids == [&"element_bolt"], "formal host projects catalog initial ownership")
+	var owned := _host.run_session.snapshot().skills.owned_skill_ids
+	_expect(owned.has(&"element_bolt") and owned.has(&"ignition"), "formal host projects catalog initial ownership: %s" % str(owned))
 	_expect(_host.content_catalog.fixed_basic_attack_definition().skill_id == &"element_slash", "player basic attack comes from catalog")
 	_expect(_host.runtime_loadout.get_skill(&"element_slash") == null, "fixed basic attack cannot enter shared runtime slots")
 

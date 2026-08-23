@@ -102,7 +102,7 @@ func _test_authored_markers_and_collision_geometry() -> void:
 		var definition: CombatRoomDefinition = spec["definition"]
 		_expect(room.configure(definition), "%s configures only from authored markers" % room.name)
 		_assert_spawn_marker_consumption(room)
-		_assert_interactable_marker_consumption(room)
+		_assert_interactable_configuration(room)
 		_assert_spawn_supports(room, float(spec["ground"]), spec["platforms"].values(), false)
 		room.queue_free()
 		await process_frame
@@ -112,7 +112,7 @@ func _test_authored_markers_and_collision_geometry() -> void:
 	_assert_background(shop, "res://assets/world/rooms/tidal_dungeon/full_rooms/tidal_shop_room_full_v1.png", "Shop Room")
 	_assert_world_bounds(shop, 639.0, "Shop Room")
 	_expect_eq(shop.player_spawn_global_position(), (shop.get_node("PlayerSpawn") as Marker2D).global_position, "shop consumes PlayerSpawn marker")
-	_expect_eq(shop.exit_portal.position, (shop.get_node("ExitPortalSpawn") as Marker2D).position, "shop exit portal matches its authored marker")
+	_expect(shop.exit_transition != null and shop.exit_transition.interaction_region == shop.exit_transition_zone, "shop exit uses its configured room-local rectangle")
 	shop.queue_free()
 	await process_frame
 
@@ -141,7 +141,7 @@ func _test_boss_has_only_main_ground_and_keeps_projectiles() -> void:
 	_expect_eq(_one_way_shape_count(room), 0, "Boss Room has no hidden or transparent one-way platform")
 	_expect(room.configure(definition), "Boss Room configures from the main-ground marker")
 	_assert_spawn_marker_consumption(room)
-	_assert_interactable_marker_consumption(room)
+	_assert_interactable_configuration(room)
 	_assert_spawn_supports(room, 692.0, [], true)
 	room.activate()
 	var player := PLAYER_SCENE.instantiate() as PlayerCharacter
@@ -194,7 +194,7 @@ func _test_formal_five_stage_roomcontainer_transaction() -> void:
 	_assert_persistent_ids(coordinator, persistent_ids, "Shop")
 	_assert_roomcontainer_singleton(coordinator, "Shop")
 	var shop := coordinator.active_shop_room
-	coordinator.player.global_position = shop.exit_portal.global_position
+	coordinator.player.global_position = shop.to_global(shop.exit_transition_zone.get_center())
 	coordinator.player.interact_requested.emit()
 
 	_expect(await _wait_combat(coordinator, &"combat_04_validation"), "Shop exits to formal combat three")
@@ -278,10 +278,10 @@ func _assert_spawn_marker_consumption(room: RunRoomInstance) -> void:
 		_expect_eq(room.reinforcement_enemies[index].position, marker.position, "%s reinforcement %d consumes its marker" % [room.name, index + 1])
 
 
-func _assert_interactable_marker_consumption(room: RunRoomInstance) -> void:
+func _assert_interactable_configuration(room: RunRoomInstance) -> void:
 	_expect_eq(room.chest.position, (room.get_node("RewardChestSpawn") as Marker2D).position, "%s chest consumes RewardChestSpawn" % room.name)
 	if not room.room_definition.final_boss:
-		_expect_eq(room.portal.position, (room.get_node("RoutePortalSpawn") as Marker2D).position, "%s portal consumes RoutePortalSpawn" % room.name)
+		_expect(room.route_transition != null and room.route_transition.interaction_region == room.route_transition_zone, "%s route transition uses its configured room-local rectangle" % room.name)
 
 
 func _assert_spawn_supports(room: RunRoomInstance, ground_top: float, platform_tops: Array, final_boss: bool) -> void:
@@ -298,8 +298,9 @@ func _assert_spawn_supports(room: RunRoomInstance, ground_top: float, platform_t
 		_expect(supported, "%s enemy %s starts on an authored support" % [room.name, enemy.name])
 	var chest_support := ground_top - 39.0
 	_expect_near(room.chest.position.y, chest_support, 2.0, "%s chest marker is grounded" % room.name)
-	if room.portal != null:
-		_expect_near(room.portal.position.y, ground_top - 86.0, 2.0, "%s portal marker is grounded" % room.name)
+	if room.route_transition != null:
+		_expect(room.route_transition_zone.position.x >= 0.0 and room.route_transition_zone.end.x <= ROOM_WIDTH, "%s route transition rectangle stays inside room bounds" % room.name)
+		_expect(room.route_transition_zone.position.y >= 0.0 and room.route_transition_zone.position.y < ground_top, "%s route transition rectangle starts in the walkable lower room area" % room.name)
 
 
 func _run_platform_legs(scene: PackedScene, ground_top: float, legs: Array[Dictionary], label: String) -> void:
@@ -349,8 +350,9 @@ func _finish_normal_room(coordinator: RunFlowCoordinator) -> void:
 	_expect(room.room_is_cleared, "%s clears through its unchanged authority" % String(room.room_id))
 	_interact_at(coordinator, room.chest)
 	await process_frame
-	_expect(room.chest.consumed and room.portal != null and not room.portal.locked, "%s chest unlocks its marker-backed portal" % String(room.room_id))
-	_interact_at(coordinator, room.portal)
+	_expect(room.chest.consumed and room.route_transition != null and not room.route_transition.locked, "%s chest unlocks its room-local route transition zone" % String(room.room_id))
+	coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
+	coordinator.player.interact_requested.emit()
 
 
 func _defeat_batch(enemies: Array[CombatEnemy]) -> void:

@@ -75,7 +75,7 @@ func _test_formal_four_slot_hud_and_icons() -> void:
 	_expect(icon.texture != null and icon.texture.resource_path == CATALOG.content_for(&"element_bolt").icon.resource_path, "HUD consumes catalog element bolt icon")
 	_expect((active_one.get_node("Margin/Box/Top/Key") as Control).visible, "equipped active skill shows keycap")
 	_expect(not (_hud.slot_panel(SkillSlotIds.PASSIVE_1).get_node("Margin/Box/Top/Key") as Control).visible, "PASSIVE_1 never shows a cast keycap")
-	_expect((_hud.get_node("Root/StatusPanel/Margin/Status/TitleRow/ElementBadge/BadgeMargin/BadgeRow/ElementText") as Label).text.contains("水滴"), "current element includes shape word")
+	_expect(_hud.get_node_or_null("Root/StatusPanel/Margin/Status/TitleRow") == null and _hud.get_node_or_null("Root/StatusPanel/Margin/Status/CurrentElement") == null, "status panel removes legacy title and element nodes")
 	_expect((_hud.get_node("Root/TargetPanel/Margin/Box/Water") as Label).text.contains("水滴") and (_hud.get_node("Root/TargetPanel/Margin/Box/Fire") as Label).text.contains("火焰"), "target layers use shape and text")
 
 

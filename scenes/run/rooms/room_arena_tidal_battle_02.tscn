@@ -22,6 +22,7 @@ size = Vector2(200, 16)
 script = ExtResource("1_room")
 template_id = &"arena_tidal_battle_02"
 template_display_name = "潮汐断阶"
+route_transition_zone = Rect2(1240, 520, 240, 180)
 
 [node name="DarkBacking" type="Polygon2D" parent="." unique_id=7739407]
 z_index = -2
@@ -109,8 +110,5 @@ position = Vector2(1000, 588)
 
 [node name="RewardChestSpawn" type="Marker2D" parent="." unique_id=2110629443]
 position = Vector2(760, 595)
-
-[node name="RoutePortalSpawn" type="Marker2D" parent="." unique_id=486395820]
-position = Vector2(1400, 548)
 
 [node name="EnemyContainer" type="Node2D" parent="." unique_id=835403612]

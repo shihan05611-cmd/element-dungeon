@@ -4,6 +4,7 @@ extends CharacterBody2D
 signal delivery_created(delivery: Node)
 signal player_defeated
 signal basic_attack_committed(event: BasicAttackCommittedEvent)
+signal ignition_reclaimed(event: ReclaimVfxEvent)
 signal interact_requested
 
 const SPEED := 235.0
@@ -24,11 +25,18 @@ const GLOBAL_INSTAKILL_SKILL_ID: StringName = &"global_instakill"
 const ELEMENT_BEAM_DELIVERY_SCRIPT := preload(
 	"res://combat/delivery/element_beam_delivery.gd"
 )
+const BASIC_ATTACK_AIRFLOW_TEXTURES := {
+	&"attack": preload("res://assets/characters/cat/cat_attack_airflow.png"),
+	&"water_attack": preload("res://assets/characters/cat/cat_water_attack_airflow.png"),
+	&"fire_attack": preload("res://assets/characters/cat/cat_fire_attack_airflow.png"),
+}
+const BASIC_ATTACK_FRAME_SIZE := Vector2(80.0, 64.0)
 
 @export var attack_multiplier: float = 1.0
 @export var flat_damage_bonus: float = 0.0
 @export var water_definition: ElementDefinition
 @export var fire_definition: ElementDefinition
+@export var basic_attack_airflow_enabled: bool = true
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var damage_receiver: DamageReceiver = $DamageReceiver
@@ -39,6 +47,7 @@ const ELEMENT_BEAM_DELIVERY_SCRIPT := preload(
 @onready var skill_controller: SkillController = $SkillController
 @onready var body_collision: CollisionShape2D = $BodyCollision
 @onready var combat_hurtbox: Area2D = $CombatHurtbox
+@onready var basic_attack_airflow: Sprite2D = $BasicAttackAirflow
 
 var facing: float = 1.0
 var hurt_time: float = 0.0
@@ -54,6 +63,8 @@ var _basic_attack_definition: SkillDefinition
 var _active_beam_ref: WeakRef
 var _active_beam_snapshot: ChannelExecutionSnapshot
 var _skill_level_effect_adapter: RunSkillLevelEffectAdapter
+var _ignition_state: IgnitionState
+var _basic_attack_airflow_base_scale := Vector2.ONE
 var _dodging: bool = false
 var _dodge_elapsed: float = 0.0
 var _dodge_cooldown_remaining: float = 0.0
@@ -76,6 +87,10 @@ static var _last_global_instakill_cast_id: int = 3_000_000_000
 
 func _ready() -> void:
 	add_to_group(&"player")
+	_ignition_state = IgnitionState.new()
+	_ignition_state.name = &"IgnitionState"
+	add_child(_ignition_state)
+	_ignition_state.cleared.connect(_on_ignition_state_cleared)
 	combat_receiver.configure_components(null, damage_receiver)
 	var delivery_parent: Node = get_tree().current_scene
 	if delivery_parent == null:
@@ -102,6 +117,12 @@ func _ready() -> void:
 	_apply_element_presentation(current_element_controller.current_element_id, false)
 	_update_energy_regeneration_pause()
 	sprite.play(_idle_animation_name())
+	_basic_attack_airflow_base_scale = basic_attack_airflow.scale
+	_sync_basic_attack_airflow()
+
+
+func _process(_delta: float) -> void:
+	_sync_basic_attack_airflow()
 
 
 func _notification(what: int) -> void:
@@ -206,14 +227,45 @@ func try_basic_attack() -> CastAttemptResult:
 			&"",
 			&"missing_basic_attack_catalog_entry"
 		)
-	var attempt := skill_executor.try_cast(_basic_attack_definition)
+	var basic_attack := _ignition_basic_attack_definition() if ignition_active() else _basic_attack_definition
+	var attempt := skill_executor.try_cast(basic_attack)
 	if attempt.accepted:
-		sprite.play(_element_animation_name(
-			&"attack",
-			&"water_attack",
-			&"fire_attack",
-		))
+		var animation := &"fire_attack" if ignition_active() else _element_animation_name(&"attack", &"water_attack", &"fire_attack")
+		sprite.play(animation)
+		_sync_basic_attack_airflow()
 	return attempt
+
+
+## The attack wind current is authored as a separate texture/node so VFX or
+## accessibility code can suppress it without changing the character clip or
+## any authoritative basic-attack timing. By default this mirrors the body
+## frame, facing and tint exactly, reproducing the former combined sheet.
+func set_basic_attack_airflow_enabled(enabled: bool) -> void:
+	basic_attack_airflow_enabled = enabled
+	_sync_basic_attack_airflow()
+
+
+func _sync_basic_attack_airflow() -> void:
+	if basic_attack_airflow == null or sprite == null:
+		return
+	var texture: Texture2D = BASIC_ATTACK_AIRFLOW_TEXTURES.get(sprite.animation)
+	var ignition_attack_airflow := sprite.animation == &"fire_attack" and ignition_active()
+	basic_attack_airflow.scale = _basic_attack_airflow_base_scale * (1.5 if ignition_attack_airflow else 1.0)
+	basic_attack_airflow.modulate = (
+		Color("ff7a20")
+		if ignition_attack_airflow
+		else sprite.modulate
+	)
+	var should_show := basic_attack_airflow_enabled and texture != null and sprite.visible
+	basic_attack_airflow.visible = should_show
+	if not should_show:
+		return
+	basic_attack_airflow.texture = texture
+	basic_attack_airflow.region_rect = Rect2(
+		Vector2(float(sprite.frame) * BASIC_ATTACK_FRAME_SIZE.x, 0.0),
+		BASIC_ATTACK_FRAME_SIZE
+	)
+	basic_attack_airflow.flip_h = sprite.flip_h
 
 
 func configure_run_runtime(
@@ -237,6 +289,13 @@ func configure_run_runtime(
 		256
 	)
 	var services := SkillExecutionServices.new(reclaim_port)
+	services.set_ignition_port(RangeIgnitionPort.new(
+		self,
+		_ignition_state,
+		8,
+		256,
+		Callable(self, "_on_ignition_reclaimed")
+	))
 	services.set_projectile_sweep_query_port(PhysicsProjectileSweepQuery2D.new())
 	services.set_skill_delivery_prepare_port(CombatSkillDeliveryAdapter.new(self, content_catalog))
 	services.set_projectile_source(self)
@@ -440,13 +499,54 @@ func _can_change_element() -> bool:
 
 
 func _capture_attack_stats(_skill: SkillDefinition) -> CombatStatSnapshot:
-	return CombatStatSnapshot.new(attack_multiplier, flat_damage_bonus)
+	var multiplier := attack_multiplier
+	if _skill != null and _basic_attack_definition != null and _skill.skill_id == _basic_attack_definition.skill_id and ignition_active():
+		multiplier *= _ignition_state.multiplier
+	return CombatStatSnapshot.new(multiplier, flat_damage_bonus)
+
+
+func ignition_active() -> bool:
+	return _ignition_state != null and _ignition_state.active
+
+
+func ignition_multiplier() -> float:
+	return _ignition_state.multiplier if _ignition_state != null else 1.0
+
+
+func _ignition_basic_attack_definition() -> SkillDefinition:
+	var copy := _basic_attack_definition.duplicate(true) as SkillDefinition
+	assert(copy != null)
+	copy.element_policy = SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT
+	copy.required_element_id = ElementIds.FIRE
+	var execution := copy.execution_definition as InstantDeliveryExecution
+	assert(execution != null)
+	var payload := execution.payload
+	assert(payload != null)
+	payload.element_mode = AttackPayloadDefinition.ElementMode.FIXED_ELEMENT
+	payload.fixed_element_id = ElementIds.FIRE
+	payload.element_amount = 1
+	payload.melee_query_multiplier = 1.5
+	return copy
+
+
+func _on_ignition_reclaimed(event: ReclaimVfxEvent) -> void:
+	if event != null and event.is_valid():
+		ignition_reclaimed.emit(event)
+
+
+func _on_ignition_state_cleared(_reason: StringName) -> void:
+	_sync_basic_attack_airflow()
 
 
 func _capture_spawn_snapshot(_skill: SkillDefinition) -> DeliverySpawnSnapshot:
 	var direction := Vector2.RIGHT if facing >= 0.0 else Vector2.LEFT
 	var spawn_transform := global_transform
-	spawn_transform.origin = global_position + Vector2(30.0 * direction.x, -2.0)
+	var spawn_distance := 30.0
+	if _skill != null and _basic_attack_definition != null and _skill.skill_id == _basic_attack_definition.skill_id:
+		var execution := _skill.execution_definition as InstantDeliveryExecution
+		if execution != null and execution.payload != null:
+			spawn_distance *= execution.payload.melee_query_multiplier
+	spawn_transform.origin = global_position + Vector2(spawn_distance * direction.x, -2.0)
 	return DeliverySpawnSnapshot.new(spawn_transform, direction)
 
 

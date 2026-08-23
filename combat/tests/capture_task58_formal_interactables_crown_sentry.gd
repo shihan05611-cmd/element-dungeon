@@ -27,30 +27,30 @@ func _run() -> void:
 	await _clear_active_room()
 	var room := _coordinator.active_room
 	_assert(room.chest.visible and not room.chest.consumed, "closed chest is visible after clear")
-	_assert(room.portal.visible and room.portal.locked, "locked portal is visible before chest claim")
+	_assert(room.route_transition.visible and room.route_transition.locked, "locked route transition zone is visible before chest claim")
 	_assert(room.chest.sprite.texture.resource_path.ends_with("chest_closed_v2.png"), "closed screenshot uses formal closed v2")
-	_assert(room.portal.sprite.texture.resource_path.ends_with("portal_locked_v2.png"), "locked screenshot uses formal locked v2")
+	_assert(room.route_transition.sprite == null, "locked route transition zone has no portal art")
 	await create_timer(1.2).timeout
 	_coordinator.player.global_position = room.chest.global_position + Vector2(-92, 0)
 	await _settle()
 	await _save("task58_01_closed_chest_1920x1080.png")
-	_coordinator.player.global_position = room.portal.global_position + Vector2(-96, 0)
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	await create_timer(0.75).timeout
 	await _settle()
-	await _save("task58_02_locked_portal_1920x1080.png")
+	await _save("task58_02_locked_transition_zone_1920x1080.png")
 
 	_interact_at(room.chest)
 	await process_frame
 	_assert(room.chest.consumed and room.chest.sprite.texture.resource_path.ends_with("chest_open_v2.png"), "open screenshot uses formal open v2")
-	_assert(not room.portal.locked and room.portal.sprite.texture.resource_path.ends_with("portal_active_v2.png"), "active screenshot uses formal active v2")
+	_assert(not room.route_transition.locked and room.route_transition.sprite == null, "unlocked route transition zone remains art-free")
 	_coordinator.player.global_position = room.chest.global_position + Vector2(-92, 0)
 	await _settle()
 	await _save("task58_03_open_chest_1920x1080.png")
-	_coordinator.player.global_position = room.portal.global_position + Vector2(-96, 0)
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	await create_timer(0.75).timeout
 	await _settle()
-	await _save("task58_04_active_portal_1920x1080.png")
-	_interact_at(room.portal)
+	await _save("task58_04_unlocked_transition_zone_1920x1080.png")
+	_interact_at(room.route_transition)
 
 	_assert(await _wait_combat(&"combat_02_swarm"), "capture reaches Battle02")
 	room = _coordinator.active_room
@@ -126,8 +126,8 @@ func _finish_active_room() -> void:
 	var room := _coordinator.active_room
 	_interact_at(room.chest)
 	await process_frame
-	_assert(room.chest.consumed and room.portal != null and not room.portal.locked, "%s formal chest unlocks portal" % String(room.room_id))
-	_interact_at(room.portal)
+	_assert(room.chest.consumed and room.route_transition != null and not room.route_transition.locked, "%s formal chest unlocks route transition zone" % String(room.room_id))
+	_interact_at(room.route_transition)
 
 
 func _defeat_batch(enemies: Array[CombatEnemy]) -> void:
@@ -142,7 +142,8 @@ func _defeat_batch(enemies: Array[CombatEnemy]) -> void:
 
 
 func _interact_at(target: RunWorldInteractable) -> void:
-	_coordinator.player.global_position = target.global_position
+	var room := _coordinator.active_room
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center()) if room != null and target == room.route_transition else target.global_position
 	_coordinator.player.interact_requested.emit()
 
 

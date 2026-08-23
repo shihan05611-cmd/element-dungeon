@@ -178,8 +178,8 @@ func _clear_claim_and_exit(coordinator: RunFlowCoordinator) -> void:
 	coordinator.player.global_position = room.chest.global_position
 	coordinator.player.interact_requested.emit()
 	await process_frame
-	_assert(room.chest.consumed and room.portal != null and not room.portal.locked, "%s chest unlocks its world portal" % String(room.room_id))
-	coordinator.player.global_position = room.portal.global_position
+	_assert(room.chest.consumed and room.route_transition != null and not room.route_transition.locked, "%s chest unlocks its world route transition zone" % String(room.room_id))
+	coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	coordinator.player.interact_requested.emit()
 	await process_frame
 

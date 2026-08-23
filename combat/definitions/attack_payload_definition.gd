@@ -14,6 +14,7 @@ enum ElementMode {
 @export var element_mode: ElementMode = ElementMode.NONE
 @export var fixed_element_id: StringName = ElementIds.NONE
 @export_range(0, 10, 1) var element_amount: int = 0
+@export_range(1.0, 10.0, 0.001, "or_greater") var melee_query_multiplier: float = 1.0
 @export var presentation_tags: PackedStringArray = PackedStringArray()
 
 
@@ -22,6 +23,8 @@ func validation_error() -> StringName:
 		return &"invalid_damage_multiplier"
 	if element_amount < 0 or element_amount > 10:
 		return &"invalid_element_amount"
+	if not is_finite(melee_query_multiplier) or melee_query_multiplier < 1.0:
+		return &"invalid_melee_query_multiplier"
 	match element_mode:
 		ElementMode.NONE:
 			if element_amount != 0:
@@ -70,5 +73,7 @@ func build_runtime(cast_snapshot: CastSnapshot) -> RuntimeAttackPayload:
 		offensive_damage,
 		resolved_element,
 		element_amount,
-		presentation_tags
+		presentation_tags,
+		&"",
+		melee_query_multiplier
 	)

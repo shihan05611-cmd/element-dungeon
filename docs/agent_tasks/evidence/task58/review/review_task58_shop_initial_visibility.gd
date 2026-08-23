@@ -54,7 +54,7 @@ func _finish_normal_room() -> void:
 	_coordinator.player.global_position = room.chest.global_position
 	_coordinator.player.interact_requested.emit()
 	await process_frame
-	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	_coordinator.player.interact_requested.emit()
 
 

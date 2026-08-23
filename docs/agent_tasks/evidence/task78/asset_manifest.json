@@ -1,0 +1,642 @@
+{
+  "boss": {
+    "boss_tide_idle_v2.png": {
+      "source": "boss_plain_idle_v2.png",
+      "source_sha256": "e391f0b8e86f99617eb078f1010c1147c166b500a045411be32a11902a1373db",
+      "sha256": "6387e7cf0307caf318522d1700d7aff5076364425548e4290d7c50f03eac8c45",
+      "size": [
+        1200,
+        200
+      ],
+      "frame_count": 6,
+      "frame_bboxes": [
+        [
+          44,
+          98,
+          125,
+          163
+        ],
+        [
+          44,
+          98,
+          129,
+          163
+        ],
+        [
+          44,
+          102,
+          129,
+          167
+        ],
+        [
+          44,
+          102,
+          125,
+          167
+        ],
+        [
+          44,
+          98,
+          125,
+          167
+        ],
+        [
+          40,
+          98,
+          125,
+          167
+        ]
+      ]
+    },
+    "boss_ember_idle_v2.png": {
+      "source": "boss_plain_idle_v2.png",
+      "source_sha256": "e391f0b8e86f99617eb078f1010c1147c166b500a045411be32a11902a1373db",
+      "sha256": "168d178be57fb2b115def043e972440a41d0b94d97adb173ece252e0f5d5f5fe",
+      "size": [
+        1200,
+        200
+      ],
+      "frame_count": 6,
+      "frame_bboxes": [
+        [
+          44,
+          94,
+          124,
+          158
+        ],
+        [
+          44,
+          98,
+          124,
+          158
+        ],
+        [
+          44,
+          102,
+          124,
+          162
+        ],
+        [
+          44,
+          98,
+          124,
+          162
+        ],
+        [
+          44,
+          94,
+          124,
+          162
+        ],
+        [
+          44,
+          90,
+          124,
+          162
+        ]
+      ]
+    },
+    "boss_tide_walk_v2.png": {
+      "source": "boss_plain_walk_v2.png",
+      "source_sha256": "3318366e5a96ee8ed664c26caea82f5a5f52e699f0d5d545c35b62cf38e30c62",
+      "sha256": "431652a81a686c5d2bb6b55b3af2026314e3848ac33ddb58ae4e9f51ba69fb34",
+      "size": [
+        1600,
+        200
+      ],
+      "frame_count": 8,
+      "frame_bboxes": [
+        [
+          44,
+          98,
+          125,
+          163
+        ],
+        [
+          44,
+          94,
+          129,
+          159
+        ],
+        [
+          44,
+          98,
+          129,
+          163
+        ],
+        [
+          44,
+          102,
+          125,
+          163
+        ],
+        [
+          44,
+          98,
+          125,
+          163
+        ],
+        [
+          40,
+          94,
+          125,
+          163
+        ],
+        [
+          40,
+          98,
+          125,
+          167
+        ],
+        [
+          44,
+          102,
+          125,
+          167
+        ]
+      ]
+    },
+    "boss_ember_walk_v2.png": {
+      "source": "boss_plain_walk_v2.png",
+      "source_sha256": "3318366e5a96ee8ed664c26caea82f5a5f52e699f0d5d545c35b62cf38e30c62",
+      "sha256": "f20c6082a94d17592ff650b9a6e0abe155d4428e95ec96ccb09b5ed59e410bc0",
+      "size": [
+        1600,
+        200
+      ],
+      "frame_count": 8,
+      "frame_bboxes": [
+        [
+          44,
+          94,
+          124,
+          158
+        ],
+        [
+          44,
+          94,
+          124,
+          154
+        ],
+        [
+          44,
+          98,
+          124,
+          158
+        ],
+        [
+          44,
+          98,
+          124,
+          158
+        ],
+        [
+          44,
+          94,
+          124,
+          158
+        ],
+        [
+          44,
+          86,
+          124,
+          158
+        ],
+        [
+          44,
+          90,
+          124,
+          162
+        ],
+        [
+          44,
+          98,
+          124,
+          162
+        ]
+      ]
+    },
+    "boss_tide_attack_v2.png": {
+      "source": "boss_plain_attack_v2.png",
+      "source_sha256": "9cd75fee98f1d6d95c3bd54ea8ee3ff1c136c3f5be9006f062b9e0baac6ecba2",
+      "sha256": "eb560ad813e9a015d88c709426bb3d885fe6f4094275e86613386648d4cea39b",
+      "size": [
+        1600,
+        200
+      ],
+      "frame_count": 8,
+      "frame_bboxes": [
+        [
+          44,
+          98,
+          125,
+          163
+        ],
+        [
+          44,
+          94,
+          133,
+          163
+        ],
+        [
+          44,
+          90,
+          133,
+          163
+        ],
+        [
+          44,
+          86,
+          125,
+          163
+        ],
+        [
+          36,
+          58,
+          161,
+          163
+        ],
+        [
+          32,
+          102,
+          153,
+          167
+        ],
+        [
+          32,
+          102,
+          141,
+          167
+        ],
+        [
+          36,
+          102,
+          129,
+          167
+        ]
+      ]
+    },
+    "boss_ember_attack_v2.png": {
+      "source": "boss_plain_attack_v2.png",
+      "source_sha256": "9cd75fee98f1d6d95c3bd54ea8ee3ff1c136c3f5be9006f062b9e0baac6ecba2",
+      "sha256": "12cddeb4cbd15e0fca372e48c7867fed55048bef002c9b5b488b9f59e9f627d4",
+      "size": [
+        1600,
+        200
+      ],
+      "frame_count": 8,
+      "frame_bboxes": [
+        [
+          44,
+          94,
+          124,
+          158
+        ],
+        [
+          44,
+          94,
+          128,
+          158
+        ],
+        [
+          44,
+          90,
+          128,
+          158
+        ],
+        [
+          44,
+          82,
+          124,
+          158
+        ],
+        [
+          36,
+          54,
+          160,
+          158
+        ],
+        [
+          36,
+          94,
+          152,
+          162
+        ],
+        [
+          36,
+          94,
+          140,
+          162
+        ],
+        [
+          36,
+          98,
+          128,
+          162
+        ]
+      ]
+    },
+    "boss_tide_cast_v1.png": {
+      "source": "boss_plain_cast_v1.png",
+      "source_sha256": "889a6063adddce4b09b58fd6b58f27e542011985c19255e46a5decaa71f2d717",
+      "sha256": "8d61a2833105f72584cb026efe556a1aad1097618822d4885d46407dc13a3b27",
+      "size": [
+        1600,
+        200
+      ],
+      "frame_count": 8,
+      "frame_bboxes": [
+        [
+          44,
+          98,
+          125,
+          163
+        ],
+        [
+          44,
+          94,
+          129,
+          163
+        ],
+        [
+          44,
+          94,
+          129,
+          163
+        ],
+        [
+          44,
+          94,
+          125,
+          163
+        ],
+        [
+          44,
+          94,
+          125,
+          163
+        ],
+        [
+          28,
+          94,
+          200,
+          167
+        ],
+        [
+          32,
+          98,
+          169,
+          167
+        ],
+        [
+          36,
+          102,
+          129,
+          167
+        ]
+      ]
+    },
+    "boss_ember_cast_v1.png": {
+      "source": "boss_plain_cast_v1.png",
+      "source_sha256": "889a6063adddce4b09b58fd6b58f27e542011985c19255e46a5decaa71f2d717",
+      "sha256": "28bbf31242f2c96c2ddce53bbe423dd159f3ee270d6b47fe5916540b8a72451b",
+      "size": [
+        1600,
+        200
+      ],
+      "frame_count": 8,
+      "frame_bboxes": [
+        [
+          44,
+          94,
+          124,
+          158
+        ],
+        [
+          44,
+          94,
+          124,
+          158
+        ],
+        [
+          44,
+          94,
+          124,
+          158
+        ],
+        [
+          44,
+          90,
+          124,
+          158
+        ],
+        [
+          44,
+          90,
+          124,
+          158
+        ],
+        [
+          32,
+          86,
+          200,
+          162
+        ],
+        [
+          36,
+          90,
+          168,
+          162
+        ],
+        [
+          36,
+          98,
+          128,
+          162
+        ]
+      ]
+    },
+    "boss_tide_hurt_v1.png": {
+      "source": "boss_hurt_v2.png",
+      "source_sha256": "66fd4fa1400dc2e8a4afdf9ab89c8bcf3ada5aaf22c8069304c2ccbec4cb17d8",
+      "sha256": "4c9d1e73f383fbafaee3f095f8bf5731df23fbb4b6cadbadae59f514743c23ef",
+      "size": [
+        800,
+        200
+      ],
+      "frame_count": 4,
+      "frame_bboxes": [
+        [
+          40,
+          98,
+          121,
+          163
+        ],
+        [
+          40,
+          98,
+          125,
+          163
+        ],
+        [
+          40,
+          98,
+          125,
+          163
+        ],
+        [
+          40,
+          98,
+          121,
+          163
+        ]
+      ]
+    },
+    "boss_ember_hurt_v1.png": {
+      "source": "boss_hurt_v2.png",
+      "source_sha256": "66fd4fa1400dc2e8a4afdf9ab89c8bcf3ada5aaf22c8069304c2ccbec4cb17d8",
+      "sha256": "d381c78fe9b9be5361b7719bd3009e64291577bd9d0abdac559e9afed5d2917c",
+      "size": [
+        800,
+        200
+      ],
+      "frame_count": 4,
+      "frame_bboxes": [
+        [
+          40,
+          94,
+          120,
+          158
+        ],
+        [
+          40,
+          98,
+          120,
+          158
+        ],
+        [
+          40,
+          98,
+          120,
+          158
+        ],
+        [
+          40,
+          94,
+          120,
+          158
+        ]
+      ]
+    },
+    "boss_tide_death_v1.png": {
+      "source": "boss_death_v2.png",
+      "source_sha256": "ed83a1847456e2f3c777b0322607326b8cce8ed81c463606624e175f397613db",
+      "sha256": "0f910bac6fec81e4b2f91e68f014c207276beac2fe236433b209f26ba23f3886",
+      "size": [
+        800,
+        200
+      ],
+      "frame_count": 4,
+      "frame_bboxes": [
+        [
+          44,
+          98,
+          125,
+          163
+        ],
+        [
+          44,
+          94,
+          129,
+          163
+        ],
+        [
+          44,
+          114,
+          129,
+          167
+        ],
+        [
+          52,
+          126,
+          133,
+          163
+        ]
+      ]
+    },
+    "boss_ember_death_v1.png": {
+      "source": "boss_death_v2.png",
+      "source_sha256": "ed83a1847456e2f3c777b0322607326b8cce8ed81c463606624e175f397613db",
+      "sha256": "dcc82cd42695e84d80ee4e8ddc1365e4f357c1f6de4d0f4043318c330b473a74",
+      "size": [
+        800,
+        200
+      ],
+      "frame_count": 4,
+      "frame_bboxes": [
+        [
+          44,
+          94,
+          124,
+          158
+        ],
+        [
+          44,
+          94,
+          124,
+          158
+        ],
+        [
+          44,
+          114,
+          124,
+          162
+        ],
+        [
+          52,
+          122,
+          132,
+          158
+        ]
+      ]
+    }
+  },
+  "burning": {
+    "burning_enemy_loop.png": {
+      "size": [
+        768,
+        64
+      ],
+      "frame_count": 12,
+      "sha256": "7f40b3d61932946523321605fe50a2069b8f3739bce2eb930eb79bdb0c8f9e70"
+    },
+    "burning_tick.png": {
+      "size": [
+        512,
+        64
+      ],
+      "frame_count": 8,
+      "sha256": "6c3565bb2a7181bead7b52d05c9790af884bd3b301e7029fe121a889b7a08707"
+    }
+  },
+  "melee_telegraph": {
+    "telegraph_melee_v1.png": {
+      "source": "telegraph_alert_v1.png",
+      "size": [
+        96,
+        32
+      ],
+      "sha256": "07ce6e656da6c4f46003bdde28d506e24cba950b9d5bec9e020917513f340244",
+      "alpha_matches_source": true
+    },
+    "telegraph_melee_static_v1.png": {
+      "source": "telegraph_alert_static_v1.png",
+      "size": [
+        32,
+        32
+      ],
+      "sha256": "fbcd7d47d9d2614b8b41092d41de3e9b18c34d721722e8c68fc19fd6ede2d3d5",
+      "alpha_matches_source": true
+    }
+  }
+}

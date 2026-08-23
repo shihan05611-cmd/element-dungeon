@@ -10,12 +10,14 @@ signal colorblind_mode_changed(enabled: bool)
 
 const WARNING_RATE_LIMIT_MSEC := 450
 const SLOT_TRANSIENT_MSEC := 900
-const STATUS_SIZE := Vector2(264, 76)
+## Two 172px bars plus the panel's 8px margins.  The status zone intentionally
+## contains survival information only; element state remains authoritative in
+## gameplay and is projected where it is still needed (skills and RunOverlay).
+const STATUS_SIZE := Vector2(188, 76)
 const SKILL_STRIP_SIZE := Vector2(272, 64)
 ## Four 34px icon slots, three 8px gaps, 8px horizontal margin, and borders.
 ## Keep a small integer-pixel buffer above the layout minimum.
 const PASSIVE_STRIP_SIZE := Vector2(192, 42)
-const ELEMENT_PIVOT_SIZE := Vector2(72, 56)
 const ACTIVE_SLOT_SIZE := Vector2(72, 48)
 const PASSIVE_SLOT_SIZE := Vector2(34, 34)
 const ROOM_TITLE_SIZE := Vector2(280, 32)
@@ -45,6 +47,7 @@ const SLOT_ORDER: Array[StringName] = [
 
 var reduced_motion: bool = false
 var colorblind_mode: bool = false
+var skill_hud_visible: bool = true
 
 var status_panel: PanelContainer
 var skill_panel: PanelContainer
@@ -55,8 +58,6 @@ var low_health: Label
 var energy_row: HBoxContainer
 var energy_bar: ProgressBar
 var energy_value: Label
-var element_swatch: ColorRect
-var element_text: Label
 var phase_text: Label
 var warning_text: Label
 var debug_panel: PanelContainer
@@ -88,16 +89,9 @@ var _target_fire: Label
 var _target_panel: PanelContainer
 var _feedback_panel: PanelContainer
 var _feedback_label: Label
-var _element_pivot: PanelContainer
-var _element_pivot_swatch: ColorRect
-var _element_pivot_text: Label
-var _element_pivot_shape: Label
-var _legacy_element_swatch: ColorRect
-var _legacy_element_text: Label
 var _last_warning_msec: int = -WARNING_RATE_LIMIT_MSEC
 var _banner_tween: Tween
 var _energy_tween: Tween
-var _element_tween: Tween
 var _debug_elapsed: float = 0.0
 var _last_event_text: String = "等待战斗结果"
 var _pending_auto_change: ElementChangeResult
@@ -117,6 +111,7 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	_bind_ui_refs()
+	set_skill_hud_visible(skill_hud_visible)
 
 
 func configure(
@@ -185,7 +180,10 @@ func rebind_target(target: CombatEnemy) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"toggle_debug"):
+	if event is InputEventKey and event.pressed and not event.echo and event.is_action_pressed(&"toggle_skill_hud"):
+		toggle_skill_hud()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"toggle_debug"):
 		debug_panel.visible = not debug_panel.visible
 		if debug_panel.visible:
 			_refresh_debug()
@@ -200,6 +198,26 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.keycode == KEY_F5 or event.physical_keycode == KEY_F5:
 			set_colorblind_mode(not colorblind_mode)
 			get_viewport().set_input_as_handled()
+
+
+## Recording-only visibility control for the active and passive skill belts.
+## This deliberately leaves combat state, input handling, and all other HUD
+## regions untouched; their ongoing refreshes remain authoritative while hidden.
+func set_skill_hud_visible(visible: bool) -> void:
+	skill_hud_visible = visible
+	if skill_panel != null:
+		skill_panel.visible = visible
+	if passive_panel != null:
+		passive_panel.visible = visible
+
+
+func toggle_skill_hud() -> bool:
+	set_skill_hud_visible(not skill_hud_visible)
+	return skill_hud_visible
+
+
+func is_skill_hud_visible() -> bool:
+	return skill_hud_visible
 
 
 func _process(delta: float) -> void:
@@ -259,10 +277,6 @@ func slot_visible_fields(slot_id: StringName) -> Array[StringName]:
 		if control != null and control.is_visible_in_tree():
 			fields.append(entry[&"field"])
 	return fields
-
-
-func element_pivot_panel() -> PanelContainer:
-	return _element_pivot
 
 
 ## Task 72 §2 B3: public entry point so room instances push their title copy
@@ -514,33 +528,11 @@ func _on_overlay_status_requested(message: String, tone: StringName) -> void:
 		_show_feedback(message, &"error", 1.8)
 
 
-func _refresh_element(current_element_id: StringName, animate: bool = true) -> void:
-	var definition := _player.get_element_definition(current_element_id) if _player != null else null
-	var color := _element_color(current_element_id)
-	if definition != null and definition.is_valid() and not colorblind_mode:
-		color = definition.presentation_color
-	element_swatch.color = color
-	element_text.text = _element_label(current_element_id)
-	if _legacy_element_swatch != null:
-		_legacy_element_swatch.color = color
-	if _legacy_element_text != null:
-		_legacy_element_text.text = _element_label(current_element_id)
-	if _element_pivot_swatch != null:
-		_element_pivot_swatch.color = color
-	if _element_pivot_text != null:
-		_element_pivot_text.text = _element_short_label(current_element_id)
-	if _element_pivot_shape != null:
-		_element_pivot_shape.text = _element_shape(current_element_id)
-		_element_pivot_shape.add_theme_color_override(&"font_color", color)
+func _refresh_element(current_element_id: StringName, _animate: bool = true) -> void:
+	# The StatusPanel deliberately has no element projection.  Keep these
+	# dependent projections synchronized with the authoritative element state.
 	if run_overlay != null:
 		run_overlay.set_current_element(current_element_id)
-	# Element changes already have persistent shape/color/text plus the feedback
-	# banner.  Never fade the compact element text during a live skill frame:
-	# capture and gameplay must keep the semantic short label fully readable.
-	if _element_tween != null and _element_tween.is_valid():
-		_element_tween.kill()
-	_element_tween = null
-	element_text.modulate = Color.WHITE
 	_refresh_skill_status()
 
 
@@ -961,14 +953,6 @@ func _bind_ui_refs() -> void:
 	energy_row = $Root/StatusPanel/Margin/Status/EnergyRow
 	energy_bar = $Root/StatusPanel/Margin/Status/EnergyRow/EnergyBar
 	energy_value = $Root/StatusPanel/Margin/Status/EnergyRow/EnergyBar/EnergyValue
-	_element_pivot = $Root/StatusPanel/Margin/Status/CurrentElement
-	_element_pivot_swatch = $Root/StatusPanel/Margin/Status/CurrentElement/Body/ElementSwatch
-	_element_pivot_text = $Root/StatusPanel/Margin/Status/CurrentElement/Body/ElementText
-	_element_pivot_shape = $Root/StatusPanel/Margin/Status/CurrentElement/Body/ElementShape
-	element_swatch = _element_pivot_swatch
-	element_text = _element_pivot_text
-	_legacy_element_swatch = $Root/StatusPanel/Margin/Status/TitleRow/ElementBadge/BadgeMargin/BadgeRow/ElementSwatch
-	_legacy_element_text = $Root/StatusPanel/Margin/Status/TitleRow/ElementBadge/BadgeMargin/BadgeRow/ElementText
 	phase_text = $Root/SkillPanel/Margin/Skills/PhaseText
 	warning_text = $Root/WarningText
 	debug_panel = $Root/DebugPanel
@@ -1028,32 +1012,6 @@ func _build_status_panel(parent: Control) -> void:
 	status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	status.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(status)
-	# Hidden task-12 path adapter. CurrentElement is rendered only in the
-	# bottom strip, but existing readers can still resolve the old node path.
-	var title_row := HBoxContainer.new()
-	title_row.name = "TitleRow"
-	title_row.visible = false
-	status.add_child(title_row)
-	var legacy_title := _make_label("Title", "法雅雅", UI.FONT_EMPHASIS, UI.TEXT)
-	legacy_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_row.add_child(legacy_title)
-	var badge := PanelContainer.new()
-	badge.name = "ElementBadge"
-	badge.theme_type_variation = &"HudPanelSlot"
-	title_row.add_child(badge)
-	var badge_margin := _margin("BadgeMargin", UI.GAP_SM, UI.GAP_XS)
-	badge.add_child(badge_margin)
-	var badge_row := HBoxContainer.new()
-	badge_row.name = "BadgeRow"
-	badge_row.add_theme_constant_override(&"separation", UI.GAP_XS)
-	badge_margin.add_child(badge_row)
-	var swatch := ColorRect.new()
-	swatch.name = "ElementSwatch"
-	swatch.custom_minimum_size = Vector2(12, 18)
-	badge_row.add_child(swatch)
-	var element_label := _make_label("ElementText", "水滴 水 · WATER", UI.FONT_BODY, UI.TEXT)
-	element_label.custom_minimum_size.x = 110
-	badge_row.add_child(element_label)
 	var health := _bar_row("HealthRow", "HP", "HealthBar", "HealthValue", Color("dc4658"))
 	health.position = Vector2(0, 0)
 	health.size = Vector2(172, 26)
@@ -1062,13 +1020,10 @@ func _build_status_panel(parent: Control) -> void:
 	energy.position = Vector2(0, 30)
 	energy.size = Vector2(172, 26)
 	status.add_child(energy)
-	var pivot := _build_element_pivot()
-	pivot.position = Vector2(176, 0)
-	status.add_child(pivot)
-	var low := _make_label("LowHealth", "! HP", UI.FONT_CAPTION, UI.ERROR)
+	var low := _make_label("LowHealth", "!", UI.FONT_CAPTION, UI.ERROR)
 	low.visible = false
-	low.position = Vector2(0, 1)
-	low.size = Vector2(30, 22)
+	low.position = Vector2(18, 1)
+	low.size = Vector2(12, 22)
 	low.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	low.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	status.add_child(low)
@@ -1164,34 +1119,6 @@ func _build_passive_panel(parent: Control) -> void:
 	margin.add_child(row)
 	for slot_id: StringName in SkillSlotIds.passive():
 		row.add_child(_build_compact_slot(slot_id))
-
-
-func _build_element_pivot() -> PanelContainer:
-	var panel := PanelContainer.new()
-	panel.name = "CurrentElement"
-	panel.custom_minimum_size = ELEMENT_PIVOT_SIZE
-	panel.theme_type_variation = &"HudPanelEmphasis"
-	var body := Control.new()
-	body.name = "Body"
-	body.custom_minimum_size = Vector2(68, 52)
-	panel.add_child(body)
-	var swatch := ColorRect.new()
-	swatch.name = "ElementSwatch"
-	swatch.position = Vector2(0, 4)
-	swatch.size = Vector2(4, 44)
-	swatch.color = UI.WATER
-	body.add_child(swatch)
-	var shape := _make_label("ElementShape", "◆", UI.FONT_EMPHASIS, UI.WATER)
-	shape.position = Vector2(7, 2)
-	shape.size = Vector2(24, 28)
-	shape.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	body.add_child(shape)
-	var text := _make_label("ElementText", "水", UI.FONT_EMPHASIS, UI.TEXT)
-	text.position = Vector2(31, 3)
-	text.size = Vector2(30, 26)
-	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	body.add_child(text)
-	return panel
 
 
 func _build_compact_slot(slot_id: StringName) -> PanelContainer:

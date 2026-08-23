@@ -95,7 +95,7 @@ func _record_and_finish_normal_room() -> void:
 	await process_frame
 	_interact_at(room.chest)
 	await process_frame
-	_interact_at(room.portal)
+	_interact_at(room.route_transition)
 	await process_frame
 
 
@@ -130,7 +130,7 @@ func _leave_physical_shop() -> void:
 	Input.action_press(&"move_right")
 	for _frame: int in 360:
 		await physics_frame
-		if shop_room.exit_portal.can_interact(_coordinator.player.global_position):
+		if shop_room.exit_transition.can_interact(_coordinator.player.global_position):
 			break
 	Input.action_release(&"move_right")
 	await _press_interact_input()
@@ -171,7 +171,8 @@ func _defeat_batch(enemies: Array[CombatEnemy]) -> void:
 
 
 func _interact_at(target: RunWorldInteractable) -> void:
-	_coordinator.player.global_position = target.global_position
+	var room := _coordinator.active_room
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center()) if room != null and target == room.route_transition else target.global_position
 	_coordinator.player.interact_requested.emit()
 
 

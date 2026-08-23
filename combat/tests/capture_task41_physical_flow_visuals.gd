@@ -29,7 +29,7 @@ func _run() -> void:
 	_interact_at(room.chest)
 	await process_frame
 	await _capture("task41_03_open_chest_unlocked_portal_1920x1080.png", Vector2i(1920, 1080))
-	_interact_at(room.portal)
+	_interact_at(room.route_transition)
 	await _wait_combat(&"combat_02_swarm")
 	await _capture("task41_04_direct_second_combat_1920x1080.png", Vector2i(1920, 1080))
 	await _finish_normal_room()
@@ -46,7 +46,7 @@ func _run() -> void:
 	Input.action_press(&"move_right")
 	for _frame: int in 360:
 		await physics_frame
-		if shop_room.exit_portal.can_interact(_coordinator.player.global_position):
+		if shop_room.exit_transition.can_interact(_coordinator.player.global_position):
 			break
 	Input.action_release(&"move_right")
 	await _capture("task41_06_shop_exit_f_prompt_1366x768.png", Vector2i(1366, 768))
@@ -85,7 +85,7 @@ func _finish_normal_room() -> void:
 	await process_frame
 	_interact_at(room.chest)
 	await process_frame
-	_interact_at(room.portal)
+	_interact_at(room.route_transition)
 	await process_frame
 
 
@@ -100,7 +100,8 @@ func _defeat_batch(enemies: Array[CombatEnemy]) -> void:
 
 
 func _interact_at(target: RunWorldInteractable) -> void:
-	_coordinator.player.global_position = target.global_position
+	var room := _coordinator.active_room
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center()) if room != null and target == room.route_transition else target.global_position
 	_coordinator.player.interact_requested.emit()
 
 

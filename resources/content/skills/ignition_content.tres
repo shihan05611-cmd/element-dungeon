@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SkillContentDefinition" format=3]
+
+[ext_resource type="Script" path="res://combat/content/skill_content_definition.gd" id="1_content"]
+[ext_resource type="Resource" path="res://resources/skills/ignition.tres" id="2_gameplay"]
+
+[resource]
+script = ExtResource("1_content")
+skill_id = &"ignition"
+display_name = "引燃"
+description = "吸收可见敌人的全部火元素，8 秒内普攻按吸收层数强化并固定附着 1 层火。"
+gameplay_definition = ExtResource("2_gameplay")
+initially_owned = true
+allowed_form_ids = Array[StringName]([&"fire"])
+default_slot_id = &"active_2"

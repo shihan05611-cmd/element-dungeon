@@ -296,20 +296,20 @@ func _defeat_current_room() -> void:
 	await process_frame
 	if room.room_definition.final_boss:
 		return
-	_coordinator.player.global_position = room.portal.global_position
+	_coordinator.player.global_position = room.to_global(room.route_transition_zone.get_center())
 	_coordinator.player.interact_requested.emit()
 	await process_frame
 
 
 func _leave_physical_shop() -> void:
 	var shop := _coordinator.active_shop_room
-	_expect(shop != null and shop.exit_portal != null, "single shop exposes its physical exit")
+	_expect(shop != null and shop.exit_transition != null, "single shop exposes its physical exit transition zone")
 	if shop == null:
 		return
 	if _overlay.visible:
 		_overlay.toggle_loadout()
 		await process_frame
-	_coordinator.player.global_position = shop.exit_portal.global_position
+	_coordinator.player.global_position = shop.to_global(shop.exit_transition_zone.get_center())
 	_coordinator.player.interact_requested.emit()
 	await process_frame
 
