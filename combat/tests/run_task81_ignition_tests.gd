@@ -3,6 +3,8 @@ extends SceneTree
 const TestHarness := preload("res://combat/tests/test_harness.gd")
 const ROOM_SCENE: PackedScene = preload("res://scenes/test_room.tscn")
 const ENEMY_SCENE: PackedScene = preload("res://scenes/enemy.tscn")
+const TRANSIENT_MELEE_SCENE: PackedScene = preload("res://scenes/transient_melee_delivery.tscn")
+const FIRE_AIRFLOW_TEXTURE: Texture2D = preload("res://assets/characters/cat/cat_fire_attack_airflow.png")
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const HURTBOX_LAYER := 8
 
@@ -158,37 +160,52 @@ func _test_ignition_melee_range_snapshot_and_airflow() -> void:
 	player.global_position = Vector2(400, 470)
 	var state := player.get_node("IgnitionState") as IgnitionState
 	var airflow_base_scale := player.basic_attack_airflow.scale
+	var airflow_base_position := player.basic_attack_airflow.position
+	var measured_alpha_min_x := _critical_airflow_alpha_min_x()
+	var normal_query_front := _normal_query_front(player)
+	var normal_visual_front := (PlayerCharacter.BASIC_ATTACK_FRAME_SIZE.x * 0.5 - measured_alpha_min_x) * airflow_base_scale.x
+	var fixed_margin := normal_query_front - normal_visual_front
+	var ignition_visual_front := normal_visual_front * PlayerCharacter.IGNITION_AIRFLOW_SCALE_MULTIPLIER
+	var expected_ignition_query_front := ignition_visual_front + fixed_margin
+	var expected_query_multiplier := expected_ignition_query_front / normal_query_front
+	_expect_eq(measured_alpha_min_x, int(PlayerCharacter.BASIC_ATTACK_CRITICAL_ALPHA_MIN_X), "critical FIRE airflow frame measurement keeps the configured alpha edge")
+	_expect_near(normal_query_front, PlayerCharacter.BASIC_ATTACK_QUERY_FRONT, 0.0001, "normal real melee query front stays unchanged")
+	_expect_near(normal_visual_front, PlayerCharacter.BASIC_ATTACK_VISUAL_FRONT, 0.0001, "normal critical-frame visual front is measured from the real airflow sheet")
+	_expect_near(fixed_margin, PlayerCharacter.BASIC_ATTACK_FIXED_FORWARD_MARGIN, 0.0001, "normal query keeps its fixed authored forward margin P")
+	_expect_near(expected_ignition_query_front, PlayerCharacter.IGNITION_QUERY_FRONT, 0.0001, "ignition query front equals 1.5x visual front plus the unscaled normal margin")
+	_expect_near(expected_query_multiplier, PlayerCharacter.IGNITION_MELEE_QUERY_MULTIPLIER, 0.0001, "ignition snapshot multiplier is derived from the measured visual boundary formula")
 	_expect(player.request_element(ElementIds.FIRE).accepted, "normal fire form is available")
 	await create_timer(0.25).timeout
-	var normal := await _basic_attack_hits(player, enemy, 1.0, 145.0)
+	var normal := await _basic_attack_hits(player, enemy, 1.0, normal_query_front + 19.0)
 	_expect(not normal.hit, "normal FIRE basic attack cannot hit beyond its base range")
 	_expect_near(normal.airflow_scale.x, airflow_base_scale.x, 0.0001, "normal FIRE airflow keeps authored scale")
 	_expect(normal.airflow_modulate.is_equal_approx(normal.body_modulate), "normal FIRE airflow keeps authored color")
 	var fire_body_scale := player.sprite.scale
 	var fire_body_modulate := player.sprite.modulate
 	state.activate_silent(5)
-	var ignition_right := await _basic_attack_hits(player, enemy, 1.0, 145.0)
-	_expect(ignition_right.hit, "right-facing ignition reaches the base-outside 1.5x-inside target")
-	_expect_near(ignition_right.airflow_scale.x, airflow_base_scale.x * 1.5, 0.0001, "only ignition airflow scales to 1.5x")
+	var ignition_right := await _basic_attack_hits(player, enemy, 1.0, expected_ignition_query_front + 17.0)
+	_expect(ignition_right.hit, "right-facing ignition hits immediately inside its visual-derived query boundary")
+	_expect_near(ignition_right.airflow_scale.x, airflow_base_scale.x * PlayerCharacter.IGNITION_AIRFLOW_SCALE_MULTIPLIER, 0.0001, "only ignition airflow scales to exactly 1.5x")
 	_expect(ignition_right.airflow_modulate.is_equal_approx(Color("ff7a20")), "ignition airflow becomes obvious orange")
 	_expect(ignition_right.body_scale.is_equal_approx(fire_body_scale) and ignition_right.body_modulate.is_equal_approx(fire_body_modulate), "ignition leaves the player body scale and color untouched")
+	_expect(player.basic_attack_airflow.scale.is_equal_approx(airflow_base_scale) and player.basic_attack_airflow.position.is_equal_approx(airflow_base_position), "animation completion restores airflow scale and position while ignition remains active")
 	enemy.queue_free()
 	await process_frame
 	enemy = await _add_static_enemy(room)
-	var ignition_left := await _basic_attack_hits(player, enemy, -1.0, 145.0)
-	_expect(ignition_left.hit, "left-facing ignition reaches the base-outside 1.5x-inside target")
+	var ignition_left := await _basic_attack_hits(player, enemy, -1.0, expected_ignition_query_front + 17.0)
+	_expect(ignition_left.hit, "left-facing ignition mirrors the same visual-derived inside boundary")
 	enemy.queue_free()
 	await process_frame
 	enemy = await _add_static_enemy(room)
-	var ignition_outer := await _basic_attack_hits(player, enemy, 1.0, 190.0)
-	_expect(not ignition_outer.hit, "ignition does not hit outside its 1.5x range")
+	var ignition_outer := await _basic_attack_hits(player, enemy, 1.0, expected_ignition_query_front + 19.0)
+	_expect(not ignition_outer.hit, "ignition does not hit immediately outside its visual-derived query boundary")
 	enemy.queue_free()
 	await process_frame
 	enemy = await _add_static_enemy(room)
 	var accepted_before_expiry := player.try_basic_attack()
-	_expect(accepted_before_expiry.accepted and is_equal_approx(accepted_before_expiry.payload.melee_query_multiplier, 1.5), "accepted ignition basic locks the 1.5x query multiplier")
+	_expect(accepted_before_expiry.accepted and is_equal_approx(accepted_before_expiry.payload.melee_query_multiplier, expected_query_multiplier), "accepted ignition basic locks the visual-derived query multiplier")
 	state.clear(&"range_snapshot_test")
-	enemy.global_position = player.global_position + Vector2(145, 0)
+	enemy.global_position = player.global_position + Vector2(expected_ignition_query_front + 17.0, 0)
 	enemy.damage_receiver.restore_full()
 	enemy.combat_receiver.accepting_hits = true
 	enemy.combat_receiver.clear_recent_hits()
@@ -213,9 +230,10 @@ func _test_ignition_melee_range_snapshot_and_airflow() -> void:
 	if enemy.combat_receiver.hit_resolved.is_connected(resolved_callback):
 		enemy.combat_receiver.hit_resolved.disconnect(resolved_callback)
 	_expect_near(player.basic_attack_airflow.scale.x, airflow_base_scale.x, 0.0001, "status expiry restores airflow scale immediately")
+	_expect(player.basic_attack_airflow.position.is_equal_approx(airflow_base_position), "status expiry restores airflow position without drift")
 	_expect(player.basic_attack_airflow.modulate.is_equal_approx(player.sprite.modulate), "status expiry restores airflow color immediately")
 	await _finish_basic_attack(player)
-	var neutral := await _basic_attack_hits(player, enemy, 1.0, 145.0)
+	var neutral := await _basic_attack_hits(player, enemy, 1.0, normal_query_front + 19.0)
 	_expect(not neutral.hit, "post-expiry basic attack returns to base range")
 	room.queue_free()
 	await process_frame
@@ -270,6 +288,29 @@ func _add_static_enemy(room: Node2D) -> CombatEnemy:
 	enemy.set_physics_process(false)
 	enemy.ai_enabled = false
 	return enemy
+
+
+func _critical_airflow_alpha_min_x() -> int:
+	var image := FIRE_AIRFLOW_TEXTURE.get_image()
+	if image == null:
+		return -1
+	var frame_start := PlayerCharacter.BASIC_ATTACK_CRITICAL_AIRFLOW_FRAME * int(PlayerCharacter.BASIC_ATTACK_FRAME_SIZE.x)
+	for local_x: int in range(int(PlayerCharacter.BASIC_ATTACK_FRAME_SIZE.x)):
+		for y: int in range(int(PlayerCharacter.BASIC_ATTACK_FRAME_SIZE.y)):
+			if image.get_pixel(frame_start + local_x, y).a > 0.0:
+				return local_x
+	return -1
+
+
+func _normal_query_front(player: PlayerCharacter) -> float:
+	var delivery := TRANSIENT_MELEE_SCENE.instantiate() as MeleeDelivery
+	var rectangle := delivery.hit_shape as RectangleShape2D
+	var basic_attack := player.get("_basic_attack_definition") as SkillDefinition
+	var spawn := player._capture_spawn_snapshot(basic_attack)
+	var spawn_distance := absf(spawn.initial_transform.origin.x - player.global_position.x)
+	var query_front := spawn_distance + delivery.query_offset.x + rectangle.size.x * 0.5
+	delivery.free()
+	return query_front
 
 
 func _make_viewport_rig() -> Dictionary:

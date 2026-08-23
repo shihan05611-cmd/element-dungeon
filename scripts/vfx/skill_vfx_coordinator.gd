@@ -353,13 +353,13 @@ func _refresh_enemy(enemy: CombatEnemy) -> void:
 	var snapshot := enemy.element_carrier.snapshot()
 	_set_loop(
 		enemy,
-		_burning_registered and snapshot.fire_amount > 0,
+		snapshot.fire_amount > 0,
 		burning_scene,
 		_burning_loops
 	)
 	_set_loop(
 		enemy,
-		_unending_registered and snapshot.water_amount > 0,
+		snapshot.water_amount > 0,
 		unending_scene,
 		_unending_loops
 	)

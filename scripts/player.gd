@@ -31,6 +31,22 @@ const BASIC_ATTACK_AIRFLOW_TEXTURES := {
 	&"fire_attack": preload("res://assets/characters/cat/cat_fire_attack_airflow.png"),
 }
 const BASIC_ATTACK_FRAME_SIZE := Vector2(80.0, 64.0)
+const IGNITION_AIRFLOW_SCALE_MULTIPLIER := 1.5
+## Task 85 measured the actual FIRE attack hit-start frame (frame 1 at 20 fps,
+## after the 0.08 s startup). Its airflow alpha begins at x=23 in the centered
+## 80 px frame, so the authored 2x sprite reaches (40 - 23) * 2 = 34 px.
+## The unchanged melee scene reaches 30 spawn + 42 offset + 36 half-width =
+## 108 px, leaving the normal fixed forward margin P = 108 - 34 = 74 px.
+## Ignition keeps that same margin: V1 + P = 34 * 1.5 + 74 = 125 px.
+## The accepted attack snapshot therefore locks 125 / 108, not a 1.5 range.
+const BASIC_ATTACK_CRITICAL_AIRFLOW_FRAME := 1
+const BASIC_ATTACK_CRITICAL_ALPHA_MIN_X := 23.0
+const BASIC_ATTACK_VISUAL_FRONT := (BASIC_ATTACK_FRAME_SIZE.x * 0.5 - BASIC_ATTACK_CRITICAL_ALPHA_MIN_X) * 2.0
+const BASIC_ATTACK_QUERY_FRONT := 108.0
+const BASIC_ATTACK_FIXED_FORWARD_MARGIN := BASIC_ATTACK_QUERY_FRONT - BASIC_ATTACK_VISUAL_FRONT
+const IGNITION_VISUAL_FRONT := BASIC_ATTACK_VISUAL_FRONT * IGNITION_AIRFLOW_SCALE_MULTIPLIER
+const IGNITION_QUERY_FRONT := IGNITION_VISUAL_FRONT + BASIC_ATTACK_FIXED_FORWARD_MARGIN
+const IGNITION_MELEE_QUERY_MULTIPLIER := IGNITION_QUERY_FRONT / BASIC_ATTACK_QUERY_FRONT
 
 @export var attack_multiplier: float = 1.0
 @export var flat_damage_bonus: float = 0.0
@@ -250,7 +266,7 @@ func _sync_basic_attack_airflow() -> void:
 		return
 	var texture: Texture2D = BASIC_ATTACK_AIRFLOW_TEXTURES.get(sprite.animation)
 	var ignition_attack_airflow := sprite.animation == &"fire_attack" and ignition_active()
-	basic_attack_airflow.scale = _basic_attack_airflow_base_scale * (1.5 if ignition_attack_airflow else 1.0)
+	basic_attack_airflow.scale = _basic_attack_airflow_base_scale * (IGNITION_AIRFLOW_SCALE_MULTIPLIER if ignition_attack_airflow else 1.0)
 	basic_attack_airflow.modulate = (
 		Color("ff7a20")
 		if ignition_attack_airflow
@@ -525,7 +541,7 @@ func _ignition_basic_attack_definition() -> SkillDefinition:
 	payload.element_mode = AttackPayloadDefinition.ElementMode.FIXED_ELEMENT
 	payload.fixed_element_id = ElementIds.FIRE
 	payload.element_amount = 1
-	payload.melee_query_multiplier = 1.5
+	payload.melee_query_multiplier = IGNITION_MELEE_QUERY_MULTIPLIER
 	return copy
 
 

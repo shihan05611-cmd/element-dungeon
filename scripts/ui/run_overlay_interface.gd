@@ -66,6 +66,7 @@ var _formal_route_submit_count: int = 0
 var _formal_route_cards: Array[Button] = []
 var _formal_route_confirm: Button
 var _formal_shop_draft: ShopDraft
+var _formal_shop_tab: StringName = &"purchase"
 var _formal_selected_skill_id: StringName = &""
 var _formal_selected_slot_id: StringName = &""
 var _formal_reset_skill_id: StringName = &""
@@ -1557,6 +1558,7 @@ func _show_formal_shop(cause: StringName = &"") -> void:
 			_formal_area.add_child(_formal_status)
 			return
 		_formal_shop_draft = opened.draft
+		_formal_shop_tab = &"purchase"
 	_working_loadout = _formal_shop_draft.preview_loadout()
 	_formal_begin(
 		&"shop",
@@ -1593,10 +1595,12 @@ func _show_formal_shop(cause: StringName = &"") -> void:
 
 	var offers_panel := _formal_section_panel("固定技能候选", 1.45)
 	body.add_child(offers_panel)
+	var offers_box := offers_panel.get_node("Margin/Box") as VBoxContainer
+	offers_box.add_child(_build_formal_shop_tabs())
 	var offers_scroll := ScrollContainer.new()
 	offers_scroll.name = "OffersScroll"
 	offers_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	(offers_panel.get_node("Margin/Box") as VBoxContainer).add_child(offers_scroll)
+	offers_box.add_child(offers_scroll)
 	var offers_grid := GridContainer.new()
 	offers_grid.name = "Offers"
 	offers_grid.columns = 2
@@ -1604,8 +1608,15 @@ func _show_formal_shop(cause: StringName = &"") -> void:
 	offers_grid.add_theme_constant_override(&"h_separation", UI.GAP_SM)
 	offers_grid.add_theme_constant_override(&"v_separation", UI.GAP_SM)
 	offers_scroll.add_child(offers_grid)
-	for content: SkillContentDefinition in _catalog.shop_contents():
+	var tab_contents := _shop_tab_contents()
+	for content: SkillContentDefinition in tab_contents:
 		offers_grid.add_child(_build_formal_shop_card(content))
+	if tab_contents.is_empty():
+		offers_grid.add_child(_label(
+			"所有可购买技能均已拥有。" if _formal_shop_tab == &"purchase" else "暂无已拥有的主动技能可升级。",
+			14,
+			UI.TEXT_MUTED
+		))
 
 	var loadout_panel := _formal_section_panel("权威即时配装 · A1–A3 / P1–P4", 1.0)
 	body.add_child(loadout_panel)
@@ -1637,8 +1648,8 @@ func _show_formal_shop(cause: StringName = &"") -> void:
 			Callable(self, "_formal_inventory_drop")
 		)
 		inventory_row.add_child(select)
-	loadout_box.add_child(_formal_slot_zone("主动槽 · 有键帽 / SP / 状态", SkillSlotIds.active()))
-	loadout_box.add_child(_formal_slot_zone("被动槽 · 无键帽 / SP / 冷却", SkillSlotIds.passive()))
+	loadout_box.add_child(_formal_shop_slot_zone("主动槽 · A1–A3", SkillSlotIds.active()))
+	loadout_box.add_child(_formal_shop_slot_zone("被动槽 · P1–P4", SkillSlotIds.passive()))
 	var slot_actions := HBoxContainer.new()
 	slot_actions.add_theme_constant_override(&"separation", UI.GAP_SM)
 	loadout_box.add_child(slot_actions)
@@ -1682,6 +1693,105 @@ func _show_formal_shop(cause: StringName = &"") -> void:
 	leave.tooltip_text = "正式流程只能通过商店房右下角交互区离开。"
 	footer.add_child(leave)
 	_restore_formal_focus()
+
+
+func _build_formal_shop_tabs() -> HBoxContainer:
+	var tabs := HBoxContainer.new()
+	tabs.name = "ShopTabs"
+	tabs.add_theme_constant_override(&"separation", UI.GAP_XS)
+	for tab: StringName in [&"purchase", &"upgrade"]:
+		var selected := _formal_shop_tab == tab
+		var button := _formal_action_button(
+			"购买" if tab == &"purchase" else "升级",
+			"shop_tab:%s" % String(tab),
+			Callable(self, "_formal_set_shop_tab").bind(tab),
+			Vector2(104, 42),
+			selected
+		)
+		button.tooltip_text = "仅切换本地商店列表，不提交任何事务。"
+		tabs.add_child(button)
+	return tabs
+
+
+func _shop_tab_contents() -> Array[SkillContentDefinition]:
+	var contents: Array[SkillContentDefinition] = []
+	for content: SkillContentDefinition in _catalog.shop_contents():
+		var progress := _snapshot.skills.progress_for(content.skill_id)
+		if _formal_shop_tab == &"purchase" and progress == null:
+			contents.append(content)
+		elif _formal_shop_tab == &"upgrade" and progress != null and not progress.is_passive():
+			contents.append(content)
+	return contents
+
+
+func _formal_set_shop_tab(tab: StringName) -> void:
+	if tab == _formal_shop_tab or tab not in [&"purchase", &"upgrade"]:
+		return
+	_formal_shop_tab = tab
+	_formal_focus_id = StringName("shop_tab:%s" % String(tab))
+	_show_formal_shop(&"tab_changed")
+
+
+func _formal_shop_slot_zone(title_text: String, slot_ids: Array[StringName]) -> VBoxContainer:
+	var zone := VBoxContainer.new()
+	zone.name = "ShopActiveSlots" if slot_ids == SkillSlotIds.active() else "ShopPassiveSlots"
+	zone.add_theme_constant_override(&"separation", UI.GAP_XS)
+	zone.add_child(_label(title_text, 12, UI.TEXT_MUTED))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override(&"separation", UI.GAP_XS)
+	zone.add_child(row)
+	for slot_id: StringName in slot_ids:
+		var skill_id := _working_loadout.get_skill_id(slot_id)
+		var content := _catalog.content_for(skill_id) if not skill_id.is_empty() else null
+		var prefix := "A%d" % (SkillSlotIds.active().find(slot_id) + 1) if SkillSlotIds.is_active(slot_id) else "P%d" % (SkillSlotIds.passive().find(slot_id) + 1)
+		var button := _formal_action_button(
+			"",
+			"slot:%s" % String(slot_id),
+			Callable(self, "_formal_press_slot").bind(slot_id),
+			Vector2(0, 82)
+		)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if _formal_selected_slot_id == slot_id:
+			button.add_theme_stylebox_override(&"normal", UI.button_style(UI.SURFACE_SOFT, UI.BORDER_FOCUS))
+		button.set_drag_forwarding(
+			Callable(self, "_formal_slot_drag_data").bind(slot_id),
+			Callable(self, "_formal_slot_can_drop").bind(slot_id),
+			Callable(self, "_formal_slot_drop").bind(slot_id)
+		)
+		var column := VBoxContainer.new()
+		column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		column.alignment = BoxContainer.ALIGNMENT_CENTER
+		column.add_theme_constant_override(&"separation", 1)
+		column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 6)
+		button.add_child(column)
+		var slot_label := _label(prefix, 11, UI.BORDER_FOCUS)
+		slot_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		slot_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		column.add_child(slot_label)
+		if content != null:
+			if content.icon != null:
+				var icon := TextureRect.new()
+				icon.custom_minimum_size = Vector2(28, 28)
+				icon.texture = content.icon
+				icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+				icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+				icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+				icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				column.add_child(icon)
+			var name_label := _label(content.display_name, 11, UI.TEXT)
+			name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			name_label.clip_text = true
+			name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			column.add_child(name_label)
+			var progress := _snapshot.skills.progress_for(content.skill_id)
+			if progress != null:
+				var level_label := _label("Lv.%d" % progress.level, 10, UI.WARNING)
+				level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				level_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				column.add_child(level_label)
+		row.add_child(button)
+	return zone
 
 
 func _build_formal_shop_card(content: SkillContentDefinition) -> PanelContainer:
@@ -1751,7 +1861,6 @@ func _build_formal_shop_card(content: SkillContentDefinition) -> PanelContainer:
 	else:
 		box.add_child(_label("已达最高等级", 11, UI.SUCCESS))
 	var refund := _estimated_refund(progress)
-	box.add_child(_label("累计实付 ✦ %d · 预计返还 ✦ %d" % [progress.cumulative_upgrade_spend, refund], 11, UI.TEXT_MUTED))
 	var actions := HBoxContainer.new()
 	actions.add_theme_constant_override(&"separation", UI.GAP_XS)
 	box.add_child(actions)
@@ -2492,6 +2601,8 @@ func _grab_formal_focus(control_id: StringName) -> void:
 
 func _shop_cause_copy(cause: StringName) -> String:
 	match cause:
+		&"tab_changed":
+			return "已切换本地商店列表；未提交任何事务。"
 		&"skill_selected":
 			return "已选择技能；点击同类型槽位即可即时生效。"
 		&"slot_selected":

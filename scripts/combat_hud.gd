@@ -94,7 +94,6 @@ var _banner_tween: Tween
 var _energy_tween: Tween
 var _debug_elapsed: float = 0.0
 var _last_event_text: String = "等待战斗结果"
-var _pending_auto_change: ElementChangeResult
 var _boss_target: BossTideEmber
 var _boss_health_bar: ProgressBar
 var _boss_health_value: Label
@@ -319,10 +318,7 @@ func _on_element_changed(change: ElementChangeResult) -> void:
 		return
 	_refresh_element(change.current_element_id)
 	if change.source == FormChangedEvent.Source.MANUAL:
-		_pending_auto_change = null
 		_show_feedback("手动切换 · %s" % _element_label(change.current_element_id), &"manual")
-	else:
-		_pending_auto_change = change
 
 
 func _on_element_change_attempted(result: ElementChangeResult) -> void:
@@ -354,78 +350,11 @@ func _on_cast_attempted(slot_id: StringName, result: CastAttemptResult) -> void:
 	if result == null:
 		return
 	if not result.accepted:
-		_pending_auto_change = null
 		_last_event_text = "释放拒绝：%s / %s" % [String(slot_id), String(result.reason_name())]
-		_set_slot_transient(slot_id, "失败", &"error")
-		_show_reject_feedback(result)
 		_refresh_skill_status()
 		return
-	var skill := _player_skills.get_skill_for_slot(slot_id)
-	var content := _catalog.content_for(result.skill_id) if _catalog != null else null
-	var display_name := content.display_name if content != null else String(result.skill_id)
-	if skill != null:
-		var feedback := cast_acceptance_feedback(
-			skill,
-			display_name,
-			slot_id,
-			result.cast_snapshot,
-			_pending_auto_change != null
-		)
-		if not feedback.is_empty():
-			_show_feedback(feedback, _acceptance_tone(skill, _pending_auto_change != null))
-			_set_slot_transient(slot_id, "锁定", &"lock")
-	_pending_auto_change = null
 	_last_event_text = "释放接受：%s / cast %d / locked=%s" % [String(result.skill_id), result.cast_snapshot.cast_id, String(result.cast_snapshot.cast_element_id)]
 	_refresh_skill_status()
-
-
-func cast_acceptance_feedback(
-	skill: SkillDefinition,
-	display_name: String,
-	slot_id: StringName,
-	snapshot: CastSnapshot,
-	auto_change_committed: bool
-) -> String:
-	if skill == null or snapshot == null:
-		return ""
-	match skill.element_policy:
-		SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT:
-			if auto_change_committed:
-				return "自动调谐 · %s → 当前元素 %s" % [String(slot_id).to_upper(), _element_label(snapshot.cast_element_id)]
-			return "固定元素锁定 · %s · %s" % [display_name, _element_label(snapshot.cast_element_id)]
-		SkillDefinition.ElementPolicy.CURRENT_ELEMENT:
-			return "元素锁定 · %s · %s" % [display_name, _element_label(snapshot.cast_element_id)]
-		SkillDefinition.ElementPolicy.NEUTRAL:
-			return "无属性锁定 · %s · ○ NONE" % display_name
-		_:
-			return ""
-
-
-func _acceptance_tone(skill: SkillDefinition, auto_change_committed: bool) -> StringName:
-	if skill.element_policy == SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT and auto_change_committed:
-		return &"auto"
-	if skill.element_policy == SkillDefinition.ElementPolicy.CURRENT_ELEMENT:
-		return &"lock"
-	if skill.element_policy == SkillDefinition.ElementPolicy.NEUTRAL:
-		return &"neutral"
-	return &"lock"
-
-
-func _show_reject_feedback(result: CastAttemptResult) -> void:
-	match result.reject_reason:
-		CastAttemptResult.RejectReason.INSUFFICIENT_ENERGY:
-			_show_feedback("能量不足 · 等待恢复后重试", &"energy")
-			_pulse_energy()
-		CastAttemptResult.RejectReason.COOLDOWN_ACTIVE:
-			_show_feedback("冷却中 · %.1f 秒后可用" % result.cooldown_remaining, &"cooldown")
-		CastAttemptResult.RejectReason.BUSY, CastAttemptResult.RejectReason.EXTERNAL_GATE_REJECTED:
-			_show_feedback("当前忙碌 · 动作结束后重试", &"busy")
-		CastAttemptResult.RejectReason.NOT_CASTABLE:
-			_show_feedback("被动技能 · 此按键不发起释放", &"passive")
-		CastAttemptResult.RejectReason.SLOT_UNASSIGNED:
-			_show_feedback("槽位为空 · 请在共享配装中装备技能", &"error")
-		_:
-			_show_feedback("释放失败 · %s" % String(result.reason_name()), &"error")
 
 
 func _on_target_health_changed(_current: int, _maximum: int, _delta: int) -> void:

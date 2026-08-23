@@ -8,7 +8,7 @@
 script = ExtResource("1_content")
 skill_id = &"passive_reaction_energy"
 display_name = "元素回响"
-description = "严格被动槽：玩家造成一次已接受的元素反应结算时恢复10点SP；每次结算最多触发一次。"
+description = "玩家造成一次已接受的元素反应结算时恢复10点SP；每次结算最多触发一次。"
 icon = ExtResource("3_icon")
 gameplay_definition = ExtResource("2_gameplay")
 allowed_form_ids = Array[StringName]([&"water", &"fire"])

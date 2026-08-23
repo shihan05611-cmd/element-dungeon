@@ -145,9 +145,12 @@ func _test_compact_authoritative_state_grammar() -> void:
 	_expect(cooldown_label.visible and cooldown_label.text == "2.4", "authority cooldown shows remaining seconds")
 	_expect(String(_hud.call("_format_cooldown", 12.2)) == "13", "long cooldown stays integer-short")
 	cooldowns.advance(30.0)
-	_hud.call("_on_cast_attempted", SkillSlotIds.ACTIVE_1, CastAttemptResult.rejected(CastAttemptResult.RejectReason.BUSY, skill.skill_id, &"", 0.0, SkillSlotIds.ACTIVE_1))
-	_expect(not _hud.feedback_text().is_empty(), "busy rejection supplies safe feedback")
 	(_hud.get("_slot_transients") as Dictionary).clear()
+	var feedback_before := _hud.feedback_text()
+	var feedback_visible_before := (_hud.get_node("Root/FeedbackPanel") as Control).visible
+	_hud.call("_on_cast_attempted", SkillSlotIds.ACTIVE_1, CastAttemptResult.rejected(CastAttemptResult.RejectReason.BUSY, skill.skill_id, &"", 0.0, SkillSlotIds.ACTIVE_1))
+	_expect(_hud.feedback_text() == feedback_before and (_hud.get_node("Root/FeedbackPanel") as Control).visible == feedback_visible_before, "busy rejection does not project FeedbackPanel copy")
+	_expect(not (_hud.get("_slot_transients") as Dictionary).has(SkillSlotIds.ACTIVE_1), "busy rejection does not create slot transient text")
 	_hud.call("_refresh_skill_status")
 
 

@@ -49,15 +49,15 @@ func _run() -> void:
 	await _run_async_test("fury_authoritative_signal_and_lock", _test_fury_authoritative_signal_and_lock)
 	await _run_async_test("laser_authoritative_ticks_and_cleanup", _test_laser_authoritative_ticks_and_cleanup)
 	await _run_async_test("reclaim_success_only_and_trajectory", _test_reclaim_success_only_and_trajectory)
-	await _run_async_test("burning_registration_layers_tick_cleanup", _test_burning_registration_layers_tick_cleanup)
-	await _run_async_test("unending_registration_trigger_cleanup", _test_unending_registration_trigger_cleanup)
+	await _run_async_test("element_attachment_loops_and_passive_triggers", _test_element_attachment_loops_and_passive_triggers)
+	await _run_async_test("element_attachment_loop_lifecycle_cleanup", _test_element_attachment_loop_lifecycle_cleanup)
 
 	for tween: Tween in get_processed_tweens():
 		tween.kill()
 	if is_instance_valid(_room):
 		_room.queue_free()
 	await process_frame
-	quit(_harness.report("TASK 18 SKILL VFX RUNTIME TESTS"))
+	quit(_harness.report("TASK 86 ELEMENT ATTACHMENT LOOP VFX TESTS"))
 
 
 func _test_catalog_assets_and_pure_scenes() -> void:
@@ -172,7 +172,7 @@ func _test_coordinator_single_entry() -> void:
 	_expect(
 		_coordinator.burning_loop_count == 0
 		and _coordinator.unending_loop_count == 0,
-		"no passive loop is shown without actual registration"
+		"no element attachment loop is shown with zero layers"
 	)
 
 
@@ -288,35 +288,26 @@ func _test_reclaim_success_only_and_trajectory() -> void:
 	await process_frame
 
 
-func _test_burning_registration_layers_tick_cleanup() -> void:
-	_expect(_equip(&"burning"), "equip Burning")
+func _test_element_attachment_loops_and_passive_triggers() -> void:
 	_set_enemy_elements(0, 2)
 	await process_frame
-	_expect(_coordinator.burning_loop_count == 1, "Burning loop requires registration and fire layers")
+	_expect(_coordinator.burning_loop_count == 1, "fire attachment creates one Burning loop without the passive")
 	_set_enemy_elements(0, 4)
 	await process_frame
-	_expect(_coordinator.burning_loop_count == 1, "Burning layer changes do not duplicate loops")
+	_expect(_coordinator.burning_loop_count == 1, "positive fire layer changes do not duplicate the loop")
 	var ticks_before := _coordinator.burning_tick_count
 	_host.passive_adapter.advance(1.0)
-	_expect(
-		_coordinator.burning_tick_count == ticks_before + 1,
-		"confirmed one-second Burning submission plays one trigger"
-	)
-	_set_enemy_elements(0, 0)
-	_expect(_coordinator.burning_loop_count == 0, "Burning loop clears at zero fire layers")
-	_expect(_equip(&"element_bolt"), "unequip Burning")
-	_set_enemy_elements(0, 2)
-	_expect(_coordinator.burning_loop_count == 0, "unregistered Burning remains hidden")
+	_expect(_coordinator.burning_tick_count == ticks_before, "unregistered Burning produces no tick trigger")
 
-
-func _test_unending_registration_trigger_cleanup() -> void:
-	_expect(_equip(&"unending"), "equip Unending")
-	_set_enemy_elements(3, 0)
+	_set_enemy_elements(3, 4)
 	await process_frame
-	_expect(_coordinator.unending_loop_count == 1, "Unending loop requires registration and water layers")
+	_expect(
+		_coordinator.burning_loop_count == 1 and _coordinator.unending_loop_count == 1,
+		"fire and water attachments coexist as one loop each without either passive"
+	)
 	var target_id := _host_enemy_id(_enemy)
 	var event := BasicAttackCommittedEvent.new(
-		&"task18:unending:1",
+		&"task86:unending:without-passive",
 		_player.get_instance_id(),
 		target_id,
 		_enemy.element_carrier.snapshot()
@@ -324,19 +315,58 @@ func _test_unending_registration_trigger_cleanup() -> void:
 	var triggers_before := _coordinator.unending_trigger_count
 	_player.basic_attack_committed.emit(event)
 	_expect(
-		_coordinator.unending_trigger_count == triggers_before + 1,
-		"successful fixed-basic-attack recovery event plays one Unending trigger"
+		_coordinator.unending_trigger_count == triggers_before,
+		"unregistered Unending produces no basic-attack trigger"
 	)
+
+	_expect(_equip(&"burning"), "equip Burning after fire loop already exists")
+	await process_frame
+	_expect(_coordinator.burning_loop_count == 1, "equipping Burning does not restart its attachment loop")
+	_host.passive_adapter.advance(1.0)
+	_expect(
+		_coordinator.burning_tick_count == ticks_before + 1,
+		"actual registered Burning tick plays one trigger"
+	)
+	_expect(_equip(&"unending"), "replace Burning with Unending")
+	await process_frame
+	_expect(
+		_coordinator.burning_loop_count == 1 and _coordinator.unending_loop_count == 1,
+		"passive replacement does not recreate either attachment loop"
+	)
+	_player.basic_attack_committed.emit(event)
+	_expect(
+		_coordinator.unending_trigger_count == triggers_before + 1,
+		"registered Unending reacts to the accepted basic-attack event"
+	)
+
+	_set_enemy_elements(3, 0)
+	_expect(_coordinator.burning_loop_count == 0, "zero fire layers immediately remove Burning loop")
+	_set_enemy_elements(3, 2)
+	_expect(_coordinator.burning_loop_count == 1, "reapplying fire creates one new Burning loop")
+	_set_enemy_elements(0, 2)
+	_expect(_coordinator.unending_loop_count == 0, "zero water layers immediately remove Unending loop")
+	_set_enemy_elements(2, 2)
+	_expect(_coordinator.unending_loop_count == 1, "reapplying water creates one new Unending loop")
+
+
+func _test_element_attachment_loop_lifecycle_cleanup() -> void:
 	_set_enemy_elements(0, 0)
-	_expect(_coordinator.unending_loop_count == 0, "Unending loop clears at zero water layers")
-	_set_enemy_elements(2, 0)
-	_expect(_coordinator.unending_loop_count == 1, "Unending loop rebuilds once when water returns")
+	_set_enemy_elements(2, 2)
+	_expect(
+		_coordinator.unending_loop_count == 1 and _coordinator.burning_loop_count == 1,
+		"both attachment loops exist before lifecycle cleanup"
+	)
+	_expect(_coordinator.set_enemies([]), "room enemy observation can clear during room transition")
+	_expect(
+		_coordinator.unending_loop_count == 0 and _coordinator.burning_loop_count == 0,
+		"room transition releases all attachment loop WeakRefs"
+	)
 	_player.skill_controller.on_owner_died()
 	_player.player_defeated.emit()
 	_expect(
 		_coordinator.unending_loop_count == 0
 		and _coordinator.burning_loop_count == 0,
-		"player death atomically clears passive presentations"
+		"player death leaves no attachment presentations"
 	)
 
 

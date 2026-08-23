@@ -8,7 +8,7 @@
 script = ExtResource("1_content")
 skill_id = &"passive_energy"
 display_name = "元素储备"
-description = "严格被动槽：常驻增加10点最大SP；不立即回复SP，也不触发回能。"
+description = "常驻增加10点最大SP；不立即回复SP，也不触发回能。"
 icon = ExtResource("3_icon")
 gameplay_definition = ExtResource("2_gameplay")
 allowed_form_ids = Array[StringName]([&"water", &"fire"])

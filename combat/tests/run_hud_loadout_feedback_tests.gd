@@ -43,8 +43,8 @@ func _run() -> void:
 	await _run_async_test("responsive_fixed_layout", _test_responsive_fixed_layout)
 	_run_test("element_text_shape_and_colorblind", _test_element_text_shape_and_colorblind)
 	_run_test("three_policy_and_future_element_preview", _test_three_policy_and_future_element_preview)
-	_run_test("structured_failure_feedback", _test_structured_failure_feedback)
-	_run_test("manual_lock_and_auto_feedback", _test_manual_lock_and_auto_feedback)
+	_run_test("cast_attempts_do_not_project_feedback", _test_cast_attempts_do_not_project_feedback)
+	_run_test("manual_feedback_survives_success_and_auto_change", _test_manual_feedback_survives_success_and_auto_change)
 	_run_test("active_slot_rejects_passive", _test_active_slot_rejects_passive)
 	_run_test("passive_slot_rejects_active", _test_passive_slot_rejects_active)
 	_run_test("zero_active_four_passive_warning", _test_zero_active_four_passive_warning)
@@ -73,6 +73,12 @@ func _test_formal_four_slot_hud_and_icons() -> void:
 	var active_one := _hud.slot_panel(SkillSlotIds.ACTIVE_1)
 	var icon := active_one.get_node("Margin/Box/Content/Icon") as TextureRect
 	_expect(icon.texture != null and icon.texture.resource_path == CATALOG.content_for(&"element_bolt").icon.resource_path, "HUD consumes catalog element bolt icon")
+	var ignition_panel := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_2)
+	var ignition_icon := ignition_panel.get_node("Margin/Body/Icon") as TextureRect
+	var ignition_material := ignition_icon.material as ShaderMaterial
+	_expect(ignition_icon.texture != null and ignition_icon.texture.resource_path == "res://assets/generated/vfx/ignition/icon.png", "real HUD consumes the unique ignition icon")
+	_expect(ignition_icon.size == Vector2(32, 32), "ignition icon keeps the real 32x32 active-slot display size")
+	_expect(is_equal_approx(float(ignition_material.get_shader_parameter(&"disabled")), 1.0), "water-form mismatch renders ignition through the disabled grayscale state")
 	_expect((active_one.get_node("Margin/Box/Top/Key") as Control).visible, "equipped active skill shows keycap")
 	_expect(not (_hud.slot_panel(SkillSlotIds.PASSIVE_1).get_node("Margin/Box/Top/Key") as Control).visible, "PASSIVE_1 never shows a cast keycap")
 	_expect(_hud.get_node_or_null("Root/StatusPanel/Margin/Status/TitleRow") == null and _hud.get_node_or_null("Root/StatusPanel/Margin/Status/CurrentElement") == null, "status panel removes legacy title and element nodes")
@@ -132,52 +138,77 @@ func _test_three_policy_and_future_element_preview() -> void:
 	_overlay.hide_overlay()
 
 
-func _test_structured_failure_feedback() -> void:
-	_hud.call("_show_reject_feedback", CastAttemptResult.rejected(CastAttemptResult.RejectReason.INSUFFICIENT_ENERGY, &"element_bolt", &"", 0.0, SkillSlotIds.ACTIVE_1))
-	var energy_text := _hud.feedback_text()
-	_hud.call("_show_reject_feedback", CastAttemptResult.rejected(CastAttemptResult.RejectReason.COOLDOWN_ACTIVE, &"element_reclaim", &"", 2.4, SkillSlotIds.ACTIVE_1))
-	var cooldown_text := _hud.feedback_text()
-	_hud.call("_show_reject_feedback", CastAttemptResult.rejected(CastAttemptResult.RejectReason.BUSY, &"element_bolt", &"", 0.0, SkillSlotIds.ACTIVE_1))
-	var busy_text := _hud.feedback_text()
-	_expect(not energy_text.is_empty(), "energy rejection has feedback")
-	_expect(cooldown_text.contains("2.4"), "cooldown rejection includes the remaining time")
-	_expect(not busy_text.is_empty(), "busy rejection has feedback")
-	_expect(energy_text != cooldown_text and cooldown_text != busy_text and energy_text != busy_text, "energy cooldown and busy cannot be confused")
+func _test_cast_attempts_do_not_project_feedback() -> void:
+	_hud.call("_show_feedback", "手动切换 · 基线", &"manual", 10.0)
+	var before_text := _hud.feedback_text()
+	var before_visible := (_hud.get_node("Root/FeedbackPanel") as Control).visible
+	(_hud.get("_slot_transients") as Dictionary).clear()
+	var reasons: Array[int] = [
+		CastAttemptResult.RejectReason.INSUFFICIENT_ENERGY,
+		CastAttemptResult.RejectReason.COOLDOWN_ACTIVE,
+		CastAttemptResult.RejectReason.BUSY,
+		CastAttemptResult.RejectReason.NOT_CASTABLE,
+		CastAttemptResult.RejectReason.SLOT_UNASSIGNED,
+		CastAttemptResult.RejectReason.INVALID_CONFIGURATION,
+	]
+	for reason: int in reasons:
+		var rejected := CastAttemptResult.rejected(reason, &"element_bolt", &"", 2.4, SkillSlotIds.ACTIVE_1)
+		_hud.call("_on_cast_attempted", SkillSlotIds.ACTIVE_1, rejected)
+		_expect(_hud.feedback_text() == before_text and (_hud.get_node("Root/FeedbackPanel") as Control).visible == before_visible, "reject %s does not replace player feedback" % rejected.reason_name())
+		_expect(not (_hud.get("_slot_transients") as Dictionary).has(SkillSlotIds.ACTIVE_1), "reject %s creates no slot transient" % rejected.reason_name())
+	_expect(String(_hud.get("_last_event_text")).begins_with("释放拒绝"), "structured rejection remains debug-observable")
 
 
-func _test_manual_lock_and_auto_feedback() -> void:
+func _test_manual_feedback_survives_success_and_auto_change() -> void:
 	_player.skill_executor.advance(2.0)
 	var manual := _player.request_element(ElementIds.FIRE)
 	_expect(manual.accepted and manual.changed, "manual switch commits")
 	_expect(not _hud.feedback_text().is_empty(), "manual switch has feedback")
+	var ignition_panel := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_2)
+	var ignition_icon := ignition_panel.get_node("Margin/Body/Icon") as TextureRect
+	var ignition_material := ignition_icon.material as ShaderMaterial
+	_expect(is_zero_approx(float(ignition_material.get_shader_parameter(&"disabled"))), "fire form restores ignition's normal full-color icon state")
+	_expect(not (ignition_panel.get_node("Margin/Body/CooldownMask") as Control).visible, "available ignition has no cooldown mask")
 	var current_policy := (_hud.slot_panel(SkillSlotIds.ACTIVE_1).get_node("Margin/Box/Content/Text/Policy") as Label).text
 	_expect(not current_policy.is_empty(), "manual switch immediately updates the dynamic badge")
 	_player.energy_component.set_current(100)
+	(_hud.get("_slot_transients") as Dictionary).clear()
+	var manual_text := _hud.feedback_text()
+	var manual_visible := (_hud.get_node("Root/FeedbackPanel") as Control).visible
 	var accepted := _player.try_cast_slot(SkillSlotIds.ACTIVE_1)
 	_expect(accepted.accepted, "current-element cast accepted")
-	_expect(_hud.feedback_text().contains("FIRE"), "accepted common skill identifies its locked element")
-	var exclusive := SkillDefinition.new()
-	exclusive.skill_id = &"qa_exclusive"
-	exclusive.element_policy = SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT
-	exclusive.required_element_id = ElementIds.WATER
-	var exclusive_snapshot := _cast_snapshot(ElementIds.WATER, &"qa_exclusive")
-	var auto_text := _hud.cast_acceptance_feedback(exclusive, "模拟专属", SkillSlotIds.ACTIVE_2, exclusive_snapshot, true)
-	_expect(auto_text.contains("ACTIVE_2") and auto_text.contains("WATER"), "exclusive accepted feedback identifies its slot and element")
-	var failed := CastAttemptResult.rejected(CastAttemptResult.RejectReason.INSUFFICIENT_ENERGY, &"qa_exclusive", &"")
-	_hud.call("_on_cast_attempted", SkillSlotIds.ACTIVE_2, failed)
-	_expect(not _hud.feedback_text().is_empty() and _hud.feedback_text() != auto_text, "failed exclusive cast replaces the success feedback")
+	_expect(_hud.feedback_text() == manual_text and (_hud.get_node("Root/FeedbackPanel") as Control).visible == manual_visible, "successful common cast leaves manual feedback unchanged")
+	_expect(not (_hud.get("_slot_transients") as Dictionary).has(SkillSlotIds.ACTIVE_1), "successful common cast creates no slot transient")
+	_expect(String(_hud.get("_last_event_text")).begins_with("释放接受"), "accepted common cast remains debug-observable")
 	_player.skill_executor.advance(2.0)
+	var back_to_water := _player.request_element(ElementIds.WATER)
+	_expect(back_to_water.accepted and back_to_water.changed, "manual switch returns to water before exclusive cast")
+	_enemy.element_carrier.set_amounts_silent(0, 3)
+	manual_text = _hud.feedback_text()
+	manual_visible = (_hud.get_node("Root/FeedbackPanel") as Control).visible
+	var ignition := _player.try_cast_slot(SkillSlotIds.ACTIVE_2)
+	_expect(ignition.accepted and _player.current_element_controller.current_element_id == ElementIds.FIRE, "exclusive ignition still auto-switches to fire")
+	_expect(_hud.feedback_text() == manual_text and (_hud.get_node("Root/FeedbackPanel") as Control).visible == manual_visible, "exclusive auto-change success leaves manual feedback unchanged")
+	_expect(not (_hud.get("_slot_transients") as Dictionary).has(SkillSlotIds.ACTIVE_2), "exclusive auto-change creates no slot transient")
+	_expect((ignition_panel.get_node("Margin/Body/CooldownMask") as Control).visible and (ignition_panel.get_node("Margin/Body/CooldownLabel") as Label).visible, "accepted ignition keeps its cooldown mask and seconds")
+	_expect(is_equal_approx(float(ignition_material.get_shader_parameter(&"disabled")), 1.0), "ignition cooldown keeps the icon grayscale-disabled")
+	_hud.set_skill_hud_visible(false)
+	_expect(not _hud.skill_panel.visible and ignition_icon.texture.resource_path == "res://assets/generated/vfx/ignition/icon.png", "H-hidden skill HUD retains the latest ignition icon state")
+	_hud.set_skill_hud_visible(true)
+	_expect(_hud.skill_panel.visible and ignition_icon.is_visible_in_tree() and ignition_icon.texture.resource_path == "res://assets/generated/vfx/ignition/icon.png", "restored skill HUD shows the latest ignition icon state")
 
 
 func _test_active_slot_rejects_passive() -> void:
 	_overlay.show_loadout()
 	var before: RuntimeLoadoutSnapshot = _overlay.current_preview()
+	var active_two_before := before.get_skill_id(SkillSlotIds.ACTIVE_2)
+	_expect(active_two_before == &"ignition", "Task81 default preview keeps ignition in ACTIVE_2")
 	var detail: StringName = _overlay.try_preview_assignment(&"burning", SkillSlotIds.ACTIVE_2)
 	var after: RuntimeLoadoutSnapshot = _overlay.current_preview()
 	_expect(detail == &"passive_skill_in_active_slot", "ACTIVE slot rejects PASSIVE through runtime validation")
 	_expect(after.same_mapping(before), "rejected passive drop does not mutate preview")
 	_expect(after.entries.size() == 7, "strict preview keeps the complete seven-slot snapshot")
-	_expect(after.get_skill_id(SkillSlotIds.ACTIVE_2).is_empty(), "rejected active slot stays empty")
+	_expect(after.get_skill_id(SkillSlotIds.ACTIVE_2) == active_two_before, "rejected passive drop preserves the existing ACTIVE_2 assignment")
 
 
 func _test_passive_slot_rejects_active() -> void:

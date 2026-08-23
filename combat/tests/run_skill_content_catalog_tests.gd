@@ -134,7 +134,8 @@ func _test_formal_catalog_shape() -> void:
 		var expected: Dictionary = formal_stat_passives[skill_id]
 		var content := CATALOG.content_for(skill_id)
 		_expect(content != null and content.display_name == expected["name"], "formal stat passive has its product name: %s" % String(skill_id))
-		_expect(content != null and content.description.contains("严格被动槽") and content.description.contains("最大"), "formal stat passive describes strict passive capacity: %s" % String(skill_id))
+		_expect(content != null and not content.description.contains("严格被动槽") and content.description.contains("最大"), "formal stat passive keeps effect copy without a slot-label prefix: %s" % String(skill_id))
+		_expect(content != null and not content.gameplay_definition.is_active_skill(), "formal stat passive remains governed by passive gameplay semantics: %s" % String(skill_id))
 		_expect(content != null and content.icon != null and content.icon.resource_path == expected["icon"], "formal stat passive has its independent icon: %s" % String(skill_id))
 		_expect(content != null and content.gameplay_definition.resource_path == expected["gameplay"], "formal stat passive points to the frozen gameplay resource: %s" % String(skill_id))
 		_expect(content != null and content.equippable and content.purchase_price == 75, "formal stat passive is purchasable and equippable: %s" % String(skill_id))
@@ -153,7 +154,17 @@ func _test_formal_catalog_shape() -> void:
 		elif content.skill_id in [&"passive_vitality", &"passive_energy", &"passive_reaction_energy"]:
 			_expect(content.icon != null and content.presentation_scene == null, "stat passive uses an icon without fake world presentation: %s" % String(content.skill_id))
 		elif content.skill_id == &"ignition":
-			_expect(content.icon == null and content.presentation_scene == null and content.runtime_delivery_scene == null, "ignition reuses existing presentation without adding an icon or delivery")
+			_expect(content.icon != null and content.icon.resource_path == "res://assets/generated/vfx/ignition/icon.png", "ignition owns its unique stable formal icon path")
+			_expect(content.presentation_scene == null and content.runtime_delivery_scene == null, "ignition icon adds no world presentation or delivery")
+			var ignition_image := content.icon.get_image()
+			_expect(ignition_image != null and ignition_image.get_size() == Vector2i(256, 256), "ignition formal icon keeps the authored 256x256 size")
+			_expect(ignition_image != null and ignition_image.detect_alpha() != Image.ALPHA_NONE, "ignition formal icon preserves real transparency")
+			if ignition_image != null:
+				var border_is_clear := true
+				for coordinate: int in range(256):
+					border_is_clear = border_is_clear and ignition_image.get_pixel(coordinate, 0).a == 0.0 and ignition_image.get_pixel(coordinate, 255).a == 0.0
+					border_is_clear = border_is_clear and ignition_image.get_pixel(0, coordinate).a == 0.0 and ignition_image.get_pixel(255, coordinate).a == 0.0
+				_expect(border_is_clear, "ignition icon has a clean fully transparent outer edge")
 		else:
 			_expect(content.icon != null and content.presentation_scene != null, "approved task-17 presentation fields are connected: %s" % String(content.skill_id))
 

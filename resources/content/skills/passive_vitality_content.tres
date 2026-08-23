@@ -8,7 +8,7 @@
 script = ExtResource("1_content")
 skill_id = &"passive_vitality"
 display_name = "坚韧体魄"
-description = "严格被动槽：常驻增加20点最大生命；不治疗，也不触发回血。"
+description = "常驻增加20点最大生命；不治疗，也不触发回血。"
 icon = ExtResource("3_icon")
 gameplay_definition = ExtResource("2_gameplay")
 allowed_form_ids = Array[StringName]([&"water", &"fire"])

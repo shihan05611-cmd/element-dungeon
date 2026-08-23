@@ -62,6 +62,9 @@ func _test_compact_hud_state_contract() -> void:
 	_hud.call("_refresh_skill_status")
 	_expect(cooldown_mask.visible and cooldown_label.visible and cooldown_label.text == "2.4", "cooldown mask and seconds remain intact")
 	cooldowns.advance(30.0)
+	(_hud.get("_slot_transients") as Dictionary).clear()
+	var feedback_before := _hud.feedback_text()
+	var feedback_visible_before := (_hud.get_node("Root/FeedbackPanel") as Control).visible
 	_hud.call("_on_cast_attempted", SkillSlotIds.ACTIVE_1, CastAttemptResult.rejected(
 		CastAttemptResult.RejectReason.BUSY,
 		skill.skill_id,
@@ -69,8 +72,8 @@ func _test_compact_hud_state_contract() -> void:
 		0.0,
 		SkillSlotIds.ACTIVE_1
 	))
-	_expect(not _hud.feedback_text().is_empty(), "busy rejection keeps recovery feedback without a permanent strip")
-	(_hud.get("_slot_transients") as Dictionary).clear()
+	_expect(_hud.feedback_text() == feedback_before and (_hud.get_node("Root/FeedbackPanel") as Control).visible == feedback_visible_before, "busy rejection does not project FeedbackPanel copy")
+	_expect(not (_hud.get("_slot_transients") as Dictionary).has(SkillSlotIds.ACTIVE_1), "busy rejection does not create slot transient text")
 	_hud.call("_refresh_skill_status")
 	_expect(not _hud.slot_visible_fields(SkillSlotIds.ACTIVE_1).has(&"cooldown"), "ready state returns to visually quiet after transient feedback")
 
