@@ -59,10 +59,12 @@ var _active_summons: Array[WeakRef] = []
 var _summon_pending_form: BossFormDefinition = null
 var _summon_telegraph_remaining: float = 0.0
 var _melee_range_blink_time: float = 0.0
+var _element_attachment_anchor_base_x: float = 0.0
 
 @onready var _melee_range_telegraph: Node2D = $MeleeRangeTelegraph
 @onready var _melee_range_fill: Polygon2D = $MeleeRangeTelegraph/Fill
 @onready var _melee_range_outline: Line2D = $MeleeRangeTelegraph/Outline
+@onready var _element_attachment_anchor: Node2D = $ElementAttachmentAnchor
 
 
 func _ready() -> void:
@@ -85,6 +87,8 @@ func _ready() -> void:
 	element_carrier.set_meta(&"same_element_mitigation_factor", tuning.same_element_mitigation_factor)
 	current_form_id = starting_form_id
 	ranged_projectile_profile = current_form.ranged_projectile_profile
+	_element_attachment_anchor_base_x = _element_attachment_anchor.position.x
+	_sync_element_attachment_anchor()
 	_play_pose(&"idle")
 	_hide_melee_range_telegraph()
 	_choose_patrol_target()
@@ -225,12 +229,34 @@ func _physics_process(delta: float) -> void:
 	if direction_x != 0.0:
 		facing = direction_x
 		sprite.flip_h = facing < 0.0
+		_sync_element_attachment_anchor()
 		if sprite.animation != _animation_name(&"walk"):
 			_play_pose(&"walk")
 	else:
 		if sprite.animation != _animation_name(&"idle"):
 			_play_pose(&"idle")
 	move_and_slide()
+
+
+## The sprite mirrors with flip_h while this presentation-only anchor is a
+## sibling. Mirror its authored horizontal offset explicitly so a manually
+## tuned attachment keeps the same body-relative placement on both facings.
+func _sync_element_attachment_anchor() -> void:
+	if _element_attachment_anchor == null:
+		return
+	_element_attachment_anchor.position.x = (
+		-_element_attachment_anchor_base_x
+		if sprite.flip_h
+		else _element_attachment_anchor_base_x
+	)
+
+
+## CombatEnemy's ranged cycle changes facing through this hook.  Keep the
+## presentation anchor coupled here as well as in the Boss's direct movement
+## and melee paths, so every left/right transition uses the same mirror rule.
+func _apply_facing(direction: Vector2) -> void:
+	super(direction)
+	_sync_element_attachment_anchor()
 
 
 ## §3.3 "常驻回补": ticks every physics frame regardless of ai_enabled/attack
@@ -462,6 +488,7 @@ func _start_melee_attack(form: BossFormDefinition) -> void:
 	if is_zero_approx(facing):
 		facing = 1.0
 	sprite.flip_h = facing < 0.0
+	_sync_element_attachment_anchor()
 	# Task 69 §2.2: the swing starts on animation frame 0 at exactly the same
 	# instant the ! indicator and the DelayedAreaDelivery's WAITING phase
 	# start, so the animation's windup segment (frames 0 .. impact-1) IS the

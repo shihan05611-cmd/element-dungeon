@@ -1,0 +1,175 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+SCRIPT ERROR: Parse Error: Cannot pass a value of type "StringName" as "NodePath".
+   at: GDScript::reload (res://scripts/vfx/skill_vfx_coordinator.gd:384)
+SCRIPT ERROR: Parse Error: Invalid argument for "get_node_or_null()" function: argument 1 should be "NodePath" but is "StringName".
+   at: GDScript::reload (res://scripts/vfx/skill_vfx_coordinator.gd:384)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://scripts/test_room.gd:0)
+ERROR: Failed to load script "res://scripts/test_room.gd" with error "Compilation failed".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+SCRIPT ERROR: Trying to assign value of type 'Node2D' to a variable of type 'skill_vfx_coordinator.gd'.
+   at: @implicit_ready (res://scripts/test_room.gd:15)
+   GDScript backtrace (most recent call first):
+       [0] @implicit_ready (res://scripts/test_room.gd:15)
+       [1] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:26)
+SCRIPT ERROR: Invalid call. Nonexistent function 'configure' in base 'Nil'.
+   at: _ready (res://scripts/test_room.gd:27)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://scripts/test_room.gd:27)
+       [1] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:26)
+SCRIPT ERROR: Invalid call. Nonexistent 'float' constructor.
+   at: _test_formal_four_slot_hud_and_icons (res://combat/tests/run_hud_loadout_feedback_tests.gd:81)
+   GDScript backtrace (most recent call first):
+       [0] _test_formal_four_slot_hud_and_icons (res://combat/tests/run_hud_loadout_feedback_tests.gd:81)
+       [1] run_test (res://combat/tests/test_harness.gd:34)
+       [2] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [3] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:42)
+PASS responsive_fixed_layout
+PASS element_text_shape_and_colorblind
+PASS cast_attempts_do_not_project_feedback
+SCRIPT ERROR: Invalid call. Nonexistent 'float' constructor.
+   at: _test_element_switches_do_not_project_feedback (res://combat/tests/run_hud_loadout_feedback_tests.gd:171)
+   GDScript backtrace (most recent call first):
+       [0] _test_element_switches_do_not_project_feedback (res://combat/tests/run_hud_loadout_feedback_tests.gd:171)
+       [1] run_test (res://combat/tests/test_harness.gd:34)
+       [2] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [3] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:47)
+       [4] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [5] run_test (res://combat/tests/test_harness.gd:36)
+       [6] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+PASS element_switches_do_not_project_feedback
+SCRIPT ERROR: Invalid call. Nonexistent function 'get_skill_id' in base 'Nil'.
+   at: _test_active_slot_rejects_passive (res://combat/tests/run_hud_loadout_feedback_tests.gd:209)
+   GDScript backtrace (most recent call first):
+       [0] _test_active_slot_rejects_passive (res://combat/tests/run_hud_loadout_feedback_tests.gd:209)
+       [1] run_test (res://combat/tests/test_harness.gd:34)
+       [2] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [3] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:48)
+       [4] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [5] run_test (res://combat/tests/test_harness.gd:36)
+       [6] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+PASS active_slot_rejects_passive
+SCRIPT ERROR: Invalid call. Nonexistent function 'get_skill_id' in base 'Nil'.
+   at: _test_passive_slot_rejects_active (res://combat/tests/run_hud_loadout_feedback_tests.gd:220)
+   GDScript backtrace (most recent call first):
+       [0] _test_passive_slot_rejects_active (res://combat/tests/run_hud_loadout_feedback_tests.gd:220)
+       [1] run_test (res://combat/tests/test_harness.gd:34)
+       [2] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [3] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:49)
+       [4] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [5] run_test (res://combat/tests/test_harness.gd:36)
+       [6] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+PASS passive_slot_rejects_active
+SCRIPT ERROR: Cannot call method 'get_children' on a null value.
+   at: _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+   GDScript backtrace (most recent call first):
+       [0] _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+       [1] _test_zero_active_four_passive_warning (res://combat/tests/run_hud_loadout_feedback_tests.gd:244)
+       [2] run_test (res://combat/tests/test_harness.gd:34)
+       [3] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [4] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:50)
+       [5] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [6] run_test (res://combat/tests/test_harness.gd:36)
+       [7] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+SCRIPT ERROR: Cannot call method 'get_children' on a null value.
+   at: _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+   GDScript backtrace (most recent call first):
+       [0] _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+       [1] _test_zero_active_four_passive_warning (res://combat/tests/run_hud_loadout_feedback_tests.gd:244)
+       [2] run_test (res://combat/tests/test_harness.gd:34)
+       [3] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [4] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:50)
+       [5] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [6] run_test (res://combat/tests/test_harness.gd:36)
+       [7] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+SCRIPT ERROR: Cannot call method 'get_children' on a null value.
+   at: _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+   GDScript backtrace (most recent call first):
+       [0] _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+       [1] _test_zero_active_four_passive_warning (res://combat/tests/run_hud_loadout_feedback_tests.gd:244)
+       [2] run_test (res://combat/tests/test_harness.gd:34)
+       [3] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [4] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:50)
+       [5] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [6] run_test (res://combat/tests/test_harness.gd:36)
+       [7] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+SCRIPT ERROR: Cannot call method 'get_children' on a null value.
+   at: _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+   GDScript backtrace (most recent call first):
+       [0] _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+       [1] _test_zero_active_four_passive_warning (res://combat/tests/run_hud_loadout_feedback_tests.gd:244)
+       [2] run_test (res://combat/tests/test_harness.gd:34)
+       [3] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [4] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:50)
+       [5] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [6] run_test (res://combat/tests/test_harness.gd:36)
+       [7] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+SCRIPT ERROR: Cannot call method 'get_children' on a null value.
+   at: _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+   GDScript backtrace (most recent call first):
+       [0] _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+       [1] _test_zero_active_four_passive_warning (res://combat/tests/run_hud_loadout_feedback_tests.gd:244)
+       [2] run_test (res://combat/tests/test_harness.gd:34)
+       [3] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [4] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:50)
+       [5] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [6] run_test (res://combat/tests/test_harness.gd:36)
+       [7] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+SCRIPT ERROR: Cannot call method 'get_children' on a null value.
+   at: _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+   GDScript backtrace (most recent call first):
+       [0] _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+       [1] _test_zero_active_four_passive_warning (res://combat/tests/run_hud_loadout_feedback_tests.gd:244)
+       [2] run_test (res://combat/tests/test_harness.gd:34)
+       [3] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [4] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:50)
+       [5] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [6] run_test (res://combat/tests/test_harness.gd:36)
+       [7] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+SCRIPT ERROR: Cannot call method 'get_children' on a null value.
+   at: _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+   GDScript backtrace (most recent call first):
+       [0] _all_text (res://combat/tests/run_hud_loadout_feedback_tests.gd:406)
+       [1] _test_zero_active_four_passive_warning (res://combat/tests/run_hud_loadout_feedback_tests.gd:244)
+       [2] run_test (res://combat/tests/test_harness.gd:34)
+       [3] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [4] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:50)
+       [5] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [6] run_test (res://combat/tests/test_harness.gd:36)
+       [7] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+ERROR: Node not found: "DamageFeedback_0" (relative to "/root/TestRoom/WorldFeedbackLayer").
+   at: get_node (scene/main/node.cpp:1975)
+   GDScript backtrace (most recent call first):
+       [0] _test_single_final_number_two_layer_reaction (res://combat/tests/run_hud_loadout_feedback_tests.gd:265)
+       [1] run_test (res://combat/tests/test_harness.gd:34)
+       [2] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [3] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:51)
+       [4] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [5] run_test (res://combat/tests/test_harness.gd:36)
+       [6] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+SCRIPT ERROR: Cannot call method 'get_node' on a null value.
+   at: _test_single_final_number_two_layer_reaction (res://combat/tests/run_hud_loadout_feedback_tests.gd:266)
+   GDScript backtrace (most recent call first):
+       [0] _test_single_final_number_two_layer_reaction (res://combat/tests/run_hud_loadout_feedback_tests.gd:266)
+       [1] run_test (res://combat/tests/test_harness.gd:34)
+       [2] _run_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:412)
+       [3] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:51)
+       [4] _run_async_test (res://combat/tests/run_hud_loadout_feedback_tests.gd:416)
+       [5] run_test (res://combat/tests/test_harness.gd:36)
+       [6] _test_responsive_fixed_layout (res://combat/tests/run_hud_loadout_feedback_tests.gd:108)
+PASS actual_consumption_one_layer
+SCRIPT ERROR: Out of bounds get index '0' (on base: 'Array[RouteOption]')
+   at: _test_reward_to_shop_ui_wiring (res://combat/tests/run_hud_loadout_feedback_tests.gd:315)
+   GDScript backtrace (most recent call first):
+       [0] _test_reward_to_shop_ui_wiring (res://combat/tests/run_hud_loadout_feedback_tests.gd:315)
+TASK 12 HUD LOADOUT FEEDBACK TESTS FAILED: 8/13 tests, 91 assertions
+  - formal_four_slot_hud_and_icons: HUD consumes catalog element bolt icon
+  - formal_four_slot_hud_and_icons: real HUD consumes the unique ignition icon
+  - three_policy_and_future_element_preview: future element previews preserve the strict three-active/four-passive zones
+  - zero_active_four_passive_warning: zero-active warning explains the consequence
+  - single_final_number_two_layer_reaction: one damage group and one reaction composition are spawned
+  - reduced_motion_preserves_semantics: reduced motion propagates to combat feedback
+  - reward_to_shop_ui_wiring: reward_ready opens reward UI
+  - reward_to_shop_ui_wiring: reward UI claims through RunSession

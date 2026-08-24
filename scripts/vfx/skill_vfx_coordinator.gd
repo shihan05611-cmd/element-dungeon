@@ -381,8 +381,16 @@ func _set_loop(
 		var presentation := scene.instantiate() as EnemyPassiveVfxPresentation
 		if presentation == null:
 			return
-		enemy.add_child(presentation)
-		presentation.position = Vector2(0.0, 30.0)
+		var attachment_anchor := enemy.get_node_or_null(NodePath("ElementAttachmentAnchor")) as Node2D
+		if attachment_anchor != null:
+			# Bosses may provide a presentation-only anchor sized from their
+			# authored sprite.  Keeping both loops under this same node guarantees
+			# their centers and scale stay synchronized without touching gameplay
+			# collision, root transforms, or normal-enemy presentation.
+			attachment_anchor.add_child(presentation)
+		else:
+			enemy.add_child(presentation)
+			presentation.position = Vector2(0.0, 30.0)
 		storage[enemy_id] = weakref(presentation)
 	elif existing != null:
 		existing.queue_free()

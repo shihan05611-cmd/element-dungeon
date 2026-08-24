@@ -44,7 +44,7 @@ func _run() -> void:
 	_run_test("element_text_shape_and_colorblind", _test_element_text_shape_and_colorblind)
 	_run_test("three_policy_and_future_element_preview", _test_three_policy_and_future_element_preview)
 	_run_test("cast_attempts_do_not_project_feedback", _test_cast_attempts_do_not_project_feedback)
-	_run_test("manual_feedback_survives_success_and_auto_change", _test_manual_feedback_survives_success_and_auto_change)
+	_run_test("element_switches_do_not_project_feedback", _test_element_switches_do_not_project_feedback)
 	_run_test("active_slot_rejects_passive", _test_active_slot_rejects_passive)
 	_run_test("passive_slot_rejects_active", _test_passive_slot_rejects_active)
 	_run_test("zero_active_four_passive_warning", _test_zero_active_four_passive_warning)
@@ -159,11 +159,12 @@ func _test_cast_attempts_do_not_project_feedback() -> void:
 	_expect(String(_hud.get("_last_event_text")).begins_with("释放拒绝"), "structured rejection remains debug-observable")
 
 
-func _test_manual_feedback_survives_success_and_auto_change() -> void:
+func _test_element_switches_do_not_project_feedback() -> void:
 	_player.skill_executor.advance(2.0)
+	_hud.call("_hide_feedback")
 	var manual := _player.request_element(ElementIds.FIRE)
 	_expect(manual.accepted and manual.changed, "manual switch commits")
-	_expect(not _hud.feedback_text().is_empty(), "manual switch has feedback")
+	_expect(not (_hud.get_node("Root/FeedbackPanel") as Control).visible, "manual switch does not show FeedbackPanel")
 	var ignition_panel := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_2)
 	var ignition_icon := ignition_panel.get_node("Margin/Body/Icon") as TextureRect
 	var ignition_material := ignition_icon.material as ShaderMaterial
@@ -173,22 +174,26 @@ func _test_manual_feedback_survives_success_and_auto_change() -> void:
 	_expect(not current_policy.is_empty(), "manual switch immediately updates the dynamic badge")
 	_player.energy_component.set_current(100)
 	(_hud.get("_slot_transients") as Dictionary).clear()
-	var manual_text := _hud.feedback_text()
-	var manual_visible := (_hud.get_node("Root/FeedbackPanel") as Control).visible
+	var feedback_text := _hud.feedback_text()
+	var feedback_visible := (_hud.get_node("Root/FeedbackPanel") as Control).visible
 	var accepted := _player.try_cast_slot(SkillSlotIds.ACTIVE_1)
 	_expect(accepted.accepted, "current-element cast accepted")
-	_expect(_hud.feedback_text() == manual_text and (_hud.get_node("Root/FeedbackPanel") as Control).visible == manual_visible, "successful common cast leaves manual feedback unchanged")
+	_expect(_hud.feedback_text() == feedback_text and (_hud.get_node("Root/FeedbackPanel") as Control).visible == feedback_visible, "successful common cast leaves FeedbackPanel unchanged")
 	_expect(not (_hud.get("_slot_transients") as Dictionary).has(SkillSlotIds.ACTIVE_1), "successful common cast creates no slot transient")
 	_expect(String(_hud.get("_last_event_text")).begins_with("释放接受"), "accepted common cast remains debug-observable")
 	_player.skill_executor.advance(2.0)
 	var back_to_water := _player.request_element(ElementIds.WATER)
 	_expect(back_to_water.accepted and back_to_water.changed, "manual switch returns to water before exclusive cast")
+	_expect(not (_hud.get_node("Root/FeedbackPanel") as Control).visible, "second manual switch still does not show FeedbackPanel")
 	_enemy.element_carrier.set_amounts_silent(0, 3)
-	manual_text = _hud.feedback_text()
-	manual_visible = (_hud.get_node("Root/FeedbackPanel") as Control).visible
+	feedback_text = _hud.feedback_text()
+	feedback_visible = (_hud.get_node("Root/FeedbackPanel") as Control).visible
 	var ignition := _player.try_cast_slot(SkillSlotIds.ACTIVE_2)
 	_expect(ignition.accepted and _player.current_element_controller.current_element_id == ElementIds.FIRE, "exclusive ignition still auto-switches to fire")
-	_expect(_hud.feedback_text() == manual_text and (_hud.get_node("Root/FeedbackPanel") as Control).visible == manual_visible, "exclusive auto-change success leaves manual feedback unchanged")
+	_expect(_hud.feedback_text() == feedback_text and (_hud.get_node("Root/FeedbackPanel") as Control).visible == feedback_visible, "exclusive auto-change leaves FeedbackPanel unchanged")
+	var rejected := ElementChangeResult.rejected(&"test_rejection", _player.current_element_controller.current_element_id, FormChangedEvent.Source.MANUAL)
+	_hud.call("_on_element_change_attempted", rejected)
+	_expect(_hud.feedback_text() == feedback_text and (_hud.get_node("Root/FeedbackPanel") as Control).visible == feedback_visible, "failed switch does not replace FeedbackPanel")
 	_expect(not (_hud.get("_slot_transients") as Dictionary).has(SkillSlotIds.ACTIVE_2), "exclusive auto-change creates no slot transient")
 	_expect((ignition_panel.get_node("Margin/Body/CooldownMask") as Control).visible and (ignition_panel.get_node("Margin/Body/CooldownLabel") as Label).visible, "accepted ignition keeps its cooldown mask and seconds")
 	_expect(is_equal_approx(float(ignition_material.get_shader_parameter(&"disabled")), 1.0), "ignition cooldown keeps the icon grayscale-disabled")
@@ -250,18 +255,23 @@ func _test_zero_active_four_passive_warning() -> void:
 func _test_single_final_number_two_layer_reaction() -> void:
 	_reset_enemy()
 	_enemy.element_carrier.set_amounts_silent(0, 2)
+	var feedback_text_before := _hud.feedback_text()
+	_hud.call("_hide_feedback")
 	var before := _feedback.get_child_count()
 	var result := _submit_hit(ElementIds.WATER, 2, 10.0)
 	_expect(result.accepted and result.reaction_triggered, "two-layer reaction commits")
 	_expect(result.reaction_consumed == 2 and is_equal_approx(result.reaction_multiplier, 1.6), "two layers produce actual 1.6 multiplier")
-	_expect(_feedback.get_child_count() == before + 1, "one feedback group is spawned")
-	var group := _feedback.get_child(_feedback.get_child_count() - 1) as Control
+	_expect(_feedback.get_child_count() == before + 2, "one damage group and one reaction composition are spawned")
+	var group := _feedback.get_node("DamageFeedback_%d" % (_feedback.get("_spawn_serial") as int)) as Control
 	var final_label := group.get_node("FinalDamage") as Label
-	var detail := group.get_node("ReactionDetail") as Label
+	var cue := group.get_node("ReactionCue") as Label
 	_expect(final_label.text == str(result.final_damage), "only one final damage number is displayed")
-	_expect(detail.text == "反应 ×1.6 · 消耗 2 层", "reaction annotation contains multiplier and consumed layers")
+	_expect(cue.text == "反应" and not cue.text.contains("1.6") and not cue.text.contains("2"), "reaction cue contains no multiplier or layer count")
 	_expect(group.find_children("FinalDamage", "Label", true, false).size() == 1, "feedback has one final-damage label")
-	_expect(not _feedback.semantic_damage_summary(result).is_empty(), "semantic summary is available for the resolved hit")
+	_expect(_feedback.active_reaction_visual_count() == 1, "feedback has one reaction composition")
+	var semantic := _feedback.semantic_damage_summary(result)
+	_expect(semantic.contains("1.6") and semantic.contains("消耗 2 层"), "debug semantic summary retains authoritative reaction values")
+	_expect(not (_hud.get_node("Root/FeedbackPanel") as Control).visible and _hud.feedback_text() == feedback_text_before, "accepted reaction does not create or replace the top FeedbackPanel banner")
 
 
 func _test_actual_consumption_one_layer() -> void:
@@ -271,8 +281,8 @@ func _test_actual_consumption_one_layer() -> void:
 	_expect(result.accepted and result.reaction_consumed == 1, "many incoming fire layers consume only one available water layer")
 	_expect(is_equal_approx(result.reaction_multiplier, 1.3), "multiplier uses actual one-layer consumption")
 	var lines := _feedback.presentation_text(result)
-	_expect(lines.size() == 2 and lines[1] == "反应 ×1.3 · 消耗 1 层", "feedback reports actual one layer")
-	_expect(not lines[1].contains(str(result.final_damage)), "reaction annotation does not fabricate a second damage number")
+	_expect(lines.size() == 2 and lines[1] == "反应", "formal feedback uses the fixed reaction cue")
+	_expect(not lines[1].contains(str(result.final_damage)) and not lines[1].contains("×"), "reaction cue exposes no damage duplicate or multiplier")
 
 
 func _test_reduced_motion_preserves_semantics() -> void:

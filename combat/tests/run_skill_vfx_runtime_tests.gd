@@ -12,6 +12,7 @@ const PROJECTILE_SCENE: PackedScene = preload(
 const PROJECTILE_FRAMES: SpriteFrames = preload(
 	"res://resources/animations/element_projectile_frames.tres"
 )
+const BOSS_SCENE: PackedScene = preload("res://scenes/run/enemies/boss_tide_ember.tscn")
 
 var _harness := TestHarness.new()
 var _room: Node2D
@@ -50,6 +51,7 @@ func _run() -> void:
 	await _run_async_test("laser_authoritative_ticks_and_cleanup", _test_laser_authoritative_ticks_and_cleanup)
 	await _run_async_test("reclaim_success_only_and_trajectory", _test_reclaim_success_only_and_trajectory)
 	await _run_async_test("element_attachment_loops_and_passive_triggers", _test_element_attachment_loops_and_passive_triggers)
+	await _run_async_test("boss_attachment_anchor_preserves_normal_enemy_vfx", _test_boss_attachment_anchor_preserves_normal_enemy_vfx)
 	await _run_async_test("element_attachment_loop_lifecycle_cleanup", _test_element_attachment_loop_lifecycle_cleanup)
 
 	for tween: Tween in get_processed_tweens():
@@ -368,6 +370,55 @@ func _test_element_attachment_loop_lifecycle_cleanup() -> void:
 		and _coordinator.burning_loop_count == 0,
 		"player death leaves no attachment presentations"
 	)
+
+
+func _test_boss_attachment_anchor_preserves_normal_enemy_vfx() -> void:
+	_set_enemy_elements(0, 0)
+	var boss := BOSS_SCENE.instantiate() as CombatEnemy
+	_room.add_child(boss)
+	boss.global_position = Vector2(700.0, 470.0)
+	boss.set_physics_process(false)
+	boss.ai_enabled = false
+	await process_frame
+	_expect(_coordinator.set_enemies([_enemy, boss]), "coordinator accepts boss alongside normal enemy")
+	var anchor := boss.get_node_or_null("ElementAttachmentAnchor") as Node2D
+	_expect(anchor != null and anchor.scale == Vector2(2.0, 2.0), "Boss supplies its authored presentation-only attachment anchor")
+	var authored_anchor_x := anchor.position.x
+	var authored_anchor_y := anchor.position.y
+	boss.sprite.flip_h = true
+	boss.call("_sync_element_attachment_anchor")
+	_expect(is_equal_approx(anchor.position.x, -authored_anchor_x) and is_equal_approx(anchor.position.y, authored_anchor_y), "Boss facing mirror negates only the authored attachment X offset")
+	boss.sprite.flip_h = false
+	boss.call("_sync_element_attachment_anchor")
+	_expect(is_equal_approx(anchor.position.x, authored_anchor_x), "unflipped Boss restores its authored attachment X offset")
+	boss.call("_apply_facing", Vector2.LEFT)
+	_expect(boss.sprite.flip_h and is_equal_approx(anchor.position.x, -authored_anchor_x), "shared ranged-facing hook mirrors the attachment anchor")
+	boss.call("_apply_facing", Vector2.RIGHT)
+	_expect(not boss.sprite.flip_h and is_equal_approx(anchor.position.x, authored_anchor_x), "shared ranged-facing hook restores the attachment anchor")
+	_set_enemy_elements(2, 2)
+	var boss_before := boss.element_carrier.snapshot()
+	_expect(boss.element_carrier.set_amounts_silent(2, 2), "boss accepts two attachments")
+	boss.element_carrier.notify_changed(boss_before)
+	await process_frame
+	var normal_fire := _coordinator.get("_burning_loops") as Dictionary
+	var normal_water := _coordinator.get("_unending_loops") as Dictionary
+	var boss_fire := (normal_fire.get(boss.get_instance_id()) as WeakRef).get_ref() as EnemyPassiveVfxPresentation
+	var boss_water := (normal_water.get(boss.get_instance_id()) as WeakRef).get_ref() as EnemyPassiveVfxPresentation
+	var normal_loop := (normal_fire.get(_enemy.get_instance_id()) as WeakRef).get_ref() as EnemyPassiveVfxPresentation
+	_expect(boss_fire != null and boss_water != null and normal_loop != null, "both boss loops and normal fire loop exist")
+	_expect(boss_fire.get_parent() == anchor and boss_water.get_parent() == anchor, "Boss fire and water loops share the visual anchor")
+	_expect(boss_fire.position == Vector2.ZERO and boss_water.position == Vector2.ZERO and boss_fire.global_scale == boss_water.global_scale, "Boss double attachments share center and scale")
+	_expect((boss_fire.get_node("Loop") as Node2D).global_scale == (boss_fire.get_node("Trigger") as Node2D).global_scale, "Boss burning trigger inherits its loop scale")
+	_expect((boss_water.get_node("Loop") as Node2D).global_position == (boss_water.get_node("Trigger") as Node2D).global_position, "Boss unending trigger inherits its loop anchor")
+	_expect(normal_loop.get_parent() == _enemy and normal_loop.position == Vector2(0.0, 30.0) and normal_loop.scale == Vector2.ONE, "normal enemy keeps its existing attachment parent, position and scale")
+	boss_before = boss.element_carrier.snapshot()
+	boss.element_carrier.clear_all(false)
+	boss.element_carrier.notify_changed(boss_before)
+	await process_frame
+	_expect(not normal_fire.has(boss.get_instance_id()) and not normal_water.has(boss.get_instance_id()), "clearing boss elements removes both adapted loops")
+	_expect(_coordinator.set_enemies([_enemy]), "coordinator restores normal-room enemy binding")
+	boss.queue_free()
+	await process_frame
 
 
 func _equip(skill_id: StringName) -> bool:

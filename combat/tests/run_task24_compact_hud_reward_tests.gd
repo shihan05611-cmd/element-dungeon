@@ -267,12 +267,13 @@ func _test_single_final_damage_contract() -> void:
 	var result := _submit_hit(ElementIds.WATER, 2, 10.0)
 	_expect(result.accepted and result.reaction_triggered, "committed two-layer reaction remains accepted")
 	_expect(result.reaction_consumed == 2 and is_equal_approx(result.reaction_multiplier, 1.6), "authoritative reaction values remain unchanged")
-	_expect(_feedback.get_child_count() == groups_before + 1, "one committed hit creates one feedback group")
-	var group := _feedback.get_child(_feedback.get_child_count() - 1) as Control
+	_expect(_feedback.get_child_count() == groups_before + 2, "one reaction creates one damage group and one composition")
+	var group := _feedback.get_node("DamageFeedback_%d" % (_feedback.get("_spawn_serial") as int)) as Control
 	var final_labels := group.find_children("FinalDamage", "Label", true, false)
 	_expect(final_labels.size() == 1 and (final_labels[0] as Label).text == str(result.final_damage), "exactly one final-damage number is rendered")
-	var detail := group.get_node("ReactionDetail") as Label
-	_expect(detail.text == "反应 ×1.6 · 消耗 2 层" and not detail.text.contains(str(result.final_damage)), "reaction annotation has no duplicate damage number")
+	var cue := group.get_node("ReactionCue") as Label
+	_expect(cue.text == "反应" and not cue.text.contains(str(result.final_damage)), "reaction cue is fixed and contains no mechanical number")
+	_expect(_feedback.active_reaction_visual_count() == 1, "reaction creates exactly one composition instance")
 
 
 func _test_real_reward_explicit_confirm() -> void:

@@ -317,17 +317,13 @@ func _on_element_changed(change: ElementChangeResult) -> void:
 	if change == null or not change.accepted or not change.changed:
 		return
 	_refresh_element(change.current_element_id)
-	if change.source == FormChangedEvent.Source.MANUAL:
-		_show_feedback("手动切换 · %s" % _element_label(change.current_element_id), &"manual")
 
 
-func _on_element_change_attempted(result: ElementChangeResult) -> void:
-	if result == null:
-		return
-	if not result.accepted:
-		_show_feedback("切换失败 · %s" % String(result.detail), &"error")
-	elif result.buffered:
-		_show_feedback("手动切换已排队 · %s" % _element_label(result.current_element_id), &"manual")
+func _on_element_change_attempted(_result: ElementChangeResult) -> void:
+	# Element changes remain fully observable through the element icon, active
+	# skill availability and debug state.  They intentionally never claim the
+	# general-purpose FeedbackPanel, including rejected and buffered attempts.
+	pass
 
 
 func _on_phase_changed(
@@ -435,8 +431,6 @@ func _on_result_observed(result: CombatResult, receiver: CombatReceiver) -> void
 		]
 		if result.mitigation_applied:
 			_show_feedback("同元素免伤 · 伤害大幅降低（%d）" % result.final_damage, &"mitigated")
-		elif result.reaction_triggered:
-			_show_feedback("反元素增伤 · ×%.1f（%d）" % [result.reaction_multiplier, result.final_damage], &"reaction")
 	else:
 		var target_name := String(receiver.target_team_id) if receiver != null else "unknown"
 		_last_event_text = "命中拒绝：%s / %s\n目标：%s" % [String(result.reject_code), String(result.reject_detail), target_name]

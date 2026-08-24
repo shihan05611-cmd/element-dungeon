@@ -2,16 +2,19 @@ class_name CombatFeedback
 extends Node2D
 
 const UI := preload("res://scripts/ui/combat_ui_tokens.gd")
+const REACTION_VISUAL_SCENE: PackedScene = preload("res://combat/presentation/element_reaction_visual.tscn")
 
 signal result_observed(result: CombatResult, receiver: CombatReceiver)
 
 const MAX_ACTIVE_LABELS := 28
+const MAX_ACTIVE_REACTION_VISUALS := 16
 const MAX_SHOWN_KEYS := 128
 const PLAYER_DAMAGE_COLOR := Color("ff9aaa")
 
 @export var reduced_motion: bool = false
 
 var _active_labels: Array[Control] = []
+var _active_reaction_visuals: Array[Node2D] = []
 var _observed_receivers: Dictionary = {}
 var _observed_deliveries: Dictionary = {}
 var _shown_keys: Dictionary = {}
@@ -67,6 +70,7 @@ func _on_delivery_exited(delivery_id: int) -> void:
 
 
 func _spawn_damage_number(result: CombatResult, receiver: CombatReceiver) -> void:
+	_prune_labels()
 	while _active_labels.size() >= MAX_ACTIVE_LABELS:
 		var oldest: Control = _active_labels.pop_front()
 		if is_instance_valid(oldest):
@@ -74,6 +78,7 @@ func _spawn_damage_number(result: CombatResult, receiver: CombatReceiver) -> voi
 
 	_spawn_serial += 1
 	var group := VBoxContainer.new()
+	group.name = "DamageFeedback_%d" % _spawn_serial
 	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	group.z_index = 60
 	group.add_theme_constant_override(&"separation", -2)
@@ -89,20 +94,22 @@ func _spawn_damage_number(result: CombatResult, receiver: CombatReceiver) -> voi
 	number.text = "-%d" % result.final_damage if targets_player else str(result.final_damage)
 	group.add_child(number)
 	if result.reaction_triggered:
-		var detail := Label.new()
-		detail.name = "ReactionDetail"
-		detail.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		detail.add_theme_constant_override(&"outline_size", 4)
-		detail.add_theme_color_override(&"font_outline_color", Color("10131c"))
-		detail.add_theme_color_override(&"font_color", UI.WARNING)
-		detail.add_theme_font_size_override(&"font_size", 13)
-		detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		detail.text = "反应 ×%.1f · 消耗 %d 层" % [result.reaction_multiplier, result.reaction_consumed]
-		group.add_child(detail)
+		var cue := Label.new()
+		cue.name = "ReactionCue"
+		cue.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		cue.add_theme_constant_override(&"outline_size", 4)
+		cue.add_theme_color_override(&"font_outline_color", Color("10131c"))
+		cue.add_theme_color_override(&"font_color", UI.WARNING)
+		cue.add_theme_font_size_override(&"font_size", 16)
+		cue.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		cue.text = "反应"
+		group.add_child(cue)
 	add_child(group)
 	var stack_offset := float(_spawn_serial % 5) * 5.0
 	group.global_position = result.hit_position + Vector2(-42.0 + stack_offset, -52.0 - stack_offset)
 	_active_labels.append(group)
+	if result.reaction_triggered:
+		_spawn_reaction_visual(result)
 	_animate_label(group, targets_player, result.reaction_triggered)
 
 
@@ -111,37 +118,76 @@ func presentation_text(result: CombatResult, targets_player: bool = false) -> Pa
 		return PackedStringArray()
 	var lines := PackedStringArray(["-%d" % result.final_damage if targets_player else str(result.final_damage)])
 	if result.reaction_triggered:
-		lines.append("反应 ×%.1f · 消耗 %d 层" % [result.reaction_multiplier, result.reaction_consumed])
+		lines.append("反应")
 	return lines
 
 
 func semantic_damage_summary(result: CombatResult) -> String:
 	if result == null or not result.accepted:
 		return ""
-	return "基础 %.1f · 反应后 %.1f · 最终 %d" % [result.offensive_damage, result.reacted_damage, result.final_damage]
+	return "基础 %.1f · 反应倍率 %.1f · 消耗 %d 层 · 反应后 %.1f · 最终 %d" % [
+		result.offensive_damage,
+		result.reaction_multiplier,
+		result.reaction_consumed,
+		result.reacted_damage,
+		result.final_damage,
+	]
+
+
+func active_reaction_visual_count() -> int:
+	_prune_reaction_visuals()
+	return _active_reaction_visuals.size()
+
+
+func _spawn_reaction_visual(result: CombatResult) -> void:
+	_prune_reaction_visuals()
+	while _active_reaction_visuals.size() >= MAX_ACTIVE_REACTION_VISUALS:
+		var oldest: Node2D = _active_reaction_visuals.pop_front()
+		if is_instance_valid(oldest):
+			oldest.queue_free()
+	var visual := REACTION_VISUAL_SCENE.instantiate() as Node2D
+	visual.name = "ReactionComposition_%d" % _spawn_serial
+	add_child(visual)
+	visual.global_position = result.hit_position
+	_active_reaction_visuals.append(visual)
+	visual.tree_exited.connect(_on_reaction_visual_exited.bind(visual))
+	visual.call(&"configure", result.source_element_id, result.reaction_consumed, reduced_motion)
+
+
+func _on_reaction_visual_exited(visual: Node2D) -> void:
+	_active_reaction_visuals.erase(visual)
+
+
+func _prune_reaction_visuals() -> void:
+	for index: int in range(_active_reaction_visuals.size() - 1, -1, -1):
+		if not is_instance_valid(_active_reaction_visuals[index]) or _active_reaction_visuals[index].is_queued_for_deletion():
+			_active_reaction_visuals.remove_at(index)
 
 
 func _animate_label(group: Control, targets_player: bool, is_reaction: bool) -> void:
 	if reduced_motion:
 		var static_tween := create_tween()
-		static_tween.tween_interval(0.72)
+		static_tween.tween_interval(0.26 if is_reaction else 0.60)
+		static_tween.tween_property(group, "modulate:a", 0.0, 0.12)
 		static_tween.tween_callback(_release_label.bind(group))
 		return
 	group.modulate.a = 0.0
 	group.scale = Vector2.ONE * (1.06 if is_reaction else 0.96)
 	var entrance := create_tween().set_parallel(true)
-	entrance.tween_property(group, "modulate:a", 1.0, 0.10).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	entrance.tween_property(group, "scale", Vector2.ONE, 0.10).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	entrance.chain().tween_callback(_animate_label_exit.bind(group, targets_player))
+	var entrance_duration := 0.07 if is_reaction else 0.10
+	entrance.tween_property(group, "modulate:a", 1.0, entrance_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	entrance.tween_property(group, "scale", Vector2.ONE, entrance_duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	entrance.chain().tween_callback(_animate_label_exit.bind(group, targets_player, is_reaction))
 
 
-func _animate_label_exit(group: Control, targets_player: bool) -> void:
+func _animate_label_exit(group: Control, targets_player: bool, is_reaction: bool) -> void:
 	if not is_instance_valid(group):
 		return
-	var drift := Vector2(-10.0, -28.0) if targets_player else Vector2(10.0, -34.0)
+	var drift := Vector2(0.0, -22.0) if is_reaction else Vector2(-10.0, -28.0) if targets_player else Vector2(10.0, -34.0)
+	var exit_duration := 0.30 if is_reaction else 0.64
 	var exit_tween := create_tween().set_parallel(true)
-	exit_tween.tween_property(group, "position", group.position + drift, 0.64).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	exit_tween.tween_property(group, "modulate:a", 0.0, 0.64).set_delay(0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	exit_tween.tween_property(group, "position", group.position + drift, exit_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	exit_tween.tween_property(group, "modulate:a", 0.0, exit_duration).set_delay(0.0 if is_reaction else 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	exit_tween.chain().tween_callback(_release_label.bind(group))
 
 
@@ -149,6 +195,12 @@ func _release_label(group: Control) -> void:
 	_active_labels.erase(group)
 	if is_instance_valid(group):
 		group.queue_free()
+
+
+func _prune_labels() -> void:
+	for index: int in range(_active_labels.size() - 1, -1, -1):
+		if not is_instance_valid(_active_labels[index]) or _active_labels[index].is_queued_for_deletion():
+			_active_labels.remove_at(index)
 
 
 func _color_for_result(result: CombatResult, targets_player: bool) -> Color:

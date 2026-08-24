@@ -58,6 +58,10 @@ scale = Vector2(2, 2)
 sprite_frames = ExtResource("2_frames")
 animation = &"ember_idle"
 
+[node name="ElementAttachmentAnchor" type="Node2D" parent="." unique_id=1403789372]
+position = Vector2(-26, -3)
+scale = Vector2(2, 2)
+
 [node name="Prompt" type="Label" parent="." unique_id=1715920970]
 visible = false
 offset_left = -74.0

@@ -1,0 +1,33 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS fire_into_water_consumes_then_bursts
+PASS water_into_fire_reverses_composition
+PASS weak_medium_strong_caps_at_three
+PASS ordinary_same_and_rejected_hits_have_no_reaction
+PASS multiple_hits_and_boss_scale_keep_authoritative_positions
+PASS reduced_motion_is_static_and_semantic
+SCRIPT ERROR: Trying to assign invalid previously freed instance.
+   at: CombatFeedback._spawn_damage_number (res://scripts/combat_feedback.gd:74)
+   GDScript backtrace (most recent call first):
+       [0] _spawn_damage_number (res://scripts/combat_feedback.gd:74)
+       [1] _on_committed_result (res://scripts/combat_feedback.gd:60)
+       [2] _emit_post_commit_notifications (res://combat/components/combat_receiver.gd:232)
+       [3] receive_hit (res://combat/components/combat_receiver.gd:106)
+       [4] _submit_hit (res://combat/tests/run_task87_element_reaction_visual_tests.gd:201)
+       [5] _test_concurrency_dedupe_and_cleanup (res://combat/tests/run_task87_element_reaction_visual_tests.gd:163)
+       [6] _reset_fixture (res://combat/tests/run_task87_element_reaction_visual_tests.gd:219)
+SCRIPT ERROR: Trying to assign invalid previously freed instance.
+   at: CombatFeedback._spawn_damage_number (res://scripts/combat_feedback.gd:74)
+   GDScript backtrace (most recent call first):
+       [0] _spawn_damage_number (res://scripts/combat_feedback.gd:74)
+       [1] _on_committed_result (res://scripts/combat_feedback.gd:60)
+       [2] _emit_post_commit_notifications (res://combat/components/combat_receiver.gd:232)
+       [3] receive_hit (res://combat/components/combat_receiver.gd:106)
+       [4] _submit_hit (res://combat/tests/run_task87_element_reaction_visual_tests.gd:201)
+       [5] _test_concurrency_dedupe_and_cleanup (res://combat/tests/run_task87_element_reaction_visual_tests.gd:163)
+       [6] _reset_fixture (res://combat/tests/run_task87_element_reaction_visual_tests.gd:219)
+PASS concurrency_cap_dedupe_and_lifecycle_cleanup
+TASK 87 ELEMENT REACTION VISUAL TESTS PASSED: 7 tests, 38 assertions
