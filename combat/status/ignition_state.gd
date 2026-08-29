@@ -8,6 +8,7 @@ signal activated(absorbed_fire_layers: int, multiplier: float)
 signal cleared(reason: StringName)
 
 const DURATION_SECONDS := 8.0
+const BASE_DAMAGE_INCREASE_PER_FIRE_LAYER := 0.05
 
 var active: bool:
 	get:
@@ -30,13 +31,17 @@ var _multiplier: float = 1.0
 var _absorbed_fire_layers: int = 0
 
 
-func activate_silent(fire_layers: int) -> bool:
-	if fire_layers <= 0:
+func activate_silent(fire_layers: int, damage_scale: float = 1.0) -> bool:
+	if fire_layers <= 0 or not is_finite(damage_scale) or damage_scale < 1.0:
 		return false
 	_absorbed_fire_layers = fire_layers
-	_multiplier = 1.0 + 0.05 * float(fire_layers)
+	_multiplier = multiplier_for(fire_layers, damage_scale)
 	_remaining_seconds = DURATION_SECONDS
 	return true
+
+
+static func multiplier_for(fire_layers: int, damage_scale: float = 1.0) -> float:
+	return 1.0 + float(fire_layers) * BASE_DAMAGE_INCREASE_PER_FIRE_LAYER * damage_scale
 
 
 func publish_activated() -> void:

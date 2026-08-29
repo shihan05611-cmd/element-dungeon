@@ -31,9 +31,11 @@ func _test_world_prompt_font_outline_and_motion_are_scoped() -> void:
 	for interactable: RunWorldInteractable in [chest, transition, crown]:
 		var prompt := interactable.prompt
 		_harness.expect(prompt.get_theme_font(&"font") == FONT, "%s prompt uses the shared Fusion Pixel font" % interactable.name)
-		_harness.expect_eq(prompt.get_theme_font_size(&"font_size"), 12, "%s prompt uses the native 12px font rung" % interactable.name)
+		var expected_font_size := 14 if interactable == chest else 12
+		_harness.expect_eq(prompt.get_theme_font_size(&"font_size"), expected_font_size, "%s prompt keeps its scoped native font rung" % interactable.name)
 		_harness.expect(not prompt.has_theme_stylebox_override(&"normal"), "%s prompt has no normal StyleBox background" % interactable.name)
 		_harness.expect_eq(prompt.get_theme_constant(&"outline_size"), 2, "%s prompt keeps a 2px hard readability outline" % interactable.name)
+	_harness.expect_eq(chest.prompt.size, Vector2(232, 34), "chest grows only its label bounds to prevent 14px clipping")
 
 	_harness.expect(chest.get_node_or_null("PromptFloat") is AnimationPlayer, "only chest owns the prompt floating AnimationPlayer")
 	_harness.expect(transition.sprite == null and transition.get_node_or_null("PromptFloat") == null, "art-free transition prompt remains static")

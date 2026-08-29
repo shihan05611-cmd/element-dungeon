@@ -89,6 +89,20 @@ func configure_run_spawn(
 	)
 
 
+func configure_runtime_summon(maximum_health: int) -> bool:
+	if maximum_health <= 0 or damage_receiver == null or defeated:
+		return false
+	experience_reward = 0
+	dream_dust_reward = 0
+	terminal_enemy = false
+	_formal_run_spawn = true
+	return damage_receiver.configure_runtime(
+		maximum_health,
+		maximum_health,
+		damage_receiver.defense_flat
+	)
+
+
 func _ready() -> void:
 	add_to_group(&"enemies")
 	combat_receiver.configure_components(element_carrier, damage_receiver)
@@ -438,8 +452,9 @@ func _on_death_candidate(_result: CombatResult) -> void:
 	velocity = Vector2.ZERO
 	combat_receiver.accepting_hits = false
 	element_carrier.clear_all()
-	prompt.visible = true
-	prompt.text = "已击败 · R 重置"
+	prompt.visible = not _formal_run_spawn
+	if prompt.visible:
+		prompt.text = "已击败 · R 重置"
 	sprite.play(&"hurt")
 	enemy_defeated.emit()
 	if _formal_run_spawn:

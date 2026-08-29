@@ -53,14 +53,13 @@ func _test_only_skill_panels_toggle_and_echo_is_ignored() -> void:
 	var unchanged := [
 		_hud.status_panel.visible,
 		(_hud.get_node("Root/BossPanel") as Control).visible,
-		(_hud.get_node("Root/RoomTitle") as Control).visible,
 		(_hud.get_node("Root/FeedbackPanel") as Control).visible,
 		_hud.run_overlay.visible,
 	]
 	_hud._unhandled_input(_h_key_event(false))
 	_expect(not _hud.is_skill_hud_visible(), "H hides the skill HUD")
 	_expect(not _hud.skill_panel.visible and not _hud.passive_panel.visible, "H hides both and only both skill belts")
-	_expect(_unchanged_regions_match(unchanged), "H leaves status, boss, room, feedback, and overlay visibility unchanged")
+	_expect(_unchanged_regions_match(unchanged), "H leaves status, boss, feedback, and overlay visibility unchanged")
 	_hud._unhandled_input(_h_key_event(true))
 	_expect(not _hud.is_skill_hud_visible(), "H echo does not re-toggle the skill HUD")
 	_hud._unhandled_input(_h_key_event(false))
@@ -108,7 +107,6 @@ func _unchanged_regions_match(expected: Array) -> bool:
 	return expected == [
 		_hud.status_panel.visible,
 		(_hud.get_node("Root/BossPanel") as Control).visible,
-		(_hud.get_node("Root/RoomTitle") as Control).visible,
 		(_hud.get_node("Root/FeedbackPanel") as Control).visible,
 		_hud.run_overlay.visible,
 	]

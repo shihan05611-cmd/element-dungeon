@@ -112,7 +112,7 @@ func _boot() -> bool:
 	return booted
 
 
-func _capture_combat(file_name: String, size: Vector2i, room_id: StringName, assert_title_clear: bool) -> void:
+func _capture_combat(file_name: String, size: Vector2i, room_id: StringName, _assert_title_clear: bool) -> void:
 	await _set_size(size)
 	_expect(await _wait_for_feedback_clear(), "%s clears transition feedback" % file_name)
 	var snapshot := _coordinator.current_snapshot()
@@ -125,18 +125,6 @@ func _capture_combat(file_name: String, size: Vector2i, room_id: StringName, ass
 	_expect(_inside(_hud.skill_panel.get_global_rect(), size), "%s active belt is in bounds" % file_name)
 	_expect(_inside(_hud.passive_panel.get_global_rect(), size), "%s passive belt is in bounds" % file_name)
 	_expect(not _hud.slot_visible_fields(SkillSlotIds.ACTIVE_1).has(&"cooldown"), "%s active slot has no persistent availability copy" % file_name)
-	if assert_title_clear:
-		# Task 72 §2 B3: the room title moved into the HUD (Root/RoomTitle);
-		# read it from there instead of the world-space room node.
-		var title := _hud.room_title_label()
-		_expect(title != null and title.visible and not title.text.is_empty(), "%s has a visible authoritative room title" % file_name)
-		if title != null:
-			var status_rect := _hud.status_panel.get_global_rect()
-			var title_rect := title.get_global_rect()
-			_expect(
-				not status_rect.intersects(title_rect),
-				"%s HP capsule no longer overlaps the room title (status=%s title=%s)" % [file_name, str(status_rect), str(title_rect)]
-			)
 	await _store_capture(file_name, size)
 
 

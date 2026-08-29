@@ -87,29 +87,43 @@ func set_enemies(enemies: Array[CombatEnemy]) -> bool:
 			return false
 	_clear_enemy_bindings()
 	for enemy: CombatEnemy in enemies:
-		var enemy_ref: WeakRef = weakref(enemy)
-		_enemy_refs.append(enemy_ref)
-		_index_enemy(enemy)
-		var element_callback := Callable(
-			self,
-			"_on_enemy_elements_changed"
-		).bind(enemy_ref)
-		if not enemy.element_carrier.elements_changed.is_connected(element_callback):
-			enemy.element_carrier.elements_changed.connect(element_callback)
-		var hit_callback := Callable(self, "_on_enemy_hit_resolved").bind(enemy_ref)
-		if not enemy.combat_receiver.hit_resolved.is_connected(hit_callback):
-			enemy.combat_receiver.hit_resolved.connect(hit_callback)
-		var defeated_callback := Callable(self, "_on_enemy_defeated").bind(enemy_ref)
-		if not enemy.enemy_defeated.is_connected(defeated_callback):
-			enemy.enemy_defeated.connect(defeated_callback)
-		var tree_callback := Callable(
-			self,
-			"_on_enemy_tree_exiting"
-		).bind(enemy.get_instance_id())
-		if not enemy.tree_exiting.is_connected(tree_callback):
-			enemy.tree_exiting.connect(tree_callback)
-		_refresh_enemy(enemy)
+		_bind_enemy(enemy)
 	return true
+
+
+func add_enemy(enemy: CombatEnemy) -> bool:
+	if not _is_live_node(enemy):
+		return false
+	for enemy_ref: WeakRef in _enemy_refs:
+		if enemy_ref.get_ref() == enemy:
+			return true
+	_bind_enemy(enemy)
+	return true
+
+
+func _bind_enemy(enemy: CombatEnemy) -> void:
+	var enemy_ref: WeakRef = weakref(enemy)
+	_enemy_refs.append(enemy_ref)
+	_index_enemy(enemy)
+	var element_callback := Callable(
+		self,
+		"_on_enemy_elements_changed"
+	).bind(enemy_ref)
+	if not enemy.element_carrier.elements_changed.is_connected(element_callback):
+		enemy.element_carrier.elements_changed.connect(element_callback)
+	var hit_callback := Callable(self, "_on_enemy_hit_resolved").bind(enemy_ref)
+	if not enemy.combat_receiver.hit_resolved.is_connected(hit_callback):
+		enemy.combat_receiver.hit_resolved.connect(hit_callback)
+	var defeated_callback := Callable(self, "_on_enemy_defeated").bind(enemy_ref)
+	if not enemy.enemy_defeated.is_connected(defeated_callback):
+		enemy.enemy_defeated.connect(defeated_callback)
+	var tree_callback := Callable(
+		self,
+		"_on_enemy_tree_exiting"
+	).bind(enemy.get_instance_id())
+	if not enemy.tree_exiting.is_connected(tree_callback):
+		enemy.tree_exiting.connect(tree_callback)
+	_refresh_enemy(enemy)
 
 
 func clear_presentations() -> void:

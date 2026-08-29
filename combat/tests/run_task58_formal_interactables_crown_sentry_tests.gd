@@ -211,7 +211,7 @@ func _test_battle02_static_sentry_projectile_and_clear_protocol() -> void:
 	var sentry := room.initial_enemies[0] as TidalSentry
 	_expect(sentry != null and sentry.scene_file_path == "res://scenes/run/enemies/tidal_sentry.tscn", "InitialEnemySpawns/Spawn1 instantiates the dedicated Tidal Sentry")
 	_expect_eq(sentry.growth_enemy_id, &"swarm_left", "Sentry preserves the formal spawn identity")
-	_expect_eq(sentry.damage_receiver.maximum_health, 55, "Sentry preserves Spawn1 55 HP")
+	_expect_eq(sentry.damage_receiver.maximum_health, 28, "Sentry preserves the halved Spawn1 28 HP")
 	_expect_eq(sentry.dream_dust_reward, 15, "Sentry preserves Spawn1 15 dream dust")
 	for enemy: CombatEnemy in room.enemies:
 		if enemy != sentry:

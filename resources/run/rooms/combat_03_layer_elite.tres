@@ -10,7 +10,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"layer_elite"
 local_position = Vector2(790, 494)
-maximum_health = 145
+maximum_health = 73
 defense_flat = 2.0
 dream_dust_reward = 35
 
@@ -19,7 +19,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"layer_elite_b"
 local_position = Vector2(660, 494)
-maximum_health = 145
+maximum_health = 73
 defense_flat = 2.0
 dream_dust_reward = 0
 
@@ -28,7 +28,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"layer_elite_c"
 local_position = Vector2(940, 494)
-maximum_health = 145
+maximum_health = 73
 defense_flat = 2.0
 dream_dust_reward = 0
 
@@ -37,7 +37,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"layer_reinforcement_a"
 local_position = Vector2(620, 290)
-maximum_health = 110
+maximum_health = 55
 dream_dust_reward = 0
 
 [sub_resource type="Resource" id="ReinforcementEliteB"]
@@ -45,7 +45,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"layer_reinforcement_b"
 local_position = Vector2(980, 290)
-maximum_health = 110
+maximum_health = 55
 dream_dust_reward = 0
 
 [resource]

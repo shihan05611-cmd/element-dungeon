@@ -62,8 +62,8 @@ shape = SubResource("HurtShape")
 
 [node name="DamageReceiver" type="Node" parent="."]
 script = ExtResource("3_damage")
-configured_maximum_health = 55
-configured_starting_health = 55
+configured_maximum_health = 28
+configured_starting_health = 28
 defense_flat = 0.0
 
 [node name="ElementCarrier" type="Node" parent="."]

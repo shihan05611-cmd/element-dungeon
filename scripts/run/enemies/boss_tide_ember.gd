@@ -17,11 +17,13 @@ extends CombatEnemy
 
 signal form_changed(form_id: StringName, display_name: String)
 signal counter_progress_changed(hits: int, threshold: int)
+signal summon_created(summon: CombatEnemy)
 
 const BOSS_MELEE_SCENE: PackedScene = preload("res://scenes/run/boss_melee_delivery.tscn")
 const MELEE_ACTIVE_DURATION := 0.14
 const MELEE_RECOVERY_DURATION := 0.22
 const TRANSITION_MOVE_DAMP := 560.0
+const SUMMON_MAXIMUM_HEALTH := 25
 ## Task 71 C4: full period of the melee range box's alpha pulse. Suppressed
 ## entirely under reduced motion (static outline instead).
 const MELEE_RANGE_BLINK_PERIOD := 0.32
@@ -706,7 +708,11 @@ func _resolve_summon(form: BossFormDefinition) -> void:
 		var offset_x := side * (110.0 + 60.0 * float(index))
 		summon.global_position = global_position + Vector2(offset_x, -20.0)
 		get_tree().current_scene.add_child(summon)
+		if not summon.configure_runtime_summon(SUMMON_MAXIMUM_HEALTH):
+			summon.queue_free()
+			continue
 		_active_summons.append(weakref(summon))
+		summon_created.emit(summon)
 
 
 ## Task 71 C5: a poise break is the one interrupt allowed to abort a pending

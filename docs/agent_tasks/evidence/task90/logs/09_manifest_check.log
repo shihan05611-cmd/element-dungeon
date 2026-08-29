@@ -1,0 +1,9 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+UNLISTED (not executed by default):
+  res://combat/tests/run_task87_element_reaction_visual_tests.gd
+  res://combat/tests/run_task90_reaction_visual_follow_tests.gd
+MANIFEST ERROR: unlisted run_*.gd entries exist

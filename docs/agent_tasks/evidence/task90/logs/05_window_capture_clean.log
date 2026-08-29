@@ -1,0 +1,14 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 591.74 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 2060
+
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+TASK90 ANCHOR right spawn target=(693.6778, 434.25) visual=(693.6778, 434.25) distance=0.000
+TASK90 ANCHOR right middle target=(717.5, 431.75) visual=(717.5, 431.75) distance=0.000
+TASK90 ANCHOR right late target=(733.2778, 449.9332) visual=(733.2778, 449.9332) distance=0.000
+TASK90 ANCHOR left spawn target=(917.8, 432.8195) visual=(917.8, 432.8195) distance=0.000
+TASK90 ANCHOR left middle target=(895.2222, 432.875) visual=(895.2222, 432.875) distance=0.000
+TASK90 ANCHOR left late target=(880.9999, 449.9332) visual=(880.9999, 449.9332) distance=0.000
+TASK90 ANCHOR multi left target=(670.2222, 432.875) visual=(670.2222, 432.875) distance=0.000
+TASK90 ANCHOR multi right target=(949.7778, 436.0695) visual=(949.7778, 436.0695) distance=0.000
+TASK90 ANCHOR reduced motion middle target=(739.7778, 436.0695) visual=(739.7778, 436.0695) distance=0.000
+TASK 90 WINDOW CAPTURE PASSED: 13 same-camera screenshots

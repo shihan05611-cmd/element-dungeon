@@ -10,7 +10,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"risk_vanguard"
 local_position = Vector2(700, 494)
-maximum_health = 105
+maximum_health = 53
 defense_flat = 1.0
 dream_dust_reward = 35
 
@@ -19,7 +19,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"risk_center"
 local_position = Vector2(790, 494)
-maximum_health = 105
+maximum_health = 53
 defense_flat = 1.0
 dream_dust_reward = 0
 
@@ -28,7 +28,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"risk_reinforcement_a"
 local_position = Vector2(620, 494)
-maximum_health = 150
+maximum_health = 75
 dream_dust_reward = 0
 
 [sub_resource type="Resource" id="ReinforcementB"]
@@ -36,7 +36,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"risk_reinforcement_b"
 local_position = Vector2(1000, 494)
-maximum_health = 150
+maximum_health = 75
 dream_dust_reward = 0
 
 [sub_resource type="Resource" id="SpawnB"]
@@ -44,7 +44,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"risk_rearguard"
 local_position = Vector2(880, 494)
-maximum_health = 105
+maximum_health = 53
 defense_flat = 1.0
 dream_dust_reward = 35
 

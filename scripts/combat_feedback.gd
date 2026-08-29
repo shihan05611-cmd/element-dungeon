@@ -109,7 +109,7 @@ func _spawn_damage_number(result: CombatResult, receiver: CombatReceiver) -> voi
 	group.global_position = result.hit_position + Vector2(-42.0 + stack_offset, -52.0 - stack_offset)
 	_active_labels.append(group)
 	if result.reaction_triggered:
-		_spawn_reaction_visual(result)
+		_spawn_reaction_visual(result, receiver)
 	_animate_label(group, targets_player, result.reaction_triggered)
 
 
@@ -139,7 +139,7 @@ func active_reaction_visual_count() -> int:
 	return _active_reaction_visuals.size()
 
 
-func _spawn_reaction_visual(result: CombatResult) -> void:
+func _spawn_reaction_visual(result: CombatResult, receiver: CombatReceiver = null) -> void:
 	_prune_reaction_visuals()
 	while _active_reaction_visuals.size() >= MAX_ACTIVE_REACTION_VISUALS:
 		var oldest: Node2D = _active_reaction_visuals.pop_front()
@@ -149,9 +149,22 @@ func _spawn_reaction_visual(result: CombatResult) -> void:
 	visual.name = "ReactionComposition_%d" % _spawn_serial
 	add_child(visual)
 	visual.global_position = result.hit_position
+	var target := _reaction_visual_target(receiver)
+	if target != null:
+		var local_hit_offset := target.to_local(result.hit_position)
+		visual.call(&"follow_target", target, local_hit_offset)
 	_active_reaction_visuals.append(visual)
 	visual.tree_exited.connect(_on_reaction_visual_exited.bind(visual))
 	visual.call(&"configure", result.source_element_id, result.reaction_consumed, reduced_motion)
+
+
+func _reaction_visual_target(receiver: CombatReceiver) -> Node2D:
+	if receiver == null or not is_instance_valid(receiver) or receiver.is_queued_for_deletion():
+		return null
+	var target := receiver.get_parent() as Node2D
+	if target == null or not is_instance_valid(target) or target.is_queued_for_deletion() or not target.is_inside_tree():
+		return null
+	return target
 
 
 func _on_reaction_visual_exited(visual: Node2D) -> void:

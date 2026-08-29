@@ -4,6 +4,10 @@ const TestHarness := preload("res://combat/tests/test_harness.gd")
 
 const CATALOG: RunContentCatalog = preload("res://resources/content/run_content_catalog.tres")
 const FLOW: RunFlowDefinition = preload("res://resources/run/flows/prototype_five_stage_demo.tres")
+const PRESSURE_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_02_pressure.tres")
+const LAYER_ELITE_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_03_layer_elite.tres")
+const STABLE_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_05_stable.tres")
+const RISK_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_05_risk.tres")
 const ROOM_IDS: Array[StringName] = [
 	&"combat_01_entry",
 	&"combat_02_swarm",
@@ -15,6 +19,7 @@ const ACTIVE_IDS: Array[StringName] = [
 	&"elemental_fury",
 	&"elemental_laser",
 	&"element_reclaim",
+	&"ignition",
 ]
 const PASSIVE_IDS: Array[StringName] = [
 	&"burning",
@@ -35,6 +40,7 @@ func _run() -> void:
 	_run_test("active_prices_levels_and_effect_whitelist", _test_active_progression)
 	_run_test("four_passives_are_level_free_purchase_content", _test_passives)
 	_run_test("demo_rooms_have_reachable_scenes_and_spawns", _test_room_resources)
+	_run_test("minor_enemy_health_is_halved_while_boss_is_unchanged", _test_minor_enemy_health)
 	_run_test("five_stage_demo_has_fixed_sequence", _test_route_differences)
 	_run_test("boss_is_stronger_and_awards_zero_dream_dust", _test_boss)
 	_run_test("three_build_budgets_are_feasible", _test_build_budgets)
@@ -45,11 +51,12 @@ func _run() -> void:
 
 func _test_catalog_and_modes() -> void:
 	_expect(CATALOG != null and CATALOG.is_valid(), "formal catalog validates")
-	_expect_eq(CATALOG.gameplay_definitions().size(), 10, "catalog contains fixed basic plus nine shop skills")
+	_expect_eq(CATALOG.gameplay_definitions().size(), 11, "catalog contains fixed basic, the initial ignition active, and nine shop skills")
 	_expect_eq(CATALOG.shop_contents().size(), 9, "catalog exposes nine purchasable contents")
-	_expect_eq(CATALOG.initial_owned_skill_ids(), [&"element_bolt"], "only element bolt starts owned")
+	_expect_eq(CATALOG.initial_owned_skill_ids(), [&"element_bolt", &"ignition"], "element bolt and ignition start owned")
 	_expect_eq(CATALOG.default_loadout_snapshot().entries.size(), 7, "default authority mapping has seven slots")
 	_expect_eq(CATALOG.default_loadout_snapshot().get_skill_id(SkillSlotIds.ACTIVE_1), &"element_bolt", "A1 starts with element bolt")
+	_expect_eq(CATALOG.default_loadout_snapshot().get_skill_id(SkillSlotIds.ACTIVE_2), &"ignition", "A2 starts with ignition")
 	for slot_id: StringName in SkillSlotIds.passive():
 		_expect(CATALOG.default_loadout_snapshot().get_skill_id(slot_id).is_empty(), "%s starts empty" % String(slot_id))
 	var rules := RunRulesSnapshot.formal_disabled()
@@ -67,7 +74,10 @@ func _test_active_progression() -> void:
 		if content == null:
 			continue
 		_expect(content.gameplay_definition.is_active_skill(), "%s remains active" % String(skill_id))
-		_expect(content.purchase_price > 0, "%s purchase price is positive" % String(skill_id))
+		if skill_id == &"ignition":
+			_expect(content.initially_owned and content.purchase_price == 0 and not content.reward_pool, "ignition stays initial-only and outside purchase/reward pools")
+		else:
+			_expect(content.purchase_price > 0, "%s purchase price is positive" % String(skill_id))
 		_expect(content.active_progression != null and content.active_progression.is_valid(), "%s progression validates" % String(skill_id))
 		if content.active_progression == null:
 			continue
@@ -86,6 +96,9 @@ func _test_active_progression() -> void:
 			else:
 				_expect(current.damage_scale > previous.damage_scale, "%s increases damage" % String(skill_id))
 				_expect(is_equal_approx(current.resource_gain_scale, 1.0), "%s does not gain resource recovery" % String(skill_id))
+				if skill_id == &"ignition":
+					_expect(is_equal_approx(current.damage_scale, 1.2 if current.level == 2 else 1.4), "ignition scales only its 5 percent per-layer increment")
+					_expect_eq(current.upgrade_price, 60 if current.level == 2 else 100, "ignition keeps the fixed target-level price")
 			_expect(is_equal_approx(current.healing_scale, 1.0), "%s does not gain healing" % String(skill_id))
 			_expect(is_equal_approx(current.shield_scale, 1.0), "%s does not gain shield" % String(skill_id))
 		var effect := content.level_effect(3)
@@ -163,6 +176,17 @@ func _test_route_differences() -> void:
 	_expect_eq(FLOW.node_for(&"combat_04_validation").next_node_id, &"combat_06_final_boss", "combat three reaches Boss")
 	_expect_eq(_safe_run_earnings(), 345, "fixed demo combat rooms retain 345 base dream dust")
 	_expect_eq(_risk_run_earnings(), 345, "the route-free demo has one fixed base-income path")
+
+
+func _test_minor_enemy_health() -> void:
+	_expect_eq(_spawn_healths(FLOW.combat_room_for(&"combat_01_entry")), [35, 35], "entry enemies keep half of their former 70 HP")
+	_expect_eq(_spawn_healths(FLOW.combat_room_for(&"combat_02_swarm")), [28, 28, 28, 28, 28], "swarm enemies round half of 55 HP up to 28")
+	_expect_eq(_spawn_healths(PRESSURE_ROOM), [53, 53, 53, 53, 53], "pressure enemies round half of 105 HP up to 53")
+	_expect_eq(_spawn_healths(LAYER_ELITE_ROOM), [73, 73, 73, 55, 55], "layer elite enemies preserve rounded-up half health")
+	_expect_eq(_spawn_healths(FLOW.combat_room_for(&"combat_04_validation")), [38, 38, 38, 38, 38], "validation enemies round half of 75 HP up to 38")
+	_expect_eq(_spawn_healths(STABLE_ROOM), [65, 65, 65, 50, 50], "stable route enemies keep half health")
+	_expect_eq(_spawn_healths(RISK_ROOM), [53, 53, 53, 75, 75], "risk route enemies preserve rounded-up half health")
+	_expect_eq(_spawn_healths(FLOW.combat_room_for(&"combat_06_final_boss")), [280], "Boss health is excluded from the reduction")
 
 
 func _test_boss() -> void:
@@ -262,6 +286,15 @@ func _maximum_enemy_health(room: CombatRoomDefinition) -> int:
 	for spawn: EnemySpawnDefinition in room.reinforcement_spawns:
 		maximum = maxi(maximum, spawn.maximum_health)
 	return maximum
+
+
+func _spawn_healths(room: CombatRoomDefinition) -> Array[int]:
+	var healths: Array[int] = []
+	for spawn: EnemySpawnDefinition in room.enemy_spawns:
+		healths.append(spawn.maximum_health)
+	for spawn: EnemySpawnDefinition in room.reinforcement_spawns:
+		healths.append(spawn.maximum_health)
+	return healths
 
 
 func _maximum_enemy_defense(room: CombatRoomDefinition) -> float:

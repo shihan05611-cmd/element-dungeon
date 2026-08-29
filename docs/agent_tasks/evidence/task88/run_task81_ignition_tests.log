@@ -1,0 +1,10 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS catalog_and_default_active_2
+PASS fire_transaction_is_atomic_and_preserves_water
+PASS player_basic_attack_snapshots_and_lifecycle_clear
+PASS ignition_melee_range_snapshot_and_airflow
+TASK 81 IGNITION TESTS PASSED: 4 tests, 80 assertions

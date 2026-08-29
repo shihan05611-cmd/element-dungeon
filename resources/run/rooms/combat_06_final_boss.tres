@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://147bp5lbfphl" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
 [ext_resource type="Script" uid="uid://kkg62e2wet7j" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
 [ext_resource type="PackedScene" path="res://scenes/run/rooms/room_arena_boss.tscn" id="3_template"]
-[ext_resource type="PackedScene" path="res://scenes/run/enemies/boss_tide_ember.tscn" id="4_enemy"]
+[ext_resource type="PackedScene" uid="uid://l0ehsoi1837l" path="res://scenes/run/enemies/boss_tide_ember.tscn" id="4_enemy"]
 
 [sub_resource type="Resource" id="SpawnBoss"]
 script = ExtResource("2_spawn")

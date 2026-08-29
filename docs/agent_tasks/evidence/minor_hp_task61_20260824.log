@@ -1,0 +1,24 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS switch_counter_exact_15_and_reset
+PASS same_element_does_not_count
+PASS alternation_cap_enters_plain
+PASS plain_form_exit_both_branches
+PASS plain_form_no_attachment
+PASS plain_form_reaction_behavior
+PASS same_element_mitigation_exact_value
+PASS cross_element_bonus_damage
+PASS attach_layers_regen_cap_reset
+PASS hit_does_not_interrupt_attack_or_telegraph
+PASS poise_break_and_reset
+PASS form_transition_presentation
+PASS melee_telegraph_waiting_to_active
+PASS ranged_telegraph_lock_and_count
+PASS summon_cap_and_death_cleanup
+PASS run_coordinator_binds_summon_feedback
+PASS death_flow_zero_dream_dust
+PASS damage_resolver_validation_branches
+TASK 61 BOSS THREE FORM TESTS PASSED: 18 tests, 110 assertions

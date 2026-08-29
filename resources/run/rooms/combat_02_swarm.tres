@@ -11,7 +11,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("5_sentry")
 enemy_id = &"swarm_left"
 local_position = Vector2(1200, 513)
-maximum_health = 55
+maximum_health = 28
 dream_dust_reward = 15
 
 [sub_resource type="Resource" id="SpawnB"]
@@ -19,7 +19,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"swarm_right"
 local_position = Vector2(850, 588)
-maximum_health = 55
+maximum_health = 28
 dream_dust_reward = 15
 
 [sub_resource type="Resource" id="SpawnC"]
@@ -27,21 +27,21 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"swarm_center"
 local_position = Vector2(1300, 588)
-maximum_health = 55
+maximum_health = 28
 
 [sub_resource type="Resource" id="ReinforcementA"]
 script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"swarm_reinforcement_left"
 local_position = Vector2(600, 588)
-maximum_health = 55
+maximum_health = 28
 
 [sub_resource type="Resource" id="ReinforcementB"]
 script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"swarm_reinforcement_right"
 local_position = Vector2(1000, 588)
-maximum_health = 55
+maximum_health = 28
 
 [resource]
 script = ExtResource("1_room")

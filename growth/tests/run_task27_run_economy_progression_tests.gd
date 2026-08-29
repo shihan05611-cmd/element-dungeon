@@ -32,6 +32,7 @@ func _initialize() -> void:
 	_run_test("disabled_observe_enabled_modes", _test_disabled_observe_enabled_modes)
 	_run_test("active_and_passive_purchase", _test_active_and_passive_purchase)
 	_run_test("active_upgrade_curve_and_max", _test_active_upgrade_curve_and_max)
+	_run_test("initial_ignition_upgrade_curve_and_reset", _test_initial_ignition_upgrade_curve_and_reset)
 	_run_test("reset_floor_and_purchase_not_refunded", _test_reset_floor_and_purchase_not_refunded)
 	_run_test("economy_rejections_are_atomic", _test_economy_rejections_are_atomic)
 	_run_test("command_replay_and_id_reuse", _test_command_replay_and_id_reuse)
@@ -204,6 +205,38 @@ func _test_active_upgrade_curve_and_max() -> void:
 	)
 	_expect(not insufficient.accepted and insufficient.reject_reason == RunCommandResult.RejectReason.INSUFFICIENT_DREAM_DUST, "insufficient upgrade has typed rejection")
 	_expect_eq(_signature(poor.snapshot()), poor_before, "insufficient upgrade changes no authority")
+
+
+func _test_initial_ignition_upgrade_curve_and_reset() -> void:
+	var session := _ignition_shop_session(500)
+	var shop := session.open_shop_draft().shop_snapshot
+	var level_two := session.upgrade_active_skill(
+		&"ignition_lv2", session.snapshot().revision, shop.session_id, &"ignition"
+	)
+	_expect(level_two.accepted, "initially owned ignition upgrades to Lv2 in the normal shop")
+	_expect_eq(level_two.shop_commit.charged_dream_dust, 60, "ignition Lv2 charges exactly 60")
+	_expect_eq(level_two.run_snapshot.skills.progress_for(&"ignition").level, 2, "ignition reaches Lv2")
+	_expect(is_equal_approx(session.active_skill_level_effect(&"ignition").damage_scale, 1.2), "ignition Lv2 projects a 6 percent per-layer scale")
+	var level_three := session.upgrade_active_skill(
+		&"ignition_lv3", level_two.run_snapshot.revision, shop.session_id, &"ignition"
+	)
+	_expect(level_three.accepted, "ignition upgrades to Lv3 in the normal shop")
+	_expect_eq(level_three.shop_commit.charged_dream_dust, 100, "ignition Lv3 charges exactly 100")
+	_expect_eq(level_three.run_snapshot.skills.progress_for(&"ignition").level, 3, "ignition reaches Lv3")
+	_expect(is_equal_approx(session.active_skill_level_effect(&"ignition").damage_scale, 1.4), "ignition Lv3 projects a 7 percent per-layer scale")
+	var at_max := session.upgrade_active_skill(
+		&"ignition_lv4", level_three.run_snapshot.revision, shop.session_id, &"ignition"
+	)
+	_expect(not at_max.accepted and at_max.reject_reason == RunCommandResult.RejectReason.MAX_LEVEL_REACHED, "ignition Lv3 blocks further upgrades")
+	var reset := session.reset_active_skill_upgrades(
+		&"ignition_reset", level_three.run_snapshot.revision, shop.session_id, &"ignition"
+	)
+	_expect(reset.accepted, "ignition reset uses the normal authority path")
+	_expect_eq(reset.shop_commit.refunded_dream_dust, 112, "ignition reset refunds floor(160 x 70 percent)")
+	_expect_eq(reset.run_snapshot.skills.progress_for(&"ignition").level, 1, "ignition reset returns to Lv1")
+	_expect_eq(reset.run_snapshot.skills.progress_for(&"ignition").cumulative_upgrade_spend, 0, "ignition reset clears upgrade investment")
+
+
 
 
 func _test_reset_floor_and_purchase_not_refunded() -> void:
@@ -432,6 +465,22 @@ func _shop_session(
 		initial_dream_dust,
 		RunRulesSnapshot.legacy_enabled(),
 		loadout_port
+	)
+	_reach_shop(session)
+	return session
+
+
+func _ignition_shop_session(initial_dream_dust: int) -> RunSession:
+	var session := RunSession.new(
+		_dummy_reward_catalog(),
+		[],
+		[&"element_bolt", &"ignition"],
+		[ElementIds.WATER, ElementIds.FIRE],
+		null,
+		GrowthEffectPort.new(),
+		RunRulesSnapshot.legacy_enabled(),
+		CATALOG,
+		initial_dream_dust
 	)
 	_reach_shop(session)
 	return session

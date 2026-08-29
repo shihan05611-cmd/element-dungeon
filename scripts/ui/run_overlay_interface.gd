@@ -1486,19 +1486,13 @@ func _show_formal_combat_loadout(cause: StringName = &"") -> void:
 		_formal_shop_draft = null
 	_working_loadout = _snapshot.loadout
 	var available := bool(_formal_coordinator.call("combat_loadout_available"))
-	_formal_begin(
-		&"combat_loadout",
-		"战斗配装 · ACTIVE 1–3 / PASSIVE 1–4",
-		"清场后可调整 · 直接提交权威 RuntimeLoadout，不创建商店草稿"
-	)
-	var gate := _label(
-		"✓ 当前房已清场，可点击或拖拽调整" if available else "战斗进行中 · 清场后可调整",
-		14,
-		UI.SUCCESS if available else UI.WARNING
-	)
-	gate.name = "CombatLoadoutGate"
-	_formal_area.add_child(gate)
+	_formal_begin(&"combat_loadout", "战斗配装页面", "")
 	var panel := _formal_section_panel("本局已拥有技能", 1.0)
+	panel.add_theme_stylebox_override(
+		&"panel",
+		UI.flat_panel(UI.SURFACE_OVERLAY, UI.BORDER_FOCUS if available else UI.BORDER, 8, 1)
+	)
+	panel.modulate = Color(1, 1, 1, 1.0 if available else 0.55)
 	_formal_area.add_child(panel)
 	var box := panel.get_node("Margin/Box") as VBoxContainer
 	var inventory := HFlowContainer.new()
@@ -1510,11 +1504,11 @@ func _show_formal_combat_loadout(cause: StringName = &"") -> void:
 		var content := _catalog.content_for(skill_id)
 		if content == null or not content.equippable:
 			continue
-		var select := _formal_action_button(
-			"%s%s" % ["◆ " if _formal_selected_skill_id == skill_id else "", content.display_name],
+		var select := _combat_loadout_skill_card(
+			content,
 			"select:%s" % String(skill_id),
 			Callable(self, "_formal_select_skill").bind(skill_id),
-			Vector2(124, 44)
+			_formal_selected_skill_id == skill_id
 		)
 		select.disabled = not available
 		select.set_drag_forwarding(
@@ -1523,8 +1517,8 @@ func _show_formal_combat_loadout(cause: StringName = &"") -> void:
 			Callable(self, "_formal_inventory_drop")
 		)
 		inventory.add_child(select)
-	box.add_child(_formal_slot_zone("主动槽", SkillSlotIds.active()))
-	box.add_child(_formal_slot_zone("被动槽", SkillSlotIds.passive()))
+	box.add_child(_combat_loadout_slot_zone("主动槽", SkillSlotIds.active(), available))
+	box.add_child(_combat_loadout_slot_zone("被动槽", SkillSlotIds.passive(), available))
 	var actions := HBoxContainer.new()
 	actions.add_theme_constant_override(&"separation", UI.GAP_SM)
 	box.add_child(actions)
@@ -1533,14 +1527,86 @@ func _show_formal_combat_loadout(cause: StringName = &"") -> void:
 	)
 	clear.disabled = not available or _formal_selected_slot_id.is_empty()
 	actions.add_child(clear)
-	_formal_status = _label(
-		"清场门禁已开放" if available else "战斗未清场：操作不会调用 authority",
-		13,
-		UI.TEXT_MUTED
-	)
+	_formal_status = _label("", 13, UI.TEXT_MUTED)
 	_formal_status.name = "Status"
 	_formal_area.add_child(_formal_status)
 	_restore_formal_focus()
+
+
+func _combat_loadout_skill_card(
+	content: SkillContentDefinition,
+	control_id: String,
+	callback: Callable,
+	selected: bool,
+	minimum: Vector2 = Vector2(100, 96)
+) -> Button:
+	var card := _formal_action_button("", control_id, callback, minimum)
+	if selected:
+		card.add_theme_stylebox_override(&"normal", UI.button_style(UI.SURFACE_SOFT, UI.BORDER_FOCUS))
+	if content == null:
+		return card
+	var wrap := CenterContainer.new()
+	wrap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wrap.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	card.add_child(wrap)
+	var column := VBoxContainer.new()
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	column.add_theme_constant_override(&"separation", 2)
+	wrap.add_child(column)
+	if content.icon != null:
+		var icon := TextureRect.new()
+		icon.custom_minimum_size = Vector2(36, 36)
+		icon.texture = content.icon
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		column.add_child(icon)
+	var name_label := _label(content.display_name, 12, UI.TEXT)
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.custom_minimum_size.x = minimum.x - 16.0
+	name_label.clip_text = true
+	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(name_label)
+	var progress := _snapshot.skills.progress_for(content.skill_id)
+	if progress != null and progress.is_active():
+		var level_label := _label("Lv.%d" % progress.level, 11, UI.WARNING)
+		level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		level_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		column.add_child(level_label)
+	return card
+
+
+func _combat_loadout_slot_zone(
+	title_text: String, slot_ids: Array[StringName], available: bool
+) -> VBoxContainer:
+	var zone := VBoxContainer.new()
+	zone.name = "ActiveSlots" if slot_ids == SkillSlotIds.active() else "PassiveSlots"
+	zone.add_theme_constant_override(&"separation", UI.GAP_XS)
+	zone.add_child(_label(title_text, 12, UI.TEXT_MUTED))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override(&"separation", UI.GAP_XS)
+	zone.add_child(row)
+	for slot_id: StringName in slot_ids:
+		var skill_id := _working_loadout.get_skill_id(slot_id)
+		var content := _catalog.content_for(skill_id) if not skill_id.is_empty() else null
+		var button := _combat_loadout_skill_card(
+			content,
+			"slot:%s" % String(slot_id),
+			Callable(self, "_formal_press_slot").bind(slot_id),
+			_formal_selected_slot_id == slot_id,
+			Vector2(108, 96)
+		)
+		button.disabled = not available
+		button.set_drag_forwarding(
+			Callable(self, "_formal_slot_drag_data").bind(slot_id),
+			Callable(self, "_formal_slot_can_drop").bind(slot_id),
+			Callable(self, "_formal_slot_drop").bind(slot_id)
+		)
+		row.add_child(button)
+	return zone
 
 
 func _show_formal_shop(cause: StringName = &"") -> void:

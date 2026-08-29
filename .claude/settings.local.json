@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"$HOME/mnt/.claude/projects/\" 2>/dev/null | head -20)",
+      "Bash(find \"$HOME/.claude\" -name \"*.jsonl\" -type f 2>/dev/null | head -10)"
+    ]
+  }
+}

@@ -10,7 +10,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"stable_guard"
 local_position = Vector2(820, 494)
-maximum_health = 130
+maximum_health = 65
 defense_flat = 1.0
 dream_dust_reward = 25
 
@@ -19,7 +19,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"stable_guard_b"
 local_position = Vector2(690, 494)
-maximum_health = 130
+maximum_health = 65
 defense_flat = 1.0
 dream_dust_reward = 0
 
@@ -28,7 +28,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"stable_guard_c"
 local_position = Vector2(940, 494)
-maximum_health = 130
+maximum_health = 65
 defense_flat = 1.0
 dream_dust_reward = 0
 
@@ -37,7 +37,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"stable_reinforcement_a"
 local_position = Vector2(620, 494)
-maximum_health = 100
+maximum_health = 50
 dream_dust_reward = 0
 
 [sub_resource type="Resource" id="ReinforcementStableB"]
@@ -45,7 +45,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"stable_reinforcement_b"
 local_position = Vector2(1000, 494)
-maximum_health = 100
+maximum_health = 50
 dream_dust_reward = 0
 
 [resource]

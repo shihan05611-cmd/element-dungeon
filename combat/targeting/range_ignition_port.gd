@@ -99,7 +99,14 @@ func prepare(cast_snapshot: CastSnapshot) -> IgnitionPrepareResult:
 	plans.sort_custom(func(a: ElementReclaimTargetPlan, b: ElementReclaimTargetPlan) -> bool:
 		return a.stable_identity < b.stable_identity
 	)
-	var transaction := IgnitionTransaction.new(state, plans, positions, _published_callback, cast_snapshot.cast_id)
+	var transaction := IgnitionTransaction.new(
+		state,
+		plans,
+		positions,
+		_published_callback,
+		cast_snapshot.cast_id,
+		cast_snapshot.level_effect.damage_scale
+	)
 	var error := transaction.validation_error()
 	if not error.is_empty():
 		return IgnitionPrepareResult.rejected(CastAttemptResult.RejectReason.INVALID_CONFIGURATION, error)
@@ -119,6 +126,7 @@ class IgnitionTransaction:
 	var _positions: Array[Vector2] = []
 	var _published_callback: Callable
 	var _cast_id: int
+	var _damage_scale: float
 	var _committed: bool = false
 	var _published: bool = false
 
@@ -127,13 +135,15 @@ class IgnitionTransaction:
 			plans: Array[ElementReclaimTargetPlan],
 			positions: Array[Vector2],
 			published_callback: Callable,
-			cast_id: int
+			cast_id: int,
+			damage_scale: float
 	) -> void:
 		_state_ref = weakref(state)
 		_target_plans = plans.duplicate()
 		_positions = positions.duplicate()
 		_published_callback = published_callback
 		_cast_id = cast_id
+		_damage_scale = damage_scale
 		for plan: ElementReclaimTargetPlan in _target_plans:
 			if plan != null and plan.consume_plan != null:
 				matched_element_amount += plan.consume_plan.consumed_amount
@@ -161,7 +171,7 @@ class IgnitionTransaction:
 		for plan: ElementReclaimTargetPlan in _target_plans:
 			plan.commit_silent()
 		var state := _state_ref.get_ref() as IgnitionState
-		assert(state.activate_silent(matched_element_amount))
+		assert(state.activate_silent(matched_element_amount, _damage_scale))
 		_committed = true
 
 	func publish_committed() -> void:

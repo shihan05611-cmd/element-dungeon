@@ -29,7 +29,11 @@ func _run() -> void:
 	overlay.toggle_loadout()
 	await _settle()
 	_assert(overlay.visible and overlay.formal_kind() == &"combat_loadout", "live combat page is visible")
-	_assert(not coordinator.combat_loadout_available() and _visible_text(overlay).contains("清场后可调整"), "live page proves read-only clear gate")
+	_assert(
+		not coordinator.combat_loadout_available()
+		and (overlay.formal_control(&"slot:active_1") as Button).disabled,
+		"live page proves read-only clear gate"
+	)
 	await _save("task43_01_live_combat_loadout_readonly_1920x1080.png", Vector2i(1920, 1080))
 
 	var room := coordinator.active_room
@@ -53,7 +57,12 @@ func _run() -> void:
 	_assert(not auto_skill.is_empty() and after_claim.skills.owns(auto_skill), "first formal chest grants and auto-equips a real skill")
 	overlay.toggle_loadout()
 	await _settle()
-	_assert(overlay.visible and coordinator.combat_loadout_available() and _visible_text(overlay).contains("可点击或拖拽调整"), "cleared page is visibly writable")
+	_assert(
+		overlay.visible
+		and coordinator.combat_loadout_available()
+		and not (overlay.formal_control(&"slot:active_1") as Button).disabled,
+		"cleared page is visibly writable"
+	)
 	_assert(_visible_text(overlay).contains(CATALOG.content_for(auto_skill).display_name), "cleared page displays the real auto-equipped skill")
 	await _save("task43_02_cleared_combat_loadout_auto_equipped_1920x1080.png", Vector2i(1920, 1080))
 

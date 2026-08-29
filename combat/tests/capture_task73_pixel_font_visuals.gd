@@ -61,7 +61,6 @@ func _run() -> void:
 
 
 func _populate_readability_sample() -> void:
-	_hud.set_room_title("熔汐王门 · Boss Gate")
 	_hud.boss_panel.visible = true
 	(_hud.get_node("Root/BossPanel/Margin/Box/TitleRow/Name") as Label).text = "熔汐之王 · Sovereign"
 	(_hud.get_node("Root/BossPanel/Margin/Box/TitleRow/Form") as Label).text = "形态：熔炽"

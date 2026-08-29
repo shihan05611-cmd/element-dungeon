@@ -1,0 +1,7 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS world_prompt_font_outline_and_motion_are_scoped
+TASK 75 WORLD PROMPT FONT AND MOTION TESTS PASSED: 1 tests, 22 assertions

@@ -477,6 +477,19 @@ func _bind_persistent_feedback(enemies: Array[CombatEnemy]) -> void:
 		var enemy_delivery_callback := Callable(self, "_on_delivery_created")
 		if not enemy.delivery_created.is_connected(enemy_delivery_callback):
 			enemy.delivery_created.connect(enemy_delivery_callback)
+		if enemy is BossTideEmber:
+			var summon_callback := Callable(self, "_on_boss_summon_created")
+			if not (enemy as BossTideEmber).summon_created.is_connected(summon_callback):
+				(enemy as BossTideEmber).summon_created.connect(summon_callback)
+
+
+func _on_boss_summon_created(summon: CombatEnemy) -> void:
+	if summon == null or not is_instance_valid(summon) or summon.is_queued_for_deletion():
+		return
+	var summons: Array[CombatEnemy] = [summon]
+	_bind_persistent_feedback(summons)
+	if not vfx.add_enemy(summon):
+		_fail(&"skill_vfx_summon_bind_failed")
 
 
 func _on_delivery_created(delivery: Node) -> void:

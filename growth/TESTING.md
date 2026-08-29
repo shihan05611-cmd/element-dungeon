@@ -1,5 +1,8 @@
 # Growth 测试清单
 
+仓库级默认回归门禁、四层归属和批量命令见
+[`combat/tests/REGRESSION_GATES.md`](../combat/tests/REGRESSION_GATES.md)。默认门禁通过显式清单运行 `core + feature`；本页以下命令仅用于 Growth 基础套件的定向诊断。
+
 使用 Godot 4.7.1，在项目根目录依次运行：
 
 ```powershell

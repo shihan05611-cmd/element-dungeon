@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="SkillDefinition" format=3]
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://eqabeqk2k1c3"]
 
-[ext_resource type="Script" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
-[ext_resource type="Script" path="res://combat/execution/ignition_execution.gd" id="2_execution"]
+[ext_resource type="Script" uid="uid://b2p5xuomj0hba" path="res://combat/definitions/skill_definition.gd" id="1_skill"]
+[ext_resource type="Script" uid="uid://dn1vchxkdowya" path="res://combat/execution/ignition_execution.gd" id="2_execution"]
 
 [sub_resource type="Resource" id="IgnitionExecution"]
 script = ExtResource("2_execution")

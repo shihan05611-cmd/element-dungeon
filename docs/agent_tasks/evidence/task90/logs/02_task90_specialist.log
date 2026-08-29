@@ -1,0 +1,12 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS local_hit_offset_follows_each_frame_without_moving_damage_number
+PASS left_right_and_multiple_targets_follow_independently
+PASS invalid_host_falls_back_and_tree_exit_freezes
+PASS released_host_freezes_then_keeps_original_lifetime
+PASS reduced_motion_still_anchors_while_static_and_boss_stay_stable
+PASS sixteen_cap_and_existing_dedupe_key_remain_bounded
+TASK 90 REACTION VISUAL FOLLOW TESTS PASSED: 6 tests, 28 assertions

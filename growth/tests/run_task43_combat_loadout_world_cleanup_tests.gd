@@ -154,7 +154,10 @@ func _test_combat_loadout_gate_and_formal_cleanup() -> void:
 	_expect(overlay.visible and overlay.formal_kind() == &"combat_loadout", "L opens the combat loadout page while enemies live")
 	_expect(overlay.formal_shop_draft_instance_id() == 0, "combat loadout creates no ShopDraft")
 	_expect(not coordinator.combat_loadout_available(), "live room keeps combat authority gate closed")
-	_expect(_visible_text(overlay).contains("清场后可调整"), "live page shows the short clear-gate copy")
+	_expect(
+		(overlay.formal_control(&"slot:active_1") as Button).disabled,
+		"live page shows the closed clear-gate through disabled slot buttons"
+	)
 	var commands: Array[StringName] = []
 	coordinator.ui_command_result.connect(func(command: StringName, _result: RunCommandResult) -> void: commands.append(command))
 	var live_before := _authority_signature(coordinator.current_snapshot())
@@ -186,7 +189,10 @@ func _test_combat_loadout_gate_and_formal_cleanup() -> void:
 	_expect(reinforcement_refs.is_empty(), "first room creates no reinforcement nodes")
 	_expect(room.room_is_cleared and room.chest.visible, "single wave reveals exactly one chest")
 	_expect(coordinator.combat_loadout_available(), "same room opens combat loadout authority only after true clear")
-	_expect(overlay.visible and _visible_text(overlay).contains("可点击或拖拽调整"), "same open page refreshes to the clear state")
+	_expect(
+		overlay.visible and not (overlay.formal_control(&"slot:active_1") as Button).disabled,
+		"same open page refreshes to the clear state"
+	)
 	_expect(_chest_bottom_is_grounded(room), "normal chest alpha-visible bottom matches the authored ground")
 	_expect(_all_refs_freed(initial_refs) and _all_refs_freed(reinforcement_refs), "grounded chest presentation does not depend on enemy corpse nodes")
 

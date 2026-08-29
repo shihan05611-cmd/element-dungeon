@@ -225,9 +225,9 @@ func _test_laser_authoritative_ticks_and_cleanup() -> void:
 	var laser := _find_laser()
 	_expect(
 		laser != null
-		and laser.get_child_count() == 5
+		and laser.get_child_count() == 0
 		and laser.visual_size() == Vector2(320.0, 24.0),
-		"Laser is five 64x24 segments and reports 320x24"
+		"Laser is a childless procedural presentation reporting 320x24"
 	)
 	_player.skill_executor.advance(0.49)
 	_expect(_coordinator.laser_tick_count == 0, "0.49 seconds has no visual Tick")

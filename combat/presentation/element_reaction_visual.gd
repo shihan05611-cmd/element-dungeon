@@ -15,6 +15,30 @@ var consumed_element_id: StringName = &""
 var strength_tier: int = 1
 var reduced_motion: bool = false
 var phase_order: PackedStringArray = PackedStringArray()
+var local_hit_offset: Vector2 = Vector2.ZERO
+
+var _target_ref: WeakRef
+var _following_target: bool = false
+
+
+func follow_target(target: Node2D, hit_offset: Vector2) -> void:
+	if target == null or not is_instance_valid(target) or target.is_queued_for_deletion() or not target.is_inside_tree():
+		return
+	local_hit_offset = hit_offset
+	_target_ref = weakref(target)
+	_following_target = true
+	global_position = target.to_global(local_hit_offset)
+
+
+func _process(_delta: float) -> void:
+	if not _following_target:
+		return
+	var target := _target_ref.get_ref() as Node2D if _target_ref != null else null
+	if target == null or not is_instance_valid(target) or target.is_queued_for_deletion() or not target.is_inside_tree():
+		_following_target = false
+		_target_ref = null
+		return
+	global_position = target.to_global(local_hit_offset)
 
 
 func configure(element_id: StringName, consumed_layers: int, motion_reduced: bool) -> void:

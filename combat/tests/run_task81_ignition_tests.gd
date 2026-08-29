@@ -39,6 +39,13 @@ func _test_catalog_and_default_active_2() -> void:
 	var skill := CATALOG.gameplay_for(&"ignition")
 	_expect(skill != null and skill.element_policy == SkillDefinition.ElementPolicy.EXCLUSIVE_ELEMENT and skill.required_element_id == ElementIds.FIRE, "ignition has fixed FIRE semantics")
 	_expect(skill != null and is_equal_approx(skill.cooldown, 8.0) and skill.energy_cost == 0, "ignition is an eight-second zero-SP active")
+	_expect(content != null and content.active_progression != null and content.active_progression.is_valid(), "ignition owns a valid active progression")
+	if content != null and content.active_progression != null:
+		var levels := content.active_progression.levels
+		_expect_eq(levels.size(), 3, "ignition has exactly three levels")
+		_expect(is_equal_approx(levels[0].damage_scale, 1.0) and is_equal_approx(levels[1].damage_scale, 1.2) and is_equal_approx(levels[2].damage_scale, 1.4), "ignition scales only the 5 percent per-layer increment")
+		_expect_eq(levels[1].upgrade_price, 60, "ignition Lv2 costs 60 dream dust")
+		_expect_eq(levels[2].upgrade_price, 100, "ignition Lv3 costs 100 dream dust")
 
 
 func _test_fire_transaction_is_atomic_and_preserves_water() -> void:
@@ -69,6 +76,16 @@ func _test_fire_transaction_is_atomic_and_preserves_water() -> void:
 	_expect_near(state.multiplier, 1.8, 0.0001, "aggregate multiplier is exactly 1 + 0.05*N")
 	_expect(received_events.size() == 1 and received_events[0].element_id == ElementIds.FIRE and received_events[0].target_positions.size() == 3, "commit publishes one reusable fire reclaim VFX event")
 	state.clear(&"test")
+	var level_three := ActiveSkillLevelEffectSnapshot.new(&"ignition", 3, 1.4)
+	_expect(state.activate_silent(20, level_three.damage_scale), "accepted Lv3 snapshot activates ignition")
+	_expect_near(state.multiplier, 2.4, 0.0001, "Lv3 twenty layers equal 1 + 20 x 0.05 x 1.4")
+	_expect_near(IgnitionState.multiplier_for(1, 1.4), 1.07, 0.0001, "Lv3 one layer adds seven percent")
+	_expect_near(IgnitionState.multiplier_for(5, 1.4), 1.35, 0.0001, "Lv3 five layers add thirty-five percent")
+	_expect_near(IgnitionState.multiplier_for(20, 1.4), 2.4, 0.0001, "Lv3 twenty layers add one hundred forty percent")
+	var later_level := ActiveSkillLevelEffectSnapshot.new(&"ignition", 1, 1.0)
+	_expect_near(state.multiplier, 2.4, 0.0001, "later level reset data cannot mutate the already accepted ignition")
+	_expect(later_level.level == 1, "snapshot fixture changes only the next release level")
+	state.clear(&"level_snapshot_test")
 	first.carrier.set_amounts_silent(2, 1)
 	second.carrier.set_amounts_silent(3, 5)
 	await physics_frame

@@ -20,7 +20,6 @@ const SKILL_STRIP_SIZE := Vector2(272, 64)
 const PASSIVE_STRIP_SIZE := Vector2(192, 42)
 const ACTIVE_SLOT_SIZE := Vector2(72, 48)
 const PASSIVE_SLOT_SIZE := Vector2(34, 34)
-const ROOM_TITLE_SIZE := Vector2(280, 32)
 # Task 12's hidden compatibility adapter retains full policy copy. Fusion
 # Pixel's 12px proportional Chinese/English metrics make its widest active
 # card 226px after a viewport relayout, so the historic 184px stride overlaps.
@@ -100,7 +99,6 @@ var _boss_health_value: Label
 var _boss_form_label: Label
 var _boss_counter_bar: ProgressBar
 var _boss_counter_label: Label
-var _room_title_label: Label
 
 
 func _enter_tree() -> void:
@@ -276,17 +274,6 @@ func slot_visible_fields(slot_id: StringName) -> Array[StringName]:
 		if control != null and control.is_visible_in_tree():
 			fields.append(entry[&"field"])
 	return fields
-
-
-## Task 72 §2 B3: public entry point so room instances push their title copy
-## into the HUD instead of owning a world-space Label of their own.
-func set_room_title(text: String) -> void:
-	if _room_title_label != null:
-		_room_title_label.text = text
-
-
-func room_title_label() -> Label:
-	return _room_title_label
 
 
 func has_visible_target_attachment_text() -> bool:
@@ -900,7 +887,6 @@ func _build_ui() -> void:
 	root_control.theme = COMBAT_HUD_THEME
 	add_child(root_control)
 	_build_status_panel(root_control)
-	_build_room_title(root_control)
 	_build_skill_panel(root_control)
 	_build_passive_panel(root_control)
 	_build_compatibility_slots(root_control)
@@ -921,8 +907,7 @@ func _build_ui() -> void:
 func _build_status_panel(parent: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "StatusPanel"
-	# Task 72 §2 B1: top-left safe-margin anchor. The room title now lives in
-	# its own HUD band directly below this capsule (see _build_room_title).
+	# Task 72 §2 B1: top-left safe-margin anchor.
 	panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	panel.position = Vector2(16, 16)
 	panel.size = STATUS_SIZE
@@ -950,23 +935,6 @@ func _build_status_panel(parent: Control) -> void:
 	low.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	low.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	status.add_child(low)
-
-
-## Task 72 §2 B3: the room title used to be a world-space Label owned by each
-## room scene, rendered through the static Camera2D (zoom 0.75) and therefore
-## blurry and inconsistently styled across rooms. It now lives directly in the
-## HUD's safe-margin grid, immediately below StatusPanel, so it renders at
-## integer pixel size and shares one style across every room.
-func _build_room_title(parent: Control) -> void:
-	var label := _make_label("RoomTitle", "", UI.FONT_TITLE, UI.TEXT)
-	label.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	label.position = Vector2(16, 100)
-	label.size = ROOM_TITLE_SIZE
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.clip_text = true
-	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	parent.add_child(label)
-	_room_title_label = label
 
 
 func _bar_row(row_name: String, caption: String, bar_name: String, value_name: String, fill: Color) -> HBoxContainer:

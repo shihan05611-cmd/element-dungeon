@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://147bp5lbfphl" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
 [ext_resource type="Script" uid="uid://kkg62e2wet7j" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
-[ext_resource type="PackedScene" path="res://scenes/run/rooms/room_arena_flat.tscn" id="3_template"]
+[ext_resource type="PackedScene" uid="uid://cj20uo7hx5wey" path="res://scenes/run/rooms/room_arena_flat.tscn" id="3_template"]
 [ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="4_enemy"]
 
 [sub_resource type="Resource" id="SpawnEntry"]
@@ -10,7 +10,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"entry_guard"
 local_position = Vector2(740, 469)
-maximum_health = 70
+maximum_health = 35
 dream_dust_reward = 20
 
 [sub_resource type="Resource" id="SpawnEntryB"]
@@ -18,7 +18,7 @@ script = ExtResource("2_spawn")
 enemy_scene = ExtResource("4_enemy")
 enemy_id = &"entry_guard_b"
 local_position = Vector2(1000, 584)
-maximum_health = 70
+maximum_health = 35
 
 [resource]
 script = ExtResource("1_room")

@@ -31,7 +31,7 @@ func _run() -> void:
 	_run_test("no_overlap_boss_hidden", _test_no_overlap_boss_hidden)
 	_run_test("no_overlap_boss_visible", _test_no_overlap_boss_visible)
 	_run_test("every_panel_keeps_16px_safe_margin", _test_safe_margin)
-	_run_test("room_title_readable_from_hud", _test_room_title_from_hud)
+	_run_test("room_progress_removed_from_hud", _test_room_progress_removed_from_hud)
 	_run_test("b5_passive_slot_downgrade", _test_b5_passive_downgrade)
 	_run_test("active_slot_values_unchanged", _test_active_slot_unchanged)
 
@@ -99,15 +99,11 @@ func _test_safe_margin() -> void:
 
 
 # ---------------------------------------------------------------------------
-# B3: the room title is now HUD-owned, reachable through a public accessor,
-# and the "%s · %s" formatting contract is preserved.
+# B3 replacement: the room-progress/title band below the status capsule has
+# been removed from the combat HUD.
 # ---------------------------------------------------------------------------
-func _test_room_title_from_hud() -> void:
-	var label := _hud.room_title_label()
-	_expect(label != null, "room_title_label() resolves a Label")
-	_hud.set_room_title("熔汐王门 · 占位 Boss")
-	_expect(label.text == "熔汐王门 · 占位 Boss", "set_room_title keeps the '%%s · %%s' format intact")
-	_expect(label.is_visible_in_tree(), "room title renders once set")
+func _test_room_progress_removed_from_hud() -> void:
+	_expect(_hud.get_node_or_null("Root/RoomTitle") == null, "HUD no longer builds the room progress/title band")
 
 
 # ---------------------------------------------------------------------------

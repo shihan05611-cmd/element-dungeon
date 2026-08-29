@@ -2,8 +2,8 @@ extends SceneTree
 
 ## Task 72 §5.3 (simplified per the amended acceptance flow): a single
 ## Boss-room verification screenshot for the HUD layout rework -- B1's
-## overlap fix, B3's room-title relocation into the HUD, and B5's passive
-## belt downgrade. Uses the real Boss room background and the real HUD
+## overlap fix and B5's passive belt downgrade. Uses the real Boss room
+## background and the real HUD
 ## builder (no mock nodes), populated with plausible Boss/status numbers
 ## directly through CombatHUD's own public surface, so the screenshot is
 ## purely about layout geometry -- it intentionally skips playing an entire
@@ -32,7 +32,6 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 
-	hud.set_room_title("熔汐王门 · 占位 Boss")
 	hud.boss_panel.visible = true
 	(hud.get_node("Root/BossPanel/Margin/Box/TitleRow/Name") as Label).text = "熔汐王座"
 	(hud.get_node("Root/BossPanel/Margin/Box/TitleRow/Form") as Label).text = "形态：熔炽"
@@ -55,7 +54,7 @@ func _run() -> void:
 	(hud.get_node("Root/StatusPanel/Margin/Status/EnergyRow/EnergyValue") as Label).text = "  42 / 60"
 
 	_expect(hud.boss_panel != null and hud.boss_panel.visible, "Boss panel is visible")
-	_expect(hud.room_title_label() != null and not hud.room_title_label().text.is_empty(), "room title is populated from the HUD")
+	_expect(hud.get_node_or_null("Root/RoomTitle") == null, "room progress/title band is absent from the HUD")
 	_expect(hud.status_panel != null and hud.status_panel.visible, "status panel is visible")
 	_expect(hud.passive_panel != null and hud.passive_panel.visible, "passive belt is visible")
 	_expect(hud.skill_panel != null and hud.skill_panel.visible, "skill belt is visible")

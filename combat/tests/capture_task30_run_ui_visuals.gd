@@ -663,15 +663,6 @@ func _assert_live_combat_geometry(file_name: String, size: Vector2i, enemy: Comb
 	_expect(_inside(enemy_rect, size), "%s keeps the enemy inside the viewport" % file_name)
 	_assert_rect_clear_of_hud(player_rect, "%s player" % file_name)
 	_assert_rect_clear_of_hud(enemy_rect, "%s enemy" % file_name)
-	if room != null:
-		# Task 72 §2 B3: the room title moved into the HUD (Root/RoomTitle);
-		# read it from there instead of the world-space room node.
-		var title := _hud.room_title_label()
-		_expect(title != null and title.is_visible_in_tree(), "%s keeps the room title/key geometry visible" % file_name)
-		if title != null:
-			var title_rect := _canvas_rect(title, Rect2(Vector2.ZERO, title.size))
-			_expect(_inside(title_rect, size), "%s room title is in bounds" % file_name)
-			_assert_rect_clear_of_hud(title_rect, "%s room title" % file_name)
 
 
 func _assert_damage_numbers_clear(file_name: String, size: Vector2i) -> void:

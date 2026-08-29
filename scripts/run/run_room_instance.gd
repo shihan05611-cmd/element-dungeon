@@ -127,16 +127,6 @@ func configure(definition: CombatRoomDefinition) -> bool:
 		return _fail(&"enemy_spawn_count_mismatch")
 	_reinforcement_activated = definition.final_boss
 	_create_interactables()
-	# Task 72 §2 B3: the room title now lives in the HUD (Root/RoomTitle),
-	# not as a world-space Label owned by this room scene. Look up the
-	# formal HUD by name rather than requiring a direct reference, since
-	# standalone room tests instantiate RunRoomInstance without any
-	# CombatHUD sibling and must keep configuring successfully.
-	var hud: CombatHUD = null
-	if is_inside_tree():
-		hud = get_tree().root.find_child("CombatHUD", true, false) as CombatHUD
-	if hud != null:
-		hud.set_room_title("%s · %s" % [definition.display_name, definition.template_label])
 	_configured = true
 	return true
 

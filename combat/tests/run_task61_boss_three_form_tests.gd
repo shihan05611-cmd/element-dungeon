@@ -5,6 +5,8 @@ extends SceneTree
 
 const BOSS_SCENE: PackedScene = preload("res://scenes/run/enemies/boss_tide_ember.tscn")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
+const VFX_SCENE: PackedScene = preload("res://scenes/vfx/skill_vfx_coordinator.tscn")
+const RUN_GAME_SCENE: PackedScene = preload("res://scenes/run/run_game.tscn")
 const BOSS_ROOM: CombatRoomDefinition = preload("res://resources/run/rooms/combat_06_final_boss.tres")
 const TestHarness := preload("res://combat/tests/test_harness.gd")
 
@@ -32,6 +34,7 @@ func _run() -> void:
 	await _run_test("melee_telegraph_waiting_to_active", _test_melee_telegraph_waiting_to_active)
 	await _run_test("ranged_telegraph_lock_and_count", _test_ranged_telegraph_lock_and_count)
 	await _run_test("summon_cap_and_death_cleanup", _test_summon_cap_and_death_cleanup)
+	await _run_test("run_coordinator_binds_summon_feedback", _test_run_coordinator_binds_summon_feedback)
 	await _run_test("death_flow_zero_dream_dust", _test_death_flow_zero_dream_dust)
 	await _run_test("damage_resolver_validation_branches", _test_damage_resolver_validation_branches)
 	_finish()
@@ -352,6 +355,19 @@ func _test_summon_cap_and_death_cleanup() -> void:
 	var ctx := await _make_boss(&"tide")
 	var boss: BossTideEmber = ctx[&"boss"]
 	var player: PlayerCharacter = ctx[&"player"]
+	var created_summons: Array[CombatEnemy] = []
+	boss.summon_created.connect(func(summon: CombatEnemy) -> void: created_summons.append(summon))
+	var feedback := CombatFeedback.new()
+	(ctx[&"world"] as Node).add_child(feedback)
+	var vfx := VFX_SCENE.instantiate() as SkillVfxCoordinator
+	(ctx[&"world"] as Node).add_child(vfx)
+	feedback.observe_receiver(boss.combat_receiver)
+	var initial_enemies: Array[CombatEnemy] = [boss]
+	_expect(vfx.set_enemies(initial_enemies), "Boss fixture binds its initial VFX target")
+	boss.summon_created.connect(func(summon: CombatEnemy) -> void:
+		feedback.observe_receiver(summon.combat_receiver)
+		vfx.add_enemy(summon)
+	)
 	# Task 71 C5 made summoning telegraphed: _start_summon() now only opens the
 	# warning window and the instantiate() happens when that window closes, so
 	# the cap has to be read AFTER the window has been driven to completion.
@@ -362,6 +378,19 @@ func _test_summon_cap_and_death_cleanup() -> void:
 	_expect(boss._alive_summon_count() <= boss.tide_form.summon_max_alive, "summon count never exceeds summon_max_alive after one cast")
 	var count_after_first := boss._alive_summon_count()
 	_expect(count_after_first > 0, "the first cast actually produced summons (guards this test against going vacuous)")
+	_expect_eq(created_summons.size(), count_after_first, "every instantiated summon is published for runtime feedback binding")
+	for summon: CombatEnemy in created_summons:
+		_expect_eq(summon.damage_receiver.maximum_health, 25, "Boss summon maximum health is reduced to 25")
+		_expect_eq(summon.damage_receiver.current_health, 25, "Boss summon starts at full 25 health")
+		_expect(bool(summon.get("_formal_run_spawn")), "Boss summon uses formal-run defeat cleanup")
+	var feedback_before := feedback.get_child_count()
+	var water_loops_before := vfx.unending_loop_count
+	var summon_hit := _hit(created_summons[0], ElementIds.WATER, 2, 5.0)
+	await process_frame
+	_expect(summon_hit.accepted, "registered Boss summon accepts a real elemental hit")
+	_expect_eq(created_summons[0].element_carrier.get_amount(ElementIds.WATER), 2, "Boss summon stores the attached water layers")
+	_expect(vfx.unending_loop_count == water_loops_before + 1, "Boss summon displays its water attachment VFX")
+	_expect(feedback.get_child_count() > feedback_before, "Boss summon displays a damage number")
 	boss._summon_cooldown_remaining = 0.0
 	boss._start_summon(boss.tide_form)
 	await _resolve_summon_window(boss)
@@ -373,11 +402,72 @@ func _test_summon_cap_and_death_cleanup() -> void:
 	var lethal := _hit(boss, ElementIds.WATER, 10, 99999.0)
 	_expect(boss.defeated, "boss is defeated by the lethal hit")
 	_expect_eq(boss._alive_summon_count(), count_after_first, "existing summons are left alone (not force-freed) when the boss dies")
+	var defeated_summon := created_summons[0]
+	var summon_lethal := _hit(defeated_summon, ElementIds.NONE, 0, 99999.0)
+	_expect(summon_lethal.accepted and defeated_summon.defeated, "Boss summon reaches defeated state through real damage")
+	_expect(not defeated_summon.prompt.visible, "formal Boss summon never shows the test-room R reset prompt")
+	var defeated_summon_ref: WeakRef = weakref(defeated_summon)
+	await process_frame
+	var defeated_summon_after: Variant = defeated_summon_ref.get_ref()
+	_expect(defeated_summon_after == null or (defeated_summon_after as Node).is_queued_for_deletion(), "defeated Boss summon schedules formal cleanup")
 	await _destroy(ctx)
 
 
 # ---------------------------------------------------------------------------
-# 16. Death flow: death_candidate reaches defeated state; the formal spawn
+# 16. The formal RunFlowCoordinator receives the Boss summon signal and
+#     incrementally binds damage numbers plus element-attachment VFX.
+# ---------------------------------------------------------------------------
+func _test_run_coordinator_binds_summon_feedback() -> void:
+	var game := RUN_GAME_SCENE.instantiate() as RunFlowCoordinator
+	root.add_child(game)
+	current_scene = game
+	var boot_frames := 0
+	while (game.active_room == null or not game.vfx.configured) and boot_frames < 300:
+		await process_frame
+		boot_frames += 1
+	_expect(game.active_room != null and game.vfx.configured, "formal RunGame boots before the summon binding probe")
+	if game.active_room == null or not game.vfx.configured:
+		game.queue_free()
+		await process_frame
+		return
+	for enemy: CombatEnemy in game.active_enemies:
+		enemy.ai_enabled = false
+
+	var boss := BOSS_SCENE.instantiate() as BossTideEmber
+	boss.starting_form_id = &"tide"
+	boss.ai_enabled = false
+	game.add_child(boss)
+	boss.player = game.player
+	for i in 3:
+		await physics_frame
+	var boss_targets: Array[CombatEnemy] = [boss]
+	game.call(&"_bind_persistent_feedback", boss_targets)
+	var water_loops_before := game.vfx.unending_loop_count
+	boss._resolve_summon(boss.tide_form)
+	await process_frame
+
+	var sentry: TidalSentry
+	for child: Node in game.get_children():
+		if child is TidalSentry:
+			sentry = child as TidalSentry
+			break
+	_expect(sentry != null, "formal coordinator observes a real Boss-created TidalSentry")
+	if sentry != null:
+		_expect_eq(sentry.damage_receiver.maximum_health, 25, "formal Boss summon has 25 maximum health")
+		var feedback_before := game.feedback.get_child_count()
+		var hit := _hit(sentry, ElementIds.WATER, 2, 5.0)
+		await process_frame
+		_expect(hit.accepted, "formal Boss summon accepts elemental damage")
+		_expect(game.vfx.unending_loop_count == water_loops_before + 1, "formal coordinator shows the summon water attachment VFX")
+		_expect(game.feedback.get_child_count() > feedback_before, "formal coordinator shows the summon damage number")
+		var lethal := _hit(sentry, ElementIds.NONE, 0, 99999.0)
+		_expect(lethal.accepted and not sentry.prompt.visible, "formal summon defeat suppresses the R reset prompt")
+	game.queue_free()
+	await process_frame
+
+
+# ---------------------------------------------------------------------------
+# 17. Death flow: death_candidate reaches defeated state; the formal spawn
 #     definition backing the real Boss room awards zero dream dust.
 # ---------------------------------------------------------------------------
 func _test_death_flow_zero_dream_dust() -> void:
@@ -397,7 +487,7 @@ func _test_death_flow_zero_dream_dust() -> void:
 
 
 # ---------------------------------------------------------------------------
-# 17. DamageResolver: every validation branch for the new mitigation_factor
+# 18. DamageResolver: every validation branch for the new mitigation_factor
 #     parameter, plus the pre-existing branches remain intact.
 # ---------------------------------------------------------------------------
 func _test_damage_resolver_validation_branches() -> void:
@@ -477,10 +567,10 @@ func _destroy(ctx: Dictionary) -> void:
 	await process_frame
 
 
-func _hit(boss: BossTideEmber, element_id: StringName, amount: int, offensive: float = 10.0) -> CombatResult:
+func _hit(enemy: CombatEnemy, element_id: StringName, amount: int, offensive: float = 10.0) -> CombatResult:
 	var cast := CastSnapshot.new(_next_hit_id(), &"task61_probe", 1, 1, &"player", ElementIds.NONE, CombatStatSnapshot.new())
 	var payload := RuntimeAttackPayload.new(offensive, offensive, element_id, amount)
-	return boss.combat_receiver.receive_hit(HitRequest.new(cast, payload, _next_hit_id(), 0, boss.global_position, Vector2.RIGHT))
+	return enemy.combat_receiver.receive_hit(HitRequest.new(cast, payload, _next_hit_id(), 0, enemy.global_position, Vector2.RIGHT))
 
 
 func _hit_n(boss: BossTideEmber, element_id: StringName, amount: int, count: int) -> void:
