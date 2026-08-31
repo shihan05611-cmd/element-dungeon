@@ -4,22 +4,29 @@ extends CanvasLayer
 const UI := preload("res://scripts/ui/combat_ui_tokens.gd")
 const RUN_OVERLAY_SCRIPT := preload("res://scripts/ui/run_overlay_interface.gd")
 const COMBAT_HUD_THEME: Theme = preload("res://resources/ui/combat_hud.theme")
+const ELEMENT_SKILL_ICON_RENDERER := preload("res://scripts/ui/element_skill_icon_renderer.gd")
 
 signal reduced_motion_changed(enabled: bool)
 signal colorblind_mode_changed(enabled: bool)
 
 const WARNING_RATE_LIMIT_MSEC := 450
 const SLOT_TRANSIENT_MSEC := 900
-## Two 172px bars plus the panel's 8px margins.  The status zone intentionally
-## contains survival information only; element state remains authoritative in
-## gameplay and is projected where it is still needed (skills and RunOverlay).
-const STATUS_SIZE := Vector2(188, 76)
-const SKILL_STRIP_SIZE := Vector2(272, 64)
-## Four 34px icon slots, three 8px gaps, 8px horizontal margin, and borders.
-## Keep a small integer-pixel buffer above the layout minimum.
-const PASSIVE_STRIP_SIZE := Vector2(192, 42)
-const ACTIVE_SLOT_SIZE := Vector2(72, 48)
-const PASSIVE_SLOT_SIZE := Vector2(34, 34)
+## Direct 4:1 crops from Task 79's approved status concepts.  The source
+## dimensions are 1056x348, so this fixed integer-pixel presentation is 264x87.
+const STATUS_SIZE := Vector2(264, 87)
+const STATUS_WATER_TEXTURE: Texture2D = preload("res://assets/ui/hud_status/status_hud_water.png")
+const STATUS_FIRE_TEXTURE: Texture2D = preload("res://assets/ui/hud_status/status_hud_fire.png")
+## Task95 presents the Task94 crop at the 1152x648 logical canvas size. The
+## frame is one continuous outer contour with exactly two internal dividers.
+const SKILL_STRIP_SIZE := Vector2(324, 85)
+const PASSIVE_STRIP_SIZE := Vector2(249, 70)
+const ACTIVE_SLOT_SIZE := Vector2(108, 85)
+const PASSIVE_SLOT_SIZE := Vector2(57, 58)
+const SKILL_FRAME_TEXTURE: Texture2D = preload("res://assets/ui/hud_skill/active_frame.png")
+const PASSIVE_FRAME_TEXTURE: Texture2D = preload("res://assets/ui/hud_skill/passive_frame.png")
+const PASSIVE_EMPTY_TEXTURE: Texture2D = preload("res://assets/ui/hud_skill/passive_empty_inset.png")
+const PASSIVE_LOCK_TEXTURE: Texture2D = preload("res://assets/ui/hud_skill/passive_lock.png")
+const PASSIVE_PULSE_TEXTURE: Texture2D = preload("res://assets/ui/hud_skill/passive_pulse_border.png")
 # Task 12's hidden compatibility adapter retains full policy copy. Fusion
 # Pixel's 12px proportional Chinese/English metrics make its widest active
 # card 226px after a viewport relayout, so the historic 184px stride overlaps.
@@ -57,6 +64,7 @@ var low_health: Label
 var energy_row: HBoxContainer
 var energy_bar: ProgressBar
 var energy_value: Label
+var _status_skin: TextureRect
 var phase_text: Label
 var warning_text: Label
 var debug_panel: PanelContainer
@@ -83,6 +91,8 @@ var _target_carrier: ElementCarrier
 var _slot_views: Dictionary = {}
 var _compat_slot_views: Dictionary = {}
 var _slot_transients: Dictionary = {}
+var _passive_lock_visual_fixtures: Dictionary = {}
+var _element_skill_icon_renderer = ELEMENT_SKILL_ICON_RENDERER.new()
 var _target_water: Label
 var _target_fire: Label
 var _target_panel: PanelContainer
@@ -226,6 +236,7 @@ func _process(delta: float) -> void:
 	if _player_executor != null:
 		_expire_slot_transients()
 		_refresh_cooldown_text_only()
+		_update_passive_pulse_visuals()
 
 
 func set_reduced_motion(enabled: bool) -> void:
@@ -255,6 +266,20 @@ func slot_panel(slot_id: StringName) -> PanelContainer:
 func visual_slot_panel(slot_id: StringName) -> PanelContainer:
 	var view: Dictionary = _slot_views.get(slot_id, {})
 	return view.get("panel") as PanelContainer
+
+
+## Task95 exposes the reusable lock appearance without inventing a gameplay
+## lock rule. This is intentionally fixture-only; normal loadout authority never
+## calls it and therefore never locks a passive slot.
+func set_passive_slot_locked_fixture(slot_id: StringName, locked: bool) -> void:
+	if not SkillSlotIds.is_passive(slot_id):
+		return
+	if locked:
+		_passive_lock_visual_fixtures[slot_id] = true
+	else:
+		_passive_lock_visual_fixtures.erase(slot_id)
+	if _player_skills != null:
+		_refresh_slot(slot_id)
 
 
 ## Stable semantic projection for HUD checks. Callers should use this instead
@@ -439,8 +464,10 @@ func _on_overlay_status_requested(message: String, tone: StringName) -> void:
 
 
 func _refresh_element(current_element_id: StringName, _animate: bool = true) -> void:
-	# The StatusPanel deliberately has no element projection.  Keep these
-	# dependent projections synchronized with the authoritative element state.
+	# The direct-crop status skin is the only element projection in StatusPanel.
+	# Geometry and the runtime HP/SP layers stay unchanged across this swap.
+	if _status_skin != null:
+		_status_skin.texture = STATUS_FIRE_TEXTURE if current_element_id == ElementIds.FIRE else STATUS_WATER_TEXTURE
 	if run_overlay != null:
 		run_overlay.set_current_element(current_element_id)
 	_refresh_skill_status()
@@ -497,6 +524,9 @@ func _refresh_slot_view(
 	var slot_label := view.get("slot") as Label
 	var cooldown_mask := view.get("cooldown_mask") as ColorRect
 	var cooldown_label := view.get("cooldown_label") as Label
+	var empty_inset := view.get("empty_inset") as TextureRect
+	var lock_icon := view.get("lock_icon") as TextureRect
+	var pulse_border := view.get("pulse_border") as TextureRect
 	if state != null:
 		state.visible = true
 	if slot_label != null:
@@ -505,6 +535,12 @@ func _refresh_slot_view(
 		cooldown_mask.visible = false
 	if cooldown_label != null:
 		cooldown_label.visible = false
+	if empty_inset != null:
+		empty_inset.visible = false
+	if lock_icon != null:
+		lock_icon.visible = false
+	if pulse_border != null:
+		pulse_border.visible = false
 	if skill == null:
 		icon.texture = null
 		_set_slot_icon_disabled(icon, true)
@@ -520,11 +556,22 @@ func _refresh_slot_view(
 		if meta != null:
 			meta.text = "共享槽位"
 		if key_panel != null:
-			key_panel.visible = false
+			key_panel.visible = not is_passive_slot
+		if key_label != null:
+			key_label.text = _key_for_slot(slot_id)
+		if empty_inset != null:
+			empty_inset.visible = not _passive_lock_visual_fixtures.has(slot_id)
+		if lock_icon != null:
+			lock_icon.visible = _passive_lock_visual_fixtures.has(slot_id)
 		(view["panel"] as Control).tooltip_text = "空槽"
 		return
 	var content := _catalog.content_for(skill.skill_id) if _catalog != null else null
-	icon.texture = content.icon if content != null else null
+	icon.texture = _icon_texture_for(skill, content, compact)
+	icon.texture_filter = (
+		CanvasItem.TEXTURE_FILTER_NEAREST
+		if compact and _element_skill_icon_renderer.supports(skill.skill_id)
+		else CanvasItem.TEXTURE_FILTER_PARENT_NODE
+	)
 	if name_label != null:
 		name_label.text = content.display_name if content != null else String(skill.skill_id)
 	if cost_label != null:
@@ -546,6 +593,8 @@ func _refresh_slot_view(
 		key_label.text = _key_for_slot(slot_id)
 	if not castable_here:
 		_set_slot_icon_disabled(icon, false)
+		if pulse_border != null:
+			pulse_border.visible = compact and not transient.is_empty()
 		if state != null and compact and not transient.is_empty():
 			state.text = String(transient.get("text", "触发"))
 			state.add_theme_color_override(&"font_color", _tone_color(StringName(transient.get("tone", &"passive"))))
@@ -572,14 +621,35 @@ func _refresh_slot_view(
 		state.visible = not state.text.is_empty()
 	if compact and remaining > 0.0 and cooldown_mask != null and cooldown_label != null:
 		var ratio := clampf(remaining / maxf(skill.cooldown, remaining), 0.0, 1.0)
+		var mask_height := icon.size.y * ratio
 		cooldown_mask.visible = true
-		cooldown_mask.position.y = (1.0 if is_passive_slot else 5.0) + 32.0 * (1.0 - ratio)
-		cooldown_mask.size = Vector2(30.0 if is_passive_slot else 32.0, 32.0 * ratio)
+		cooldown_mask.position = Vector2(icon.position.x, icon.position.y + icon.size.y - mask_height)
+		cooldown_mask.size = Vector2(icon.size.x, mask_height)
 		cooldown_label.visible = true
 		cooldown_label.text = _format_cooldown(remaining)
 	if meta != null:
 		var cooldown_text := " · CD %.1fs" % skill.cooldown if skill.cooldown > 0.0 else " · 无冷却"
 		meta.text = "能量 ≥%d%s" % [skill.energy_cost, cooldown_text]
+
+
+func _icon_texture_for(
+	skill: SkillDefinition,
+	content: SkillContentDefinition,
+	compact: bool
+) -> Texture2D:
+	if (
+		compact
+		and skill != null
+		and skill.element_policy == SkillDefinition.ElementPolicy.CURRENT_ELEMENT
+		and _player_element != null
+	):
+		var tinted := _element_skill_icon_renderer.texture_for(
+			skill.skill_id,
+			_player_element.current_element_id
+		)
+		if tinted != null:
+			return tinted
+	return content.icon if content != null else null
 
 
 func _is_element_mismatch(skill: SkillDefinition) -> bool:
@@ -679,6 +749,17 @@ func _expire_slot_transients() -> void:
 	for slot_id: StringName in expired:
 		_slot_transients.erase(slot_id)
 		_refresh_slot(slot_id)
+
+
+func _update_passive_pulse_visuals() -> void:
+	var wave := 0.62
+	if not reduced_motion:
+		wave = 0.52 + 0.18 * sin(float(Time.get_ticks_msec() % 600) / 600.0 * TAU)
+	for slot_id: StringName in SkillSlotIds.passive():
+		var view: Dictionary = _slot_views.get(slot_id, {})
+		var pulse := view.get("pulse_border") as TextureRect
+		if pulse != null and pulse.visible:
+			pulse.modulate = Color(1.0, 1.0, 1.0, wave)
 
 
 func _pulse_matching_passive(skill_id: StringName) -> void:
@@ -911,9 +992,18 @@ func _build_status_panel(parent: Control) -> void:
 	panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	panel.position = Vector2(16, 16)
 	panel.size = STATUS_SIZE
-	panel.theme_type_variation = &"HudPanel"
+	panel.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	parent.add_child(panel)
-	var margin := _margin("Margin", 8, 8)
+	var skin := TextureRect.new()
+	skin.name = "ElementSkin"
+	skin.texture = STATUS_WATER_TEXTURE
+	skin.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	skin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	skin.stretch_mode = TextureRect.STRETCH_KEEP
+	skin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(skin)
+	_status_skin = skin
+	var margin := _margin("Margin", 0, 0)
 	panel.add_child(margin)
 	var status := Control.new()
 	status.name = "Status"
@@ -921,17 +1011,17 @@ func _build_status_panel(parent: Control) -> void:
 	status.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(status)
 	var health := _bar_row("HealthRow", "HP", "HealthBar", "HealthValue", Color("dc4658"))
-	health.position = Vector2(0, 0)
-	health.size = Vector2(172, 26)
+	health.position = Vector2(53, 14)
+	health.size = Vector2(179, 25)
 	status.add_child(health)
 	var energy := _bar_row("EnergyRow", "SP", "EnergyBar", "EnergyValue", Color("289dcf"))
-	energy.position = Vector2(0, 30)
-	energy.size = Vector2(172, 26)
+	energy.position = Vector2(53, 48)
+	energy.size = Vector2(179, 25)
 	status.add_child(energy)
 	var low := _make_label("LowHealth", "!", UI.FONT_CAPTION, UI.ERROR)
 	low.visible = false
-	low.position = Vector2(18, 1)
-	low.size = Vector2(12, 22)
+	low.position = Vector2(40, 14)
+	low.size = Vector2(12, 25)
 	low.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	low.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	status.add_child(low)
@@ -942,11 +1032,13 @@ func _bar_row(row_name: String, caption: String, bar_name: String, value_name: S
 	row.name = row_name
 	row.add_theme_constant_override(&"separation", UI.GAP_SM)
 	var label := _make_label("Label", caption, UI.FONT_CAPTION, UI.TEXT_MUTED)
-	label.custom_minimum_size.x = 24
+	# HP/SP are part of the direct concept crop.  Retain the stable node but
+	# suppress its legacy draw so the caption cannot double-render.
+	label.visible = false
 	row.add_child(label)
 	var bar := ProgressBar.new()
 	bar.name = bar_name
-	bar.custom_minimum_size = Vector2(132, 18)
+	bar.custom_minimum_size = Vector2(179, 25)
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.show_percentage = false
 	bar.theme_type_variation = &"HudBarHealth" if bar_name == "HealthBar" else &"HudBarEnergy"
@@ -964,13 +1056,27 @@ func _build_skill_panel(parent: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "SkillPanel"
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.position = Vector2(-136, -80)
+	panel.position = Vector2(-162, -101)
 	panel.size = SKILL_STRIP_SIZE
+	panel.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	panel.theme_type_variation = &"HudPanelActive"
 	parent.add_child(panel)
-	# The active belt now contains only A1-A3; its compact height still leaves
-	# an integer-pixel border and stable center-bottom safe margin.
-	var margin := _margin("Margin", 10, 6)
+	var source_fill := ColorRect.new()
+	source_fill.name = "SourceFill"
+	# Exact clean interior sample from Task94 final at (1170, 980).
+	source_fill.color = Color8(13, 17, 23, 255)
+	source_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(source_fill)
+	var frame := TextureRect.new()
+	frame.name = "StaticFrame"
+	frame.texture = SKILL_FRAME_TEXTURE
+	frame.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	frame.stretch_mode = TextureRect.STRETCH_KEEP
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(frame)
+	# Node names remain stable for loadout, screenshot and accessibility callers.
+	var margin := _margin("Margin", 0, 0)
 	panel.add_child(margin)
 	var skills := VBoxContainer.new()
 	skills.name = "Skills"
@@ -979,7 +1085,7 @@ func _build_skill_panel(parent: Control) -> void:
 	var row := HBoxContainer.new()
 	row.name = "SlotRow"
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	row.add_theme_constant_override(&"separation", UI.GAP_SM)
+	row.add_theme_constant_override(&"separation", 0)
 	skills.add_child(row)
 	for slot_id: StringName in SkillSlotIds.active():
 		row.add_child(_build_compact_slot(slot_id))
@@ -988,25 +1094,38 @@ func _build_skill_panel(parent: Control) -> void:
 	skills.add_child(phase)
 
 
-## Task 72 §2 B1/§0.1.1: moved from the top-right corner (where it overlapped
-## BossPanel by 196px) down to just above SkillPanel, forming one "loadout"
-## band. Both strips share the same CENTER_BOTTOM anchor and are centered on
-## the same x (position.x == -size.x / 2 for each), so §5.2's "shared center
-## x" assertion holds structurally rather than by coincidence.
+## Task95 anchors the passive 4x1 strip to the lower-right with the exact
+## Task94 source margins: 51px from the logical right edge and 18px from the
+## logical bottom edge. It only grows leftward.
 func _build_passive_panel(parent: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "PassivePanel"
-	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.position = Vector2(-96, -130)
+	panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	panel.position = Vector2(-300, -88)
 	panel.size = PASSIVE_STRIP_SIZE
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	panel.theme_type_variation = &"HudPanelPassive"
 	parent.add_child(panel)
-	var margin := _margin("Margin", UI.GAP_XS, 2)
+	var source_fill := ColorRect.new()
+	source_fill.name = "SourceFill"
+	# Exact clean interior sample from Task94 final at (1800, 1018).
+	source_fill.color = Color8(16, 20, 28, 255)
+	source_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(source_fill)
+	var frame := TextureRect.new()
+	frame.name = "StaticFrame"
+	frame.texture = PASSIVE_FRAME_TEXTURE
+	frame.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	frame.stretch_mode = TextureRect.STRETCH_KEEP
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(frame)
+	var margin := _margin("Margin", 7, 6)
 	panel.add_child(margin)
 	var row := HBoxContainer.new()
 	row.name = "SlotRow"
-	row.add_theme_constant_override(&"separation", UI.GAP_SM)
+	row.add_theme_constant_override(&"separation", 2)
 	margin.add_child(row)
 	for slot_id: StringName in SkillSlotIds.passive():
 		row.add_child(_build_compact_slot(slot_id))
@@ -1018,18 +1137,20 @@ func _build_compact_slot(slot_id: StringName) -> PanelContainer:
 	panel.name = String(slot_id)
 	panel.custom_minimum_size = PASSIVE_SLOT_SIZE if passive else ACTIVE_SLOT_SIZE
 	panel.theme_type_variation = &"HudPanelPassiveSlot" if passive else &"HudPanelSlot"
-	var margin := _margin("Margin", 0 if passive else 2, 0 if passive else 2)
+	panel.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
+	var margin := _margin("Margin", 0, 0)
 	panel.add_child(margin)
 	var body := Control.new()
 	body.name = "Body"
-	body.custom_minimum_size = Vector2(32 if passive else 66, 32 if passive else 42)
+	body.custom_minimum_size = PASSIVE_SLOT_SIZE if passive else ACTIVE_SLOT_SIZE
 	margin.add_child(body)
 	var icon := TextureRect.new()
 	icon.name = "Icon"
-	icon.position = Vector2(1 if passive else 2, 1 if passive else 5)
-	icon.size = Vector2(30 if passive else 32, 30 if passive else 32)
+	icon.position = Vector2(12, 11) if passive else Vector2(30, 22)
+	icon.size = Vector2(34, 34) if passive else Vector2(48, 48)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	icon.material = _make_slot_icon_material()
 	body.add_child(icon)
 	var cooldown_mask := ColorRect.new()
@@ -1053,20 +1174,58 @@ func _build_compact_slot(slot_id: StringName) -> PanelContainer:
 		"cooldown_mask": cooldown_mask,
 		"cooldown_label": cooldown_label,
 	}
-	if not passive:
+	if passive:
+		var empty_inset := TextureRect.new()
+		empty_inset.name = "EmptyInset"
+		empty_inset.position = Vector2(8, 7)
+		empty_inset.size = Vector2(42, 44)
+		empty_inset.texture = PASSIVE_EMPTY_TEXTURE
+		empty_inset.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		empty_inset.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		empty_inset.stretch_mode = TextureRect.STRETCH_KEEP
+		empty_inset.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		empty_inset.visible = false
+		body.add_child(empty_inset)
+		var lock_icon := TextureRect.new()
+		lock_icon.name = "LockFixture"
+		lock_icon.position = Vector2(17, 14)
+		lock_icon.size = Vector2(24, 30)
+		lock_icon.texture = PASSIVE_LOCK_TEXTURE
+		lock_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		lock_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		lock_icon.stretch_mode = TextureRect.STRETCH_KEEP
+		lock_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lock_icon.visible = false
+		body.add_child(lock_icon)
+		var pulse_border := TextureRect.new()
+		pulse_border.name = "PulseBorder"
+		pulse_border.position = Vector2.ZERO
+		pulse_border.size = PASSIVE_SLOT_SIZE
+		pulse_border.texture = PASSIVE_PULSE_TEXTURE
+		pulse_border.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		pulse_border.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		pulse_border.stretch_mode = TextureRect.STRETCH_KEEP
+		pulse_border.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		pulse_border.visible = false
+		body.add_child(pulse_border)
+		view["empty_inset"] = empty_inset
+		view["lock_icon"] = lock_icon
+		view["pulse_border"] = pulse_border
+	else:
 		var key_panel := PanelContainer.new()
 		key_panel.name = "Key"
-		key_panel.position = Vector2(0, 0)
-		key_panel.size = Vector2(20, 18)
+		key_panel.position = Vector2(11, 8)
+		key_panel.size = Vector2(23, 26)
 		key_panel.theme_type_variation = &"HudPanelKey"
+		key_panel.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 		body.add_child(key_panel)
 		var key := _make_label("Text", _key_for_slot(slot_id), UI.FONT_CAPTION, UI.TEXT)
 		key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		key.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		key_panel.add_child(key)
 		var cost := _make_label("Cost", "", UI.FONT_CAPTION, UI.WATER)
-		cost.position = Vector2(36, 29)
-		cost.size = Vector2(28, 12)
+		cost.position = Vector2(53, 64)
+		cost.size = Vector2(49, 16)
 		cost.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		body.add_child(cost)
 		view["key_panel"] = key_panel

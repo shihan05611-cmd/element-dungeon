@@ -77,7 +77,7 @@ func _test_formal_four_slot_hud_and_icons() -> void:
 	var ignition_icon := ignition_panel.get_node("Margin/Body/Icon") as TextureRect
 	var ignition_material := ignition_icon.material as ShaderMaterial
 	_expect(ignition_icon.texture != null and ignition_icon.texture.resource_path == "res://assets/generated/vfx/ignition/icon.png", "real HUD consumes the unique ignition icon")
-	_expect(ignition_icon.size == Vector2(32, 32), "ignition icon keeps the real 32x32 active-slot display size")
+	_expect(ignition_icon.size == Vector2(48, 48), "ignition icon uses the Task95 48x48 active-slot display size")
 	_expect(is_equal_approx(float(ignition_material.get_shader_parameter(&"disabled")), 1.0), "water-form mismatch renders ignition through the disabled grayscale state")
 	_expect((active_one.get_node("Margin/Box/Top/Key") as Control).visible, "equipped active skill shows keycap")
 	_expect(not (_hud.slot_panel(SkillSlotIds.PASSIVE_1).get_node("Margin/Box/Top/Key") as Control).visible, "PASSIVE_1 never shows a cast keycap")
@@ -162,8 +162,19 @@ func _test_cast_attempts_do_not_project_feedback() -> void:
 func _test_element_switches_do_not_project_feedback() -> void:
 	_player.skill_executor.advance(2.0)
 	_hud.call("_hide_feedback")
+	var bolt_panel := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_1)
+	var bolt_icon := bolt_panel.get_node("Margin/Body/Icon") as TextureRect
+	var water_bolt_texture := bolt_icon.texture
+	_expect(
+		water_bolt_texture != null and water_bolt_texture.get_size() == Vector2(16, 16),
+		"water form draws the compact procedural element-bolt icon"
+	)
 	var manual := _player.request_element(ElementIds.FIRE)
 	_expect(manual.accepted and manual.changed, "manual switch commits")
+	_expect(
+		bolt_icon.texture != null and bolt_icon.texture != water_bolt_texture,
+		"fire form swaps the element-bolt icon to its fire palette"
+	)
 	_expect(not (_hud.get_node("Root/FeedbackPanel") as Control).visible, "manual switch does not show FeedbackPanel")
 	var ignition_panel := _hud.visual_slot_panel(SkillSlotIds.ACTIVE_2)
 	var ignition_icon := ignition_panel.get_node("Margin/Body/Icon") as TextureRect
@@ -184,6 +195,7 @@ func _test_element_switches_do_not_project_feedback() -> void:
 	_player.skill_executor.advance(2.0)
 	var back_to_water := _player.request_element(ElementIds.WATER)
 	_expect(back_to_water.accepted and back_to_water.changed, "manual switch returns to water before exclusive cast")
+	_expect(bolt_icon.texture == water_bolt_texture, "returning to water restores the cached water icon")
 	_expect(not (_hud.get_node("Root/FeedbackPanel") as Control).visible, "second manual switch still does not show FeedbackPanel")
 	_enemy.element_carrier.set_amounts_silent(0, 3)
 	feedback_text = _hud.feedback_text()

@@ -1,0 +1,23 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS font_import_keeps_pixel_edges
+PASS pixel_type_scale_is_tokenized
+PASS static_hud_panels_use_theme_variations
+PASS task72_and_task74_geometry_is_preserved
+TASK73 COMPAT (1152, 648) active_1 rect=[P: (208.0, 526.0), S: (160.0, 131.0)] minimum=(226.0, 93.0)
+TASK73 COMPAT (1152, 648) active_2 rect=[P: (448.0, 526.0), S: (160.0, 131.0)] minimum=(213.0, 93.0)
+TASK73 COMPAT (1152, 648) active_3 rect=[P: (688.0, 526.0), S: (160.0, 131.0)] minimum=(160.0, 112.0)
+TASK73 COMPAT (1152, 648) passive_1 rect=[P: (928.0, 526.0), S: (160.0, 131.0)] minimum=(160.0, 106.0)
+TASK73 COMPAT (900, 540) active_1 rect=[P: (208.0, 569.0), S: (226.0, 131.0)] minimum=(226.0, 93.0)
+TASK73 COMPAT (900, 540) active_2 rect=[P: (448.0, 569.0), S: (213.0, 131.0)] minimum=(213.0, 93.0)
+TASK73 COMPAT (900, 540) active_3 rect=[P: (688.0, 569.0), S: (160.0, 131.0)] minimum=(160.0, 112.0)
+TASK73 COMPAT (900, 540) passive_1 rect=[P: (928.0, 569.0), S: (160.0, 131.0)] minimum=(160.0, 106.0)
+TASK73 COMPAT (1280, 720) active_1 rect=[P: (208.0, 526.0), S: (226.0, 131.0)] minimum=(226.0, 93.0)
+TASK73 COMPAT (1280, 720) active_2 rect=[P: (448.0, 526.0), S: (213.0, 131.0)] minimum=(213.0, 93.0)
+TASK73 COMPAT (1280, 720) active_3 rect=[P: (688.0, 526.0), S: (160.0, 131.0)] minimum=(160.0, 112.0)
+TASK73 COMPAT (1280, 720) passive_1 rect=[P: (928.0, 526.0), S: (160.0, 131.0)] minimum=(160.0, 106.0)
+PASS task12_compatibility_slots_keep_order_after_font_change
+TASK 73 PIXEL FONT AND HUD THEME TESTS PASSED: 5 tests, 41 assertions

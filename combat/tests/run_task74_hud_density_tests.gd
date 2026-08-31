@@ -43,7 +43,7 @@ func _run() -> void:
 func _test_slot_density() -> void:
 	for slot_id: StringName in SkillSlotIds.passive():
 		var slot := _hud.visual_slot_panel(slot_id)
-		_expect(slot.custom_minimum_size.x * slot.custom_minimum_size.y <= 1210.0, "%s area is <= 1210 px²" % String(slot_id))
+		_expect(slot.custom_minimum_size == CombatHUD.PASSIVE_SLOT_SIZE, "%s uses the exact Task95 passive source footprint" % String(slot_id))
 		_expect(_hud.slot_visible_fields(slot_id) == [&"icon"], "%s is icon-only" % String(slot_id))
 	for slot_id: StringName in SkillSlotIds.active():
 		var fields := _hud.slot_visible_fields(slot_id)

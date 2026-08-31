@@ -1,0 +1,12 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS layout_anchor_and_safe_margin_matrix
+PASS single_active_frame_and_seven_slots
+PASS dynamic_key_cost_and_empty_active
+PASS bottom_anchored_cooldown_and_disabled_grayscale
+PASS passive_empty_lock_equipped_and_pulse
+PASS h_visibility_and_compatibility_contract
+TASK 95 SKILL HUD TESTS PASSED: 6 tests, 68 assertions

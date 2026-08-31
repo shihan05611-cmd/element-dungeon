@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CombatRoomDefinition" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="CombatRoomDefinition" format=3 uid="uid://dlnn5oac2ysah"]
 
-[ext_resource type="Script" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
-[ext_resource type="Script" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
-[ext_resource type="PackedScene" path="res://scenes/run/rooms/room_arena_flat.tscn" id="3_template"]
+[ext_resource type="Script" uid="uid://147bp5lbfphl" path="res://growth/flow/combat_room_definition.gd" id="1_room"]
+[ext_resource type="Script" uid="uid://kkg62e2wet7j" path="res://growth/flow/enemy_spawn_definition.gd" id="2_spawn"]
+[ext_resource type="PackedScene" uid="uid://cj20uo7hx5wey" path="res://scenes/run/rooms/room_arena_flat.tscn" id="3_template"]
 [ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="4_enemy"]
 
 [sub_resource type="Resource" id="SpawnStable"]
@@ -21,7 +21,6 @@ enemy_id = &"stable_guard_b"
 local_position = Vector2(690, 494)
 maximum_health = 65
 defense_flat = 1.0
-dream_dust_reward = 0
 
 [sub_resource type="Resource" id="SpawnStableC"]
 script = ExtResource("2_spawn")
@@ -30,7 +29,6 @@ enemy_id = &"stable_guard_c"
 local_position = Vector2(940, 494)
 maximum_health = 65
 defense_flat = 1.0
-dream_dust_reward = 0
 
 [sub_resource type="Resource" id="ReinforcementStableA"]
 script = ExtResource("2_spawn")
@@ -38,7 +36,6 @@ enemy_scene = ExtResource("4_enemy")
 enemy_id = &"stable_reinforcement_a"
 local_position = Vector2(620, 494)
 maximum_health = 50
-dream_dust_reward = 0
 
 [sub_resource type="Resource" id="ReinforcementStableB"]
 script = ExtResource("2_spawn")
@@ -46,7 +43,6 @@ enemy_scene = ExtResource("4_enemy")
 enemy_id = &"stable_reinforcement_b"
 local_position = Vector2(1000, 494)
 maximum_health = 50
-dream_dust_reward = 0
 
 [resource]
 script = ExtResource("1_room")
@@ -58,5 +54,4 @@ environment_label = "开阔平地"
 room_scene = ExtResource("3_template")
 enemy_spawns = Array[ExtResource("2_spawn")]([SubResource("SpawnStable"), SubResource("SpawnStableB"), SubResource("SpawnStableC")])
 reinforcement_spawns = Array[ExtResource("2_spawn")]([SubResource("ReinforcementStableA"), SubResource("ReinforcementStableB")])
-reinforcement_delay_seconds = 12.0
 completion_dream_dust = 100

@@ -49,16 +49,19 @@ func _test_type_scale() -> void:
 func _test_theme_variations() -> void:
 	_expect(_hud.get_node("Root").theme == THEME, "HUD root owns the shared Theme resource")
 	for entry: Dictionary in [
-		{"path": "Root/StatusPanel", "variation": &"HudPanel"},
-		{"path": "Root/SkillPanel", "variation": &"HudPanelActive"},
-		{"path": "Root/PassivePanel", "variation": &"HudPanelPassive"},
-		{"path": "Root/BossPanel", "variation": &"HudPanelBoss"},
-		{"path": "Root/SkillPanel/Margin/Skills/SlotRow/active_1", "variation": &"HudPanelSlot"},
-		{"path": "Root/PassivePanel/Margin/SlotRow/passive_1", "variation": &"HudPanelPassiveSlot"},
+		{"path": "Root/StatusPanel", "variation": &"", "extracted": true},
+		{"path": "Root/SkillPanel", "variation": &"HudPanelActive", "extracted": true},
+		{"path": "Root/PassivePanel", "variation": &"HudPanelPassive", "extracted": true},
+		{"path": "Root/BossPanel", "variation": &"HudPanelBoss", "extracted": false},
+		{"path": "Root/SkillPanel/Margin/Skills/SlotRow/active_1", "variation": &"HudPanelSlot", "extracted": true},
+		{"path": "Root/PassivePanel/Margin/SlotRow/passive_1", "variation": &"HudPanelPassiveSlot", "extracted": true},
 	]:
 		var panel := _hud.get_node(entry.path) as PanelContainer
 		_expect(panel.theme_type_variation == entry.variation, "%s uses %s" % [entry.path, String(entry.variation)])
-		_expect(not panel.has_theme_stylebox_override(&"panel"), "%s has no static runtime panel override" % entry.path)
+		if entry.extracted:
+			_expect(panel.has_theme_stylebox_override(&"panel") and panel.get_theme_stylebox(&"panel") is StyleBoxEmpty, "%s delegates drawing to its approved extracted texture" % entry.path)
+		else:
+			_expect(not panel.has_theme_stylebox_override(&"panel"), "%s keeps its theme-owned panel" % entry.path)
 	for variation: StringName in [&"HudPanel", &"HudPanelEmphasis", &"HudPanelBoss", &"HudPanelSlot", &"HudPanelPassiveSlot", &"HudPanelKey"]:
 		var style := THEME.get_stylebox(&"panel", variation) as StyleBoxFlat
 		_expect(style != null and style.corner_radius_top_left == 0 and style.corner_radius_top_right == 0 and style.corner_radius_bottom_left == 0 and style.corner_radius_bottom_right == 0, "%s is an integer hard-corner pixel panel" % String(variation))

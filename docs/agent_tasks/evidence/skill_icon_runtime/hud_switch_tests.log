@@ -1,0 +1,29 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+SCRIPT ERROR: Parse Error: Cannot find member "TEXTURE_FILTER_INHERIT" in base "CanvasItem".
+   at: GDScript::reload (res://scripts/combat_hud.gd:537)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://scripts/enemy.gd:0)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://scripts/player.gd:0)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://scripts/test_room.gd:0)
+ERROR: Failed to load script "res://scripts/test_room.gd" with error "Compilation failed".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+SCRIPT ERROR: Trying to assign value of type 'CanvasLayer' to a variable of type 'combat_hud.gd'.
+   at: @implicit_ready (res://scripts/test_room.gd:13)
+   GDScript backtrace (most recent call first):
+       [0] @implicit_ready (res://scripts/test_room.gd:13)
+       [1] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:26)
+SCRIPT ERROR: Invalid call. Nonexistent function 'configure' in base 'Nil'.
+   at: _ready (res://scripts/test_room.gd:20)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://scripts/test_room.gd:20)
+       [1] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:26)
+SCRIPT ERROR: Invalid access to property or key 'run_overlay' on a base object of type 'Nil'.
+   at: _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:35)
+   GDScript backtrace (most recent call first):
+       [0] _run (res://combat/tests/run_hud_loadout_feedback_tests.gd:35)

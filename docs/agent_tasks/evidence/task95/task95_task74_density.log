@@ -1,0 +1,14 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+[godot_ai game_helper] registered mcp capture (debugger active=false, logger=true)
+PASS disabled_icons_keep_non_hue_cues
+PASS status_panel_is_hp_sp_only
+PASS status_is_stable_across_element_change_and_low_health
+PASS upgrade_refreshes_hover_level
+TASK 74 HUD DENSITY TESTS FAILED: 4/5 tests, 29 assertions
+  - icon_only_passives_and_compact_actives: passive_1 area is <= 1210 px²
+  - icon_only_passives_and_compact_actives: passive_2 area is <= 1210 px²
+  - icon_only_passives_and_compact_actives: passive_3 area is <= 1210 px²
+  - icon_only_passives_and_compact_actives: passive_4 area is <= 1210 px²

@@ -119,26 +119,26 @@ func _test_b5_passive_downgrade() -> void:
 		CombatHUD.PASSIVE_STRIP_SIZE.x <= CombatHUD.SKILL_STRIP_SIZE.x * 0.85 + 0.01,
 		"criterion 2: passive strip width (%s) <= 85%% of skill strip width (%s)" % [CombatHUD.PASSIVE_STRIP_SIZE.x, CombatHUD.SKILL_STRIP_SIZE.x]
 	)
-	var passive_center := _hud.passive_panel.get_global_rect().get_center().x
-	var skill_center := _hud.skill_panel.get_global_rect().get_center().x
-	_expect(absf(passive_center - skill_center) <= 0.5, "criterion 3: passive/skill strips share center x (%.2f vs %.2f)" % [passive_center, skill_center])
+	var passive_rect := _hud.passive_panel.get_global_rect()
+	_expect(absf(CANVAS_SIZE.x - passive_rect.end.x - 51.0) <= 0.5, "criterion 3a: passive strip keeps Task95's fixed 51px right margin")
+	_expect(absf(CANVAS_SIZE.y - passive_rect.end.y - 18.0) <= 0.5, "criterion 3b: passive strip keeps Task95's fixed 18px bottom margin")
 	for slot_id: StringName in SkillSlotIds.passive():
 		var panel := _hud.visual_slot_panel(slot_id)
-		_expect(panel.custom_minimum_size.x * panel.custom_minimum_size.y <= 1210.0, "criterion 4: %s is an icon-only compact slot" % String(slot_id))
+		_expect(panel.custom_minimum_size == CombatHUD.PASSIVE_SLOT_SIZE, "criterion 4: %s uses the exact Task95 passive source footprint" % String(slot_id))
 
 
 # ---------------------------------------------------------------------------
-# §4 guardrail: this task must never touch the active slot's own geometry.
+# Task95 intentional active source geometry: exact one-third shares of 324x85.
 # ---------------------------------------------------------------------------
 func _test_active_slot_unchanged() -> void:
-	_expect(CombatHUD.ACTIVE_SLOT_SIZE.x < 132.0 and CombatHUD.ACTIVE_SLOT_SIZE.y <= 54.0, "ACTIVE_SLOT_SIZE is reduced after copy removal")
+	_expect(CombatHUD.ACTIVE_SLOT_SIZE == Vector2(108, 85), "ACTIVE_SLOT_SIZE is the exact Task95 frame division")
 	for slot_id: StringName in SkillSlotIds.active():
 		var panel := _hud.visual_slot_panel(slot_id)
 		_expect(panel.custom_minimum_size == CombatHUD.ACTIVE_SLOT_SIZE, "%s uses the shared reduced active size" % String(slot_id))
 		var body := panel.get_node("Margin/Body") as Control
-		_expect(body.custom_minimum_size == Vector2(66, 42), "%s Body uses the compact active footprint" % String(slot_id))
+		_expect(body.custom_minimum_size == CombatHUD.ACTIVE_SLOT_SIZE, "%s Body uses the Task95 active footprint" % String(slot_id))
 		var icon := body.get_node("Icon") as Control
-		_expect(icon.size == Vector2(32, 32), "%s Icon size stays (32, 32)" % String(slot_id))
+		_expect(icon.size == Vector2(48, 48), "%s Icon uses the Task95 readable 48px footprint" % String(slot_id))
 		var fields := _hud.slot_visible_fields(slot_id)
 		_expect(fields.has(&"icon") and fields.has(&"key") and fields.has(&"cost"), "%s retains the compact active affordances" % String(slot_id))
 
