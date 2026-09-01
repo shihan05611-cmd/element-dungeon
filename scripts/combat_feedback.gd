@@ -3,6 +3,7 @@ extends Node2D
 
 const UI := preload("res://scripts/ui/combat_ui_tokens.gd")
 const REACTION_VISUAL_SCENE: PackedScene = preload("res://combat/presentation/element_reaction_visual.tscn")
+const PIXEL_FONT: Font = preload("res://assets/ui/fonts/fusion_pixel_12px/fusion-pixel-12px-proportional-zh_hans.otf")
 
 signal result_observed(result: CombatResult, receiver: CombatReceiver)
 
@@ -89,6 +90,7 @@ func _spawn_damage_number(result: CombatResult, receiver: CombatReceiver) -> voi
 	number.add_theme_constant_override(&"outline_size", 5)
 	number.add_theme_color_override(&"font_outline_color", Color("10131c"))
 	number.add_theme_color_override(&"font_color", _color_for_result(result, targets_player))
+	number.add_theme_font_override(&"font", PIXEL_FONT)
 	number.add_theme_font_size_override(&"font_size", 28 if result.reaction_triggered else 22)
 	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	number.text = "-%d" % result.final_damage if targets_player else str(result.final_damage)
@@ -100,6 +102,7 @@ func _spawn_damage_number(result: CombatResult, receiver: CombatReceiver) -> voi
 		cue.add_theme_constant_override(&"outline_size", 4)
 		cue.add_theme_color_override(&"font_outline_color", Color("10131c"))
 		cue.add_theme_color_override(&"font_color", UI.WARNING)
+		cue.add_theme_font_override(&"font", PIXEL_FONT)
 		cue.add_theme_font_size_override(&"font_size", 16)
 		cue.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cue.text = "反应"
